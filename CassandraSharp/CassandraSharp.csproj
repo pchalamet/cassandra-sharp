@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C1D252B7-D766-4C28-9C46-0696F896846C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CassandraSharp</RootNamespace>
+    <AssemblyName>CassandraSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\cassandra-sharp-version.cs">
+      <Link>Properties\cassandra-sharp-version.cs</Link>
+    </Compile>
+    <Compile Include="Model\LongNameOrValue.cs" />
+    <Compile Include="INameOrValue.cs" />
+    <Compile Include="Model\NameOrValueBase.cs" />
+    <Compile Include="Model\ByteArrayNameOrValue.cs" />
+    <Compile Include="Model\IntNameOrValue.cs" />
+    <Compile Include="Model\TimeUuidNameOrValue.cs" />
+    <Compile Include="Model\Utf8NameOrValue.cs" />
+    <Compile Include="Cluster.cs" />
+    <Compile Include="CommandExtensions.cs" />
+    <Compile Include="ClusterManager.cs" />
+    <Compile Include="ClusterExtensions.cs" />
+    <Compile Include="Commands\ColumnFamily.cs" />
+    <Compile Include="Commands\Cql.cs" />
+    <Compile Include="Commands\SystemManagement.cs" />
+    <Compile Include="Config\Behavior.cs" />
+    <Compile Include="Config\CassandraSharpConfig.cs" />
+    <Compile Include="Config\ClusterConfig.cs" />
+    <Compile Include="Config\EndpointStrategy.cs" />
+    <Compile Include="Config\EndpointsConfig.cs" />
+    <Compile Include="Commands\Describe.cs" />
+    <Compile Include="Config\PoolType.cs" />
+    <Compile Include="Config\SnitchType.cs" />
+    <Compile Include="Utils\DisposableExtensions.cs" />
+    <Compile Include="EndpointStrategy\Endpoint.cs" />
+    <Compile Include="Commands\IExecutionContext.cs" />
+    <Compile Include="Factory\PoolConfigExtensions.cs" />
+    <Compile Include="Factory\SnitchTypeExtensions.cs" />
+    <Compile Include="Factory\EndpointsConfigExtensions.cs" />
+    <Compile Include="Factory\TransportConfigExtensions.cs" />
+    <Compile Include="Utils\GuidGenerator.cs" />
+    <Compile Include="Utils\GuidVersion.cs" />
+    <Compile Include="Utils\NetworkFinder.cs" />
+    <Compile Include="EndpointStrategy\NearestEndpointStrategy.cs" />
+    <Compile Include="Pool\ConcurrentBagPool.cs" />
+    <Compile Include="Pool\VoidPool.cs" />
+    <Compile Include="SectionHandler.cs" />
+    <Compile Include="Config\TransportConfig.cs" />
+    <Compile Include="Config\XmlConfigurator.cs" />
+    <Compile Include="Pool\StackPool.cs" />
+    <Compile Include="IConnection.cs" />
+    <Compile Include="Pool\IPool.cs" />
+    <Compile Include="EndpointStrategy\IEndpointStrategy.cs" />
+    <Compile Include="EndpointStrategy\RandomEndpointStrategy.cs" />
+    <Compile Include="ICluster.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Snitch\ISnitch.cs" />
+    <Compile Include="Snitch\RackInferringSnitch.cs" />
+    <Compile Include="Snitch\SimpleSnitch.cs" />
+    <Compile Include="Timestamp.cs" />
+    <Compile Include="Transport\BufferedTransportFactory.cs" />
+    <Compile Include="Transport\FramedTransportFactory.cs" />
+    <Compile Include="Transport\ITransportFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
+      <Project>{984A4B04-C71A-4550-9193-817CFACBA30A}</Project>
+      <Name>Apache.Cassandra</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Thrift\Thrift.csproj">
+      <Project>{81DA65BC-9ACD-4271-9ED0-84A3B3A1FB7A}</Project>
+      <Name>Thrift</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
