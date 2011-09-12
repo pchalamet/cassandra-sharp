@@ -47,7 +47,7 @@
 			<ZipFiles Include="OutDir\**\*.*" />
         </ItemGroup>
 	
-		<Zip ZipFileName="cassandra-sharp-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
+		<Zip ZipFileName="cassandra-sharp-bin-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
 	</Target>
 	
 	<Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">		
