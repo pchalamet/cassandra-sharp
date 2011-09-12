@@ -18,7 +18,7 @@
 		<ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
 		<ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
 		<KeyFile>cassandra-sharp.snk</KeyFile>
-		<cassandra-sharpAssembly>OutDir/$(Configuration)/cassandra-sharp.dll</cassandra-sharpAssembly>
+		<cassandra-sharpAssembly>OutDir\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
 	</PropertyGroup>
 		
 	<Target Name="Compile">
@@ -26,22 +26,31 @@
 	</Target>
 	
 	<Target Name="CreateOutDirs">
-		<RemoveDir Directories="OutDir/$(Configuration)" />
-		<MakeDir Directories="OutDir/$(Configuration)" />
+		<RemoveDir Directories="OutDir\$(Configuration)" />
+		<MakeDir Directories="OutDir\$(Configuration)" />
 	</Target>
 	
 	<Target Name="GenerateThrift">
 		<Exec Command="$(Thrift) -o $(ThriftOutput) --gen csharp $(ThriftInput)" />
 	</Target>
 	
-	<Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs">
+	<Target Name="GenerateAssemblyInfo">
 		<AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)" OutputFile="cassandra-sharp-version.cs" />
+	</Target>
 	
-		<CallTarget Targets="GenerateThrift" />
-	
-		<CallTarget Targets="Compile" />
-		
+	<Target Name="Merge">
 		<Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly) /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
+	</Target>
+	
+	<Target Name="ZipBinaries">
+		<ItemGroup>
+			<ZipFiles Include="OutDir\**\*.*" />
+        </ItemGroup>
+	
+		<Zip ZipFileName="cassandra-sharp-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
+	</Target>
+	
+	<Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">		
 	</Target>
 
 </Project>
