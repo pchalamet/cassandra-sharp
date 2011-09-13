@@ -179,14 +179,18 @@ namespace CassandraSharp
 
         private void ReleaseConnection(IConnection connection, bool hasFailed)
         {
-            if (hasFailed)
+            // protects against exception during acquire connection
+            if (null != connection)
             {
-                _endpointsManager.Ban(connection.Endpoint);
-                connection.SafeDispose();
-            }
-            else
-            {
-                _pool.Release(connection);
+                if (hasFailed)
+                {
+                    _endpointsManager.Ban(connection.Endpoint);
+                    connection.SafeDispose();
+                }
+                else
+                {
+                    _pool.Release(connection);
+                }
             }
         }
 
