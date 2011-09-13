@@ -1,3 +1,4 @@
+ABOUT
 cassandra-sharp is a .NET client for Apache Cassandra released under the Apache License 2.0.
 It is able to interact with the Cassandra 0.8.x version using thrift API.
 
@@ -6,12 +7,13 @@ Cassandra.Client interface. It's pretty raw. Next versions will include:
 * IDictionary wrapping
 * recovery of banned endpoints
 
+HOW TO BUILD
 To compile, use a command line and run the following commands:
-GenerateVersion.bat <VersionNumber>
-
+  GenerateVersion.bat <VersionNumber>
 You will find a package named "cassandra-sharp-bin-<VersionNumber>.zip" in the root folder.
 
-This projects is using the following components:
+THIRD PARTIES
+This projects relies on the following third parties:
 * MSBuild Community Tasks Project (http://msbuildtasks.tigris.org/)
   released under BSD License (http://opensource.org/licenses/bsd-license.php)
 * Apache Thrift (http://thrift.apache.org/)
