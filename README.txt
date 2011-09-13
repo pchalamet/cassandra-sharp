@@ -30,3 +30,4 @@ This projects relies on the following third parties:
   released under New BSD License
 * NUnit (http://www.nunit.org/)
   released NUnit license
+* NuGet (http://nuget.org/)
