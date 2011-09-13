@@ -1,56 +1,56 @@
 <Project DefaultTargets="Compile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<Import Project="Tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+    <Import Project="Tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
 
-	<PropertyGroup>
-		<Version>0.0.0.0</Version>
-	</PropertyGroup>
+    <PropertyGroup>
+        <Version>0.0.0.0</Version>
+    </PropertyGroup>
 
-	<PropertyGroup>
-		<Thrift>Tools\thrift-0.6.1.exe</Thrift>		
-		<ThriftInput>cassandra.thrift</ThriftInput>
-		<ThriftOutput>Apache.Cassandra</ThriftOutput>
-	</PropertyGroup>
-	
-	<PropertyGroup>
-		<ILMerge>Tools\ilmerge</ILMerge>
-		<CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp.dll</CassandraSharpAssembly>
-		<ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
-		<ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
-		<KeyFile>cassandra-sharp.snk</KeyFile>
-		<cassandra-sharpAssembly>OutDir\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
-	</PropertyGroup>
-		
-	<Target Name="Compile">
-		<MSBuild Projects="cassandra-sharp.sln" />
-	</Target>
-	
-	<Target Name="CreateOutDirs">
-		<RemoveDir Directories="OutDir\$(Configuration)" />
-		<MakeDir Directories="OutDir\$(Configuration)" />
-	</Target>
-	
-	<Target Name="GenerateThrift">
-		<Exec Command="$(Thrift) -o $(ThriftOutput) --gen csharp $(ThriftInput)" />
-	</Target>
-	
-	<Target Name="GenerateAssemblyInfo">
-		<AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)" OutputFile="cassandra-sharp-version.cs" />
-	</Target>
-	
-	<Target Name="Merge">
-		<Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly) /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
-	</Target>
-	
-	<Target Name="ZipBinaries">
-		<ItemGroup>
-			<ZipFiles Include="OutDir\**\*.*" />
+    <PropertyGroup>
+        <Thrift>Tools\thrift-0.6.1.exe</Thrift>
+        <ThriftInput>cassandra.thrift</ThriftInput>
+        <ThriftOutput>Apache.Cassandra</ThriftOutput>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ILMerge>Tools\ilmerge</ILMerge>
+        <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp.dll</CassandraSharpAssembly>
+        <ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
+        <ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
+        <KeyFile>cassandra-sharp.snk</KeyFile>
+        <cassandra-sharpAssembly>OutDir\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
+    </PropertyGroup>
+
+    <Target Name="Compile">
+        <MSBuild Projects="cassandra-sharp.sln" />
+    </Target>
+
+    <Target Name="CreateOutDirs">
+        <RemoveDir Directories="OutDir\$(Configuration)" />
+        <MakeDir Directories="OutDir\$(Configuration)" />
+    </Target>
+
+    <Target Name="GenerateThrift">
+        <Exec Command="$(Thrift) -o $(ThriftOutput) --gen csharp $(ThriftInput)" />
+    </Target>
+
+    <Target Name="GenerateAssemblyInfo">
+        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)" OutputFile="cassandra-sharp-version.cs" />
+    </Target>
+
+    <Target Name="Merge">
+        <Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly) /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
+    </Target>
+
+    <Target Name="ZipBinaries">
+        <ItemGroup>
+            <ZipFiles Include="OutDir\**\*.*" />
         </ItemGroup>
-	
-		<Zip ZipFileName="cassandra-sharp-bin-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
-	</Target>
-	
-	<Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">		
-	</Target>
+
+        <Zip ZipFileName="cassandra-sharp-bin-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
+    </Target>
+
+    <Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">
+    </Target>
 
 </Project>
