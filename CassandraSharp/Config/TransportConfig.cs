@@ -26,5 +26,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("type")]
         public TransportType Type;
+
+        [XmlAttribute("timeout")]
+        public int Timeout;
     }
 }

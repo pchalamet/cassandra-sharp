@@ -19,15 +19,18 @@ namespace CassandraSharp.Transport
     {
         private readonly int _port;
 
+        private readonly int _timeout;
+
         public FramedTransportFactory(TransportConfig config)
         {
             _port = config.Port;
+            _timeout = config.Timeout;
         }
 
         public TTransport Create(IPAddress address)
         {
             string ip = address.ToString();
-            TStreamTransport streamTransport = new TSocket(ip, _port);
+            TStreamTransport streamTransport = new TSocket(ip, _port, _timeout);
             TTransport framedTransport = new TFramedTransport(streamTransport);
             return framedTransport;
         }
