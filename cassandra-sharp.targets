@@ -7,13 +7,13 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Thrift>Tools\thrift-0.6.1.exe</Thrift>
+        <Thrift>Tools\Thrift\thrift-0.6.1.exe</Thrift>
         <ThriftInput>cassandra.thrift</ThriftInput>
         <ThriftOutput>Apache.Cassandra</ThriftOutput>
     </PropertyGroup>
 
     <PropertyGroup>
-        <ILMerge>Tools\ilmerge</ILMerge>
+        <ILMerge>Tools\ILMerge\ILMerge.exe</ILMerge>
         <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp.dll</CassandraSharpAssembly>
         <ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
         <ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
