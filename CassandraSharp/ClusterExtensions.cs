@@ -11,6 +11,7 @@
 // limitations under the License.
 namespace CassandraSharp
 {
+    using System;
     using Apache.Cassandra;
     using CassandraSharp.Commands;
 
@@ -24,6 +25,11 @@ namespace CassandraSharp
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value,
                                   ConsistencyLevel consistencyLevel)
         {
+            if (null == @this || null == columnFamily || null == key || null == column)
+            {
+                throw new ArgumentNullException();
+            }
+
             @this.Execute(ctx => ColumnFamily.Insert(ctx,
                                                      columnFamily,
                                                      key.ToByteArray(),
@@ -40,6 +46,11 @@ namespace CassandraSharp
         public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column,
                                               ConsistencyLevel consistencyLevel)
         {
+            if (null == @this || null == columnFamily || null == key || null == column)
+            {
+                throw new ArgumentNullException();
+            }
+
             return @this.Execute(ctx => ColumnFamily.Get(ctx,
                                                          columnFamily,
                                                          key.ToByteArray(),
@@ -55,35 +66,67 @@ namespace CassandraSharp
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column,
                                   ConsistencyLevel consistencyLevel)
         {
+            if (null == @this || null == columnFamily || null == key)
+            {
+                throw new ArgumentNullException();
+            }
+
             @this.Execute(ctx => ColumnFamily.Remove(ctx,
                                                      columnFamily,
                                                      key.ToByteArray(),
-                                                     column.ToByteArray(),
+                                                     null != column
+                                                         ? column.ToByteArray()
+                                                         : null,
                                                      consistencyLevel));
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)
         {
+            if (null == @this)
+            {
+                throw new ArgumentNullException();
+            }
+
             @this.Execute(ctx => ColumnFamily.Truncate(ctx, columnFamily));
         }
 
         public static string DescribeClusterName(this ICluster @this)
         {
+            if (null == @this)
+            {
+                throw new ArgumentNullException();
+            }
+
             return @this.Execute(ctx => Describe.ClusterName(ctx));
         }
 
         public static string AddColumnFamily(this ICluster @this, CfDef cfDef)
         {
+            if (null == @this || null == cfDef)
+            {
+                throw new ArgumentNullException();
+            }
+
             return @this.Execute(ctx => SystemManagement.AddColumnFamily(ctx, cfDef));
         }
 
         public static string DropColumnFamily(this ICluster @this, string columnFamily)
         {
+            if (null == @this || null == columnFamily)
+            {
+                throw new ArgumentNullException();
+            }
+
             return @this.Execute(ctx => SystemManagement.DropColumnFamily(ctx, columnFamily));
         }
 
         public static CqlResult ExecuteCql(this ICluster @this, string cql)
         {
+            if (null == @this || null == cql)
+            {
+                throw new ArgumentNullException();
+            }
+
             return @this.Execute(ctx => Cql.Command(ctx, cql));
         }
     }
