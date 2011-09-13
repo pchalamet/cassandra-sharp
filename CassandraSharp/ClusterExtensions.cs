@@ -69,7 +69,7 @@ namespace CassandraSharp
 
         public static string DescribeClusterName(this ICluster @this)
         {
-            return @this.Execute(Describe.ClusterName);
+            return @this.Execute(ctx => Describe.ClusterName(ctx));
         }
 
         public static string AddColumnFamily(this ICluster @this, CfDef cfDef)
