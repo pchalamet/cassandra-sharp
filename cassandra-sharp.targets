@@ -6,6 +6,10 @@
         <Version>0.0.0.0</Version>
     </PropertyGroup>
 
+	<PropertyGroup>
+		<NuGet>Tools\NuGet\NuGet.exe</NuGet>
+	</PropertyGroup>
+	
     <PropertyGroup>
         <Thrift>Tools\Thrift\thrift-0.6.1.exe</Thrift>
         <ThriftInput>cassandra.thrift</ThriftInput>
@@ -29,6 +33,10 @@
         <RemoveDir Directories="OutDir\$(Configuration)" />
         <MakeDir Directories="OutDir\$(Configuration)" />
     </Target>
+	
+	<Target Name="NuGet">
+		<Exec Command="$(NuGet) install CassandraSharpUnitTests\packages.config -o packages" />
+	</Target>
 
     <Target Name="GenerateThrift">
         <Exec Command="$(Thrift) -o $(ThriftOutput) --gen csharp $(ThriftInput)" />
@@ -50,7 +58,7 @@
         <Zip ZipFileName="cassandra-sharp-bin-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
     </Target>
 
-    <Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">
+    <Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;NuGet;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">
     </Target>
 
 </Project>
