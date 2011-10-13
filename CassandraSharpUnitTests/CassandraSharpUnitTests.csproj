@@ -66,9 +66,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj">
       <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
       <Name>CassandraSharp</Name>
