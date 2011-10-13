@@ -20,6 +20,7 @@ namespace CassandraSharp
     using CassandraSharp.Pool;
     using CassandraSharp.Transport;
     using CassandraSharp.Utils;
+    using log4net;
     using Thrift.Protocol;
     using Thrift.Transport;
 
@@ -33,6 +34,8 @@ namespace CassandraSharp
 
         private readonly ITransportFactory _transportFactory;
 
+        private readonly ILog _logger = LogManager.GetLogger(typeof(Cluster));
+
         public Cluster(BehaviorConfig config, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager)
         {
             _config = config;
@@ -42,11 +45,14 @@ namespace CassandraSharp
             DefaultReadConsistencyLevel = config.DefaultReadConsistencyLevel;
             DefaultWriteConsistencyLevel = config.DefaultWriteConsistencyLevel;
             DefaultKeyspace = config.DefaultKeyspace;
+            DefaultTTL = config.DefaultTTL;
         }
 
         public ConsistencyLevel DefaultReadConsistencyLevel { get; private set; }
 
         public ConsistencyLevel DefaultWriteConsistencyLevel { get; private set; }
+
+        public int DefaultTTL { get; private set; }
 
         public string DefaultKeyspace { get; private set; }
 
@@ -78,9 +84,13 @@ namespace CassandraSharp
                     bool retry;
                     DecipherException(ex, out connectionDead, out retry);
 
+                    string errMsg = string.Format("Exception during command processing: connectionDead={0} retry={1}", connectionDead, retry);
+                    _logger.Error(errMsg, ex);
+
                     ReleaseConnection(connection, connectionDead);
                     if (!retry || tryCount >= _config.MaxRetries)
                     {
+                        _logger.Fatal("Max retry count reached");
                         throw;
                     }
                 }
@@ -133,6 +143,11 @@ namespace CassandraSharp
             {
                 connectionDead = false;
                 retry = _config.RetryOnUnavailable;
+            }
+            else if( ex is NotFoundException)
+            {
+                connectionDead = false;
+                retry = _config.RetryOnNotFound;
             }
 
                 // other exceptions ==> connection is not dead / do not retry

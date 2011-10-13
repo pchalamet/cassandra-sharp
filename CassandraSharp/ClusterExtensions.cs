@@ -19,10 +19,10 @@ namespace CassandraSharp
     {
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value)
         {
-            @this.Insert(columnFamily, key, column, value, @this.DefaultWriteConsistencyLevel);
+            @this.Insert(columnFamily, key, column, value, @this.DefaultTTL, @this.DefaultWriteConsistencyLevel);
         }
 
-        public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value,
+        public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value, int ttl,
                                   ConsistencyLevel consistencyLevel)
         {
             if (null == @this || null == columnFamily || null == key || null == column)
@@ -35,6 +35,7 @@ namespace CassandraSharp
                                                      key.ToByteArray(),
                                                      column.ToByteArray(),
                                                      value.ToByteArray(),
+                                                     ttl,
                                                      consistencyLevel));
         }
 

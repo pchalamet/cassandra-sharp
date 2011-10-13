@@ -26,6 +26,8 @@ namespace CassandraSharp
 
         ConsistencyLevel DefaultWriteConsistencyLevel { get; }
 
+        int DefaultTTL { get; }
+
         TResult Execute<TResult>(Func<Cassandra.Client, TResult> func);
     }
 }

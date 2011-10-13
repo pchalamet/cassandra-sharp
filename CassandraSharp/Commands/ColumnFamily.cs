@@ -16,7 +16,7 @@ namespace CassandraSharp.Commands
     internal static class ColumnFamily
     {
         public static void Insert(Cassandra.Client client, string columnFamilyName, byte[] key, byte[] columnName, byte[] value,
-                                  ConsistencyLevel consistencyLevel)
+                                  int ttl, ConsistencyLevel consistencyLevel)
         {
             ColumnParent columnParent = new ColumnParent
                                             {
@@ -26,6 +26,7 @@ namespace CassandraSharp.Commands
                                 {
                                     Name = columnName,
                                     Value = value,
+                                    Ttl = ttl,
                                     Timestamp = Timestamp.Now
                                 };
 

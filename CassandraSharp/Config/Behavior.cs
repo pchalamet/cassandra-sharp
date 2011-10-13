@@ -28,11 +28,17 @@ namespace CassandraSharp.Config
         [XmlAttribute("retryOnUnavailable")]
         public bool RetryOnUnavailable;
 
+        [XmlAttribute("retryOnNotFound")]
+        public bool RetryOnNotFound;
+
         [XmlAttribute("defaultReadConsistencyLevel")]
         public ConsistencyLevel DefaultReadConsistencyLevel;
 
         [XmlAttribute("defaultWriteConsistencyLevel")]
         public ConsistencyLevel DefaultWriteConsistencyLevel;
+
+        [XmlAttribute("defaultTTL")]
+        public int DefaultTTL;
 
         [XmlAttribute("defaultKeyspace")]
         public string DefaultKeyspace;
