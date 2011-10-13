@@ -35,7 +35,7 @@
     </Target>
 	
 	<Target Name="NuGet">
-		<Exec Command="$(NuGet) install CassandraSharpUnitTests\packages.config -o packages" />
+		<Exec Command="$(NuGet) install packages.config -o packages" />
 	</Target>
 
     <Target Name="GenerateThrift">
