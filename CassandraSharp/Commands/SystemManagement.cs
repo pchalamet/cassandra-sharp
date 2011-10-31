@@ -38,5 +38,13 @@ namespace CassandraSharp.Commands
             string schemaId = client.system_drop_column_family(cfName);
             return schemaId;
         }
+
+        public static void Login(Cassandra.Client client, string username, string password)
+        {
+            AuthenticationRequest authenticationRequest = new AuthenticationRequest();
+            authenticationRequest.Credentials.Add("username", username);
+            authenticationRequest.Credentials.Add("password", password);
+            client.login(authenticationRequest);            
+        }
     }
 }
