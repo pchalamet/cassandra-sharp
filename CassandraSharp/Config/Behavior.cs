@@ -37,6 +37,12 @@ namespace CassandraSharp.Config
         [XmlAttribute("defaultWriteConsistencyLevel")]
         public ConsistencyLevel DefaultWriteConsistencyLevel;
 
+        [XmlAttribute("user")]
+        public string User;
+
+        [XmlAttribute("password")]
+        public string Password;
+
         [XmlAttribute("defaultTTL")]
         public int DefaultTTL;
 

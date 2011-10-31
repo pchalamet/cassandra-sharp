@@ -1,0 +1,19 @@
+version 0.4.0.0
+- support for authentication
+- tested against Cassandra 1.0
+
+version 0.3.3.0
+- exception logging
+- counter support
+- NotFoundException specific behavior
+- TTL support
+
+version 0.3.0.0
+- added timeout configuration
+- fixed bug when exception thrown during acquire connection
+
+version 0.2
+- build system
+
+version 0.1
+- initial version
