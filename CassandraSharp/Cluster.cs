@@ -1,20 +1,10 @@
-﻿// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-// limitations under the License.
-namespace CassandraSharp
+﻿namespace CassandraSharp
 {
     using System;
     using System.IO;
     using System.Net.Sockets;
     using Apache.Cassandra;
+    using CassandraSharp.Commands;
     using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Pool;
@@ -30,11 +20,11 @@ namespace CassandraSharp
 
         private readonly IEndpointStrategy _endpointsManager;
 
+        private readonly ILog _logger = LogManager.GetLogger(typeof(Cluster));
+
         private readonly IPool<IConnection> _pool;
 
         private readonly ITransportFactory _transportFactory;
-
-        private readonly ILog _logger = LogManager.GetLogger(typeof(Cluster));
 
         public Cluster(BehaviorConfig config, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager)
         {
@@ -107,6 +97,11 @@ namespace CassandraSharp
                 transport.Open();
             }
 
+            if (null != _config.User && null != _config.Password)
+            {
+                SystemManagement.Login(connection.CassandraClient, _config.User, _config.Password);
+            }
+
             if (connection.KeySpace != DefaultKeyspace)
             {
                 connection.CassandraClient.set_keyspace(DefaultKeyspace);
@@ -144,7 +139,7 @@ namespace CassandraSharp
                 connectionDead = false;
                 retry = _config.RetryOnUnavailable;
             }
-            else if( ex is NotFoundException)
+            else if (ex is NotFoundException)
             {
                 connectionDead = false;
                 retry = _config.RetryOnNotFound;
