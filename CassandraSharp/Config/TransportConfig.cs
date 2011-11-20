@@ -22,10 +22,10 @@ namespace CassandraSharp.Config
         }
 
         [XmlAttribute("port")]
-        public int Port;
+        public int Port = 9160;
 
         [XmlAttribute("type")]
-        public TransportType Type;
+        public TransportType Type = TransportType.Framed;
 
         [XmlAttribute("timeout")]
         public int Timeout;
