@@ -15,6 +15,11 @@ namespace CassandraSharp.Commands
 
     internal static class SystemManagement
     {
+        public static void SetKeySpace(Cassandra.Client client, string keyspace)
+        {
+            client.set_keyspace(keyspace);
+        }
+
         public static string AddKeySpace(Cassandra.Client client, KsDef ksDef)
         {
             string schemaId = client.system_add_keyspace(ksDef);

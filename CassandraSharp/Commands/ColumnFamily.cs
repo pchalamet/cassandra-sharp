@@ -15,9 +15,12 @@
                                 {
                                     Name = columnName,
                                     Value = value,
-                                    Ttl = ttl,
                                     Timestamp = Timestamp.Now
                                 };
+            if( ttl != 0 )
+            {
+                column.Ttl = ttl;
+            }
 
             client.insert(key, columnParent, column, consistencyLevel);
         }

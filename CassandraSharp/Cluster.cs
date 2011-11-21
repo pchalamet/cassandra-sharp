@@ -104,7 +104,7 @@
 
             if (connection.KeySpace != DefaultKeyspace)
             {
-                connection.CassandraClient.set_keyspace(DefaultKeyspace);
+                SystemManagement.SetKeySpace(connection.CassandraClient, DefaultKeyspace);
                 connection.KeySpace = DefaultKeyspace;
             }
         }
