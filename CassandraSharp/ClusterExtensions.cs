@@ -8,7 +8,7 @@
     {
         public static void SetKeySpace(this ICluster @this, string keyspace)
         {
-            @this.Execute(ctx => SystemManagement.SetKeySpace(ctx, keyspace));
+            @this.Execute(null, ctx => SystemManagement.SetKeySpace(ctx, keyspace));
         }
 
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value)
@@ -24,7 +24,8 @@
                 throw new ArgumentNullException();
             }
 
-            @this.Execute(ctx => ColumnFamily.Insert(ctx,
+            @this.Execute(null,
+                          ctx => ColumnFamily.Insert(ctx,
                                                      columnFamily,
                                                      key.ToByteArray(),
                                                      column.ToByteArray(),
@@ -46,7 +47,8 @@
                 throw new ArgumentNullException();
             }
 
-            return @this.Execute(ctx => ColumnFamily.Get(ctx,
+            return @this.ExecuteCommand(null,
+                                 ctx => ColumnFamily.Get(ctx,
                                                          columnFamily,
                                                          key.ToByteArray(),
                                                          column.ToByteArray(),
@@ -66,7 +68,8 @@
                 throw new ArgumentNullException();
             }
 
-            @this.Execute(ctx => ColumnFamily.Remove(ctx,
+            @this.Execute(null,
+                          ctx => ColumnFamily.Remove(ctx,
                                                      columnFamily,
                                                      key.ToByteArray(),
                                                      null != column
@@ -83,8 +86,8 @@
         public static void IncrementCounter(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, long value,
                                             ConsistencyLevel consistencyLevel)
         {
-            @this.Execute(
-                ctx => ColumnFamily.IncrementCounter(ctx, columnFamily, key.ToByteArray(), column.ToByteArray(), value, consistencyLevel));
+            @this.Execute(null,
+                          ctx => ColumnFamily.IncrementCounter(ctx, columnFamily, key.ToByteArray(), column.ToByteArray(), value, consistencyLevel));
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)
@@ -94,7 +97,7 @@
                 throw new ArgumentNullException();
             }
 
-            @this.Execute(ctx => ColumnFamily.Truncate(ctx, columnFamily));
+            @this.Execute(null, ctx => ColumnFamily.Truncate(ctx, columnFamily));
         }
 
         public static string DescribeClusterName(this ICluster @this)
@@ -104,7 +107,7 @@
                 throw new ArgumentNullException();
             }
 
-            return @this.Execute(ctx => Describe.ClusterName(ctx));
+            return @this.ExecuteCommand(null, ctx => Describe.ClusterName(ctx));
         }
 
         public static string AddColumnFamily(this ICluster @this, CfDef cfDef)
@@ -114,7 +117,7 @@
                 throw new ArgumentNullException();
             }
 
-            return @this.Execute(ctx => SystemManagement.AddColumnFamily(ctx, cfDef));
+            return @this.ExecuteCommand(null, ctx => SystemManagement.AddColumnFamily(ctx, cfDef));
         }
 
         public static string DropColumnFamily(this ICluster @this, string columnFamily)
@@ -124,7 +127,7 @@
                 throw new ArgumentNullException();
             }
 
-            return @this.Execute(ctx => SystemManagement.DropColumnFamily(ctx, columnFamily));
+            return @this.ExecuteCommand(null, ctx => SystemManagement.DropColumnFamily(ctx, columnFamily));
         }
 
         public static CqlResult ExecuteCql(this ICluster @this, string cql)
@@ -134,7 +137,7 @@
                 throw new ArgumentNullException();
             }
 
-            return @this.Execute(ctx => Cql.Command(ctx, cql));
+            return @this.ExecuteCommand(null, ctx => Cql.Command(ctx, cql));
         }
     }
 }

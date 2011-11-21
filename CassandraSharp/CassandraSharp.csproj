@@ -50,6 +50,9 @@
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
+    <Compile Include="ConnectionInfo.cs" />
+    <Compile Include="ConnectionInfoExtensions.cs" />
+    <Compile Include="IConnectionInfo.cs" />
     <Compile Include="Model\LongNameOrValue.cs" />
     <Compile Include="INameOrValue.cs" />
     <Compile Include="Model\NameOrValueBase.cs" />

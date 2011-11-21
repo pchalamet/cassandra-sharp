@@ -32,9 +32,9 @@
             _pool = pool;
             _endpointsManager = endpointsManager;
             _transportFactory = transportFactory;
+            DefaultConnectionInfo = new ConnectionInfo(config.DefaultKeyspace, config.User, config.Password);
             DefaultReadConsistencyLevel = config.DefaultReadConsistencyLevel;
             DefaultWriteConsistencyLevel = config.DefaultWriteConsistencyLevel;
-            DefaultKeyspace = config.DefaultKeyspace;
             DefaultTTL = config.DefaultTTL;
         }
 
@@ -44,15 +44,20 @@
 
         public int DefaultTTL { get; private set; }
 
-        public string DefaultKeyspace { get; private set; }
+        public IConnectionInfo DefaultConnectionInfo { get; private set; }
 
         public void Dispose()
         {
             _pool.SafeDispose();
         }
 
-        public TResult Execute<TResult>(Func<Cassandra.Client, TResult> func)
+        public TResult ExecuteCommand<TResult>(IConnectionInfo cnxInfo, Func<Cassandra.Client, TResult> func)
         {
+            if( null == cnxInfo)
+            {
+                cnxInfo = DefaultConnectionInfo;
+            }
+
             int tryCount = 1;
             while (true)
             {
@@ -61,7 +66,7 @@
                 {
                     connection = AcquireConnection();
 
-                    OpenConnection(connection);
+                    OpenConnection(connection, cnxInfo);
                     TResult res = func(connection.CassandraClient);
 
                     ReleaseConnection(connection, false);
@@ -89,7 +94,7 @@
             }
         }
 
-        private void OpenConnection(IConnection connection)
+        private void OpenConnection(IConnection connection, IConnectionInfo cnxInfo)
         {
             TTransport transport = connection.CassandraClient.InputProtocol.Transport;
             if (!transport.IsOpen)
@@ -97,15 +102,15 @@
                 transport.Open();
             }
 
-            if (null != _config.User && null != _config.Password)
+            if (null != cnxInfo.Login && null != cnxInfo.Password)
             {
                 SystemManagement.Login(connection.CassandraClient, _config.User, _config.Password);
             }
 
-            if (connection.KeySpace != DefaultKeyspace)
+            if (connection.KeySpace != cnxInfo.KeySpace)
             {
-                SystemManagement.SetKeySpace(connection.CassandraClient, DefaultKeyspace);
-                connection.KeySpace = DefaultKeyspace;
+                SystemManagement.SetKeySpace(connection.CassandraClient, cnxInfo.KeySpace);
+                connection.KeySpace = cnxInfo.KeySpace;
             }
         }
 
