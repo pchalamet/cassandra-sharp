@@ -14,7 +14,7 @@ namespace CassandraSharp.Commands
     using System.Text;
     using Apache.Cassandra;
 
-    internal static class Cql
+    public static class Cql
     {
         public static CqlResult Command(Cassandra.Client client, string command)
         {

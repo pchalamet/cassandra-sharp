@@ -2,7 +2,7 @@
 {
     using Apache.Cassandra;
 
-    internal static class ColumnFamily
+    public static class ColumnFamily
     {
         public static void Insert(Cassandra.Client client, string columnFamilyName, byte[] key, byte[] columnName, byte[] value,
                                   int ttl, ConsistencyLevel consistencyLevel)

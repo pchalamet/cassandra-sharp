@@ -40,16 +40,12 @@
                 throw new ArgumentNullException("clusterConfig");
             }
 
-            if (null == clusterConfig.Behavior)
-            {
-                throw new ArgumentNullException("clusterConfig.Behavior");
-            }
-
             if (null == clusterConfig.Endpoints)
             {
                 throw new ArgumentNullException("clusterConfig.Endpoints");
             }
 
+            BehaviorConfig behaviorConfig = clusterConfig.Behavior ?? new BehaviorConfig();
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
 
             // create endpoints
@@ -59,11 +55,11 @@
 
             // create endpoint strategy
             IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(endpoints);
-            IPool<IConnection> pool = PoolType.Stack.Create(clusterConfig.Behavior.PoolSize);
+            IPool<IConnection> pool = PoolType.Stack.Create(behaviorConfig.PoolSize);
 
             // create the cluster now
             ITransportFactory transportFactory = transportConfig.Create();
-            return new Cluster(clusterConfig.Behavior, pool, transportFactory, endpointsManager);
+            return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager);
         }
 
         private static IEnumerable<Endpoint> GetEndpoints(EndpointsConfig config, ISnitch snitch, IPAddress clientAddress)

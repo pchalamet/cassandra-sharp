@@ -13,7 +13,7 @@ namespace CassandraSharp.Commands
 {
     using Apache.Cassandra;
 
-    internal static class SystemManagement
+    public static class SystemManagement
     {
         public static void SetKeySpace(Cassandra.Client client, string keyspace)
         {

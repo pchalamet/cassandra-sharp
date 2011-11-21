@@ -14,7 +14,7 @@ namespace CassandraSharp.Commands
     using System.Collections.Generic;
     using Apache.Cassandra;
 
-    public class Describe
+    public static class Describe
     {
         public static string ClusterName(Cassandra.Client client)
         {
