@@ -16,7 +16,6 @@ namespace CassandraSharp
     using System.Net.Sockets;
     using Apache.Cassandra;
     using CassandraSharp.Commands;
-    using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Pool;
     using CassandraSharp.Transport;
