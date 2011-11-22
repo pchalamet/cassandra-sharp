@@ -9,14 +9,8 @@
     /// </summary>
     public interface ICluster : IDisposable
     {
-        IConnectionInfo DefaultConnectionInfo { get; }
+        IBehaviorConfig BehaviorConfig { get; }
 
-        ConsistencyLevel DefaultReadConsistencyLevel { get; }
-
-        ConsistencyLevel DefaultWriteConsistencyLevel { get; }
-
-        int DefaultTTL { get; }
-
-        TResult ExecuteCommand<TResult>(IConnectionInfo cnxInfo, Func<Cassandra.Client, TResult> func);
+        TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<Cassandra.Client, TResult> func);
     }
 }

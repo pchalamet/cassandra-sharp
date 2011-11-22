@@ -29,5 +29,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("timeout")]
         public int Timeout;
+
+        [XmlAttribute("poolSize")]
+        public int PoolSize;
     }
 }

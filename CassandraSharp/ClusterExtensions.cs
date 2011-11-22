@@ -13,7 +13,7 @@
 
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value)
         {
-            @this.Insert(columnFamily, key, column, value, @this.DefaultTTL, @this.DefaultWriteConsistencyLevel);
+            @this.Insert(columnFamily, key, column, value, @this.BehaviorConfig.TTL, @this.BehaviorConfig.WriteConsistencyLevel);
         }
 
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value, int ttl,
@@ -36,7 +36,7 @@
 
         public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
         {
-            return @this.Get(columnFamily, key, column, @this.DefaultReadConsistencyLevel);
+            return @this.Get(columnFamily, key, column, @this.BehaviorConfig.ReadConsistencyLevel);
         }
 
         public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column,
@@ -57,7 +57,7 @@
 
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
         {
-            @this.Remove(columnFamily, key, column, @this.DefaultWriteConsistencyLevel);
+            @this.Remove(columnFamily, key, column, @this.BehaviorConfig.WriteConsistencyLevel);
         }
 
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column,
@@ -80,7 +80,7 @@
 
         public static void IncrementCounter(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, long value)
         {
-            @this.IncrementCounter(columnFamily, key, column, value, @this.DefaultWriteConsistencyLevel);
+            @this.IncrementCounter(columnFamily, key, column, value, @this.BehaviorConfig.WriteConsistencyLevel);
         }
 
         public static void IncrementCounter(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, long value,

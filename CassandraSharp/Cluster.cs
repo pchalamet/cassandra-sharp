@@ -16,8 +16,6 @@
 
     internal class Cluster : ICluster
     {
-        private readonly BehaviorConfig _config;
-
         private readonly IEndpointStrategy _endpointsManager;
 
         private readonly ILog _logger = LogManager.GetLogger(typeof(Cluster));
@@ -26,36 +24,26 @@
 
         private readonly ITransportFactory _transportFactory;
 
-        public Cluster(BehaviorConfig config, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager)
+        public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager)
         {
-            _config = config;
+            BehaviorConfig = behaviorConfig;
             _pool = pool;
             _endpointsManager = endpointsManager;
             _transportFactory = transportFactory;
-            DefaultConnectionInfo = new ConnectionInfo(config.DefaultKeyspace, config.User, config.Password);
-            DefaultReadConsistencyLevel = config.DefaultReadConsistencyLevel;
-            DefaultWriteConsistencyLevel = config.DefaultWriteConsistencyLevel;
-            DefaultTTL = config.DefaultTTL;
         }
 
-        public ConsistencyLevel DefaultReadConsistencyLevel { get; private set; }
-
-        public ConsistencyLevel DefaultWriteConsistencyLevel { get; private set; }
-
-        public int DefaultTTL { get; private set; }
-
-        public IConnectionInfo DefaultConnectionInfo { get; private set; }
+        public IBehaviorConfig BehaviorConfig { get; private set; }
 
         public void Dispose()
         {
             _pool.SafeDispose();
         }
 
-        public TResult ExecuteCommand<TResult>(IConnectionInfo cnxInfo, Func<Cassandra.Client, TResult> func)
+        public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<Cassandra.Client, TResult> func)
         {
-            if( null == cnxInfo)
+            if (null == behaviorConfig)
             {
-                cnxInfo = DefaultConnectionInfo;
+                behaviorConfig = BehaviorConfig;
             }
 
             int tryCount = 1;
@@ -66,7 +54,7 @@
                 {
                     connection = AcquireConnection();
 
-                    OpenConnection(connection, cnxInfo);
+                    OpenConnection(connection, behaviorConfig);
                     TResult res = func(connection.CassandraClient);
 
                     ReleaseConnection(connection, false);
@@ -77,13 +65,13 @@
                 {
                     bool connectionDead;
                     bool retry;
-                    DecipherException(ex, out connectionDead, out retry);
+                    DecipherException(ex, behaviorConfig, out connectionDead, out retry);
 
                     string errMsg = string.Format("Exception during command processing: connectionDead={0} retry={1}", connectionDead, retry);
                     _logger.Error(errMsg, ex);
 
                     ReleaseConnection(connection, connectionDead);
-                    if (!retry || tryCount >= _config.MaxRetries)
+                    if (!retry || tryCount >= behaviorConfig.MaxRetries)
                     {
                         _logger.Fatal("Max retry count reached");
                         throw;
@@ -94,7 +82,7 @@
             }
         }
 
-        private void OpenConnection(IConnection connection, IConnectionInfo cnxInfo)
+        private static void OpenConnection(IConnection connection, IBehaviorConfig behaviorConfig)
         {
             TTransport transport = connection.CassandraClient.InputProtocol.Transport;
             if (!transport.IsOpen)
@@ -102,19 +90,19 @@
                 transport.Open();
             }
 
-            if (null != cnxInfo.Login && null != cnxInfo.Password)
+            if (null != behaviorConfig.User && null != behaviorConfig.Password)
             {
-                SystemManagement.Login(connection.CassandraClient, _config.User, _config.Password);
+                SystemManagement.Login(connection.CassandraClient, behaviorConfig.User, behaviorConfig.Password);
             }
 
-            if (connection.KeySpace != cnxInfo.KeySpace)
+            if (connection.KeySpace != behaviorConfig.KeySpace)
             {
-                SystemManagement.SetKeySpace(connection.CassandraClient, cnxInfo.KeySpace);
-                connection.KeySpace = cnxInfo.KeySpace;
+                SystemManagement.SetKeySpace(connection.CassandraClient, behaviorConfig.KeySpace);
+                connection.KeySpace = behaviorConfig.KeySpace;
             }
         }
 
-        private void DecipherException(Exception ex, out bool connectionDead, out bool retry)
+        private static void DecipherException(Exception ex, IBehaviorConfig behaviorConfig, out bool connectionDead, out bool retry)
         {
             // connection dead exception handling
             if (ex is TTransportException)
@@ -137,17 +125,17 @@
             else if (ex is TimedOutException)
             {
                 connectionDead = false;
-                retry = _config.RetryOnTimeout;
+                retry = behaviorConfig.RetryOnTimeout;
             }
             else if (ex is UnavailableException)
             {
                 connectionDead = false;
-                retry = _config.RetryOnUnavailable;
+                retry = behaviorConfig.RetryOnUnavailable;
             }
             else if (ex is NotFoundException)
             {
                 connectionDead = false;
-                retry = _config.RetryOnNotFound;
+                retry = behaviorConfig.RetryOnNotFound;
             }
 
                 // other exceptions ==> connection is not dead / do not retry

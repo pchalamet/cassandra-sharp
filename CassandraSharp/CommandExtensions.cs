@@ -10,14 +10,14 @@
             @this.Execute(null, action);
         }
 
-        public static void Execute(this ICluster @this, IConnectionInfo cnxInfo, Action<Cassandra.Client> action)
+        public static void Execute(this ICluster @this, IBehaviorConfig behaviorConfig, Action<Cassandra.Client> action)
         {
             Func<Cassandra.Client, object> func = client =>
                                                       {
                                                           action(client);
                                                           return null;
                                                       };
-            @this.ExecuteCommand(cnxInfo, func);
+            @this.ExecuteCommand(behaviorConfig, func);
         }
     }
 }

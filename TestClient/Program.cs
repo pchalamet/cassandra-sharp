@@ -16,12 +16,12 @@
                 TestCluster(cluster);
 
             // using minimal declarative configuration
-            // no keyspace is specified : we need to set IConnectionInfo before calling the command
+            // no keyspace is specified : we need to set ICommandInfo before calling the command
             using (ICluster cluster = ClusterManager.GetCluster("TestCassandraMinimal"))
             {
-                IConnectionInfo cnxInfo = new ConnectionInfo("TestKS");
-                ICluster overrideCluster = cnxInfo.Overrides(cluster);
-                TestCluster(overrideCluster);
+                BehaviorConfigBuilder cmdInfoBuilder = new BehaviorConfigBuilder { KeySpace = "TestKS" };
+                ICluster configuredCluster = cluster.Configure(cmdInfoBuilder);
+                TestCluster(configuredCluster);
             }
 
             ClusterManager.Shutdown();

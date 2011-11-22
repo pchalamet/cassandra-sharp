@@ -16,7 +16,7 @@ namespace CassandraSharp.Config
     public class ClusterConfig
     {
         [XmlElement("Behavior")]
-        public BehaviorConfig Behavior;
+        public BehaviorConfig BehaviorConfig;
 
         [XmlElement("Endpoints")]
         public EndpointsConfig Endpoints;

@@ -45,7 +45,7 @@
                 throw new ArgumentNullException("clusterConfig.Endpoints");
             }
 
-            BehaviorConfig behaviorConfig = clusterConfig.Behavior ?? new BehaviorConfig();
+            IBehaviorConfig behaviorConfig = clusterConfig.BehaviorConfig ?? new BehaviorConfig();
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
 
             // create endpoints
@@ -55,7 +55,7 @@
 
             // create endpoint strategy
             IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(endpoints);
-            IPool<IConnection> pool = PoolType.Stack.Create(behaviorConfig.PoolSize);
+            IPool<IConnection> pool = PoolType.Stack.Create(transportConfig.PoolSize);
 
             // create the cluster now
             ITransportFactory transportFactory = transportConfig.Create();

@@ -50,9 +50,9 @@
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
-    <Compile Include="ConnectionInfo.cs" />
-    <Compile Include="ConnectionInfoExtensions.cs" />
-    <Compile Include="IConnectionInfo.cs" />
+    <Compile Include="BehaviorConfigBuilder.cs" />
+    <Compile Include="CommandInfoExtensions.cs" />
+    <Compile Include="IBehaviorConfig.cs" />
     <Compile Include="Model\LongNameOrValue.cs" />
     <Compile Include="INameOrValue.cs" />
     <Compile Include="Model\NameOrValueBase.cs" />
@@ -67,7 +67,7 @@
     <Compile Include="Commands\ColumnFamily.cs" />
     <Compile Include="Commands\Cql.cs" />
     <Compile Include="Commands\SystemManagement.cs" />
-    <Compile Include="Config\Behavior.cs" />
+    <Compile Include="Config\BehaviorConfig.cs" />
     <Compile Include="Config\CassandraSharpConfig.cs" />
     <Compile Include="Config\ClusterConfig.cs" />
     <Compile Include="Config\EndpointStrategy.cs" />
