@@ -17,11 +17,6 @@ namespace CassandraSharp
 
     public static class ClusterExtensions
     {
-        public static void SetKeySpace(this ICluster @this, string keyspace)
-        {
-            @this.Execute(null, ctx => SystemManagement.SetKeySpace(ctx, keyspace));
-        }
-
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column, INameOrValue value)
         {
             @this.Insert(columnFamily, key, column, value, @this.BehaviorConfig.TTL, @this.BehaviorConfig.WriteConsistencyLevel);
