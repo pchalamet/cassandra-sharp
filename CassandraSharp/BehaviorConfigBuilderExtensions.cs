@@ -14,7 +14,7 @@ namespace CassandraSharp
     using System;
     using Apache.Cassandra;
 
-    public static class CommandInfoExtensions
+    public static class BehaviorConfigBuilderExtensions
     {
         public static ICluster Configure(this ICluster @this, BehaviorConfigBuilder cmdInfoBuilder)
         {

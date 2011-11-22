@@ -51,7 +51,7 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="BehaviorConfigBuilder.cs" />
-    <Compile Include="CommandInfoExtensions.cs" />
+    <Compile Include="BehaviorConfigBuilderExtensions.cs" />
     <Compile Include="IBehaviorConfig.cs" />
     <Compile Include="Model\LongNameOrValue.cs" />
     <Compile Include="INameOrValue.cs" />
