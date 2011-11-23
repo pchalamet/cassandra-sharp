@@ -1,6 +1,6 @@
-version 0.6.0.0
+version 0.7.0.0
 - property file endpoint strategy
 
-version 0.5.0.0
+version 0.6.0.0
 - endpoint recycling
 - random endpoint strategy
