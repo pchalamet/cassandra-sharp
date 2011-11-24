@@ -89,14 +89,15 @@
                 transport.Open();
             }
 
-            bool keySpaceChanged = connection.KeySpace != behaviorConfig.KeySpace;
-            if (keySpaceChanged)
+            bool userChanged = connection.User != behaviorConfig.User;
+            if (userChanged && null != behaviorConfig.User && null != behaviorConfig.Password)
             {
-                if (null != behaviorConfig.User && null != behaviorConfig.Password)
-                {
-                    SystemManagement.Login(connection.CassandraClient, behaviorConfig.User, behaviorConfig.Password);
-                }
+                SystemManagement.Login(connection.CassandraClient, behaviorConfig.User, behaviorConfig.Password);
+            }
 
+            bool keyspaceChanged = connection.KeySpace != behaviorConfig.KeySpace;
+            if (keyspaceChanged && null != behaviorConfig.KeySpace)
+            {
                 SystemManagement.SetKeySpace(connection.CassandraClient, behaviorConfig.KeySpace);
                 connection.KeySpace = behaviorConfig.KeySpace;
             }
@@ -211,6 +212,8 @@
             }
 
             public string KeySpace { get; set; }
+
+            public string User { get; set; }
 
             public Endpoint Endpoint { get; private set; }
 

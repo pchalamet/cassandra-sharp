@@ -22,6 +22,8 @@ namespace CassandraSharp
     {
         string KeySpace { get; set; }
 
+        string User { get; set; }
+
         Endpoint Endpoint { get; }
 
         Cassandra.Client CassandraClient { get; }
