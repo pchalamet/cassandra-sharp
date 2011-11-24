@@ -95,12 +95,10 @@
                 if (null != behaviorConfig.User && null != behaviorConfig.Password)
                 {
                     SystemManagement.Login(connection.CassandraClient, behaviorConfig.User, behaviorConfig.Password);
-                    if (connection.KeySpace != behaviorConfig.KeySpace)
-                    {
-                        SystemManagement.SetKeySpace(connection.CassandraClient, behaviorConfig.KeySpace);
-                        connection.KeySpace = behaviorConfig.KeySpace;
-                    }
                 }
+
+                SystemManagement.SetKeySpace(connection.CassandraClient, behaviorConfig.KeySpace);
+                connection.KeySpace = behaviorConfig.KeySpace;
             }
         }
 
