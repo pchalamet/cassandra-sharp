@@ -11,7 +11,7 @@
 	</PropertyGroup>
 	
     <PropertyGroup>
-        <Thrift>Tools\Thrift\thrift-0.6.1.exe</Thrift>
+        <Thrift>packages\Thrift.0.7\tools\thrift-0.7.0.exe</Thrift>
         <ThriftInput>Apache.Cassandra\cassandra.thrift</ThriftInput>
         <ThriftOutput>Apache.Cassandra</ThriftOutput>
     </PropertyGroup>

@@ -45,6 +45,10 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Xml" />
+    <Reference Include="Thrift, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Thrift.0.7\lib\net35\Thrift.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\cassandra-sharp-version.cs">
@@ -110,10 +114,6 @@
     <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
       <Project>{984A4B04-C71A-4550-9193-817CFACBA30A}</Project>
       <Name>Apache.Cassandra</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Thrift\Thrift.csproj">
-      <Project>{81DA65BC-9ACD-4271-9ED0-84A3B3A1FB7A}</Project>
-      <Name>Thrift</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
