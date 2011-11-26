@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>cassandra-sharp</id>
+    <version>0.0.0.0</version>
+    <authors>Pierre Chalamet</authors>
+    <owners>Pierre Chalamet</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>http://code.google.com/p/cassandra-sharp/</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>cassandra-sharp is a .NET client for Apache Cassandra</description>
+    <tags>Cassandra</tags>
+    <dependencies>
+      <dependency id="Thrift" version="0.7" />
+      <dependency id="log4net" version="1.2.10" />
+    </dependencies>
+  </metadata>
+</package>
