@@ -11,5 +11,5 @@ endlocal
 goto :eof
 
 :usage
-echo %0 ^<version^>
+echo %~n0 ^<version^>
 goto :done
