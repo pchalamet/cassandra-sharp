@@ -22,7 +22,7 @@
         <ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
         <ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
         <KeyFile>cassandra-sharp.snk</KeyFile>
-        <cassandra-sharpAssembly>OutDir\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
+        <cassandra-sharpAssembly>OutDir\\lib\net35\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
     </PropertyGroup>
 
     <Target Name="Compile">
@@ -30,8 +30,8 @@
     </Target>
 
     <Target Name="CreateOutDirs">
-        <RemoveDir Directories="OutDir\$(Configuration)" />
-        <MakeDir Directories="OutDir\$(Configuration)" />
+        <RemoveDir Directories="OutDir\lib\net35\$(Configuration)" />
+        <MakeDir Directories="OutDir\lib\net35\$(Configuration)" />
     </Target>
 	
 	<Target Name="NuGet">
