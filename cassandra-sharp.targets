@@ -20,7 +20,7 @@
         <ILMerge>Tools\ILMerge\ILMerge.exe</ILMerge>
         <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp.dll</CassandraSharpAssembly>
         <ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
-        <ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
+        <ThriftAssembly>packages\Thrift.0.7\lib\net35\Thrift.dll</ThriftAssembly>
         <KeyFile>cassandra-sharp.snk</KeyFile>
         <cassandra-sharpAssembly>OutDir\\lib\net35\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
     </PropertyGroup>
