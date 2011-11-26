@@ -22,7 +22,6 @@ if "%VERSION%" == "" (
 )
 
 msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=%FLAVOR% cassandra-sharp.targets || goto :done
-msbuild /t:ZipBinaries /p:Version=%VERSION% cassandra-sharp.targets || goto :done
 
 :done
 popd
