@@ -22,18 +22,13 @@
         <ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
         <ThriftAssembly>packages\Thrift.0.7\lib\net35\Thrift.dll</ThriftAssembly>
         <KeyFile>cassandra-sharp.snk</KeyFile>
-        <cassandra-sharpAssembly>OutDir\\lib\net35\$(Configuration)\cassandra-sharp.dll</cassandra-sharpAssembly>
+        <cassandra-sharpAssembly>OutDir\lib\net35\cassandra-sharp.dll</cassandra-sharpAssembly>
     </PropertyGroup>
 
     <Target Name="Compile">
         <MSBuild Projects="cassandra-sharp.sln" />
     </Target>
 
-    <Target Name="CreateOutDirs">
-        <RemoveDir Directories="OutDir\lib\net35\$(Configuration)" />
-        <MakeDir Directories="OutDir\lib\net35\$(Configuration)" />
-    </Target>
-	
 	<Target Name="NuGet">
 		<Exec Command="$(NuGet) install packages.config -o packages" />
 	</Target>
@@ -47,6 +42,9 @@
     </Target>
 
     <Target Name="Merge">
+        <!--<RemoveDir Directories="OutDir" />-->
+		<Exec Command="rmdir /q /s $(OutDir)" />
+        <MakeDir Directories="OutDir\lib\net35" />
         <Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly) /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
     </Target>
 
@@ -58,7 +56,7 @@
         <Zip ZipFileName="cassandra-sharp-bin-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="OutDir" ZipLevel="9" />
     </Target>
 
-    <Target Name="GenerateVersion" DependsOnTargets="CreateOutDirs;NuGet;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">
+    <Target Name="GenerateVersion" DependsOnTargets="NuGet;GenerateAssemblyInfo;GenerateThrift;Compile;Merge">
     </Target>
 
 </Project>

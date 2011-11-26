@@ -4,9 +4,16 @@ setlocal
 set HERE=%~dp0
 pushd %HERE%
 
-set VERSION=%1
-if "%VERSION%" == "/?" goto :usage
+set FLAVOR=%1
+if "%FLAVOR%" == "/?" goto :usage
+if "%FLAVOR%" == "" (
+	echo WARNING: missing flavor as parameter ^(see %~n0 /?^)
+	echo WARNING: using FLAVOR=Debug instead
+	echo.
+	set FLAVOR=Debug
+)
 
+set VERSION=%2
 if "%VERSION%" == "" (
 	echo WARNING: missing version as parameter ^(see %~n0 /?^)
 	echo WARNING: using VERSION=0.0.0.0 instead
@@ -14,21 +21,19 @@ if "%VERSION%" == "" (
 	set VERSION=0.0.0.0
 )
 
-msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=Debug cassandra-sharp.targets || goto :nok
-msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=Release cassandra-sharp.targets || goto :nok
-msbuild /t:ZipBinaries /p:Version=%VERSION% cassandra-sharp.targets || goto :nok
+msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=%FLAVOR% cassandra-sharp.targets || goto :done
+msbuild /t:ZipBinaries /p:Version=%VERSION% cassandra-sharp.targets || goto :done
 
 :done
 popd
 endlocal
 goto :eof
 
-:nok
-
-
 :usage
-echo Usage: %~n0 ^<version^>
+echo usage:
+echo    %~n0 ^<flavor^> ^<version^>
 echo.
-echo where
+echo where:
+echo    flavor  : Debug or Release
 echo    version : format is AAA.BBB.CCC.DDD
 goto :done

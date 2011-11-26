@@ -18,14 +18,14 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("CassandraSharp")]
-[assembly: AssemblyDescription(".NET Client for Apache Cassandra")]
+[assembly: AssemblyDescription("cassandra-sharp is a .NET Client for Apache Cassandra")]
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CassandraSharp")]
+[assembly: AssemblyProduct("cassandra-sharp")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
