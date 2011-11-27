@@ -1,15 +1,4 @@
-﻿// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-// limitations under the License.
-namespace CassandraSharp
+﻿namespace CassandraSharp
 {
     using System;
     using System.Collections.Generic;
@@ -20,6 +9,7 @@ namespace CassandraSharp
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Factory;
     using CassandraSharp.Pool;
+    using CassandraSharp.Recovery;
     using CassandraSharp.Snitch;
     using CassandraSharp.Transport;
     using CassandraSharp.Utils;
@@ -27,6 +17,8 @@ namespace CassandraSharp
     public class ClusterManager
     {
         private static CassandraSharpConfig _config;
+
+        private static IRecoveryService _recoveryService;
 
         public static ICluster GetCluster(string name)
         {
@@ -59,6 +51,8 @@ namespace CassandraSharp
             IBehaviorConfig behaviorConfig = clusterConfig.BehaviorConfig ?? new BehaviorConfig();
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
 
+            IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
+
             // create endpoints
             ISnitch snitch = clusterConfig.Endpoints.Snitch.Create();
             IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
@@ -70,7 +64,7 @@ namespace CassandraSharp
 
             // create the cluster now
             ITransportFactory transportFactory = transportConfig.Create();
-            return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager);
+            return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService);
         }
 
         private static IEnumerable<Endpoint> GetEndpoints(EndpointsConfig config, ISnitch snitch, IPAddress clientAddress)
@@ -103,6 +97,22 @@ namespace CassandraSharp
             }
 
             return clusterConfig;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private static IRecoveryService FindRecoveryService(bool recover)
+        {
+            if (! recover)
+            {
+                return null;
+            }
+
+            if (null == _recoveryService)
+            {
+                _recoveryService = new DefaultRecovery();
+            }
+
+            return _recoveryService;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

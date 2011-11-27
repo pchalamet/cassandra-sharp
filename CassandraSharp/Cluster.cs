@@ -21,13 +21,17 @@
 
         private readonly IPool<IConnection> _pool;
 
+        private readonly IRecoveryService _recoveryService;
+
         private readonly ITransportFactory _transportFactory;
 
-        public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager)
+        public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager,
+                       IRecoveryService recoveryService)
         {
             BehaviorConfig = behaviorConfig;
             _pool = pool;
             _endpointsManager = endpointsManager;
+            _recoveryService = recoveryService;
             _transportFactory = transportFactory;
         }
 
@@ -188,6 +192,11 @@
             {
                 if (hasFailed)
                 {
+                    if (null != _recoveryService)
+                    {
+                        _recoveryService.Recover(connection.Endpoint, _endpointsManager, _transportFactory);
+                    }
+
                     _endpointsManager.Ban(connection.Endpoint);
                     connection.SafeDispose();
                 }

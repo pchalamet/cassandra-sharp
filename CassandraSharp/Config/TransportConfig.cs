@@ -32,5 +32,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("poolSize")]
         public int PoolSize;
+
+        [XmlAttribute("recoverable")]
+        public bool Recoverable = true;
     }
 }

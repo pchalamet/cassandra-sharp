@@ -57,6 +57,7 @@
     <Compile Include="BehaviorConfigBuilder.cs" />
     <Compile Include="BehaviorConfigBuilderExtensions.cs" />
     <Compile Include="IBehaviorConfig.cs" />
+    <Compile Include="IRecoveryService.cs" />
     <Compile Include="Model\LongNameOrValue.cs" />
     <Compile Include="INameOrValue.cs" />
     <Compile Include="Model\NameOrValueBase.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Commands\Describe.cs" />
     <Compile Include="Config\PoolType.cs" />
     <Compile Include="Config\SnitchType.cs" />
+    <Compile Include="Recovery\DefaultRecovery.cs" />
     <Compile Include="Utils\DisposableExtensions.cs" />
     <Compile Include="EndpointStrategy\Endpoint.cs" />
     <Compile Include="Commands\IExecutionContext.cs" />
@@ -116,6 +118,7 @@
       <Name>Apache.Cassandra</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
