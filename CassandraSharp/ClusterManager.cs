@@ -118,9 +118,10 @@
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void Shutdown()
         {
-            if (null == _config)
+            if (null != _recoveryService)
             {
-                return;
+                _recoveryService.SafeDispose();
+                _recoveryService = null;
             }
 
             _config = null;
