@@ -27,16 +27,18 @@
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Recover(Endpoint endpoint, IEndpointStrategy endpointStrategy, ITransportFactory transportFactory)
         {
+            _log.Info(string.Format("marking {0} for recovery", endpoint.Address));
+
             RecoveryItem recoveryItem = new RecoveryItem(endpoint, transportFactory, endpointStrategy);
             _toRecover.Add(recoveryItem);
-
-            _log.Info(string.Format("{0} is marked for recovery", endpoint.Address));
 
             _timer.Enabled = true;
         }
 
         public void Dispose()
         {
+            _log.Info("Recovery service is shutting down");
+
             _timer.Enabled = false;
             _timer.SafeDispose();
         }
@@ -44,6 +46,8 @@
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void TryRecover(object sender, ElapsedEventArgs e)
         {
+            _log.Info("Recovery service is trying to recover connections");
+
             List<RecoveryItem> recoveredItems = new List<RecoveryItem>();
             foreach (RecoveryItem recoveryItem in _toRecover)
             {
