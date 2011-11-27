@@ -6,6 +6,7 @@
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Transport;
     using CassandraSharp.Utils;
+    using log4net;
     using Thrift.Transport;
 
     internal class DefaultRecovery : IRecoveryService
@@ -13,6 +14,8 @@
         private readonly Timer _timer;
 
         private readonly List<RecoveryItem> _toRecover;
+
+        private ILog _log = LogManager.GetLogger(typeof(DefaultRecovery));
 
         public DefaultRecovery()
         {
@@ -26,6 +29,8 @@
         {
             RecoveryItem recoveryItem = new RecoveryItem(endpoint, transportFactory, endpointStrategy);
             _toRecover.Add(recoveryItem);
+
+            _log.Info(string.Format("{0} is marked for recovery", endpoint.Address));
 
             _timer.Enabled = true;
         }
@@ -72,6 +77,8 @@
 
             foreach (RecoveryItem recoveryItem in recoveredItems)
             {
+                _log.Info(string.Format("{0} is recovered", recoveryItem.Endpoint.Address));
+
                 _toRecover.Remove(recoveryItem);
             }
 
