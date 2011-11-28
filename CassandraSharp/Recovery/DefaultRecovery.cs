@@ -31,7 +31,7 @@ namespace CassandraSharp.Recovery
         public DefaultRecovery()
         {
             _toRecover = new List<RecoveryItem>();
-            _timer = new Timer(60*1000);
+            _timer = new Timer(60*1000) {AutoReset = true};
             _timer.Elapsed += TryRecover;
         }
 
@@ -46,6 +46,7 @@ namespace CassandraSharp.Recovery
             _timer.Enabled = true;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Dispose()
         {
             _log.Info("Recovery service is shutting down");
