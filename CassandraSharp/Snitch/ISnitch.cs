@@ -17,6 +17,6 @@ namespace CassandraSharp.Snitch
     {
         string GetDataCenter(IPAddress target);
 
-        int ComputeProximity(IPAddress source, IPAddress target);
+        int ComputeDistance(IPAddress source, IPAddress target);
     }
 }

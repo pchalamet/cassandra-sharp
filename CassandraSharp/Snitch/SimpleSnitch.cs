@@ -20,7 +20,7 @@ namespace CassandraSharp.Snitch
             return "datacenter1";
         }
 
-        public int ComputeProximity(IPAddress source, IPAddress target)
+        public int ComputeDistance(IPAddress source, IPAddress target)
         {
             return 0;
         }

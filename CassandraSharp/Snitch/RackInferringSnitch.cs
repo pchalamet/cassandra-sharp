@@ -22,7 +22,7 @@ namespace CassandraSharp.Snitch
             return dc;
         }
 
-        public int ComputeProximity(IPAddress source, IPAddress target)
+        public int ComputeDistance(IPAddress source, IPAddress target)
         {
             byte[] addrBytes = source.GetAddressBytes();
             int sourceNum = (addrBytes[1] << 8) + addrBytes[2];
