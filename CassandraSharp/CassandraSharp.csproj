@@ -56,6 +56,7 @@
     </Compile>
     <Compile Include="BehaviorConfigBuilder.cs" />
     <Compile Include="BehaviorConfigBuilderExtensions.cs" />
+    <Compile Include="Factory\RecoveryServiceExtensions.cs" />
     <Compile Include="IBehaviorConfig.cs" />
     <Compile Include="IRecoveryService.cs" />
     <Compile Include="Model\LongNameOrValue.cs" />

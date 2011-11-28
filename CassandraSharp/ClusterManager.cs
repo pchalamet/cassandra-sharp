@@ -76,7 +76,7 @@
                 if (null != serverAddress)
                 {
                     string datacenter = snitch.GetDataCenter(serverAddress);
-                    int proximity = snitch.ComputeProximity(clientAddress, serverAddress);
+                    int proximity = snitch.ComputeDistance(clientAddress, serverAddress);
                     Endpoint endpoint = new Endpoint(server, serverAddress, datacenter, proximity);
                     endpoints.Add(endpoint);
                 }
@@ -109,7 +109,7 @@
 
             if (null == _recoveryService)
             {
-                _recoveryService = new DefaultRecovery();
+                _recoveryService = RecoveryServiceExtensions.Create();
             }
 
             return _recoveryService;
