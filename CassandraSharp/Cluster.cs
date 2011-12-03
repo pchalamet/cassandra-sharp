@@ -79,6 +79,8 @@
                         _logger.Fatal("Max retry count reached");
                         throw;
                     }
+
+                    System.Threading.Thread.Sleep(behaviorConfig.SleepBeforeRetry);
                 }
 
                 ++tryCount;
