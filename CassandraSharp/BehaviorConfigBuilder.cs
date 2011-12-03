@@ -34,6 +34,8 @@ namespace CassandraSharp
 
         public bool? RetryOnUnavailable { get; set; }
 
+        public int? SleepBeforeRetry { get; set; }
+
         public IBehaviorConfig Build(IBehaviorConfig behaviorConfigToOverride)
         {
             IBehaviorConfig behaviorConfigConfig = new BehaviorConfig
@@ -46,7 +48,8 @@ namespace CassandraSharp
                                                            TTL = behaviorConfigToOverride.TTL,
                                                            RetryOnNotFound = RetryOnNotFound ?? behaviorConfigToOverride.RetryOnNotFound,
                                                            RetryOnTimeout = RetryOnTimeout ?? behaviorConfigToOverride.RetryOnTimeout,
-                                                           RetryOnUnavailable = RetryOnUnavailable ?? behaviorConfigToOverride.RetryOnUnavailable
+                                                           RetryOnUnavailable = RetryOnUnavailable ?? behaviorConfigToOverride.RetryOnUnavailable,
+                                                           SleepBeforeRetry = SleepBeforeRetry ?? behaviorConfigToOverride.SleepBeforeRetry
                                                        };
             return behaviorConfigConfig;
         }
