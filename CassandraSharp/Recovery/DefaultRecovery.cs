@@ -28,25 +28,29 @@ namespace CassandraSharp.Recovery
 
         private readonly List<RecoveryItem> _toRecover;
 
+        private readonly object _lock;
+
         public DefaultRecovery()
         {
             _toRecover = new List<RecoveryItem>();
             _timer = new Timer(60*1000);
             _timer.Elapsed += TryRecover;
+            _lock = new object();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Recover(Endpoint endpoint, IEndpointStrategy endpointStrategy, ITransportFactory transportFactory)
         {
             _log.Info(string.Format("marking {0} for recovery", endpoint.Address));
 
-            RecoveryItem recoveryItem = new RecoveryItem(endpoint, transportFactory, endpointStrategy);
-            _toRecover.Add(recoveryItem);
+            lock (_lock)
+            {
+                RecoveryItem recoveryItem = new RecoveryItem(endpoint, transportFactory, endpointStrategy);
+                _toRecover.Add(recoveryItem);
 
-            _timer.Enabled = true;
+                _timer.Enabled = true;
+            }
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Dispose()
         {
             _log.Info("Recovery service is shutting down");
@@ -55,13 +59,18 @@ namespace CassandraSharp.Recovery
             _timer.SafeDispose();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         private void TryRecover(object sender, ElapsedEventArgs e)
         {
             _log.Info("Recovery service is trying to recover connections");
 
+            List<RecoveryItem> toRecover;
+            lock (_lock)
+            {
+                toRecover = new List<RecoveryItem>(_toRecover);
+            }
+
             List<RecoveryItem> recoveredItems = new List<RecoveryItem>();
-            foreach (RecoveryItem recoveryItem in _toRecover)
+            foreach (RecoveryItem recoveryItem in toRecover)
             {
                 bool ok = false;
                 TTransport transport = null;
@@ -91,14 +100,17 @@ namespace CassandraSharp.Recovery
                 }
             }
 
-            foreach (RecoveryItem recoveryItem in recoveredItems)
+            lock (_lock)
             {
-                _log.Info(string.Format("{0} is recovered", recoveryItem.Endpoint.Address));
+                foreach (RecoveryItem recoveryItem in recoveredItems)
+                {
+                    _log.Info(string.Format("{0} is recovered", recoveryItem.Endpoint.Address));
 
-                _toRecover.Remove(recoveryItem);
+                    _toRecover.Remove(recoveryItem);
+                }
+
+                _timer.Enabled = 0 < _toRecover.Count;
             }
-
-            _timer.Enabled = 0 < _toRecover.Count;
         }
 
         private class RecoveryItem
