@@ -34,5 +34,7 @@ namespace CassandraSharp
         bool RetryOnUnavailable { get; }
 
         string User { get; }
+
+        int SleepBeforeRetry { get; }
     }
 }
