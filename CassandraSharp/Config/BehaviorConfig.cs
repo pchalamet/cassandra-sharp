@@ -51,5 +51,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("user")]
         public string User { get; set; }
+
+        [XmlAttribute("sleepBeforeRetry")]
+        public int SleepBeforeRetry { get; set; }
     }
 }
