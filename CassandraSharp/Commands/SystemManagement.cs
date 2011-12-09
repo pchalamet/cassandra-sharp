@@ -11,6 +11,7 @@
 // limitations under the License.
 namespace CassandraSharp.Commands
 {
+    using System.Collections.Generic;
     using Apache.Cassandra;
 
     public static class SystemManagement
@@ -47,8 +48,11 @@ namespace CassandraSharp.Commands
         public static void Login(Cassandra.Client client, string username, string password)
         {
             AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-            authenticationRequest.Credentials.Add("username", username);
-            authenticationRequest.Credentials.Add("password", password);
+            authenticationRequest.Credentials = new Dictionary<string, string>
+                                                    {
+                                                        {"username", username}, 
+                                                        {"password", password}
+                                                    };
             client.login(authenticationRequest);            
         }
     }
