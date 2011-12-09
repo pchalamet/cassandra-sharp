@@ -39,16 +39,13 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.1.2.10\lib\2.0\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParties\log4net\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Xml" />
-    <Reference Include="Thrift, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Thrift.0.7\lib\net35\Thrift.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\cassandra-sharp-version.cs">
@@ -117,6 +114,10 @@
     <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
       <Project>{984A4B04-C71A-4550-9193-817CFACBA30A}</Project>
       <Name>Apache.Cassandra</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Thrift\Thrift.csproj">
+      <Project>{81DA65BC-9ACD-4271-9ED0-84A3B3A1FB7A}</Project>
+      <Name>Thrift</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

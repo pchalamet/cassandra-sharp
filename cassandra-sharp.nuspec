@@ -10,9 +10,5 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>cassandra-sharp is a .NET client for Apache Cassandra</description>
     <tags>Cassandra</tags>
-    <dependencies>
-      <dependency id="Thrift" version="0.7" />
-      <dependency id="log4net" version="1.2.10" />
-    </dependencies>
   </metadata>
 </package>
