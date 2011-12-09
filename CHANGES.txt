@@ -1,3 +1,27 @@
+version 0.6.1.0
+- remove NuGet for packages dependencies (unsecure)
+- using Thrift 0.8 (recompiled)
+- using log4net 1.2.11 (official bin new key)
+- Thrift is merged with cassandra-sharp.dll
+- fix NPE in authentication
+
+0.6.0.0
+- support for endpoint recovery
+
+0.5.4.0
+- support for NuGet. Package name is cassandra-sharp
+- log4net and Thrift are shipped with the zip package
+- Thrift is no more merge in the cassandra-sharp.dll (BREAKING CHANGE)
+
+0.5.1.0
+- minor fix for user/password change when overriding cluster config
+
+0.5.0.0
+- new mechanism to override a cluster configuration to handle a batch of commands (BREAKING CHANGE)
+- poolSize is moved from BehaviorConfig? to TransportConfig? (BREAKING CHANGE)
+- ICluster interface changed (BREAKING CHANGE)
+- SetKeySpace removed - this was not safe (BREAKING CHANGE)
+
 version 0.4.0.0
 - support for authentication
 - tested against Cassandra 1.0
