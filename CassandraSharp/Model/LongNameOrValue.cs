@@ -28,21 +28,15 @@ namespace CassandraSharp.Model
         public override byte[] ToByteArray()
         {
             byte[] value = BitConverter.GetBytes(Value);
-            byte[] buffer = new[]
-                                {
-                                    value[7], value[6], value[5], value[4],
-                                    value[3], value[2], value[1], value[0]
-                                };
-            return buffer;
+            Array.Reverse(value);
+            return value;
         }
 
         protected override long FromByteArray(byte[] value)
         {
-            byte[] buffer = new[]
-                                {
-                                    value[7], value[6], value[5], value[4],
-                                    value[3], value[2], value[1], value[0]
-                                };
+            byte[] buffer = new byte[value.Length];
+			value.CopyTo(buffer, 0);
+			Array.Reverse(buffer);
             long result = BitConverter.ToInt64(buffer, 0);
             return result;
         }
