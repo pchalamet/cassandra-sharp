@@ -27,7 +27,13 @@ namespace CassandraSharp.Factory
                         throw new ArgumentNullException("snitchType must not be null");
                     }
 
-                    Type snitchType = Type.GetType(customType, true);
+                    Type snitchType = Type.GetType(customType);
+                    if( null == snitchType)
+                    {
+                        string invalidTypeMsg = string.Format("'{0}' is not a valid type", snitchType);
+                        throw new ArgumentException(invalidTypeMsg);
+                    }
+
                     return (ISnitch)Activator.CreateInstance(snitchType);
 
                 case SnitchType.Simple:

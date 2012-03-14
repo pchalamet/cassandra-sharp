@@ -28,7 +28,13 @@ namespace CassandraSharp.Factory
                         throw new ArgumentNullException("strategyType must not be null");
                     }
 
-                    Type strategyType = Type.GetType(customType, true);
+                    Type strategyType = Type.GetType(customType);
+                    if (null == strategyType)
+                    {
+                        string invalidTypeMsg = string.Format("'{0}' is not a valid type", strategyType);
+                        throw new ArgumentException(invalidTypeMsg);
+                    }
+
                     return (IEndpointStrategy) Activator.CreateInstance(strategyType, endpoints);
 
                 case EndpointStrategy.Random:
