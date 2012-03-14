@@ -15,7 +15,7 @@ namespace CassandraSharp.EndpointStrategy
     ///     IEndpointStrategy helps choosing a server to connect to
     ///     Implementation must be thread safe
     /// </summary>
-    internal interface IEndpointStrategy
+    public interface IEndpointStrategy
     {
         Endpoint Pick();
 
