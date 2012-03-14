@@ -24,7 +24,7 @@ namespace CassandraSharp.Factory
                 case SnitchType.Custom:
                     if( null == customType)
                     {
-                        throw new ArgumentNullException("snitchType must not be null");
+                        throw new ArgumentException("EndpointsConfig.SnitchType must not be null");
                     }
 
                     Type snitchType = Type.GetType(customType);
