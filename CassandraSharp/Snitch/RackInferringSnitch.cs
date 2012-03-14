@@ -25,10 +25,10 @@ namespace CassandraSharp.Snitch
         public int ComputeDistance(IPAddress source, IPAddress target)
         {
             byte[] addrBytes = source.GetAddressBytes();
-            int sourceNum = (addrBytes[1] << 8) + addrBytes[2];
+            int sourceNum = (addrBytes[1] << 16) + addrBytes[2];
 
             addrBytes = target.GetAddressBytes();
-            int targetNum = (addrBytes[1] << 8) + addrBytes[2];
+            int targetNum = (addrBytes[1] << 16) + addrBytes[2];
 
             int distance = targetNum - sourceNum;
             return distance;
