@@ -23,6 +23,11 @@ namespace CassandraSharp.Factory
             switch (@this.Strategy)
             {
                 case EndpointStrategy.Custom:
+                    if( null == customType)
+                    {
+                        throw new ArgumentNullException("strategyType must not be null");
+                    }
+
                     Type strategyType = Type.GetType(customType, true);
                     return (IEndpointStrategy) Activator.CreateInstance(strategyType, endpoints);
 
