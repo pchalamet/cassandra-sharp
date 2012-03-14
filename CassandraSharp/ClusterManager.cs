@@ -54,12 +54,31 @@
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            ISnitch snitch = clusterConfig.Endpoints.Snitch.Create();
+            ISnitch snitch;
+            if (null == clusterConfig.Endpoints.SnitchType)
+            {
+                snitch = clusterConfig.Endpoints.Snitch.Create();
+            }
+            else
+            {
+                Type snitchType = Type.GetType(clusterConfig.Endpoints.SnitchType, true);
+                snitch = (ISnitch)Activator.CreateInstance(snitchType);
+            }
+
             IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
             IEnumerable<Endpoint> endpoints = GetEndpoints(clusterConfig.Endpoints, snitch, clientAddress);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(endpoints);
+            IEndpointStrategy endpointsManager;
+            if (null == clusterConfig.Endpoints.StrategyType)
+            {
+                endpointsManager = clusterConfig.Endpoints.Create(endpoints);
+            }
+            else
+            {
+                Type strategyType = Type.GetType(clusterConfig.Endpoints.StrategyType, true);
+                endpointsManager = (IEndpointStrategy) Activator.CreateInstance(strategyType, endpoints);
+            }
             IPool<IConnection> pool = PoolType.Stack.Create(transportConfig.PoolSize);
 
             // create the cluster now
