@@ -13,7 +13,7 @@ namespace CassandraSharp.Snitch
 {
     using System.Net;
 
-    internal interface ISnitch
+    public interface ISnitch
     {
         string GetDataCenter(IPAddress target);
 
