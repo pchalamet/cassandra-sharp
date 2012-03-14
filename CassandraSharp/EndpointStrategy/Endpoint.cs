@@ -13,7 +13,7 @@ namespace CassandraSharp.EndpointStrategy
 {
     using System.Net;
 
-    internal class Endpoint
+    public class Endpoint
     {
         public Endpoint(string hostName, IPAddress address, string datacenter, int proximity)
         {

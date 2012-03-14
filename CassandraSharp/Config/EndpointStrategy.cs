@@ -13,6 +13,7 @@ namespace CassandraSharp.Config
 {
     public enum EndpointStrategy
     {
+        Custom,
         Random,
         Nearest
     }

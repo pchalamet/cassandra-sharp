@@ -13,6 +13,7 @@ namespace CassandraSharp.Config
 {
     public enum SnitchType
     {
+        Custom,
         Simple,
         RackInferring
     }

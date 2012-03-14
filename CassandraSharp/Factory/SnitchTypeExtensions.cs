@@ -17,10 +17,14 @@ namespace CassandraSharp.Factory
 
     internal static class SnitchTypeExtensions
     {
-        public static ISnitch Create(this SnitchType @this)
+        public static ISnitch Create(this SnitchType @this, string customType)
         {
             switch (@this)
             {
+                case SnitchType.Custom:
+                    Type snitchType = Type.GetType(customType, true);
+                    return (ISnitch)Activator.CreateInstance(snitchType);
+
                 case SnitchType.Simple:
                     return new SimpleSnitch();
 

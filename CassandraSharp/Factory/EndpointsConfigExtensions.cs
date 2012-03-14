@@ -18,10 +18,14 @@ namespace CassandraSharp.Factory
 
     internal static class EndpointsConfigExtensions
     {
-        public static IEndpointStrategy Create(this EndpointsConfig @this, IEnumerable<Endpoint> endpoints)
+        public static IEndpointStrategy Create(this EndpointsConfig @this, string customType, IEnumerable<Endpoint> endpoints)
         {
             switch (@this.Strategy)
             {
+                case EndpointStrategy.Custom:
+                    Type strategyType = Type.GetType(customType, true);
+                    return (IEndpointStrategy) Activator.CreateInstance(strategyType, endpoints);
+
                 case EndpointStrategy.Random:
                     return new RandomEndpointStrategy(endpoints);
 

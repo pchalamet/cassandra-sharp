@@ -9,7 +9,6 @@
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Factory;
     using CassandraSharp.Pool;
-    using CassandraSharp.Recovery;
     using CassandraSharp.Snitch;
     using CassandraSharp.Transport;
     using CassandraSharp.Utils;
@@ -54,31 +53,13 @@
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            ISnitch snitch;
-            if (null == clusterConfig.Endpoints.SnitchType)
-            {
-                snitch = clusterConfig.Endpoints.Snitch.Create();
-            }
-            else
-            {
-                Type snitchType = Type.GetType(clusterConfig.Endpoints.SnitchType, true);
-                snitch = (ISnitch)Activator.CreateInstance(snitchType);
-            }
+            ISnitch snitch = clusterConfig.Endpoints.Snitch.Create(clusterConfig.Endpoints.SnitchType);
 
             IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
             IEnumerable<Endpoint> endpoints = GetEndpoints(clusterConfig.Endpoints, snitch, clientAddress);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager;
-            if (null == clusterConfig.Endpoints.StrategyType)
-            {
-                endpointsManager = clusterConfig.Endpoints.Create(endpoints);
-            }
-            else
-            {
-                Type strategyType = Type.GetType(clusterConfig.Endpoints.StrategyType, true);
-                endpointsManager = (IEndpointStrategy) Activator.CreateInstance(strategyType, endpoints);
-            }
+            IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(clusterConfig.Endpoints.StrategyType, endpoints);
             IPool<IConnection> pool = PoolType.Stack.Create(transportConfig.PoolSize);
 
             // create the cluster now
