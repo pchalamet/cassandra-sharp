@@ -25,7 +25,7 @@ namespace CassandraSharp.Factory
                 case EndpointStrategy.Custom:
                     if( null == customType)
                     {
-                        throw new ArgumentException("EndpointsConfig.StrategyType must not be null");
+                        throw new ArgumentNullException("EndpointsConfig.StrategyType");
                     }
 
                     Type strategyType = Type.GetType(customType);
