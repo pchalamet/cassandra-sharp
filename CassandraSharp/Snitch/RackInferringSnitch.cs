@@ -11,6 +11,7 @@
 // limitations under the License.
 namespace CassandraSharp.Snitch
 {
+    using System;
     using System.Net;
 
     internal class RackInferringSnitch : ISnitch
@@ -30,7 +31,7 @@ namespace CassandraSharp.Snitch
             addrBytes = target.GetAddressBytes();
             int targetNum = (addrBytes[1] << 16) + addrBytes[2];
 
-            int distance = targetNum - sourceNum;
+            int distance = Math.Abs(targetNum - sourceNum);
             return distance;
         }
     }
