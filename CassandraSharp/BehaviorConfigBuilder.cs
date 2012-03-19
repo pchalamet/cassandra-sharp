@@ -22,11 +22,13 @@ namespace CassandraSharp
 
         public string Password { get; set; }
 
+        public int? MaxRetries { get; set; }
+
         public ConsistencyLevel? ReadConsistencyLevel { get; set; }
 
         public ConsistencyLevel? WriteConsistencyLevel { get; set; }
 
-        public int TTL { get; set; }
+        public int? TTL { get; set; }
 
         public bool? RetryOnNotFound { get; set; }
 
@@ -43,9 +45,10 @@ namespace CassandraSharp
                                                            KeySpace = KeySpace ?? behaviorConfigToOverride.KeySpace,
                                                            User = Login ?? behaviorConfigToOverride.User,
                                                            Password = Password ?? behaviorConfigToOverride.Password,
+                                                           MaxRetries = MaxRetries ?? behaviorConfigToOverride.MaxRetries,
                                                            ReadConsistencyLevel = ReadConsistencyLevel ?? behaviorConfigToOverride.ReadConsistencyLevel,
                                                            WriteConsistencyLevel = WriteConsistencyLevel ?? behaviorConfigToOverride.WriteConsistencyLevel,
-                                                           TTL = behaviorConfigToOverride.TTL,
+                                                           TTL = TTL ?? behaviorConfigToOverride.TTL,
                                                            RetryOnNotFound = RetryOnNotFound ?? behaviorConfigToOverride.RetryOnNotFound,
                                                            RetryOnTimeout = RetryOnTimeout ?? behaviorConfigToOverride.RetryOnTimeout,
                                                            RetryOnUnavailable = RetryOnUnavailable ?? behaviorConfigToOverride.RetryOnUnavailable,
