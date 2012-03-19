@@ -9,6 +9,8 @@
     [TestFixture]
     public class BehaviorConfigBuilderTest
     {
+        // ensure that BehaviorConfigBuilder implements all required properties
+        // to build a BehaviorConfig instance
         [Test]
         public void MustHaveSamePropertiesThanBehaviorConfigButWithNullable()
         {
