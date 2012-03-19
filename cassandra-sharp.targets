@@ -37,7 +37,7 @@
         <ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
         <Log4NetAssembly>ThirdParties\log4net\log4net.dll</Log4NetAssembly>
         <KeyFile>cassandra-sharp.snk</KeyFile>
-        <cassandra-sharpAssembly>$(OutDir)\cassandra-sharp.dll</cassandra-sharpAssembly>
+        <cassandra-sharpAssembly>$(OutDir)\cassandra-sharp</cassandra-sharpAssembly>
     </PropertyGroup>
 
 	<Target Name="Clean">
@@ -60,12 +60,13 @@
     </Target>
 
     <Target Name="Merge" DependsOnTargets="Clean">
-        <Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly) /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
+        <Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly).dll /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
     </Target>
 
 	<Target Name="BuildZipPackage" DependsOnTargets="Compile;Merge">
         <ItemGroup>
-            <ZipFilesCopy Include="$(cassandra-sharpAssembly)" />
+            <ZipFilesCopy Include="$(cassandra-sharpAssembly).dll" />
+            <ZipFilesCopy Include="$(cassandra-sharpAssembly).pdb" />
 			<ZipFilesCopy Include="$(Log4NetAssembly)" />
         </ItemGroup>
 		
@@ -79,7 +80,8 @@
 	</Target>
 	
 	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile;Merge">
-		<Copy SourceFiles="$(cassandra-sharpAssembly)" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
+		<Copy SourceFiles="$(cassandra-sharpAssembly).dll" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
+		<Copy SourceFiles="$(cassandra-sharpAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
 		<Copy SourceFiles="$(Log4NetAssembly)" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
 		<Copy SourceFiles="cassandra-sharp.nuspec" DestinationFolder="$(NuGetPackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetPackageDir)\cassandra-sharp.nuspec" Query="/package/metadata/version" Value="$(Version)" />
