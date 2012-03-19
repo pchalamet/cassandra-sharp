@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BehaviorConfigBuilderTest.cs" />
     <Compile Include="Model\LongNameOrValueTest.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
     <Compile Include="ClusterTest.cs" />

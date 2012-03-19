@@ -18,7 +18,7 @@ namespace CassandraSharp
     {
         public string KeySpace { get; set; }
 
-        public string Login { get; set; }
+        public string User { get; set; }
 
         public string Password { get; set; }
 
@@ -43,7 +43,7 @@ namespace CassandraSharp
             IBehaviorConfig behaviorConfigConfig = new BehaviorConfig
                                                        {
                                                            KeySpace = KeySpace ?? behaviorConfigToOverride.KeySpace,
-                                                           User = Login ?? behaviorConfigToOverride.User,
+                                                           User = User ?? behaviorConfigToOverride.User,
                                                            Password = Password ?? behaviorConfigToOverride.Password,
                                                            MaxRetries = MaxRetries ?? behaviorConfigToOverride.MaxRetries,
                                                            ReadConsistencyLevel = ReadConsistencyLevel ?? behaviorConfigToOverride.ReadConsistencyLevel,
