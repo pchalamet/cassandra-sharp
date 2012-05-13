@@ -35,12 +35,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\ThirdParties\log4net\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CqlExtensions.cs" />
+    <Compile Include="Logger4log4net.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MadeSimpleSample.cs" />
+    <Compile Include="MadeSimpleMinimalConfigSample.cs" />
+    <Compile Include="ObjectMapperSample.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">

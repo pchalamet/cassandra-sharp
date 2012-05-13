@@ -10,28 +10,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Implementation
+namespace TestClient
 {
-    public class DefaultLogger : ILog
+    using log4net;
+    using log4net.Config;
+
+    public class Logger4log4net : CassandraSharp.ILog
     {
+        private readonly log4net.ILog _log = LogManager.GetLogger("TestClient");
+
+        static Logger4log4net()
+        {
+            XmlConfigurator.Configure();
+        }
+
         public void Debug(string format, params object[] prms)
         {
+            _log.DebugFormat(format, prms);
         }
 
         public void Info(string format, params object[] prms)
         {
+            _log.InfoFormat(format, prms);
         }
 
         public void Warn(string format, params object[] prms)
         {
+            _log.WarnFormat(format, prms);
         }
 
         public void Error(string format, params object[] prms)
         {
+            _log.ErrorFormat(format, prms);
         }
 
         public void Fatal(string format, params object[] prms)
         {
+            _log.FatalFormat(format, prms);
         }
     }
 }

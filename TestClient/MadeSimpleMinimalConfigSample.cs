@@ -10,18 +10,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace TestClient
 {
-    public interface ILog
+    using CassandraSharp;
+
+    public class MadeSimpleMinimalConfigSample : MadeSimpleSample
     {
-        void Debug(string format, params object[] prms);
+        public MadeSimpleMinimalConfigSample(string configName)
+            : base(configName)
+        {
+        }
 
-        void Info(string format, params object[] prms);
+        protected override void Run(ICluster cluster)
+        {
+            BehaviorConfigBuilder cmdInfoBuilder = new BehaviorConfigBuilder {KeySpace = "TestKS"};
+            ICluster configuredCluster = cluster.Configure(cmdInfoBuilder);
 
-        void Warn(string format, params object[] prms);
-
-        void Error(string format, params object[] prms);
-
-        void Fatal(string format, params object[] prms);
+            base.Run(configuredCluster);
+        }
     }
 }
