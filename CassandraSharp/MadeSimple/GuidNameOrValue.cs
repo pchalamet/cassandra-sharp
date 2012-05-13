@@ -10,23 +10,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.NameOrValues
+namespace CassandraSharp.MadeSimple
 {
-    public class ByteArrayNameOrValue : NameOrValueBase<byte[]>
+    using System;
+
+    public class GuidNameOrValue : NameOrValueBase<Guid>
     {
-        public ByteArrayNameOrValue(byte[] value)
+        public GuidNameOrValue(Guid value)
+            : base(value)
+        {
+        }
+
+        public GuidNameOrValue(byte[] value)
             : base(value)
         {
         }
 
         public override byte[] ToByteArray()
         {
-            return Value;
+            return Value.ToByteArray();
         }
 
-        protected override byte[] FromByteArray(byte[] value)
+        protected override Guid FromByteArray(byte[] value)
         {
-            return value;
+            return new Guid(value);
         }
     }
 }

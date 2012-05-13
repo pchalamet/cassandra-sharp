@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BehaviorConfigBuilderTest.cs" />
-    <Compile Include="Model\LongNameOrValueTest.cs" />
+    <Compile Include="MadeSimple\LongNameOrValueTest.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
     <Compile Include="Implementation\ClusterTest.cs" />
     <Compile Include="Utils\DisposableExtensionsTest.cs" />
@@ -58,10 +58,10 @@
     <Compile Include="Factory\PoolConfigExtensionsTest.cs" />
     <Compile Include="Factory\SnitchTypeExtensionsTest.cs" />
     <Compile Include="Factory\TransportConfigExtensionsTest.cs" />
-    <Compile Include="Model\ByteArrayNameOrValueTest.cs" />
-    <Compile Include="Model\TimeUuidNameOrValueTest.cs" />
-    <Compile Include="Model\IntNameOrValueTest.cs" />
-    <Compile Include="Model\Utf8NameOrValueTest.cs" />
+    <Compile Include="MadeSimple\ByteArrayNameOrValueTest.cs" />
+    <Compile Include="MadeSimple\TimeUuidNameOrValueTest.cs" />
+    <Compile Include="MadeSimple\IntNameOrValueTest.cs" />
+    <Compile Include="MadeSimple\Utf8NameOrValueTest.cs" />
     <Compile Include="Pool\StackPoolTest.cs" />
     <Compile Include="Pool\VoidPoolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

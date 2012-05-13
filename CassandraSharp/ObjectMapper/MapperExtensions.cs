@@ -17,7 +17,7 @@ namespace CassandraSharp.ObjectMapper
     using System.Linq;
     using System.Reflection;
     using Apache.Cassandra;
-    using CassandraSharp.NameOrValues;
+    using CassandraSharp.MadeSimple;
 
     public static class MapperExtensions
     {

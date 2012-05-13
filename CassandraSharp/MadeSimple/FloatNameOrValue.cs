@@ -10,18 +10,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.NameOrValues
+namespace CassandraSharp.MadeSimple
 {
     using System;
 
-    public class DoubleNameOrValue : NameOrValueBase<double>
+    public class FloatNameOrValue : NameOrValueBase<float>
     {
-        public DoubleNameOrValue(double value)
+        public FloatNameOrValue(float value)
             : base(value)
         {
         }
 
-        public DoubleNameOrValue(byte[] value)
+        public FloatNameOrValue(byte[] value)
             : base(value)
         {
         }
@@ -33,12 +33,12 @@ namespace CassandraSharp.NameOrValues
             return value;
         }
 
-        protected override double FromByteArray(byte[] value)
+        protected override float FromByteArray(byte[] value)
         {
             byte[] buffer = new byte[value.Length];
             value.CopyTo(buffer, 0);
             Array.Reverse(buffer);
-            double result = BitConverter.ToDouble(buffer, 0);
+            float result = BitConverter.ToSingle(buffer, 0);
             return result;
         }
     }

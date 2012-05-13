@@ -14,7 +14,6 @@ namespace CassandraSharp.MadeSimple
 {
     using System;
     using Apache.Cassandra;
-    using CassandraSharp.NameOrValues;
 
     public static class ClusterExtensions
     {
