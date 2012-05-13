@@ -18,7 +18,7 @@ namespace TestClient
     using CassandraSharp;
     using CassandraSharp.Config;
     using CassandraSharp.MadeSimple;
-    using CassandraSharp.Model;
+    using CassandraSharp.NameOrValues;
     using CassandraSharp.ObjectMapper;
 
     [Schema("TestKeyspace", Comment = "People table")]
