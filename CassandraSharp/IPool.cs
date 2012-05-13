@@ -14,11 +14,14 @@ namespace CassandraSharp
 {
     using System;
 
-    public class DefaultTimestampService : ITimestampService
+    /// <summary>
+    ///     Pool caches object according to its policy A pool implementation must be thread safe
+    /// </summary>
+    /// <typeparam name="T"> Type of entries </typeparam>
+    internal interface IPool<T> : IDisposable where T : IDisposable
     {
-        public long Generate()
-        {
-            return DateTime.Now.ToFileTimeUtc();
-        }
+        bool Acquire(out T entry);
+
+        void Release(T entry);
     }
 }

@@ -10,14 +10,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Snitch
+namespace CassandraSharp.Implementation
 {
-    using System.Net;
+    using System;
 
-    public interface ISnitch
+    public class DefaultTimestampService : ITimestampService
     {
-        string GetDataCenter(IPAddress target);
-
-        int ComputeDistance(IPAddress source, IPAddress target);
+        public long Generate()
+        {
+            return DateTime.Now.ToFileTimeUtc();
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace CassandraSharp.Factories
     using System;
     using CassandraSharp.Config;
     using CassandraSharp.Snitch;
+    using CassandraSharp.Utils;
 
     internal static class SnitchTypeFactory
     {

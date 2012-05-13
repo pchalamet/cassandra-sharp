@@ -12,6 +12,7 @@
 namespace CassandraSharpUnitTests.Pool
 {
     using System;
+    using CassandraSharp;
     using CassandraSharp.Pool;
     using Moq;
     using NUnit.Framework;

@@ -10,17 +10,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.EndpointStrategy
+namespace CassandraSharp
 {
-    /// <summary>
-    ///     IEndpointStrategy helps choosing a server to connect to Implementation must be thread safe
-    /// </summary>
-    public interface IEndpointStrategy
+    using System.Net;
+
+    public interface ISnitch
     {
-        Endpoint Pick();
+        string GetDataCenter(IPAddress target);
 
-        void Ban(Endpoint endpoint);
-
-        void Permit(Endpoint endpoint);
+        int ComputeDistance(IPAddress source, IPAddress target);
     }
 }

@@ -12,7 +12,7 @@
 namespace CassandraSharpUnitTests.Model
 {
     using System;
-    using CassandraSharp.Model;
+    using CassandraSharp.NameOrValues;
     using NUnit.Framework;
 
     [TestFixture]

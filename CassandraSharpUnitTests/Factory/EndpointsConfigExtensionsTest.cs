@@ -15,9 +15,10 @@ namespace CassandraSharpUnitTests.Factory
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using CassandraSharp;
     using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
-    using CassandraSharp.Factory;
+    using CassandraSharp.Factories;
     using NUnit.Framework;
 
     public class CustomEndpointStrategy : IEndpointStrategy

@@ -12,6 +12,9 @@
 
 namespace CassandraSharp.Factories
 {
+    using CassandraSharp.Implementation;
+    using CassandraSharp.Utils;
+
     public static class LoggerFactory
     {
         public static ILog Create(string customType)

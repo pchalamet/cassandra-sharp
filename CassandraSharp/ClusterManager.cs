@@ -20,6 +20,7 @@ namespace CassandraSharp
     using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Factories;
+    using CassandraSharp.Implementation;
     using CassandraSharp.Pool;
     using CassandraSharp.Snitch;
     using CassandraSharp.Transport;

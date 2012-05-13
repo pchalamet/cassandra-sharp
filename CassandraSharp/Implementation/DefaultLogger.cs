@@ -10,18 +10,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Pool
+namespace CassandraSharp.Implementation
 {
-    using System;
-
-    /// <summary>
-    ///     Pool caches object according to its policy A pool implementation must be thread safe
-    /// </summary>
-    /// <typeparam name="T"> Type of entries </typeparam>
-    internal interface IPool<T> : IDisposable where T : IDisposable
+    public class DefaultLogger : ILog
     {
-        bool Acquire(out T entry);
+        public void Info(string format, params object[] prms)
+        {
+        }
 
-        void Release(T entry);
+        public void Error(string format, params object[] prms)
+        {
+        }
+
+        public void Fatal(string format, params object[] prms)
+        {
+        }
     }
 }

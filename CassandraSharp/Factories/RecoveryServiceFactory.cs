@@ -12,6 +12,9 @@
 
 namespace CassandraSharp.Factories
 {
+    using CassandraSharp.Implementation;
+    using CassandraSharp.Utils;
+
     internal static class RecoveryServiceFactory
     {
         public static IRecoveryService Create(string customType)

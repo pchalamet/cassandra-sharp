@@ -13,7 +13,7 @@ namespace CassandraSharpUnitTests.Factory
 {
     using CassandraSharp;
     using CassandraSharp.Config;
-    using CassandraSharp.Factory;
+    using CassandraSharp.Factories;
     using CassandraSharp.Pool;
     using NUnit.Framework;
 

@@ -52,8 +52,8 @@
     <Compile Include="BehaviorConfigBuilderTest.cs" />
     <Compile Include="Model\LongNameOrValueTest.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
-    <Compile Include="ClusterTest.cs" />
-    <Compile Include="DisposableExtensionsTest.cs" />
+    <Compile Include="Implementation\ClusterTest.cs" />
+    <Compile Include="Utils\DisposableExtensionsTest.cs" />
     <Compile Include="Factory\EndpointsConfigExtensionsTest.cs" />
     <Compile Include="Factory\PoolConfigExtensionsTest.cs" />
     <Compile Include="Factory\SnitchTypeExtensionsTest.cs" />

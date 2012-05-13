@@ -14,8 +14,9 @@ namespace CassandraSharpUnitTests.Factory
 {
     using System;
     using System.Net;
+    using CassandraSharp;
     using CassandraSharp.Config;
-    using CassandraSharp.Factory;
+    using CassandraSharp.Factories;
     using CassandraSharp.Snitch;
     using NUnit.Framework;
 

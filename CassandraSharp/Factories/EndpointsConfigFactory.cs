@@ -16,6 +16,7 @@ namespace CassandraSharp.Factories
     using System.Collections.Generic;
     using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
+    using CassandraSharp.Utils;
 
     internal static class EndpointsConfigFactory
     {

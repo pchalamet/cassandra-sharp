@@ -11,7 +11,7 @@
 // limitations under the License.
 namespace CassandraSharpUnitTests.Model
 {
-    using CassandraSharp.Model;
+    using CassandraSharp.NameOrValues;
     using NUnit.Framework;
 
     [TestFixture]

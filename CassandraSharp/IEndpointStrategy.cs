@@ -12,18 +12,17 @@
 
 namespace CassandraSharp
 {
-    public class DefaultLogger : ILog
+    using CassandraSharp.EndpointStrategy;
+
+    /// <summary>
+    ///     IEndpointStrategy helps choosing a server to connect to Implementation must be thread safe
+    /// </summary>
+    public interface IEndpointStrategy
     {
-        public void Info(string format, params object[] prms)
-        {
-        }
+        Endpoint Pick();
 
-        public void Error(string format, params object[] prms)
-        {
-        }
+        void Ban(Endpoint endpoint);
 
-        public void Fatal(string format, params object[] prms)
-        {
-        }
+        void Permit(Endpoint endpoint);
     }
 }

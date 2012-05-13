@@ -12,6 +12,9 @@
 
 namespace CassandraSharp.Factories
 {
+    using CassandraSharp.Implementation;
+    using CassandraSharp.Utils;
+
     public static class TimestampServiceFactory
     {
         public static ITimestampService Create(string customType)
