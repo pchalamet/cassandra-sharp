@@ -7,8 +7,9 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp
 {
     using Apache.Cassandra;
@@ -17,10 +18,6 @@ namespace CassandraSharp
     public class BehaviorConfigBuilder
     {
         public string KeySpace { get; set; }
-
-        public string User { get; set; }
-
-        public string Password { get; set; }
 
         public int? MaxRetries { get; set; }
 
@@ -43,8 +40,6 @@ namespace CassandraSharp
             IBehaviorConfig behaviorConfigConfig = new BehaviorConfig
                                                        {
                                                            KeySpace = KeySpace ?? behaviorConfigToOverride.KeySpace,
-                                                           User = User ?? behaviorConfigToOverride.User,
-                                                           Password = Password ?? behaviorConfigToOverride.Password,
                                                            MaxRetries = MaxRetries ?? behaviorConfigToOverride.MaxRetries,
                                                            ReadConsistencyLevel = ReadConsistencyLevel ?? behaviorConfigToOverride.ReadConsistencyLevel,
                                                            WriteConsistencyLevel = WriteConsistencyLevel ?? behaviorConfigToOverride.WriteConsistencyLevel,

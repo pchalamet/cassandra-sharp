@@ -7,20 +7,23 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
-namespace CassandraSharp.Commands
+
+namespace CassandraSharp
 {
-    using System.Text;
-    using Apache.Cassandra;
-
-    public static class Cql
+    public class DefaultLogger : ILog
     {
-        public static CqlResult Command(Cassandra.Client client, string command)
+        public void Info(string format, params object[] prms)
         {
-            byte[] query = Encoding.UTF8.GetBytes(command);
+        }
 
-            return client.execute_cql_query(query, Compression.NONE);
+        public void Error(string format, params object[] prms)
+        {
+        }
+
+        public void Fatal(string format, params object[] prms)
+        {
         }
     }
 }

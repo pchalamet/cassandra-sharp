@@ -7,27 +7,37 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
 
     public class EndpointsConfig
     {
+        public EndpointsConfig()
+        {
+            Snitch = Config.SnitchType.RackInferring;
+            Strategy = EndpointStrategy.Nearest;
+        }
+
         [XmlElement("Server")]
-        public string[] Servers;
+        public string[] Servers { get; set; }
 
         [XmlAttribute("snitch")]
-        public SnitchType Snitch = Config.SnitchType.RackInferring;
+        public SnitchType Snitch { get; set; }
 
         [XmlAttribute("snitchType")]
-        public string SnitchType;
+        public string SnitchType { get; set; }
 
         [XmlAttribute("strategy")]
-        public EndpointStrategy Strategy = EndpointStrategy.Nearest;
+        public EndpointStrategy Strategy { get; set; }
 
-        [XmlAttribute("strategyType")]
-        public string StrategyType;
+        [XmlAttribute("strategyClass")]
+        public string StrategyClass { get; set; }
+
+        [XmlAttribute("timestampClass")]
+        public string TimestampServiceClass { get; set; }
     }
 }

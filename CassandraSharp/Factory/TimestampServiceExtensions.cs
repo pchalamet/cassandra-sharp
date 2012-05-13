@@ -7,17 +7,16 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
-namespace CassandraSharp
-{
-    using System;
 
-    public class Timestamp
+namespace CassandraSharp.Factory
+{
+    public static class TimestampServiceExtensions
     {
-        public static long Now
+        public static ITimestampService Create(string customType)
         {
-            get { return DateTime.Now.ToFileTimeUtc(); }
+            return ServiceActivator.Create<ITimestampService>(customType) ?? new DefaultTimestampService();
         }
     }
 }

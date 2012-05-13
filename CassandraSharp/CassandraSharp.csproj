@@ -39,12 +39,9 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParties\log4net\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +50,26 @@
     </Compile>
     <Compile Include="BehaviorConfigBuilder.cs" />
     <Compile Include="BehaviorConfigBuilderExtensions.cs" />
+    <Compile Include="Data\CassandraCommand.cs" />
+    <Compile Include="Data\CassandraConnection.cs" />
+    <Compile Include="Data\CassandraDataParameterCollection.cs" />
+    <Compile Include="Data\CassandraParameter.cs" />
+    <Compile Include="DefaultLogger.cs" />
+    <Compile Include="Factory\LoggerExtensions.cs" />
+    <Compile Include="Factory\ServiceActivator.cs" />
+    <Compile Include="Factory\TimestampServiceExtensions.cs" />
+    <Compile Include="ILogger.cs" />
+    <Compile Include="ITimestampService.cs" />
+    <Compile Include="Model\GuidNameOrValue.cs" />
+    <Compile Include="Model\DoubleNameOrValue.cs" />
+    <Compile Include="Model\FloatNameOrValue.cs" />
+    <Compile Include="ObjectMapper\MapperExtensions.cs" />
+    <Compile Include="ObjectMapper\SchemaExtensions.cs" />
+    <Compile Include="ObjectMapper\ColumnAttribute.cs" />
+    <Compile Include="ObjectMapper\IndexAttribute.cs" />
+    <Compile Include="ObjectMapper\KeyAttribute.cs" />
+    <Compile Include="ObjectMapper\Query.cs" />
+    <Compile Include="ObjectMapper\SchemaAttribute.cs" />
     <Compile Include="Factory\RecoveryServiceExtensions.cs" />
     <Compile Include="IBehaviorConfig.cs" />
     <Compile Include="IRecoveryService.cs" />
@@ -66,22 +83,18 @@
     <Compile Include="Cluster.cs" />
     <Compile Include="CommandExtensions.cs" />
     <Compile Include="ClusterManager.cs" />
-    <Compile Include="ClusterExtensions.cs" />
-    <Compile Include="Commands\ColumnFamily.cs" />
-    <Compile Include="Commands\Cql.cs" />
-    <Compile Include="Commands\SystemManagement.cs" />
+    <Compile Include="MadeSimple\ClusterExtensions.cs" />
     <Compile Include="Config\BehaviorConfig.cs" />
     <Compile Include="Config\CassandraSharpConfig.cs" />
     <Compile Include="Config\ClusterConfig.cs" />
     <Compile Include="Config\EndpointStrategy.cs" />
     <Compile Include="Config\EndpointsConfig.cs" />
-    <Compile Include="Commands\Describe.cs" />
     <Compile Include="Config\PoolType.cs" />
     <Compile Include="Config\SnitchType.cs" />
-    <Compile Include="Recovery\DefaultRecovery.cs" />
+    <Compile Include="DefaultRecoveryService.cs" />
+    <Compile Include="Transport\BaseTransportFactory.cs" />
     <Compile Include="Utils\DisposableExtensions.cs" />
     <Compile Include="EndpointStrategy\Endpoint.cs" />
-    <Compile Include="Commands\IExecutionContext.cs" />
     <Compile Include="Factory\PoolConfigExtensions.cs" />
     <Compile Include="Factory\SnitchTypeExtensions.cs" />
     <Compile Include="Factory\EndpointsConfigExtensions.cs" />
@@ -105,7 +118,7 @@
     <Compile Include="Snitch\ISnitch.cs" />
     <Compile Include="Snitch\RackInferringSnitch.cs" />
     <Compile Include="Snitch\SimpleSnitch.cs" />
-    <Compile Include="Timestamp.cs" />
+    <Compile Include="DefaultTimestampService.cs" />
     <Compile Include="Transport\BufferedTransportFactory.cs" />
     <Compile Include="Transport\FramedTransportFactory.cs" />
     <Compile Include="Transport\ITransportFactory.cs" />

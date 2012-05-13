@@ -1,23 +1,33 @@
-﻿namespace CassandraSharp
+﻿// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace CassandraSharp
 {
     using System;
     using System.IO;
     using System.Net.Sockets;
+    using System.Threading;
     using Apache.Cassandra;
-    using CassandraSharp.Commands;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Pool;
     using CassandraSharp.Transport;
     using CassandraSharp.Utils;
-    using log4net;
-    using Thrift.Protocol;
     using Thrift.Transport;
 
     internal class Cluster : ICluster
     {
         private readonly IEndpointStrategy _endpointsManager;
 
-        private readonly ILog _logger = LogManager.GetLogger(typeof(Cluster));
+        private readonly ILog _logger;
 
         private readonly IPool<IConnection> _pool;
 
@@ -26,23 +36,27 @@
         private readonly ITransportFactory _transportFactory;
 
         public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager,
-                       IRecoveryService recoveryService)
+                       IRecoveryService recoveryService, ITimestampService timestampService, ILog logger)
         {
             BehaviorConfig = behaviorConfig;
             _pool = pool;
             _endpointsManager = endpointsManager;
             _recoveryService = recoveryService;
+            TimestampService = timestampService;
             _transportFactory = transportFactory;
+            _logger = logger;
         }
 
         public IBehaviorConfig BehaviorConfig { get; private set; }
+
+        public ITimestampService TimestampService { get; private set; }
 
         public void Dispose()
         {
             _pool.SafeDispose();
         }
 
-        public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<Cassandra.Client, TResult> func)
+        public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func)
         {
             if (null == behaviorConfig)
             {
@@ -57,8 +71,8 @@
                 {
                     connection = AcquireConnection();
 
-                    OpenConnection(connection, behaviorConfig);
-                    TResult res = func(connection.CassandraClient);
+                    ChangeKeyspace(connection, behaviorConfig);
+                    TResult res = func(connection);
 
                     ReleaseConnection(connection, false);
 
@@ -70,8 +84,7 @@
                     bool retry;
                     DecipherException(ex, behaviorConfig, out connectionDead, out retry);
 
-                    string errMsg = string.Format("Exception during command processing: connectionDead={0} retry={1}", connectionDead, retry);
-                    _logger.Error(errMsg, ex);
+                    _logger.Error("Exception during command processing: connectionDead={0} retry={1} : {2}", connectionDead, retry, ex.Message);
 
                     ReleaseConnection(connection, connectionDead);
                     if (!retry || tryCount >= behaviorConfig.MaxRetries)
@@ -80,31 +93,19 @@
                         throw;
                     }
 
-                    System.Threading.Thread.Sleep(behaviorConfig.SleepBeforeRetry);
+                    Thread.Sleep(behaviorConfig.SleepBeforeRetry);
                 }
 
                 ++tryCount;
             }
         }
 
-        private static void OpenConnection(IConnection connection, IBehaviorConfig behaviorConfig)
+        private static void ChangeKeyspace(IConnection connection, IBehaviorConfig behaviorConfig)
         {
-            TTransport transport = connection.CassandraClient.InputProtocol.Transport;
-            if (!transport.IsOpen)
-            {
-                transport.Open();
-            }
-
-            bool userChanged = connection.User != behaviorConfig.User;
-            if (userChanged && null != behaviorConfig.User && null != behaviorConfig.Password)
-            {
-                SystemManagement.Login(connection.CassandraClient, behaviorConfig.User, behaviorConfig.Password);
-            }
-
             bool keyspaceChanged = connection.KeySpace != behaviorConfig.KeySpace;
             if (keyspaceChanged && null != behaviorConfig.KeySpace)
             {
-                SystemManagement.SetKeySpace(connection.CassandraClient, behaviorConfig.KeySpace);
+                connection.CassandraClient.set_keyspace(behaviorConfig.KeySpace);
                 connection.KeySpace = behaviorConfig.KeySpace;
             }
         }
@@ -161,30 +162,15 @@
                 return connection;
             }
 
-            TTransport transport = null;
-            try
+            Endpoint endpoint = _endpointsManager.Pick();
+            if (null == endpoint)
             {
-                Endpoint endpoint = _endpointsManager.Pick();
-                if (null == endpoint)
-                {
-                    throw new ArgumentException("Can't find any valid endpoint");
-                }
-
-                transport = _transportFactory.Create(endpoint.Address);
-                TProtocol protocol = new TBinaryProtocol(transport);
-                Cassandra.Client client = new Cassandra.Client(protocol);
-
-                connection = new Connection(client, endpoint);
-                return connection;
+                throw new ArgumentException("Can't find any valid endpoint");
             }
-            catch
-            {
-                if (null != transport)
-                {
-                    transport.Close();
-                }
-                throw;
-            }
+
+            Cassandra.Client client = _transportFactory.Create(endpoint.Address);
+            connection = new Connection(client, endpoint);
+            return connection;
         }
 
         private void ReleaseConnection(IConnection connection, bool hasFailed)
@@ -196,7 +182,8 @@
                 {
                     if (null != _recoveryService)
                     {
-                        _recoveryService.Recover(connection.Endpoint, _endpointsManager, _transportFactory);
+                        _logger.Info("marking {0} for recovery", connection.Endpoint.Address);
+                        _recoveryService.Recover(connection.Endpoint, _transportFactory, ClientRecoveredCallback);
                     }
 
                     _endpointsManager.Ban(connection.Endpoint);
@@ -207,6 +194,15 @@
                     _pool.Release(connection);
                 }
             }
+        }
+
+        private void ClientRecoveredCallback(Endpoint endpoint, Cassandra.Client client)
+        {
+            _logger.Info("{0} is recovered", endpoint.Address);
+
+            _endpointsManager.Permit(endpoint);
+            Connection connection = new Connection(client, endpoint);
+            _pool.Release(connection);
         }
 
         private class Connection : IConnection

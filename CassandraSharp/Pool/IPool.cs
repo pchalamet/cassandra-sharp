@@ -7,17 +7,17 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp.Pool
 {
     using System;
 
     /// <summary>
-    ///     Pool caches object according to its policy
-    ///     A pool implementation must be thread safe
+    ///     Pool caches object according to its policy A pool implementation must be thread safe
     /// </summary>
-    /// <typeparam name = "T">Type of entries</typeparam>
+    /// <typeparam name="T"> Type of entries </typeparam>
     internal interface IPool<T> : IDisposable where T : IDisposable
     {
         bool Acquire(out T entry);

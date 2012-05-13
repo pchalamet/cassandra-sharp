@@ -7,29 +7,30 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp
 {
     using System;
-    using Apache.Cassandra;
 
     public static class BehaviorConfigBuilderExtensions
     {
         public static ICluster Configure(this ICluster @this, BehaviorConfigBuilder cmdInfoBuilder)
         {
             IBehaviorConfig behaviorConfig = cmdInfoBuilder.Build(@this.BehaviorConfig);
-            return new ConfiguredCluster(@this, behaviorConfig);
+            return new ConfiguredCluster(@this, behaviorConfig, @this.TimestampService);
         }
 
         private class ConfiguredCluster : ICluster
         {
             private readonly ICluster _cluster;
 
-            public ConfiguredCluster(ICluster cluster, IBehaviorConfig behaviorConfig)
+            public ConfiguredCluster(ICluster cluster, IBehaviorConfig behaviorConfig, ITimestampService timestampService)
             {
                 _cluster = cluster;
                 BehaviorConfig = behaviorConfig;
+                TimestampService = timestampService;
             }
 
             public void Dispose()
@@ -38,7 +39,9 @@ namespace CassandraSharp
 
             public IBehaviorConfig BehaviorConfig { get; private set; }
 
-            public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<Cassandra.Client, TResult> func)
+            public ITimestampService TimestampService { get; private set; }
+
+            public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func)
             {
                 return _cluster.ExecuteCommand(BehaviorConfig, func);
             }

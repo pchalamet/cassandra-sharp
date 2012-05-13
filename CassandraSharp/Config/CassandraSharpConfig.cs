@@ -7,8 +7,9 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
@@ -16,6 +17,12 @@ namespace CassandraSharp.Config
     [XmlRoot("CassandraSharpConfig")]
     public class CassandraSharpConfig
     {
+        [XmlAttribute("recoveryClass")]
+        public string RecoveryClass { get; set; }
+
+        [XmlAttribute("loggerClass")]
+        public string LoggerClass { get; set; }
+
         [XmlElement("Cluster")]
         public ClusterConfig[] Clusters { get; set; }
     }

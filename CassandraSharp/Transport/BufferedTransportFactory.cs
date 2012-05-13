@@ -7,27 +7,29 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp.Transport
 {
     using System.Net;
     using CassandraSharp.Config;
     using Thrift.Transport;
 
-    internal class BufferedTransportFactory : ITransportFactory
+    internal class BufferedTransportFactory : BaseTransportFactory
     {
         private readonly int _port;
 
         private readonly int _timeout;
 
         public BufferedTransportFactory(TransportConfig config)
+            :base(config)
         {
             _port = config.Port;
             _timeout = config.Timeout;
         }
 
-        public TTransport Create(IPAddress address)
+        protected override TTransport CreateTransport(IPAddress address)
         {
             string ip = address.ToString();
             TStreamTransport streamTransport = new TSocket(ip, _port, _timeout);

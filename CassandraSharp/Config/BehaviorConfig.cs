@@ -7,8 +7,9 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
@@ -37,9 +38,6 @@ namespace CassandraSharp.Config
         [XmlAttribute("maxRetries")]
         public int MaxRetries { get; set; }
 
-        [XmlAttribute("password")]
-        public string Password { get; set; }
-
         [XmlAttribute("retryOnNotFound")]
         public bool RetryOnNotFound { get; set; }
 
@@ -48,9 +46,6 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("retryOnUnavailable")]
         public bool RetryOnUnavailable { get; set; }
-
-        [XmlAttribute("user")]
-        public string User { get; set; }
 
         [XmlAttribute("sleepBeforeRetry")]
         public int SleepBeforeRetry { get; set; }

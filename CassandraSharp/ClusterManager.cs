@@ -1,4 +1,16 @@
-﻿namespace CassandraSharp
+﻿// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace CassandraSharp
 {
     using System;
     using System.Collections.Generic;
@@ -18,6 +30,8 @@
         private static CassandraSharpConfig _config;
 
         private static IRecoveryService _recoveryService;
+
+        private static ILog _logger;
 
         public static ICluster GetCluster(string name)
         {
@@ -59,12 +73,15 @@
             IEnumerable<Endpoint> endpoints = GetEndpoints(clusterConfig.Endpoints, snitch, clientAddress);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(clusterConfig.Endpoints.StrategyType, endpoints);
+            IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(clusterConfig.Endpoints.StrategyClass, endpoints);
             IPool<IConnection> pool = PoolType.Stack.Create(transportConfig.PoolSize);
+
+            // get timestamp service
+            ITimestampService timestampService = TimestampServiceExtensions.Create(clusterConfig.Endpoints.TimestampServiceClass);
 
             // create the cluster now
             ITransportFactory transportFactory = transportConfig.Create();
-            return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService);
+            return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, _logger);
         }
 
         private static IEnumerable<Endpoint> GetEndpoints(EndpointsConfig config, ISnitch snitch, IPAddress clientAddress)
@@ -107,11 +124,6 @@
                 return null;
             }
 
-            if (null == _recoveryService)
-            {
-                _recoveryService = RecoveryServiceExtensions.Create();
-            }
-
             return _recoveryService;
         }
 
@@ -139,6 +151,10 @@
             {
                 throw new ArgumentNullException("config");
             }
+
+            _recoveryService = RecoveryServiceExtensions.Create(config.RecoveryClass);
+
+            _logger = LoggerExtensions.Create(config.LoggerClass);
 
             _config = config;
         }

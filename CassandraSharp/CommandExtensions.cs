@@ -7,27 +7,27 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace CassandraSharp
 {
     using System;
-    using Apache.Cassandra;
 
     public static class CommandExtensions
     {
-        public static void Execute(this ICluster @this, Action<Cassandra.Client> action)
+        public static void Execute(this ICluster @this, Action<IConnection> action)
         {
             @this.Execute(null, action);
         }
 
-        public static void Execute(this ICluster @this, IBehaviorConfig behaviorConfig, Action<Cassandra.Client> action)
+        public static void Execute(this ICluster @this, IBehaviorConfig behaviorConfig, Action<IConnection> action)
         {
-            Func<Cassandra.Client, object> func = client =>
-                                                      {
-                                                          action(client);
-                                                          return null;
-                                                      };
+            Func<IConnection, object> func = client =>
+                                                 {
+                                                     action(client);
+                                                     return null;
+                                                 };
             @this.ExecuteCommand(behaviorConfig, func);
         }
     }
