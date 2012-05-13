@@ -55,9 +55,9 @@
     <Compile Include="Data\CassandraDataParameterCollection.cs" />
     <Compile Include="Data\CassandraParameter.cs" />
     <Compile Include="DefaultLogger.cs" />
-    <Compile Include="Factory\LoggerFactory.cs" />
-    <Compile Include="Factory\ServiceActivator.cs" />
-    <Compile Include="Factory\TimestampServiceFactory.cs" />
+    <Compile Include="Factories\LoggerFactory.cs" />
+    <Compile Include="Factories\ServiceActivator.cs" />
+    <Compile Include="Factories\TimestampServiceFactory.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ITimestampService.cs" />
     <Compile Include="Model\GuidNameOrValue.cs" />
@@ -70,7 +70,7 @@
     <Compile Include="ObjectMapper\KeyAttribute.cs" />
     <Compile Include="ObjectMapper\Query.cs" />
     <Compile Include="ObjectMapper\SchemaAttribute.cs" />
-    <Compile Include="Factory\RecoveryServiceFactory.cs" />
+    <Compile Include="Factories\RecoveryServiceFactory.cs" />
     <Compile Include="IBehaviorConfig.cs" />
     <Compile Include="IRecoveryService.cs" />
     <Compile Include="Model\LongNameOrValue.cs" />
@@ -95,10 +95,10 @@
     <Compile Include="Transport\BaseTransportFactory.cs" />
     <Compile Include="Utils\DisposableExtensions.cs" />
     <Compile Include="EndpointStrategy\Endpoint.cs" />
-    <Compile Include="Factory\PoolConfigFactory.cs" />
-    <Compile Include="Factory\SnitchTypeFactory.cs" />
-    <Compile Include="Factory\EndpointsConfigFactory.cs" />
-    <Compile Include="Factory\TransportConfigFactory.cs" />
+    <Compile Include="Factories\PoolConfigFactory.cs" />
+    <Compile Include="Factories\SnitchTypeFactory.cs" />
+    <Compile Include="Factories\EndpointsConfigFactory.cs" />
+    <Compile Include="Factories\TransportConfigFactory.cs" />
     <Compile Include="Utils\GuidGenerator.cs" />
     <Compile Include="Utils\GuidVersion.cs" />
     <Compile Include="Utils\NetworkFinder.cs" />

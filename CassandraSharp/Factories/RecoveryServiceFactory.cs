@@ -10,14 +10,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factory
+namespace CassandraSharp.Factories
 {
-    public static class LoggerFactory
+    internal static class RecoveryServiceFactory
     {
-        public static ILog Create(string customType)
+        public static IRecoveryService Create(string customType)
         {
-            ILog log = ServiceActivator.Create<ILog>(customType) ?? new DefaultLogger();
-            return log;
+            return ServiceActivator.Create<IRecoveryService>(customType) ?? new DefaultRecoveryService();
         }
     }
 }

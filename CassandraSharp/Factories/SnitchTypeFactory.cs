@@ -10,26 +10,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factory
+namespace CassandraSharp.Factories
 {
     using System;
     using CassandraSharp.Config;
-    using CassandraSharp.Transport;
+    using CassandraSharp.Snitch;
 
-    internal static class TransportConfigFactory
+    internal static class SnitchTypeFactory
     {
-        public static ITransportFactory Create(TransportConfig @this)
+        public static ISnitch Create(SnitchType @this, string customType)
         {
-            switch (@this.Type)
+            switch (@this)
             {
-                case TransportConfig.TransportType.Framed:
-                    return new FramedTransportFactory(@this);
+                case SnitchType.Custom:
+                    return ServiceActivator.Create<ISnitch>(customType);
 
-                case TransportConfig.TransportType.Buffered:
-                    return new BufferedTransportFactory(@this);
+                case SnitchType.Simple:
+                    return new SimpleSnitch();
+
+                case SnitchType.RackInferring:
+                    return new RackInferringSnitch();
             }
 
-            string msg = string.Format("Unknown transport type '{0}'", @this.Type);
+            string msg = string.Format("Unknown snitch type '{0}'", @this);
             throw new ArgumentException(msg);
         }
     }
