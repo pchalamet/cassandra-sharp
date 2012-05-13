@@ -16,9 +16,9 @@ namespace CassandraSharp.Factory
     using CassandraSharp.Config;
     using CassandraSharp.Transport;
 
-    internal static class TransportConfigExtensions
+    internal static class TransportConfigFactory
     {
-        public static ITransportFactory Create(this TransportConfig @this)
+        public static ITransportFactory Create(TransportConfig @this)
         {
             switch (@this.Type)
             {

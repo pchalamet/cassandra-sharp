@@ -14,22 +14,25 @@ namespace CassandraSharp.Factory
 {
     using System;
     using CassandraSharp.Config;
-    using CassandraSharp.Pool;
+    using CassandraSharp.Snitch;
 
-    internal static class PoolConfigExtensions
+    internal static class SnitchTypeFactory
     {
-        public static IPool<IConnection> Create(this PoolType @this, int poolSize)
+        public static ISnitch Create(SnitchType @this, string customType)
         {
             switch (@this)
             {
-                case PoolType.Stack:
-                    return new StackPool<IConnection>(poolSize);
+                case SnitchType.Custom:
+                    return ServiceActivator.Create<ISnitch>(customType);
 
-                case PoolType.Void:
-                    return new VoidPool<IConnection>();
+                case SnitchType.Simple:
+                    return new SimpleSnitch();
+
+                case SnitchType.RackInferring:
+                    return new RackInferringSnitch();
             }
 
-            string msg = string.Format("Unknown connection pool type '{0}'", @this);
+            string msg = string.Format("Unknown snitch type '{0}'", @this);
             throw new ArgumentException(msg);
         }
     }

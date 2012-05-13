@@ -12,11 +12,25 @@
 
 namespace CassandraSharp.Factory
 {
-    public static class TimestampServiceExtensions
+    using System;
+    using CassandraSharp.Config;
+    using CassandraSharp.Pool;
+
+    internal static class PoolConfigFactory
     {
-        public static ITimestampService Create(string customType)
+        public static IPool<IConnection> Create(this PoolType @this, int poolSize)
         {
-            return ServiceActivator.Create<ITimestampService>(customType) ?? new DefaultTimestampService();
+            switch (@this)
+            {
+                case PoolType.Stack:
+                    return new StackPool<IConnection>(poolSize);
+
+                case PoolType.Void:
+                    return new VoidPool<IConnection>();
+            }
+
+            string msg = string.Format("Unknown connection pool type '{0}'", @this);
+            throw new ArgumentException(msg);
         }
     }
 }

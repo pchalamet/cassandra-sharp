@@ -12,12 +12,11 @@
 
 namespace CassandraSharp.Factory
 {
-    public static class LoggerExtensions
+    internal static class RecoveryServiceFactory
     {
-        public static ILog Create(string customType)
+        public static IRecoveryService Create(string customType)
         {
-            ILog log = ServiceActivator.Create<ILog>(customType) ?? new DefaultLogger();
-            return log;
+            return ServiceActivator.Create<IRecoveryService>(customType) ?? new DefaultRecoveryService();
         }
     }
 }

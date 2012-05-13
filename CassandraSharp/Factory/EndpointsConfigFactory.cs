@@ -13,26 +13,27 @@
 namespace CassandraSharp.Factory
 {
     using System;
+    using System.Collections.Generic;
     using CassandraSharp.Config;
-    using CassandraSharp.Snitch;
+    using CassandraSharp.EndpointStrategy;
 
-    internal static class SnitchTypeExtensions
+    internal static class EndpointsConfigFactory
     {
-        public static ISnitch Create(this SnitchType @this, string customType)
+        public static IEndpointStrategy Create(EndpointsConfig @this, string customType, IEnumerable<Endpoint> endpoints)
         {
-            switch (@this)
+            switch (@this.Strategy)
             {
-                case SnitchType.Custom:
-                    return ServiceActivator.Create<ISnitch>(customType);
+                case EndpointStrategy.Custom:
+                    return ServiceActivator.Create<IEndpointStrategy>(customType, endpoints);
 
-                case SnitchType.Simple:
-                    return new SimpleSnitch();
+                case EndpointStrategy.Random:
+                    return new RandomEndpointStrategy(endpoints);
 
-                case SnitchType.RackInferring:
-                    return new RackInferringSnitch();
+                case EndpointStrategy.Nearest:
+                    return new NearestEndpointStrategy(endpoints);
             }
 
-            string msg = string.Format("Unknown snitch type '{0}'", @this);
+            string msg = string.Format("Unknown strategy '{0}'", @this);
             throw new ArgumentException(msg);
         }
     }

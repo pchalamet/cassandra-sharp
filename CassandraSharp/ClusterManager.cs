@@ -67,20 +67,20 @@ namespace CassandraSharp
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            ISnitch snitch = clusterConfig.Endpoints.Snitch.Create(clusterConfig.Endpoints.SnitchType);
+            ISnitch snitch = SnitchTypeFactory.Create(clusterConfig.Endpoints.Snitch, clusterConfig.Endpoints.SnitchType);
 
             IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
             IEnumerable<Endpoint> endpoints = GetEndpoints(clusterConfig.Endpoints, snitch, clientAddress);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager = clusterConfig.Endpoints.Create(clusterConfig.Endpoints.StrategyClass, endpoints);
+            IEndpointStrategy endpointsManager = EndpointsConfigFactory.Create(clusterConfig.Endpoints, clusterConfig.Endpoints.StrategyClass, endpoints);
             IPool<IConnection> pool = PoolType.Stack.Create(transportConfig.PoolSize);
 
             // get timestamp service
-            ITimestampService timestampService = TimestampServiceExtensions.Create(clusterConfig.Endpoints.TimestampServiceClass);
+            ITimestampService timestampService = TimestampServiceFactory.Create(clusterConfig.Endpoints.TimestampServiceClass);
 
             // create the cluster now
-            ITransportFactory transportFactory = transportConfig.Create();
+            ITransportFactory transportFactory = TransportConfigFactory.Create(transportConfig);
             return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, _logger);
         }
 
@@ -152,9 +152,9 @@ namespace CassandraSharp
                 throw new ArgumentNullException("config");
             }
 
-            _recoveryService = RecoveryServiceExtensions.Create(config.RecoveryClass);
+            _recoveryService = RecoveryServiceFactory.Create(config.RecoveryClass);
 
-            _logger = LoggerExtensions.Create(config.LoggerClass);
+            _logger = LoggerFactory.Create(config.LoggerClass);
 
             _config = config;
         }
