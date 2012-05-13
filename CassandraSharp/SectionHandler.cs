@@ -10,11 +10,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp
 {
     using System.Configuration;
     using System.Xml;
     using System.Xml.Serialization;
+    using CassandraSharp.Config;
 
     public class SectionHandler : IConfigurationSectionHandler
     {
