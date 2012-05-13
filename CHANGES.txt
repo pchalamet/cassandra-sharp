@@ -1,3 +1,19 @@
+version next
+- CassandraSharp.ObjectMapper : cql based simple object mapper
+- CassandraSharp.Data : ado.net implementation (IDbConnection, IDbCommand, IDbParameter)
+- CassandraSharp.MadeSimple : previously ClusterExtentions but with less methods to keep it simple
+- removed log4net dependency, logging is pluggable ==> use CassandraSharp/@LoggerClass to provide ILog implementation (must be thread safe)
+- recovery class is pluggable ==> use CassandraSharp/@recoveryClass to provide IRecoveryService implementation (must be thread safe)
+- timestamp service is pluggable ==> use Transport/@timestampClass to provide ITimestampService implementation (must be thread safe)
+- BREAKING CHANGES IN CONFIG
+  Endpoints/@strategyType ==> Endpoints/@strategyClass
+  Behavior/@user ==> Transport/@user
+  Behavior/@password ==> Transport/@password
+- NEW IN CONFIG
+  Transport/@cqlver : set cql version
+  Behavior/timestampClass : timestamp manager
+  CassandraSharp/@recoveryClass : recovery manager
+  
 version 0.6.1.0
 - remove NuGet for packages dependencies (unsecure)
 - using Thrift 0.8 (recompiled)
