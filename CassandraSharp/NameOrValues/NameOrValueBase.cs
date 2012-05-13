@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Model
+namespace CassandraSharp.NameOrValues
 {
     public abstract class NameOrValueBase<T> : INameOrValue
     {

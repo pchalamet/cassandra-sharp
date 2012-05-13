@@ -10,36 +10,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Model
+namespace CassandraSharp.NameOrValues
 {
     using System;
 
-    public class IntNameOrValue : NameOrValueBase<int>
+    public class GuidNameOrValue : NameOrValueBase<Guid>
     {
-        public IntNameOrValue(int value)
+        public GuidNameOrValue(Guid value)
             : base(value)
         {
         }
 
-        public IntNameOrValue(byte[] value)
+        public GuidNameOrValue(byte[] value)
             : base(value)
         {
         }
 
         public override byte[] ToByteArray()
         {
-            byte[] value = BitConverter.GetBytes(Value);
-            Array.Reverse(value);
-            return value;
+            return Value.ToByteArray();
         }
 
-        protected override int FromByteArray(byte[] value)
+        protected override Guid FromByteArray(byte[] value)
         {
-            byte[] buffer = new byte[value.Length];
-            value.CopyTo(buffer, 0);
-            Array.Reverse(buffer);
-            int result = BitConverter.ToInt32(buffer, 0);
-            return result;
+            return new Guid(value);
         }
     }
 }

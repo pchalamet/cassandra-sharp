@@ -10,31 +10,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Model
+namespace CassandraSharp.NameOrValues
 {
-    using System.Text;
+    using System;
 
-    public class Utf8NameOrValue : NameOrValueBase<string>
+    public class DoubleNameOrValue : NameOrValueBase<double>
     {
-        public Utf8NameOrValue(string value)
+        public DoubleNameOrValue(double value)
             : base(value)
         {
         }
 
-        public Utf8NameOrValue(byte[] value)
+        public DoubleNameOrValue(byte[] value)
             : base(value)
         {
         }
 
         public override byte[] ToByteArray()
         {
-            byte[] result = Encoding.UTF8.GetBytes(Value);
-            return result;
+            byte[] value = BitConverter.GetBytes(Value);
+            Array.Reverse(value);
+            return value;
         }
 
-        protected override string FromByteArray(byte[] value)
+        protected override double FromByteArray(byte[] value)
         {
-            string result = Encoding.UTF8.GetString(value);
+            byte[] buffer = new byte[value.Length];
+            value.CopyTo(buffer, 0);
+            Array.Reverse(buffer);
+            double result = BitConverter.ToDouble(buffer, 0);
             return result;
         }
     }
