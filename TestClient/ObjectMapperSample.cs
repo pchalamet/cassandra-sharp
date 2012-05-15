@@ -15,7 +15,7 @@ namespace TestClient
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
-    [Schema("TestKeyspace", Comment = "People table")]
+    [Schema("TestKeyspace", Comment = "People table", Name="People")]
     public class PeopleSchema
     {
         [Index(Name = "birthyear")]

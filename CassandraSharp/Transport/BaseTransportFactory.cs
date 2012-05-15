@@ -40,6 +40,7 @@ namespace CassandraSharp.Transport
             try
             {
                 transport = CreateTransport(address);
+                transport.Open();
                 TProtocol protocol = new TBinaryProtocol(transport);
                 Cassandra.Client client = new Cassandra.Client(protocol);
 
