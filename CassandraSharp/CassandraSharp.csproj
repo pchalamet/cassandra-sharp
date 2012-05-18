@@ -59,6 +59,7 @@
     <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
     <Compile Include="ObjectMapper\CqlType.cs" />
     <Compile Include="ObjectMapper\DataTypeExtensions.cs" />
+    <Compile Include="ObjectMapper\PreparedQueryExtensions.cs" />
     <Compile Include="ObjectMapper\TypeExtensions.cs" />
     <Compile Include="Utils\ServiceActivator.cs" />
     <Compile Include="Factories\TimestampServiceFactory.cs" />
