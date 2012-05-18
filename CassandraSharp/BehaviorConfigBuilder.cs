@@ -12,7 +12,6 @@
 
 namespace CassandraSharp
 {
-    using System;
     using Apache.Cassandra;
     using CassandraSharp.Config;
 
