@@ -12,26 +12,13 @@
 
 namespace CassandraSharp.Implementation
 {
-    public class DefaultLogger : ILog
+    using System;
+
+    public class TimestampService : ITimestampService
     {
-        public void Debug(string format, params object[] prms)
+        public long Generate()
         {
-        }
-
-        public void Info(string format, params object[] prms)
-        {
-        }
-
-        public void Warn(string format, params object[] prms)
-        {
-        }
-
-        public void Error(string format, params object[] prms)
-        {
-        }
-
-        public void Fatal(string format, params object[] prms)
-        {
+            return DateTime.Now.ToFileTimeUtc();
         }
     }
 }

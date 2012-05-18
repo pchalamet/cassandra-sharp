@@ -125,7 +125,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static int Execute(this ICluster cluster, string query, params object[] param)
         {
-            int nbResults = cluster.ExecuteCommand(null, client => PrepareAndExecute<Unit>(client.CassandraClient, query, param).Count());
+            int nbResults = cluster.ExecuteCommand(client => PrepareAndExecute<Unit>(client.CassandraClient, query, param).Count());
             return nbResults;
         }
 

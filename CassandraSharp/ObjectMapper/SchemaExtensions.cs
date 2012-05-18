@@ -30,10 +30,6 @@ namespace CassandraSharp.ObjectMapper
             StringBuilder sbCreateTable = new StringBuilder("create table ");
             string tableName = schemaAttribute.Name ?? type.Name;
 
-            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
-            cfgBuilder.KeySpace = schemaAttribute.Keyspace;
-            ICluster tmpCluster = cfgBuilder.Build(cluster);
-
             // create table columns
             sbCreateTable.AppendFormat("{0} (", tableName);
             foreach (ColumnDef columnDef in allColumns)
@@ -63,7 +59,13 @@ namespace CassandraSharp.ObjectMapper
             }
 
             string createTableStmt = sbCreateTable.ToString();
-            tmpCluster.ExecuteCql(createTableStmt);
+
+            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
+            cfgBuilder.KeySpace = schemaAttribute.Keyspace;
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+            {
+                tmpCluster.ExecuteCql(createTableStmt);
+            }
 
             // create indices then
             //foreach (IndexAttribute ia in indices)
@@ -86,11 +88,13 @@ namespace CassandraSharp.ObjectMapper
             string tableName = schemaAttribute.Name ?? t.Name;
             sbDropTable.AppendFormat("drop columnfamily {0}", tableName);
 
-            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder {KeySpace = schemaAttribute.Keyspace};
-            ICluster tmpCluster = cfgBuilder.Build(cluster);
-
             string dropTableStmt = sbDropTable.ToString();
-            tmpCluster.ExecuteCql(dropTableStmt);
+
+            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder { KeySpace = schemaAttribute.Keyspace };
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+            {
+                tmpCluster.ExecuteCql(dropTableStmt);
+            }
         }
 
         public static void Truncate<T>(this ICluster cluster)
@@ -103,12 +107,14 @@ namespace CassandraSharp.ObjectMapper
             string tableName = schemaAttribute.Name ?? t.Name;
             sbTruncateTable.AppendFormat("truncate '{0}'", tableName);
 
+            string dropTableStmt = sbTruncateTable.ToString();
+
             BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
             cfgBuilder.KeySpace = schemaAttribute.Keyspace;
-            ICluster tmpCluster = cfgBuilder.Build(cluster);
-
-            string dropTableStmt = sbTruncateTable.ToString();
-            tmpCluster.ExecuteCql(dropTableStmt);
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+            {
+                tmpCluster.ExecuteCql(dropTableStmt);
+            }
         }
     }
 }

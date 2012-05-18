@@ -19,7 +19,7 @@ namespace CassandraSharp.Factories
     {
         public static ITimestampService Create(string customType)
         {
-            return ServiceActivator.Create<ITimestampService>(customType) ?? new DefaultTimestampService();
+            return ServiceActivator.Create<ITimestampService>(customType) ?? new TimestampService();
         }
     }
 }

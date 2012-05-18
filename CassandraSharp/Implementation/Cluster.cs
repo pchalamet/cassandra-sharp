@@ -27,6 +27,8 @@ namespace CassandraSharp.Implementation
 
         private readonly ILog _logger;
 
+        private readonly ICluster _parentCluster;
+
         private readonly IPool<IConnection> _pool;
 
         private readonly IRecoveryService _recoveryService;
@@ -35,32 +37,37 @@ namespace CassandraSharp.Implementation
 
         public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager,
                        IRecoveryService recoveryService, ITimestampService timestampService, ILog logger)
+            : this(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, logger, null)
+        {
+        }
+
+        private Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager,
+                        IRecoveryService recoveryService, ITimestampService timestampService, ILog logger, ICluster parentCluster)
         {
             BehaviorConfig = behaviorConfig;
+            TimestampService = timestampService;
             _pool = pool;
             _endpointsManager = endpointsManager;
             _recoveryService = recoveryService;
-            TimestampService = timestampService;
             _transportFactory = transportFactory;
             _logger = logger;
+            _parentCluster = parentCluster;
+        }
+
+        public void Dispose()
+        {
+            if (null == _parentCluster)
+            {
+                _pool.SafeDispose();
+            }
         }
 
         public IBehaviorConfig BehaviorConfig { get; private set; }
 
         public ITimestampService TimestampService { get; private set; }
 
-        public void Dispose()
+        public TResult ExecuteCommand<TResult>(Func<IConnection, TResult> func, Func<byte[]> keyFunc)
         {
-            _pool.SafeDispose();
-        }
-
-        public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func, Func<byte[]> keyFunc)
-        {
-            if (null == behaviorConfig)
-            {
-                behaviorConfig = BehaviorConfig;
-            }
-
             int tryCount = 1;
             while (true)
             {
@@ -68,14 +75,14 @@ namespace CassandraSharp.Implementation
                 try
                 {
                     byte[] key = null;
-                    if( null != keyFunc)
+                    if (null != keyFunc)
                     {
                         key = keyFunc();
                     }
 
                     connection = AcquireConnection(key);
 
-                    ChangeKeyspace(connection, behaviorConfig);
+                    ChangeKeyspace(connection);
                     TResult res = func(connection);
 
                     ReleaseConnection(connection, false);
@@ -86,35 +93,41 @@ namespace CassandraSharp.Implementation
                 {
                     bool connectionDead;
                     bool retry;
-                    DecipherException(ex, behaviorConfig, out connectionDead, out retry);
+                    DecipherException(ex, out connectionDead, out retry);
 
                     _logger.Error("Exception during command processing: connectionDead={0} retry={1} : {2}", connectionDead, retry, ex.Message);
 
                     ReleaseConnection(connection, connectionDead);
-                    if (!retry || tryCount >= behaviorConfig.MaxRetries)
+                    if (!retry || tryCount >= BehaviorConfig.MaxRetries)
                     {
                         _logger.Fatal("Max retry count reached");
                         throw;
                     }
 
-                    Thread.Sleep(behaviorConfig.SleepBeforeRetry);
+                    Thread.Sleep(BehaviorConfig.SleepBeforeRetry);
                 }
 
                 ++tryCount;
             }
         }
 
-        private static void ChangeKeyspace(IConnection connection, IBehaviorConfig behaviorConfig)
+        public ICluster CreateChildCluster(BehaviorConfigBuilder behaviorConfigBuilder)
         {
-            bool keyspaceChanged = connection.KeySpace != behaviorConfig.KeySpace;
-            if (keyspaceChanged && null != behaviorConfig.KeySpace)
+            IBehaviorConfig childConfig = behaviorConfigBuilder.Override(BehaviorConfig);
+            return new Cluster(childConfig, _pool, _transportFactory, _endpointsManager, _recoveryService, TimestampService, _logger, this);
+        }
+
+        private void ChangeKeyspace(IConnection connection)
+        {
+            bool keyspaceChanged = connection.KeySpace != BehaviorConfig.KeySpace;
+            if (keyspaceChanged && null != BehaviorConfig.KeySpace)
             {
-                connection.CassandraClient.set_keyspace(behaviorConfig.KeySpace);
-                connection.KeySpace = behaviorConfig.KeySpace;
+                connection.CassandraClient.set_keyspace(BehaviorConfig.KeySpace);
+                connection.KeySpace = BehaviorConfig.KeySpace;
             }
         }
 
-        private static void DecipherException(Exception ex, IBehaviorConfig behaviorConfig, out bool connectionDead, out bool retry)
+        private void DecipherException(Exception ex, out bool connectionDead, out bool retry)
         {
             // connection dead exception handling
             if (ex is TTransportException)
@@ -137,17 +150,17 @@ namespace CassandraSharp.Implementation
             else if (ex is TimedOutException)
             {
                 connectionDead = false;
-                retry = behaviorConfig.RetryOnTimeout;
+                retry = BehaviorConfig.RetryOnTimeout;
             }
             else if (ex is UnavailableException)
             {
                 connectionDead = false;
-                retry = behaviorConfig.RetryOnUnavailable;
+                retry = BehaviorConfig.RetryOnUnavailable;
             }
             else if (ex is NotFoundException)
             {
                 connectionDead = false;
-                retry = behaviorConfig.RetryOnNotFound;
+                retry = BehaviorConfig.RetryOnNotFound;
             }
 
                 // other exceptions ==> connection is not dead / do not retry

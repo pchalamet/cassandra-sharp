@@ -23,6 +23,8 @@ namespace CassandraSharp
 
         ITimestampService TimestampService { get; }
 
-        TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func, Func<byte[]> ketFunc );
+        ICluster CreateChildCluster(BehaviorConfigBuilder behaviorConfigBuilder);
+
+        TResult ExecuteCommand<TResult>(Func<IConnection, TResult> func, Func<byte[]> ketFunc );
     }
 }

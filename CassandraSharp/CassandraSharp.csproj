@@ -53,7 +53,7 @@
     <Compile Include="Data\CassandraConnection.cs" />
     <Compile Include="Data\CassandraDataParameterCollection.cs" />
     <Compile Include="Data\CassandraParameter.cs" />
-    <Compile Include="Implementation\DefaultLogger.cs" />
+    <Compile Include="Implementation\Logger.cs" />
     <Compile Include="Factories\LoggerFactory.cs" />
     <Compile Include="ObjectMapper\ColumnDef.cs" />
     <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
@@ -95,7 +95,7 @@
     <Compile Include="Config\EndpointsConfig.cs" />
     <Compile Include="Config\PoolType.cs" />
     <Compile Include="Config\SnitchType.cs" />
-    <Compile Include="Implementation\DefaultRecoveryService.cs" />
+    <Compile Include="Implementation\RecoveryService.cs" />
     <Compile Include="Transport\BaseTransportFactory.cs" />
     <Compile Include="Utils\DisposableExtensions.cs" />
     <Compile Include="EndpointStrategy\Endpoint.cs" />
@@ -122,7 +122,7 @@
     <Compile Include="ISnitch.cs" />
     <Compile Include="Snitch\RackInferringSnitch.cs" />
     <Compile Include="Snitch\SimpleSnitch.cs" />
-    <Compile Include="Implementation\DefaultTimestampService.cs" />
+    <Compile Include="Implementation\TimestampService.cs" />
     <Compile Include="Transport\BufferedTransportFactory.cs" />
     <Compile Include="Transport\FramedTransportFactory.cs" />
     <Compile Include="ITransportFactory.cs" />

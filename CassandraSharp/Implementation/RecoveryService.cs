@@ -19,7 +19,7 @@ namespace CassandraSharp.Implementation
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Utils;
 
-    internal class DefaultRecoveryService : IRecoveryService
+    internal class RecoveryService : IRecoveryService
     {
         private readonly object _lock;
 
@@ -27,7 +27,7 @@ namespace CassandraSharp.Implementation
 
         private readonly List<RecoveryItem> _toRecover;
 
-        public DefaultRecoveryService()
+        public RecoveryService()
         {
             _toRecover = new List<RecoveryItem>();
             _timer = new Timer(60*1000);

@@ -19,7 +19,7 @@ namespace CassandraSharp.Factories
     {
         public static IRecoveryService Create(string customType)
         {
-            return ServiceActivator.Create<IRecoveryService>(customType) ?? new DefaultRecoveryService();
+            return ServiceActivator.Create<IRecoveryService>(customType) ?? new RecoveryService();
         }
     }
 }

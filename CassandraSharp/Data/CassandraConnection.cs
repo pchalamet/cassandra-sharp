@@ -14,6 +14,7 @@ namespace CassandraSharp.Data
 {
     using System;
     using System.Data;
+    using CassandraSharp.Utils;
 
     public class CassandraConnection : IDbConnection
     {
@@ -38,19 +39,18 @@ namespace CassandraSharp.Data
 
         public void Close()
         {
-            if (null != _realCluster)
-            {
-                _realCluster.Dispose();
-                _realCluster = null;
-                CurrentCluster = null;
-            }
+            CurrentCluster.SafeDispose();
+            CurrentCluster = null;
+
+            _realCluster.SafeDispose();
+            _realCluster = null;
         }
 
         public void ChangeDatabase(string databaseName)
         {
             Database = databaseName;
             BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder {KeySpace = databaseName};
-            CurrentCluster = cfgBuilder.Build(_realCluster);
+            CurrentCluster = _realCluster.CreateChildCluster(cfgBuilder);
         }
 
         public IDbCommand CreateCommand()

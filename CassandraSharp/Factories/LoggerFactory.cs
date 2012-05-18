@@ -19,7 +19,7 @@ namespace CassandraSharp.Factories
     {
         public static ILog Create(string customType)
         {
-            ILog log = ServiceActivator.Create<ILog>(customType) ?? new DefaultLogger();
+            ILog log = ServiceActivator.Create<ILog>(customType) ?? new Logger();
             return log;
         }
     }
