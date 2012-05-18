@@ -17,7 +17,6 @@ namespace CassandraSharp.Implementation
     using System.Timers;
     using Apache.Cassandra;
     using CassandraSharp.EndpointStrategy;
-    using CassandraSharp.Transport;
     using CassandraSharp.Utils;
 
     internal class DefaultRecoveryService : IRecoveryService
@@ -68,7 +67,7 @@ namespace CassandraSharp.Implementation
                 {
                     client = recoveryItem.TransportFactory.Create(recoveryItem.Endpoint.Address);
 
-                    lock(_lock)
+                    lock (_lock)
                     {
                         _toRecover.Remove(recoveryItem);
                     }
