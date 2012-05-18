@@ -57,18 +57,17 @@ namespace CassandraSharp
         public ICluster Build(ICluster cluster)
         {
             IBehaviorConfig behaviorConfig = OverrideConfig(cluster.BehaviorConfig);
-            return new ConfiguredCluster(cluster, behaviorConfig, cluster.TimestampService);
+            return new ConfiguredCluster(cluster, behaviorConfig);
         }
 
         private class ConfiguredCluster : ICluster
         {
             private readonly ICluster _cluster;
 
-            public ConfiguredCluster(ICluster cluster, IBehaviorConfig behaviorConfig, ITimestampService timestampService)
+            public ConfiguredCluster(ICluster cluster, IBehaviorConfig behaviorConfig)
             {
                 _cluster = cluster;
                 BehaviorConfig = behaviorConfig;
-                TimestampService = timestampService;
             }
 
             public void Dispose()
