@@ -13,6 +13,7 @@
 namespace CassandraSharp.ObjectMapper
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -26,88 +27,50 @@ namespace CassandraSharp.ObjectMapper
         {
         }
 
-        private static IEnumerable<T> Execute<T>(Cassandra.Client client, CqlPreparedResult preparedStmt, object param)
+        private static IEnumerable<T> Execute<T>(Cassandra.Client client, CqlPreparedResult preparedStmt, IEnumerable<ColumnDef> allColumns, object param)
             where T : new()
         {
             List<byte[]> prms = new List<byte[]>();
             if (null != preparedStmt.Variable_names)
             {
-                Type paramType = param.GetType();
                 foreach (string prmName in preparedStmt.Variable_names)
                 {
-                    MemberInfo mi = paramType.GetMember(prmName).Single();
-
-                    Type mit;
-                    object miv;
-                    if (mi.MemberType == MemberTypes.Property)
-                    {
-                        PropertyInfo pi = (PropertyInfo) mi;
-                        mit = pi.PropertyType;
-                        miv = pi.GetValue(param, null);
-                    }
-                    else
-                    {
-                        FieldInfo fi = (FieldInfo) mi;
-                        mit = fi.FieldType;
-                        miv = fi.GetValue(param);
-                    }
-
-                    byte[] prm = mit.SerializeValue(miv);
+                    ColumnDef columnDef = allColumns.First(x => x.Name == prmName);
+                    object value = columnDef.GetValue(param);
+                    byte[] prm = columnDef.NetType.SerializeValue(value);
                     prms.Add(prm);
                 }
             }
 
             CqlResult result = client.execute_prepared_cql_query(preparedStmt.ItemId, prms);
-
-            Type resultType = typeof(T);
-            MemberInfo miKey = resultType.GetMember("Key", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.GetProperty).Single();
-            foreach(CqlRow row in result.Rows)
+            
+            if (null != result.Rows)
             {
-                T t = new T();
-                if( null != miKey)
-                {
-                    SetMember(t, row.Key, miKey);
-                }
-                
-                foreach (Column col in row.Columns)
-                {
-                    byte[] colValue = col.Value;
-                    string colName = new Utf8NameOrValue(col.Name).Value;
-                    MemberInfo mi = resultType.GetMember(colName).Single();
+                Type resultType = typeof(T);
+                IEnumerable<ColumnDef> resAllColumns = resultType.FindColumns();
 
-                    SetMember(t, colValue, mi);
-                }
+                ColumnDef keyColumn = resAllColumns.FirstOrDefault(x => x.IsKeyComponent && x.Index == 0);
+                foreach (CqlRow row in result.Rows)
+                {
+                    T t = new T();
+                    if (null != keyColumn)
+                    {
+                        object value = keyColumn.NetType.DeserializeValue(row.Key);
+                        keyColumn.SetValue(t, value);
+                    }
 
-                yield return t;
-            }
-        }
+                    foreach (Column col in row.Columns)
+                    {
+                        string colName = new Utf8NameOrValue(col.Name).Value;
+                        ColumnDef colDef = resAllColumns.FirstOrDefault(x => x.Name == colName);
+                        if (null != colDef)
+                        {
+                            object value = keyColumn.NetType.DeserializeValue(col.Value);
+                            colDef.SetValue(t, value);
+                        }
+                    }
 
-        private static void SetMember<T>(T t, byte[] colValue, MemberInfo mi) where T : new()
-        {
-            if (null != colValue)
-            {
-                Type mit;
-                if (mi.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo pi = (PropertyInfo) mi;
-                    mit = pi.PropertyType;
-                }
-                else
-                {
-                    FieldInfo fi = (FieldInfo) mi;
-                    mit = fi.FieldType;
-                }
-
-                object miv = mit.DeserializeValue(colValue);
-                if (mi.MemberType == MemberTypes.Property)
-                {
-                    PropertyInfo pi = (PropertyInfo) mi;
-                    pi.SetValue(t, miv, null);
-                }
-                else
-                {
-                    FieldInfo fi = (FieldInfo) mi;
-                    fi.SetValue(t, miv);
+                    yield return t;
                 }
             }
         }
@@ -120,7 +83,16 @@ namespace CassandraSharp.ObjectMapper
             Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
             CqlPreparedResult preparedStmt = client.prepare_cql_query(novQuery.ToByteArray(), Compression.NONE);
 
-            return prms.SelectMany(prm => Execute<T>(client, preparedStmt, prm));
+            foreach (object prm in prms)
+            {
+                Type type = prm.GetType();
+                IEnumerable<ColumnDef> allColumns = type.FindColumns();
+
+                foreach (T unknown in Execute<T>(client, preparedStmt, allColumns, prm))
+                {
+                    yield return unknown;
+                }
+            }
         }
 
         public static int Execute(this ICluster cluster, string query, params object[] param)

@@ -7,11 +7,11 @@
     {
         public ColumnAttribute()
         {
-            DataType = DataType.Auto;
+            CqlType = CqlType.Auto;
         }
 
         public string Name { get; set; }
 
-        public DataType DataType { get; set; }
+        public CqlType CqlType { get; set; }
     }
 }

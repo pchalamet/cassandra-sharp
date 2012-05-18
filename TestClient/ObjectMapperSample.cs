@@ -70,14 +70,10 @@ namespace TestClient
             SeenShips seenShips = new SeenShips
                                       {
                                           Day = "199-A/4", 
-                                          TimeSeen = DateTime.Now,
+                                          TimeSeen = new DateTime(1973, 06, 19),
                                           ShipName = "Sunrise Avenger"
                                       };
             cluster.Write(seenShips);
-
-            cluster.Execute("insert into People (firstname, lastname, birthyear) values (?, ?, ?)",
-                            new {firstname = "isabelle", lastname = "chalamet", birthyear = 1972},
-                            new {firstname = "pierre", lastname = "chalamet", birthyear = 1973});
         }
     }
 }

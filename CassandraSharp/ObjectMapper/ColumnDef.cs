@@ -12,6 +12,7 @@
 
 namespace CassandraSharp.ObjectMapper
 {
+    using System;
     using System.Reflection;
 
     internal class ColumnDef
@@ -19,36 +20,52 @@ namespace CassandraSharp.ObjectMapper
         private readonly PropertyInfo _pi;
         private readonly FieldInfo _fi;
 
-        public ColumnDef(string name, DataType dataType, bool isKeyComponent, int index, MemberInfo mi)
+        public ColumnDef(string name, CqlType cqlType, bool isKeyComponent, int index, MemberInfo mi)
         {
             Name = name;
-            DataType = dataType;
+            CqlType = cqlType;
             IsKeyComponent = isKeyComponent;
             Index = index;
 
             if( mi.MemberType == MemberTypes.Property)
             {
                 _pi = (PropertyInfo) mi;
+                NetType = _pi.PropertyType;
             }
             else
             {
                 _fi = (FieldInfo) mi;
+                NetType = _fi.FieldType;
             }
         }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
-        public DataType DataType { get; set; }
+        public CqlType CqlType { get; private set; }
 
-        public bool IsKeyComponent { get; set; }
+        public Type NetType { get; private set; }
 
-        public int Index { get; set; }
+        public bool IsKeyComponent { get; private set; }
+
+        public int Index { get; private set; }
 
         public object GetValue(object target)
         {
             return null != _pi
                        ? _pi.GetValue(target, null)
                        : _fi.GetValue(target);
+        }
+
+        public void SetValue(object target, object value)
+        {
+            if( null != _pi)
+            {
+                _pi.SetValue(target, value, null);
+            }
+            else
+            {
+                _fi.SetValue(target, value);
+            }
         }
     }
 }

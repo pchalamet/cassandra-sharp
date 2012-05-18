@@ -57,7 +57,7 @@
     <Compile Include="Factories\LoggerFactory.cs" />
     <Compile Include="ObjectMapper\ColumnDef.cs" />
     <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
-    <Compile Include="ObjectMapper\DataType.cs" />
+    <Compile Include="ObjectMapper\CqlType.cs" />
     <Compile Include="ObjectMapper\DataTypeExtensions.cs" />
     <Compile Include="ObjectMapper\TypeExtensions.cs" />
     <Compile Include="Utils\ServiceActivator.cs" />

@@ -21,9 +21,6 @@ namespace CassandraSharp
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Factories;
     using CassandraSharp.Implementation;
-    using CassandraSharp.Pool;
-    using CassandraSharp.Snitch;
-    using CassandraSharp.Transport;
     using CassandraSharp.Utils;
 
     public class ClusterManager

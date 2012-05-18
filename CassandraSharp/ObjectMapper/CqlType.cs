@@ -1,6 +1,6 @@
 namespace CassandraSharp.ObjectMapper
 {
-    public enum DataType
+    public enum CqlType
     {
         Auto,
 

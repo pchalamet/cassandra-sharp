@@ -34,7 +34,7 @@ namespace CassandraSharp.ObjectMapper
             sbCreateTable.AppendFormat("{0} (", tableName);
             foreach (ColumnDef columnDef in allColumns)
             {
-                string colDataType = columnDef.DataType.ToCql();
+                string colDataType = columnDef.CqlType.ToCql();
                 sbCreateTable.AppendFormat("{0} {1}, ", columnDef.Name, colDataType);
             }
 

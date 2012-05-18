@@ -15,7 +15,6 @@ namespace CassandraSharp
     using System;
     using Apache.Cassandra;
     using CassandraSharp.EndpointStrategy;
-    using CassandraSharp.Transport;
 
     public interface IRecoveryService : IDisposable
     {
