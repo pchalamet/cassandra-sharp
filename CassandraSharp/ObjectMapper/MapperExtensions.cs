@@ -18,13 +18,13 @@ namespace CassandraSharp.ObjectMapper
 
     public static class MapperExtensions
     {
-        public static IEnumerable<T> Read<T>(this ICluster cluster, object param)
+        public static IEnumerable<T> Read<T>(this ICluster cluster, T template)
         {
             // translate to "select"
             throw new NotImplementedException();
         }
 
-        public static void Write<T>(this ICluster cluster, T t)
+        public static void Write<T>(this ICluster cluster, T param)
         {
             Type type = typeof(T);
 
@@ -39,7 +39,7 @@ namespace CassandraSharp.ObjectMapper
             string sep = "";
             foreach (ColumnDef columnDef in allColumns)
             {
-                object value = columnDef.GetValue(t);
+                object value = columnDef.GetValue(param);
                 if (null != value)
                 {
                     sbInsert.Append(sep).Append(columnDef.Name);
@@ -47,19 +47,25 @@ namespace CassandraSharp.ObjectMapper
                     sep = ", ";
                 }
             }
-            sbInsert.Append(" ) values ").Append(sbJokers).Append(" )");
+            sbInsert.Append(" ) values ").Append(sbJokers);
+            sbInsert.AppendFormat(" ) using consistency {0} and timestamp {1}",
+                                  cluster.BehaviorConfig.WriteConsistencyLevel, cluster.TimestampService.Generate());
+            if( 0 != cluster.BehaviorConfig.TTL)
+            {
+                sbInsert.AppendFormat(" and ttl {0}", cluster.BehaviorConfig.TTL);
+            }
 
             string cqlInsert = sbInsert.ToString();
-            cluster.Execute(cqlInsert, t);
+            cluster.Execute(cqlInsert, param);
         }
 
-        public static void Delete<T>(this ICluster cluster, object param)
+        public static void Delete<T>(this ICluster cluster, T template)
         {
             // translate to "delete"
             throw new NotImplementedException();
         }
 
-        public static void Update<T>(this ICluster cluster, object template, object param)
+        public static void Update<T>(this ICluster cluster, T template, T param)
         {
             // translate to "update"
             throw new NotImplementedException();
