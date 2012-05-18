@@ -23,6 +23,7 @@ namespace CassandraSharp.ObjectMapper
         private static IEnumerable<T> Execute<T>(Cassandra.Client client, CqlPreparedResult preparedStmt, IEnumerable<ColumnDef> allColumns, object param)
             where T : new()
         {
+            // feed required columns for the query
             List<byte[]> prms = new List<byte[]>();
             if (null != preparedStmt.Variable_names)
             {
@@ -35,8 +36,10 @@ namespace CassandraSharp.ObjectMapper
                 }
             }
 
+            // execute the query
             CqlResult result = client.execute_prepared_cql_query(preparedStmt.ItemId, prms);
 
+            // returns results
             if (null != result.Rows)
             {
                 Type resultType = typeof(T);
@@ -46,12 +49,15 @@ namespace CassandraSharp.ObjectMapper
                 foreach (CqlRow row in result.Rows)
                 {
                     T t = new T();
+                 
+                    // map key first
                     if (null != keyColumn)
                     {
                         object value = keyColumn.NetType.DeserializeValue(row.Key);
                         keyColumn.SetValue(t, value);
                     }
 
+                    // map columns
                     foreach (Column col in row.Columns)
                     {
                         string colName = new Utf8NameOrValue(col.Name).Value;
@@ -71,8 +77,6 @@ namespace CassandraSharp.ObjectMapper
         private static IEnumerable<T> PrepareAndExecute<T>(Cassandra.Client client, string query, IEnumerable<object> prms)
             where T : new()
         {
-            //client.set_cql_version("3.0.0-beta1");
-
             Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
             CqlPreparedResult preparedStmt = client.prepare_cql_query(novQuery.ToByteArray(), Compression.NONE);
 

@@ -18,6 +18,16 @@ namespace CassandraSharp.ObjectMapper
 
     public static class MapperExtensions
     {
+        private static void AppendQueryModifiers<T>(ICluster cluster, StringBuilder sbQuery)
+        {
+            sbQuery.AppendFormat(" using consistency {0} and timestamp {1}",
+                                 cluster.BehaviorConfig.WriteConsistencyLevel, cluster.TimestampService.Generate());
+            if (0 != cluster.BehaviorConfig.TTL)
+            {
+                sbQuery.AppendFormat(" and ttl {0}", cluster.BehaviorConfig.TTL);
+            }
+        }
+
         public static IEnumerable<T> Read<T>(this ICluster cluster, T template)
         {
             // translate to "select"
@@ -47,13 +57,8 @@ namespace CassandraSharp.ObjectMapper
                     sep = ", ";
                 }
             }
-            sbInsert.Append(" ) values ").Append(sbJokers);
-            sbInsert.AppendFormat(" ) using consistency {0} and timestamp {1}",
-                                  cluster.BehaviorConfig.WriteConsistencyLevel, cluster.TimestampService.Generate());
-            if( 0 != cluster.BehaviorConfig.TTL)
-            {
-                sbInsert.AppendFormat(" and ttl {0}", cluster.BehaviorConfig.TTL);
-            }
+            sbInsert.Append(" ) values ").Append(sbJokers).Append(" )");
+            AppendQueryModifiers<T>(cluster, sbInsert);
 
             string cqlInsert = sbInsert.ToString();
             cluster.Execute(cqlInsert, param);
