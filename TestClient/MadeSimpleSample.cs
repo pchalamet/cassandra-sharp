@@ -50,27 +50,27 @@ namespace TestClient
             CqlResult result;
 
             Utf8NameOrValue insert = new Utf8NameOrValue("insert into People (firstname, lastname, birthyear) values (?, ?, ?)");
-            CqlPreparedResult preparedInsert = cluster.ExecuteCommand(null, ctx => ctx.CassandraClient.prepare_cql_query(insert.ToByteArray(), Compression.NONE));
+            CqlPreparedResult preparedInsert = cluster.ExecuteCommand(ctx => ctx.CassandraClient.prepare_cql_query(insert.ToByteArray(), Compression.NONE));
 
             Utf8NameOrValue firstName = new Utf8NameOrValue("pierre");
             Utf8NameOrValue lastName = new Utf8NameOrValue("chalamet");
             IntNameOrValue birthyear = new IntNameOrValue(1973);
 
             prms = new List<byte[]> {firstName.ToByteArray(), lastName.ToByteArray(), birthyear.ToByteArray()};
-            result = cluster.ExecuteCommand(null, ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedInsert.ItemId, prms));
+            result = cluster.ExecuteCommand(ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedInsert.ItemId, prms));
 
             prms = new List<byte[]> {new Utf8NameOrValue("isabelle").ToByteArray(), lastName.ToByteArray(), new IntNameOrValue(1972).ToByteArray()};
-            result = cluster.ExecuteCommand(null, ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedInsert.ItemId, prms));
+            result = cluster.ExecuteCommand(ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedInsert.ItemId, prms));
 
             //result = cluster.ExecuteCql("select * from People where firstname in (?)");
             //DumpCqlResult(result);
 
             // query data
             Utf8NameOrValue select = new Utf8NameOrValue("select lastname, birthyear from People where firstname in (?, ?)");
-            CqlPreparedResult preparedSelect = cluster.ExecuteCommand(null, ctx => ctx.CassandraClient.prepare_cql_query(select.ToByteArray(), Compression.NONE));
+            CqlPreparedResult preparedSelect = cluster.ExecuteCommand(ctx => ctx.CassandraClient.prepare_cql_query(select.ToByteArray(), Compression.NONE));
 
             prms = new List<byte[]> {firstName.ToByteArray(), new Utf8NameOrValue("isabelle").ToByteArray()};
-            result = cluster.ExecuteCommand(null, ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedSelect.ItemId, prms));
+            result = cluster.ExecuteCommand(ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedSelect.ItemId, prms));
             result.Dump(Console.Out);
         }
     }
