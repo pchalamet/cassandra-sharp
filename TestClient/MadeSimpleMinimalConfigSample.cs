@@ -23,10 +23,9 @@ namespace TestClient
 
         protected override void Run(ICluster cluster)
         {
-            BehaviorConfigBuilder cmdInfoBuilder = new BehaviorConfigBuilder {KeySpace = "TestKS"};
-            ICluster configuredCluster = cmdInfoBuilder.Build(cluster);
-
-            base.Run(configuredCluster);
+            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder {KeySpace = "TestKS"};
+            using (ICluster configuredCluster = cluster.CreateChildCluster(cfgBuilder))
+                base.Run(configuredCluster);
         }
     }
 }
