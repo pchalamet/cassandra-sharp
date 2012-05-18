@@ -12,6 +12,7 @@
 
 namespace CassandraSharp
 {
+    using System;
     using Apache.Cassandra;
     using CassandraSharp.Config;
 
@@ -35,7 +36,7 @@ namespace CassandraSharp
 
         public int? SleepBeforeRetry { get; set; }
 
-        public IBehaviorConfig Build(IBehaviorConfig behaviorConfigToOverride)
+        private IBehaviorConfig OverrideConfig(IBehaviorConfig behaviorConfigToOverride)
         {
             IBehaviorConfig behaviorConfigConfig = new BehaviorConfig
                                                        {
@@ -49,7 +50,39 @@ namespace CassandraSharp
                                                            RetryOnUnavailable = RetryOnUnavailable ?? behaviorConfigToOverride.RetryOnUnavailable,
                                                            SleepBeforeRetry = SleepBeforeRetry ?? behaviorConfigToOverride.SleepBeforeRetry
                                                        };
+
             return behaviorConfigConfig;
+        }
+
+        public ICluster Build(ICluster cluster)
+        {
+            IBehaviorConfig behaviorConfig = OverrideConfig(cluster.BehaviorConfig);
+            return new ConfiguredCluster(cluster, behaviorConfig, cluster.TimestampService);
+        }
+
+        private class ConfiguredCluster : ICluster
+        {
+            private readonly ICluster _cluster;
+
+            public ConfiguredCluster(ICluster cluster, IBehaviorConfig behaviorConfig, ITimestampService timestampService)
+            {
+                _cluster = cluster;
+                BehaviorConfig = behaviorConfig;
+                TimestampService = timestampService;
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public IBehaviorConfig BehaviorConfig { get; private set; }
+
+            public ITimestampService TimestampService { get; private set; }
+
+            public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func, Func<byte[]> keyFunc)
+            {
+                return _cluster.ExecuteCommand(BehaviorConfig, func, keyFunc);
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ namespace CassandraSharp
     /// </summary>
     public interface IEndpointStrategy
     {
-        Endpoint Pick();
+        Endpoint Pick(byte[] keyHint);
 
         void Ban(Endpoint endpoint);
 

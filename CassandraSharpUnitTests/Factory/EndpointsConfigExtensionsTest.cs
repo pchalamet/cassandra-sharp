@@ -27,7 +27,7 @@ namespace CassandraSharpUnitTests.Factory
         {
         }
 
-        public Endpoint Pick()
+        public Endpoint Pick(byte[] keyHint)
         {
             throw new NotImplementedException();
         }

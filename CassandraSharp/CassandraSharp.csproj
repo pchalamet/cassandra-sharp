@@ -49,13 +49,17 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="BehaviorConfigBuilder.cs" />
-    <Compile Include="BehaviorConfigBuilderExtensions.cs" />
     <Compile Include="Data\CassandraCommand.cs" />
     <Compile Include="Data\CassandraConnection.cs" />
     <Compile Include="Data\CassandraDataParameterCollection.cs" />
     <Compile Include="Data\CassandraParameter.cs" />
     <Compile Include="Implementation\DefaultLogger.cs" />
     <Compile Include="Factories\LoggerFactory.cs" />
+    <Compile Include="ObjectMapper\ColumnDef.cs" />
+    <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
+    <Compile Include="ObjectMapper\DataType.cs" />
+    <Compile Include="ObjectMapper\DataTypeExtensions.cs" />
+    <Compile Include="ObjectMapper\TypeExtensions.cs" />
     <Compile Include="Utils\ServiceActivator.cs" />
     <Compile Include="Factories\TimestampServiceFactory.cs" />
     <Compile Include="ILogger.cs" />

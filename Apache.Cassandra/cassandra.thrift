@@ -494,16 +494,11 @@ struct CqlResult {
     4: optional CqlMetadata schema
 }
 
-struct CqlNameType {
-    1: required binary key,
-	2: required string type
-}
-
 struct CqlPreparedResult {
     1: required i32 itemId,
     2: required i32 count,
     3: optional list<string> variable_types,
-    4: optional list<CqlNameType> name_types
+    4: optional list<string> variable_names
 }
 
 

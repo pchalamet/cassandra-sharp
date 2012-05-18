@@ -21,9 +21,9 @@ namespace TestClient
         {
             XmlConfigurator.Configure();
 
-            new MadeSimpleSample("MadeSimple").Run();
-            new MadeSimpleMinimalConfigSample("MinimalConfig").Run();
-            new MadeSimpleSample("CustomEndpointStrategy").Run();
+            //new MadeSimpleSample("MadeSimple").Run();
+            //new MadeSimpleMinimalConfigSample("MinimalConfig").Run();
+            //new MadeSimpleSample("CustomEndpointStrategy").Run();
             new ObjectMapperSample("ObjectMapper").Run();
 
             ClusterManager.Shutdown();

@@ -16,6 +16,7 @@ namespace CassandraSharp.ObjectMapper
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
     using Apache.Cassandra;
     using CassandraSharp.MadeSimple;
 
@@ -25,56 +26,15 @@ namespace CassandraSharp.ObjectMapper
         {
         }
 
-        private static readonly Dictionary<Type, Func<object, INameOrValue>> _netType2NameOrValueFromValue = 
-            new Dictionary<Type, Func<object, INameOrValue>>
-                {
-                    {typeof(int), x => new IntNameOrValue((int)x)},
-                    {typeof(int?), x => null != x ? new IntNameOrValue((int)x) : null},
-                    {typeof(long), x => new LongNameOrValue((long)x)},
-                    {typeof(long?), x => null != x ? new LongNameOrValue((long)x) : null},
-                    {typeof(float), x => new FloatNameOrValue((float)x)},
-                    {typeof(float?), x => null != x ? new FloatNameOrValue((float)x) : null},
-                    {typeof(double),x => new DoubleNameOrValue((double)x)},
-                    {typeof(double?), x => null != x ? new DoubleNameOrValue((double)x) : null},
-                    {typeof(string), x => null != x ? new Utf8NameOrValue((string)x) : null },
-                    {typeof(DateTime), x => null != x ? new LongNameOrValue(((DateTime)x).Ticks) : null },
-                    {typeof(byte[]), x => new ByteArrayNameOrValue((byte[])x)},
-                    {typeof(Decimal), x => null },
-                    {typeof(Decimal?), x => null},
-                    {typeof(Guid), x => new GuidNameOrValue((Guid)x) },
-                    {typeof(Guid?), x => null != x ? new GuidNameOrValue((Guid)x) : null },
-                };
-
-        private static readonly Dictionary<Type, Func<byte[], INameOrValue>> _netType2NameOrValueFromByteArray =
-    new Dictionary<Type, Func<byte[], INameOrValue>>
-                {
-                    {typeof(int), x => new IntNameOrValue(x)},
-                    {typeof(int?), x => new IntNameOrValue(x)},
-                    {typeof(long), x => new LongNameOrValue(x)},
-                    {typeof(long?), x => new LongNameOrValue(x)},
-                    {typeof(float), x => new FloatNameOrValue(x)},
-                    {typeof(float?), x => new FloatNameOrValue(x)},
-                    {typeof(double),x => new DoubleNameOrValue(x)},
-                    {typeof(double?), x => new DoubleNameOrValue(x)},
-                    {typeof(string), x => new Utf8NameOrValue(x) },
-                    {typeof(DateTime), x => new LongNameOrValue(x) },
-                    {typeof(byte[]), x => new ByteArrayNameOrValue(x)},
-                    {typeof(Decimal), x => null },
-                    {typeof(Decimal?), x => null},
-                    {typeof(Guid), x => new GuidNameOrValue(x) },
-                    {typeof(Guid?), x => new GuidNameOrValue(x) },
-                };
-
         private static IEnumerable<T> Execute<T>(Cassandra.Client client, CqlPreparedResult preparedStmt, object param)
             where T : new()
         {
             List<byte[]> prms = new List<byte[]>();
-            if (null != preparedStmt.Name_types)
+            if (null != preparedStmt.Variable_names)
             {
                 Type paramType = param.GetType();
-                foreach (CqlNameType prmDef in preparedStmt.Name_types)
+                foreach (string prmName in preparedStmt.Variable_names)
                 {
-                    string prmName = new Utf8NameOrValue(prmDef.Key).Value;
                     MemberInfo mi = paramType.GetMember(prmName).Single();
 
                     Type mit;
@@ -92,8 +52,7 @@ namespace CassandraSharp.ObjectMapper
                         miv = fi.GetValue(param);
                     }
 
-                    Func<object, INameOrValue> converter = _netType2NameOrValueFromValue[mit];
-                    byte[] prm = converter(miv).ToByteArray();
+                    byte[] prm = mit.SerializeValue(miv);
                     prms.Add(prm);
                 }
             }
@@ -139,8 +98,7 @@ namespace CassandraSharp.ObjectMapper
                     mit = fi.FieldType;
                 }
 
-                Func<byte[], INameOrValue> converter = _netType2NameOrValueFromByteArray[mit];
-                object miv = converter(colValue);
+                object miv = mit.DeserializeValue(colValue);
                 if (mi.MemberType == MemberTypes.Property)
                 {
                     PropertyInfo pi = (PropertyInfo) mi;
@@ -162,19 +120,42 @@ namespace CassandraSharp.ObjectMapper
             Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
             CqlPreparedResult preparedStmt = client.prepare_cql_query(novQuery.ToByteArray(), Compression.NONE);
 
-            foreach(object prm in prms)
-            {
-                foreach(T t in Execute<T>(client, preparedStmt, prm))
-                {
-                    yield return t;
-                }
-            }
+            return prms.SelectMany(prm => Execute<T>(client, preparedStmt, prm));
         }
 
         public static int Execute(this ICluster cluster, string query, params object[] param)
         {
             int nbResults = cluster.ExecuteCommand(null, client => PrepareAndExecute<Unit>(client.CassandraClient, query, param).Count());
             return nbResults;
+        }
+
+        public static void Write<T>(this ICluster cluster, T t)
+        {
+            Type type = typeof(T);
+
+            SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
+            string tableName = schemaAttribute.Name ?? type.Name;
+            
+            IEnumerable<ColumnDef> allColumns = type.FindColumns();
+
+            StringBuilder sbInsert = new StringBuilder("insert into ");
+            StringBuilder sbJokers = new StringBuilder("(");
+            sbInsert.AppendFormat("{0} (", tableName);
+            string sep = "";
+            foreach(ColumnDef columnDef in allColumns)
+            {
+                object value = columnDef.GetValue(t);
+                if( null != value)
+                {
+                    sbInsert.Append(sep).Append(columnDef.Name);
+                    sbJokers.Append(sep).Append("?");
+                    sep = ", ";
+                }
+            }
+            sbInsert.Append(" ) values ").Append(sbJokers).Append(" )");
+
+            string cqlInsert = sbInsert.ToString();
+            cluster.Execute(cqlInsert, t);
         }
 
         public static IEnumerable<T> Query<T>(this ICluster cluster, string query, object param)

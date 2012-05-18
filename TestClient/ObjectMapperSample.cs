@@ -12,20 +12,28 @@
 
 namespace TestClient
 {
+    using System;
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
-    [Schema("TestKeyspace", Comment = "People table", Name="People")]
-    public class PeopleSchema
+    //CREATE TABLE seen_ships (
+    //      day text,
+    //      time_seen timestamp,
+    //      shipname text,
+    //      PRIMARY KEY (day, time_seen)
+    //  );
+
+    [Schema("ObjectMapper", Comment = "Captain Reynolds register", Name = "seen_ships", CompactStorage = true)]
+    public class SeenShips
     {
-        [Index(Name = "birthyear")]
-        public int Birthyear;
+        [Key(Name = "day")]
+        public string Day;
 
-        [Key(Name = "firstname")]
-        public string FirstName;
+        [CompositeKey(Name = "time_seen", Index = 1)]
+        public DateTime TimeSeen;
 
-        [Column(Name = "lastname")]
-        public string LastName;
+        [Column(Name = "shipname")]
+        public string ShipName;
     }
 
     public class ObjectMapperSample
@@ -45,8 +53,27 @@ namespace TestClient
 
         protected void Run(ICluster cluster)
         {
-            cluster.Drop<PeopleSchema>();
-            cluster.Create<PeopleSchema>();
+            //try
+            //{
+            //    cluster.Drop<SeenShips>();
+            //}
+            //catch
+            //{
+            //}
+
+            //cluster.Create<SeenShips>();
+
+            // SELECT * FROM seen_ships WHERE day='199-A/4'
+            //AND time_seen > '7943-02-03' AND time_seen < '7943-02-28'
+            //LIMIT 12;
+
+            SeenShips seenShips = new SeenShips
+                                      {
+                                          Day = "199-A/4", 
+                                          TimeSeen = DateTime.Now,
+                                          ShipName = "Sunrise Avenger"
+                                      };
+            cluster.Write(seenShips);
 
             cluster.Execute("insert into People (firstname, lastname, birthyear) values (?, ?, ?)",
                             new {firstname = "isabelle", lastname = "chalamet", birthyear = 1972},

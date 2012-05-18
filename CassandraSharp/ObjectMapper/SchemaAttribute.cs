@@ -46,6 +46,8 @@
        // public Type Comparator { get; set; }
         public string Comment { get; set; }
 
+        public bool CompactStorage { get; set; }
+
         //public Type DefaultValidation { get; set; }
 
         //public int? GCGraceSeconds { get; set; }

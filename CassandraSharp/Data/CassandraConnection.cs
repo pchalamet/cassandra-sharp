@@ -50,7 +50,7 @@ namespace CassandraSharp.Data
         {
             Database = databaseName;
             BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder {KeySpace = databaseName};
-            CurrentCluster = _realCluster.Configure(cfgBuilder);
+            CurrentCluster = cfgBuilder.Build(_realCluster);
         }
 
         public IDbCommand CreateCommand()

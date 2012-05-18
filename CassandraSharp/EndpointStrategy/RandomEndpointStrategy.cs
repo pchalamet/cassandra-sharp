@@ -32,7 +32,7 @@ namespace CassandraSharp.EndpointStrategy
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Endpoint Pick()
+        public Endpoint Pick(byte[] keyHint)
         {
             if (0 < _healthyEndpoints.Count)
             {

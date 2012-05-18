@@ -54,7 +54,7 @@ namespace CassandraSharp.Implementation
             _pool.SafeDispose();
         }
 
-        public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func)
+        public TResult ExecuteCommand<TResult>(IBehaviorConfig behaviorConfig, Func<IConnection, TResult> func, Func<byte[]> keyFunc)
         {
             if (null == behaviorConfig)
             {
@@ -67,7 +67,13 @@ namespace CassandraSharp.Implementation
                 IConnection connection = null;
                 try
                 {
-                    connection = AcquireConnection();
+                    byte[] key = null;
+                    if( null != keyFunc)
+                    {
+                        key = keyFunc();
+                    }
+
+                    connection = AcquireConnection(key);
 
                     ChangeKeyspace(connection, behaviorConfig);
                     TResult res = func(connection);
@@ -152,7 +158,7 @@ namespace CassandraSharp.Implementation
             }
         }
 
-        private IConnection AcquireConnection()
+        private IConnection AcquireConnection(byte[] key)
         {
             IConnection connection;
             if (_pool.Acquire(out connection))
@@ -160,7 +166,7 @@ namespace CassandraSharp.Implementation
                 return connection;
             }
 
-            Endpoint endpoint = _endpointsManager.Pick();
+            Endpoint endpoint = _endpointsManager.Pick(key);
             if (null == endpoint)
             {
                 throw new ArgumentException("Can't find any valid endpoint");
