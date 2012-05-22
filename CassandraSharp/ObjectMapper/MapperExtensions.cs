@@ -18,7 +18,7 @@ namespace CassandraSharp.ObjectMapper
 
     public static class MapperExtensions
     {
-        private static void AppendQueryModifiers<T>(ICluster cluster, StringBuilder sbQuery)
+        private static void AppendQueryModifiers(ICluster cluster, StringBuilder sbQuery)
         {
             sbQuery.AppendFormat(" using consistency {0} and timestamp {1}",
                                  cluster.BehaviorConfig.WriteConsistencyLevel, cluster.TimestampService.Generate());
@@ -58,7 +58,7 @@ namespace CassandraSharp.ObjectMapper
                 }
             }
             sbInsert.Append(" ) values ").Append(sbJokers).Append(" )");
-            AppendQueryModifiers<T>(cluster, sbInsert);
+            AppendQueryModifiers(cluster, sbInsert);
 
             string cqlInsert = sbInsert.ToString();
             cluster.Execute(cqlInsert, param);
