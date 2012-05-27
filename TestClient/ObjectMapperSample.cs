@@ -30,11 +30,11 @@ namespace TestClient
         [Key(Name = "day")]
         public string Day;
 
-        [CompositeKey(Name = "time_seen", Index = 1)]
-        public DateTime? TimeSeen;
-
         [Column(Name = "shipname")]
         public string ShipName;
+
+        [CompositeKey(Name = "time_seen", Index = 1)]
+        public DateTime? TimeSeen;
     }
 
     public class ObjectMapperSample
@@ -54,42 +54,38 @@ namespace TestClient
 
         protected void Run(ICluster cluster)
         {
-
             cluster.CreateTable<SeenShips>();
 
             SeenShips seenShip = new SeenShips
-                                      {
-                                          Day = "199-A/4", 
-                                          TimeSeen = new DateTime(1973, 06, 19),
-                                          ShipName = "Sunrise Avenger"
-                                      };
+                                     {
+                                         Day = "199-A/4",
+                                         TimeSeen = new DateTime(1973, 06, 19),
+                                         ShipName = "Sunrise Avenger"
+                                     };
             cluster.Insert(seenShip);
-
 
             seenShip = new SeenShips
-            {
-                Day = "199-A/4",
-                TimeSeen = new DateTime(1973, 06, 20),
-                ShipName = "Sunrise Avenger2"
-            };
+                           {
+                               Day = "199-A/4",
+                               TimeSeen = new DateTime(1973, 06, 20),
+                               ShipName = "Sunrise Avenger2"
+                           };
             cluster.Insert(seenShip);
-
 
             seenShip = new SeenShips
-            {
-                Day = "199-A/5",
-                TimeSeen = new DateTime(1973, 06, 21),
-                ShipName = "Sunrise Avenger3"
-            };
+                           {
+                               Day = "199-A/5",
+                               TimeSeen = new DateTime(1973, 06, 21),
+                               ShipName = "Sunrise Avenger3"
+                           };
             cluster.Insert(seenShip);
-
 
             SeenShips queryShips = new SeenShips
                                        {
                                            Day = "199-A/4"
                                        };
             IEnumerable<SeenShips> seenShips = cluster.Select(queryShips);
-            foreach(SeenShips ss in seenShips)
+            foreach (SeenShips ss in seenShips)
             {
                 Console.WriteLine("{0}: {1}", ss.TimeSeen, ss.ShipName);
             }
