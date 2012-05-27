@@ -33,7 +33,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
 
             ITruncateTableBuilder builder = CreateTruncateTableBuilder();
             string cql = builder.Build();
-            Assert.AreEqual(cql, expectedCql);
+            Assert.AreEqual(expectedCql, cql);
         }
 
         [Test]

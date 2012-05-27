@@ -38,7 +38,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
 
             ICreateTableBuilder builder = CreateTableBuilder();
             string cql = builder.Build();
-            Assert.AreEqual(cql, expectedCql);
+            Assert.AreEqual(expectedCql, cql);
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
             ICreateTableBuilder builder = CreateTableBuilder();
             builder.CompactStorage = true;
             string cql = builder.Build();
-            Assert.AreEqual(cql, expectedCql);
+            Assert.AreEqual(expectedCql, cql);
         }
 
         [Test]

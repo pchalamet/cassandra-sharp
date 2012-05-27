@@ -16,22 +16,33 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
     using CassandraSharp.ObjectMapper.Dialect;
     using NUnit.Framework;
 
-    public class DropTableBuilderTestSuite<T> where T : IDialect, new()
+    public class QueryBuilderTestSuite<T> where T : IDialect, new()
     {
-        private static IDropTableBuilder CreateDropTableBuilder()
+        private static IQueryBuilder CreateQueryBuilder()
         {
             T dialect = new T();
-            IDropTableBuilder builder = dialect.GetDropTableBuilder();
+            IQueryBuilder builder = dialect.GetQueryBuilder();
             builder.Table = "TestTable";
+            builder.Columns = new[] {"A", "B"};
+            builder.Wheres = new[] {"C=3"};
             return builder;
         }
 
         [Test]
-        public void TestAllParams()
+        public void TestAllParameters()
         {
-            const string expectedCql = "drop table TestTable";
+            const string expectedCql = "select A,B from TestTable where C=3";
+            IQueryBuilder builder = CreateQueryBuilder();
+            string cql = builder.Build();
+            Assert.AreEqual(expectedCql, cql);
+        }
 
-            IDropTableBuilder builder = CreateDropTableBuilder();
+        [Test]
+        public void TestValidateOptionalWhere()
+        {
+            const string expectedCql = "select A,B from TestTable";
+            IQueryBuilder builder = CreateQueryBuilder();
+            builder.Wheres = null;
             string cql = builder.Build();
             Assert.AreEqual(expectedCql, cql);
         }
@@ -39,15 +50,23 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         [Test]
         public void TestValidateTable()
         {
-            IDropTableBuilder builder = CreateDropTableBuilder();
+            IQueryBuilder builder = CreateQueryBuilder();
             builder.Table = null;
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 
         [Test]
-        public void TestValidateColumns()
+        public void TestValidateNullColumns()
         {
-            IDropTableBuilder builder = CreateDropTableBuilder();
+            IQueryBuilder builder = CreateQueryBuilder();
+            builder.Columns = null;
+            Assert.Throws<ArgumentException>(() => builder.Build());
+        }
+
+        [Test]
+        public void TestValidateEmptyColumns()
+        {
+            IQueryBuilder builder = CreateQueryBuilder();
             builder.Columns = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }

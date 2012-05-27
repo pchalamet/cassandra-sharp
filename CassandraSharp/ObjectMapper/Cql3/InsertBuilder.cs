@@ -24,24 +24,26 @@ namespace CassandraSharp.ObjectMapper.Cql3
             Validate();
 
             StringBuilder sb = new StringBuilder();
-            string sep = "insert into (";
+            sb.AppendFormat("insert into {0} (", Table);
+            string sep = "";
             foreach (string selector in Columns)
             {
                 sb.AppendFormat("{0}{1}", sep, selector);
-                sep = ", ";
+                sep = ",";
             }
 
-            sep = " ) values (";
+            sep = ") values (";
             foreach (string value in Values)
             {
                 sb.AppendFormat("{0}{1}", sep, value);
-                sep = ", ";
+                sep = ",";
             }
+            sb.Append(")");
+            sep = "";
 
-            sep = ")";
             if (null != ConsistencyLevel)
             {
-                sb.AppendFormat("{0} using consistency {1}", sep, ConsistencyLevel.Value);
+                sb.AppendFormat(" using consistency {0}", ConsistencyLevel.Value);
                 sep = " and ";
             }
 
@@ -73,14 +75,24 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
+            if (null == Table)
+            {
+                throw new ArgumentException("Table must be set");
+            }
+
             if (null == Columns || 0 == Columns.Length)
             {
                 throw new ArgumentException("Columns must have at least one element");
             }
 
-            if (null == Table)
+            if (null == Values || 0 == Values.Length)
             {
-                throw new ArgumentException("Table must be set");
+                throw new ArgumentException("Values must have at least one element");
+            }
+
+            if (Columns.Length != Values.Length)
+            {
+                throw new ArgumentException("Columns and Values must have the same number of elements");
             }
         }
     }

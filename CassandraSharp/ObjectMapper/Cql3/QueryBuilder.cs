@@ -28,7 +28,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
             foreach (string selector in Columns)
             {
                 sb.AppendFormat("{0}{1}", sep, selector);
-                sep = ", ";
+                sep = ",";
             }
 
             sb.AppendFormat(" from {0}", Table);
