@@ -10,16 +10,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factories
+namespace CassandraSharp.Transport
 {
-    using CassandraSharp.Implementation;
+    using CassandraSharp.Config;
     using CassandraSharp.Utils;
 
-    public static class TimestampServiceFactory
+    internal static class Factory
     {
-        public static ITimestampService Create(string customType)
+        public static ITransportFactory Create(TransportConfig @this)
         {
-            return ServiceActivator.Create<ITimestampService>(customType) ?? new TimestampService();
+            switch (@this.Type)
+            {
+                case "Framed":
+                    return new FramedTransportFactory(@this);
+
+                case "Buffered":
+                    return new BufferedTransportFactory(@this);
+
+                default:
+                    return ServiceActivator.Create<ITransportFactory>(@this.Type, @this);
+            }
         }
     }
 }

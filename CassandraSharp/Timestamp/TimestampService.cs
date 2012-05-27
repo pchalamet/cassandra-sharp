@@ -10,28 +10,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Implementation
+namespace CassandraSharp.Timestamp
 {
-    public class Logger : ILog
+    using System;
+
+    public class TimestampService : ITimestampService
     {
-        public void Debug(string format, params object[] prms)
+        public long Generate()
         {
-        }
-
-        public void Info(string format, params object[] prms)
-        {
-        }
-
-        public void Warn(string format, params object[] prms)
-        {
-        }
-
-        public void Error(string format, params object[] prms)
-        {
-        }
-
-        public void Fatal(string format, params object[] prms)
-        {
+            return DateTime.Now.ToFileTimeUtc();
         }
     }
 }

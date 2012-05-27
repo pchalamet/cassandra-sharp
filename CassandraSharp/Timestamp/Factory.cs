@@ -10,20 +10,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper
+namespace CassandraSharp.Timestamp
 {
-    using System;
+    using CassandraSharp.Utils;
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class ColumnAttribute : Attribute
+    public static class Factory
     {
-        public ColumnAttribute()
+        public static ITimestampService Create(string customType)
         {
-            CqlType = CqlType.Auto;
+            return ServiceActivator.Create<ITimestampService>(customType) ?? new TimestampService();
         }
-
-        public string Name { get; set; }
-
-        public CqlType CqlType { get; set; }
     }
 }

@@ -10,20 +10,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper
+namespace CassandraSharp.ObjectMapper.Dialect
 {
-    using System;
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class ColumnAttribute : Attribute
+    public interface IInsertBuilder : IBuilder,
+                                      IScopeBuilder,
+                                      IValueSetter,
+                                      IConsistencyLevelBuilder
     {
-        public ColumnAttribute()
-        {
-            CqlType = CqlType.Auto;
-        }
-
-        public string Name { get; set; }
-
-        public CqlType CqlType { get; set; }
     }
 }

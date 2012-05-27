@@ -15,57 +15,43 @@ namespace CassandraSharp.ObjectMapper
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+    using CassandraSharp.Config;
     using CassandraSharp.MadeSimple;
+    using CassandraSharp.ObjectMapper.Cql3;
+    using CassandraSharp.ObjectMapper.Dialect;
 
     public static class SchemaExtensions
     {
-        public static void Create<T>(this ICluster cluster)
+        public static void CreateTable<T>(this ICluster cluster)
         {
             Type type = typeof(T);
 
             SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
             IEnumerable<ColumnDef> allColumns = type.FindColumns();
-
-            StringBuilder sbCreateTable = new StringBuilder("create table ");
             string tableName = schemaAttribute.Name ?? type.Name;
-
-            // create table columns
-            sbCreateTable.AppendFormat("{0} (", tableName);
-            foreach (ColumnDef columnDef in allColumns)
-            {
-                string colDataType = columnDef.CqlType.ToCql();
-                sbCreateTable.AppendFormat("{0} {1}, ", columnDef.Name, colDataType);
-            }
-
-            // add primary key definition
             IEnumerable<ColumnDef> keyColumns = from cdef in allColumns
                                                 where cdef.IsKeyComponent
                                                 orderby cdef.Index
                                                 select cdef;
 
-            sbCreateTable.AppendFormat("primary key (");
-            string sep = "";
-            foreach (ColumnDef cdef in keyColumns)
-            {
-                sbCreateTable.AppendFormat("{0}{1}", sep, cdef.Name);
-                sep = ", ";
-            }
-            sbCreateTable.Append(") ) ");
+            ICreateTableBuilder builder = new CreateTableBuilder();
+            builder.Table = tableName;
+            builder.Columns = allColumns.Select(x => x.Name).ToArray();
+            builder.ColumnTypes = allColumns.Select(x => x.CqlType).ToArray();
+            builder.Keys = keyColumns.Select(x => x.Name).ToArray();
+            builder.CompactStorage = schemaAttribute.CompactStorage;
+            string createTableStmt = builder.Build();
 
-            if (schemaAttribute.CompactStorage)
-            {
-                sbCreateTable.AppendFormat("WITH COMPACT STORAGE");
-            }
-
-            string createTableStmt = sbCreateTable.ToString();
-
-            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
-            cfgBuilder.KeySpace = schemaAttribute.Keyspace;
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
-            {
                 tmpCluster.ExecuteCql(createTableStmt);
-            }
+
+            //BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
+            //cfgBuilder.KeySpace = schemaAttribute.Keyspace;
+            //using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+            //{
+            //    tmpCluster.ExecuteCql(createTableStmt);
+            //}
 
             // create indices then
             //foreach (IndexAttribute ia in indices)
@@ -78,23 +64,19 @@ namespace CassandraSharp.ObjectMapper
             //}
         }
 
-        public static void Drop<T>(this ICluster cluster)
+        public static void DropTable<T>(this ICluster cluster)
         {
             Type t = typeof(T);
 
             SchemaAttribute schemaAttribute = t.FindSchemaAttribute();
 
-            StringBuilder sbDropTable = new StringBuilder();
-            string tableName = schemaAttribute.Name ?? t.Name;
-            sbDropTable.AppendFormat("drop columnfamily {0}", tableName);
+            IDropTableBuilder builder = new DropTableBuilder();
+            builder.Table = schemaAttribute.Name ?? t.Name;
+            string dropTableStmt = builder.ToString();
 
-            string dropTableStmt = sbDropTable.ToString();
-
-            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder { KeySpace = schemaAttribute.Keyspace };
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
-            {
                 tmpCluster.ExecuteCql(dropTableStmt);
-            }
         }
 
         public static void Truncate<T>(this ICluster cluster)
@@ -103,18 +85,13 @@ namespace CassandraSharp.ObjectMapper
 
             SchemaAttribute schemaAttribute = t.FindSchemaAttribute();
 
-            StringBuilder sbTruncateTable = new StringBuilder();
-            string tableName = schemaAttribute.Name ?? t.Name;
-            sbTruncateTable.AppendFormat("truncate '{0}'", tableName);
+            ITruncateTableBuilder tableBuilder = new TruncateTableBuilder();
+            tableBuilder.Table = schemaAttribute.Name ?? t.Name;
+            string dropTableStmt = tableBuilder.ToString();
 
-            string dropTableStmt = sbTruncateTable.ToString();
-
-            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
-            cfgBuilder.KeySpace = schemaAttribute.Keyspace;
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
-            {
                 tmpCluster.ExecuteCql(dropTableStmt);
-            }
         }
     }
 }

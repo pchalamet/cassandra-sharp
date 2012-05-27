@@ -10,15 +10,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Implementation
+namespace CassandraSharp.ObjectMapper.Dialect
 {
-    using System;
-
-    public class TimestampService : ITimestampService
+    public interface IUpdateBuilder : IBuilder,
+                                      IScopeBuilder,
+                                      IValueSetter,
+                                      IFilterBuilder,
+                                      IConsistencyLevelBuilder
     {
-        public long Generate()
-        {
-            return DateTime.Now.ToFileTimeUtc();
-        }
     }
 }

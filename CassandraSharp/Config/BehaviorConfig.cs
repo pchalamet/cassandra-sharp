@@ -17,37 +17,31 @@ namespace CassandraSharp.Config
 
     public class BehaviorConfig : IBehaviorConfig
     {
-        public BehaviorConfig()
-        {
-            ReadConsistencyLevel = ConsistencyLevel.QUORUM;
-            WriteConsistencyLevel = ConsistencyLevel.QUORUM;
-        }
-
         [XmlAttribute("keyspace")]
         public string KeySpace { get; set; }
 
         [XmlAttribute("readCL")]
-        public ConsistencyLevel ReadConsistencyLevel { get; set; }
+        public ConsistencyLevel? ReadConsistencyLevel { get; set; }
 
         [XmlAttribute("ttl")]
-        public int TTL { get; set; }
+        public int? TTL { get; set; }
 
         [XmlAttribute("writeCL")]
-        public ConsistencyLevel WriteConsistencyLevel { get; set; }
+        public ConsistencyLevel? WriteConsistencyLevel { get; set; }
 
         [XmlAttribute("maxRetries")]
-        public int MaxRetries { get; set; }
+        public int? MaxRetries { get; set; }
 
         [XmlAttribute("retryOnNotFound")]
-        public bool RetryOnNotFound { get; set; }
+        public bool? RetryOnNotFound { get; set; }
 
         [XmlAttribute("retryOnTimeout")]
-        public bool RetryOnTimeout { get; set; }
+        public bool? RetryOnTimeout { get; set; }
 
         [XmlAttribute("retryOnUnavailable")]
-        public bool RetryOnUnavailable { get; set; }
+        public bool? RetryOnUnavailable { get; set; }
 
         [XmlAttribute("sleepBeforeRetry")]
-        public int SleepBeforeRetry { get; set; }
+        public int? SleepBeforeRetry { get; set; }
     }
 }

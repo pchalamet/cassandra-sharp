@@ -17,11 +17,11 @@ namespace CassandraSharp.Config
     [XmlRoot("CassandraSharpConfig")]
     public class CassandraSharpConfig
     {
-        [XmlAttribute("recoveryClass")]
-        public string RecoveryClass { get; set; }
+        [XmlAttribute("recovery")]
+        public string Recovery { get; set; }
 
-        [XmlAttribute("loggerClass")]
-        public string LoggerClass { get; set; }
+        [XmlAttribute("logger")]
+        public string Logger { get; set; }
 
         [XmlElement("Cluster")]
         public ClusterConfig[] Clusters { get; set; }

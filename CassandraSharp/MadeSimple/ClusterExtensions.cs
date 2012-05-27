@@ -36,7 +36,7 @@ namespace CassandraSharp.MadeSimple
                                     Timestamp = @this.TimestampService.Generate()
                                 };
 
-            @this.Execute(cnx => cnx.CassandraClient.insert(key.ToByteArray(), columnParent, column, @this.BehaviorConfig.WriteConsistencyLevel));
+            @this.Execute(cnx => cnx.CassandraClient.insert(key.ToByteArray(), columnParent, column, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
         public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
@@ -52,7 +52,7 @@ namespace CassandraSharp.MadeSimple
                                             Column = column.ToByteArray()
                                         };
 
-            return @this.ExecuteCommand(cnx => cnx.CassandraClient.get(key.ToByteArray(), columnPath, @this.BehaviorConfig.ReadConsistencyLevel));
+            return @this.ExecuteCommand(cnx => cnx.CassandraClient.get(key.ToByteArray(), columnPath, @this.BehaviorConfig.ReadConsistencyLevel.Get()));
         }
 
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
@@ -70,7 +70,7 @@ namespace CassandraSharp.MadeSimple
 
             @this.Execute(cnx =>
                           cnx.CassandraClient.remove(key.ToByteArray(), columnPath, @this.TimestampService.Generate(),
-                                                     @this.BehaviorConfig.WriteConsistencyLevel));
+                                                     @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
         public static void IncrementCounter(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName, long value)
@@ -83,7 +83,7 @@ namespace CassandraSharp.MadeSimple
             counterColumn.Name = columnName.ToByteArray();
             counterColumn.Value = value;
 
-            @this.Execute(cnx => cnx.CassandraClient.add(key.ToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel));
+            @this.Execute(cnx => cnx.CassandraClient.add(key.ToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)

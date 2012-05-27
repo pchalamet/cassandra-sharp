@@ -31,7 +31,7 @@ namespace CassandraSharp.ObjectMapper
                 {
                     ColumnDef columnDef = allColumns.First(x => x.Name == prmName);
                     object value = columnDef.GetValue(param);
-                    byte[] prm = columnDef.NetType.SerializeValue(value);
+                    byte[] prm = columnDef.NetType.Serialize(value);
                     prms.Add(prm);
                 }
             }
@@ -49,11 +49,11 @@ namespace CassandraSharp.ObjectMapper
                 foreach (CqlRow row in result.Rows)
                 {
                     T t = new T();
-                 
+
                     // map key first
                     if (null != keyColumn)
                     {
-                        object value = keyColumn.NetType.DeserializeValue(row.Key);
+                        object value = keyColumn.NetType.Deserialize(row.Key);
                         keyColumn.SetValue(t, value);
                     }
 
@@ -64,7 +64,7 @@ namespace CassandraSharp.ObjectMapper
                         ColumnDef colDef = resAllColumns.FirstOrDefault(x => x.Name == colName);
                         if (null != colDef)
                         {
-                            object value = keyColumn.NetType.DeserializeValue(col.Value);
+                            object value = colDef.NetType.Deserialize(col.Value);
                             colDef.SetValue(t, value);
                         }
                     }
@@ -74,28 +74,55 @@ namespace CassandraSharp.ObjectMapper
             }
         }
 
-        private static IEnumerable<T> PrepareAndExecute<T>(Cassandra.Client client, string query, IEnumerable<object> prms)
+        public static IEnumerable<T> Execute<T>(this ICluster cluster, string query, IEnumerable<object> prms)
             where T : new()
         {
-            Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
-            CqlPreparedResult preparedStmt = client.prepare_cql_query(novQuery.ToByteArray(), Compression.NONE);
-
-            foreach (object prm in prms)
+            bool hasError = true;
+            IConnection connection = null;
+            try
             {
-                Type type = prm.GetType();
-                IEnumerable<ColumnDef> allColumns = type.FindColumns();
+                connection = cluster.AcquireConnection(null);
+                Cassandra.Client client = connection.CassandraClient;
 
-                foreach (T unknown in Execute<T>(client, preparedStmt, allColumns, prm))
+                Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
+                CqlPreparedResult preparedStmt = connection.CassandraClient.prepare_cql_query(novQuery.ToByteArray(), Compression.NONE);
+
+                foreach (object prm in prms)
                 {
-                    yield return unknown;
+                    Type type = prm.GetType();
+                    IEnumerable<ColumnDef> allColumns = type.FindColumns();
+
+                    foreach (T unknown in Execute<T>(client, preparedStmt, allColumns, prm))
+                    {
+                        yield return unknown;
+                    }
+                }
+                hasError = false;
+            }
+            finally
+            {
+                if (null != connection)
+                {
+                    cluster.ReleaseConnection(connection, hasError);
                 }
             }
         }
 
-        public static int Execute(this ICluster cluster, string query, params object[] param)
+        public static IEnumerable<T> Execute<T>(this ICluster cluster, string query, params object[] prms)
+            where T : new()
         {
-            int nbResults = cluster.ExecuteCommand(client => PrepareAndExecute<Unit>(client.CassandraClient, query, param).Count());
+            return cluster.Execute<T>(query, prms.AsEnumerable());
+        }
+
+        public static int ExecuteNonQuery(this ICluster cluster, string query, IEnumerable<object> prms)
+        {
+            int nbResults = Execute<Unit>(cluster, query, prms).Count();
             return nbResults;
+        }
+
+        public static int ExecuteNonQuery(this ICluster cluster, string query, params object[] prms)
+        {
+            return cluster.ExecuteNonQuery(query, prms.AsEnumerable());
         }
 
         private class Unit

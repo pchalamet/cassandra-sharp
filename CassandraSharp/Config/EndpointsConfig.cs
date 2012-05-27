@@ -18,26 +18,20 @@ namespace CassandraSharp.Config
     {
         public EndpointsConfig()
         {
-            Snitch = Config.SnitchType.RackInferring;
-            Strategy = EndpointStrategy.Nearest;
+            Snitch = "RackInferring";
+            Strategy = "Nearest";
         }
 
         [XmlElement("Server")]
         public string[] Servers { get; set; }
 
         [XmlAttribute("snitch")]
-        public SnitchType Snitch { get; set; }
-
-        [XmlAttribute("snitchType")]
-        public string SnitchType { get; set; }
+        public string Snitch { get; set; }
 
         [XmlAttribute("strategy")]
-        public EndpointStrategy Strategy { get; set; }
+        public string Strategy { get; set; }
 
-        [XmlAttribute("strategyClass")]
-        public string StrategyClass { get; set; }
-
-        [XmlAttribute("timestampClass")]
-        public string TimestampServiceClass { get; set; }
+        [XmlAttribute("timestamp")]
+        public string Timestamp { get; set; }
     }
 }

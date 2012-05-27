@@ -18,20 +18,20 @@ namespace CassandraSharp
     {
         string KeySpace { get; }
 
-        ConsistencyLevel ReadConsistencyLevel { get; }
+        ConsistencyLevel? ReadConsistencyLevel { get; }
 
-        int TTL { get; }
+        int? TTL { get; }
 
-        ConsistencyLevel WriteConsistencyLevel { get; }
+        ConsistencyLevel? WriteConsistencyLevel { get; }
 
-        int MaxRetries { get; }
+        int? MaxRetries { get; }
 
-        bool RetryOnNotFound { get; }
+        bool? RetryOnNotFound { get; }
 
-        bool RetryOnTimeout { get; }
+        bool? RetryOnTimeout { get; }
 
-        bool RetryOnUnavailable { get; }
+        bool? RetryOnUnavailable { get; }
 
-        int SleepBeforeRetry { get; }
+        int? SleepBeforeRetry { get; }
     }
 }

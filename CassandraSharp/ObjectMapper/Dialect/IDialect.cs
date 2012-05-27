@@ -10,24 +10,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper
+namespace CassandraSharp.ObjectMapper.Dialect
 {
-    using System;
-    using System.Collections.Generic;
-
-    public class PreparedQuery
+    public interface ICqlDialect
     {
-        public PreparedQuery(string query)
-        {
-        }
+        ICreateTableBuilder GetCreateTableBuilder();
 
-        public void Execute(ICluster cluster, object param = null)
-        {
-        }
+        IDropTableBuilder GetDropTableBuilder();
 
-        public IEnumerable<T> Query<T>(ICluster cluster, object param = null)
-        {
-            throw new NotImplementedException();
-        }
+        ITruncateTableBuilder GetTruncateTableBuilder();
+
+        IInsertBuilder GetInsertBuilder();
+
+        IUpdateBuilder GetUpdateBuilder();
+
+        IQueryBuilder GetQueryBuilder();
     }
 }

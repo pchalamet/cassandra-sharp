@@ -20,48 +20,47 @@ namespace CassandraSharp.ObjectMapper
     internal static class TypeExtensions
     {
         private static readonly Dictionary<Type, CqlType> _netType2DataType = new Dictionary<Type, CqlType>
-                                                                                   {
-                                                                                       {typeof(int), CqlType.Int},
-                                                                                       {typeof(int?), CqlType.Int},
-                                                                                       {typeof(long), CqlType.BigInt},
-                                                                                       {typeof(long?), CqlType.BigInt},
-                                                                                       {typeof(float), CqlType.Float},
-                                                                                       {typeof(float?), CqlType.Float},
-                                                                                       {typeof(double), CqlType.Double},
-                                                                                       {typeof(double?), CqlType.Double},
-                                                                                       {typeof(string), CqlType.Text},
-                                                                                       {typeof(DateTime), CqlType.Timestamp},
-                                                                                       {typeof(byte[]), CqlType.Blob},
-                                                                                       {typeof(Decimal), CqlType.Decimal},
-                                                                                       {typeof(Decimal?), CqlType.Decimal},
-                                                                                       {typeof(Guid), CqlType.Uuid},
-                                                                                       {typeof(Guid?), CqlType.Uuid},
-                                                                                   };
+                                                                                  {
+                                                                                      {typeof(int), CqlType.Int},
+                                                                                      {typeof(int?), CqlType.Int},
+                                                                                      {typeof(long), CqlType.BigInt},
+                                                                                      {typeof(long?), CqlType.BigInt},
+                                                                                      {typeof(float), CqlType.Float},
+                                                                                      {typeof(float?), CqlType.Float},
+                                                                                      {typeof(double), CqlType.Double},
+                                                                                      {typeof(double?), CqlType.Double},
+                                                                                      {typeof(string), CqlType.Text},
+                                                                                      {typeof(DateTime), CqlType.Timestamp},
+                                                                                      {typeof(DateTime?), CqlType.Timestamp},
+                                                                                      {typeof(byte[]), CqlType.Blob},
+                                                                                      {typeof(Decimal), CqlType.Decimal},
+                                                                                      {typeof(Decimal?), CqlType.Decimal},
+                                                                                      {typeof(Guid), CqlType.Uuid},
+                                                                                      {typeof(Guid?), CqlType.Uuid},
+                                                                                  };
 
         private static readonly Dictionary<CqlType, string> _dataType2CqlType = new Dictionary<CqlType, string>
-                                                                                     {
-                                                                                         {CqlType.Ascii, "ascii"},
-                                                                                         {CqlType.BigInt, "bigint"},
-                                                                                         {CqlType.Blob, "blob"},
-                                                                                         {CqlType.Boolean, "boolean"},
-                                                                                         {CqlType.Counter, "counter"},
-                                                                                         {CqlType.Decimal, "decimal"},
-                                                                                         {CqlType.Double, "double"},
-                                                                                         {CqlType.Float, "float"},
-                                                                                         {CqlType.Int, "int"},
-                                                                                         {CqlType.Text, "text"},
-                                                                                         {CqlType.Timestamp, "timestamp"},
-                                                                                         {CqlType.Uuid, "uuid"},
-                                                                                         {CqlType.Varchar, "varchar"},
-                                                                                         {CqlType.Varint, "varint"},
-                                                                                     };
-
+                                                                                    {
+                                                                                        {CqlType.Ascii, "ascii"},
+                                                                                        {CqlType.BigInt, "bigint"},
+                                                                                        {CqlType.Blob, "blob"},
+                                                                                        {CqlType.Boolean, "boolean"},
+                                                                                        {CqlType.Counter, "counter"},
+                                                                                        {CqlType.Decimal, "decimal"},
+                                                                                        {CqlType.Double, "double"},
+                                                                                        {CqlType.Float, "float"},
+                                                                                        {CqlType.Int, "int"},
+                                                                                        {CqlType.Text, "text"},
+                                                                                        {CqlType.Timestamp, "timestamp"},
+                                                                                        {CqlType.Uuid, "uuid"},
+                                                                                        {CqlType.Varchar, "varchar"},
+                                                                                        {CqlType.Varint, "varint"},
+                                                                                    };
 
         public static string ToCql(this CqlType @this)
         {
             return _dataType2CqlType[@this];
         }
-
 
         public static SchemaAttribute FindSchemaAttribute(this Type t)
         {
@@ -99,7 +98,7 @@ namespace CassandraSharp.ObjectMapper
                     bool isKeyComponent = ca is KeyAttribute;
 
                     CompositeKeyAttribute cka = ca as CompositeKeyAttribute;
-                    if( null != cka)
+                    if (null != cka)
                     {
                         index = cka.Index;
                     }

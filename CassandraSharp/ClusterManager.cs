@@ -19,8 +19,6 @@ namespace CassandraSharp
     using System.Runtime.CompilerServices;
     using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
-    using CassandraSharp.Factories;
-    using CassandraSharp.Implementation;
     using CassandraSharp.Utils;
 
     public class ClusterManager
@@ -65,20 +63,20 @@ namespace CassandraSharp
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            ISnitch snitch = SnitchTypeFactory.Create(clusterConfig.Endpoints.Snitch, clusterConfig.Endpoints.SnitchType);
+            ISnitch snitch = Snitch.Factory.Create(clusterConfig.Endpoints.Snitch);
 
             IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
             IEnumerable<Endpoint> endpoints = GetEndpoints(clusterConfig.Endpoints, snitch, clientAddress);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager = EndpointsConfigFactory.Create(clusterConfig.Endpoints, clusterConfig.Endpoints.StrategyClass, endpoints);
-            IPool<IConnection> pool = PoolType.Stack.Create(transportConfig.PoolSize);
+            IEndpointStrategy endpointsManager = Factory.Create(clusterConfig.Endpoints.Strategy, endpoints);
+            IPool<IConnection> pool = Pool.Factory.Create("Stack", transportConfig.PoolSize);
 
             // get timestamp service
-            ITimestampService timestampService = TimestampServiceFactory.Create(clusterConfig.Endpoints.TimestampServiceClass);
+            ITimestampService timestampService = Timestamp.Factory.Create(clusterConfig.Endpoints.Timestamp);
 
             // create the cluster now
-            ITransportFactory transportFactory = TransportConfigFactory.Create(transportConfig);
+            ITransportFactory transportFactory = Transport.Factory.Create(transportConfig);
             return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, _logger);
         }
 
@@ -150,9 +148,9 @@ namespace CassandraSharp
                 throw new ArgumentNullException("config");
             }
 
-            _recoveryService = RecoveryServiceFactory.Create(config.RecoveryClass);
+            _recoveryService = Recovery.Factory.Create(config.Recovery);
 
-            _logger = LoggerFactory.Create(config.LoggerClass);
+            _logger = Logger.Factory.Create(config.Logger);
 
             _config = config;
         }

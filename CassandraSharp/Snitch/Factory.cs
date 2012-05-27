@@ -10,31 +10,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factories
+namespace CassandraSharp.Snitch
 {
-    using System;
-    using CassandraSharp.Config;
-    using CassandraSharp.Snitch;
     using CassandraSharp.Utils;
 
-    internal static class SnitchTypeFactory
+    internal static class Factory
     {
-        public static ISnitch Create(SnitchType @this, string customType)
+        public static ISnitch Create(string customType)
         {
-            switch (@this)
+            switch (customType)
             {
-                case SnitchType.Custom:
-                    return ServiceActivator.Create<ISnitch>(customType);
-
-                case SnitchType.Simple:
+                case "Simple":
                     return new SimpleSnitch();
 
-                case SnitchType.RackInferring:
+                case "RackInferring":
                     return new RackInferringSnitch();
-            }
 
-            string msg = string.Format("Unknown snitch type '{0}'", @this);
-            throw new ArgumentException(msg);
+                default:
+                    return ServiceActivator.Create<ISnitch>(customType);
+            }
         }
     }
 }

@@ -10,32 +10,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factories
+namespace CassandraSharp.EndpointStrategy
 {
-    using System;
     using System.Collections.Generic;
-    using CassandraSharp.Config;
-    using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Utils;
 
-    internal static class EndpointsConfigFactory
+    internal static class Factory
     {
-        public static IEndpointStrategy Create(EndpointsConfig @this, string customType, IEnumerable<Endpoint> endpoints)
+        public static IEndpointStrategy Create(string customType, IEnumerable<Endpoint> endpoints)
         {
-            switch (@this.Strategy)
+            switch (customType)
             {
-                case EndpointStrategy.Custom:
-                    return ServiceActivator.Create<IEndpointStrategy>(customType, endpoints);
-
-                case EndpointStrategy.Random:
+                case "Random":
                     return new RandomEndpointStrategy(endpoints);
 
-                case EndpointStrategy.Nearest:
+                case "Nearest":
                     return new NearestEndpointStrategy(endpoints);
-            }
 
-            string msg = string.Format("Unknown strategy '{0}'", @this);
-            throw new ArgumentException(msg);
+                default:
+                    return ServiceActivator.Create<IEndpointStrategy>(customType, endpoints);
+            }
         }
     }
 }

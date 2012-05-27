@@ -16,17 +16,10 @@ namespace CassandraSharp.Config
 
     public class TransportConfig
     {
-        public enum TransportType
-        {
-            Buffered,
-
-            Framed
-        }
-
         public TransportConfig()
         {
             Port = 9160;
-            Type = TransportType.Framed;
+            Type = "Framed";
             Recoverable = true;
         }
 
@@ -34,7 +27,7 @@ namespace CassandraSharp.Config
         public int Port { get; set; }
 
         [XmlAttribute("type")]
-        public TransportType Type { get; set; }
+        public string Type { get; set; }
 
         [XmlAttribute("timeout")]
         public int Timeout { get; set; }

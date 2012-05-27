@@ -7,8 +7,9 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -20,10 +21,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("cassandra-sharp")]
 [assembly: AssemblyDescription("cassandra-sharp is a .NET client for Apache Cassandra")]
 #if DEBUG
+
 [assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif
+
 [assembly: AssemblyCompany("Pierre Chalamet")]
 [assembly: AssemblyProduct("cassandra-sharp")]
 [assembly: AssemblyCopyright("")]

@@ -10,17 +10,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factories
+namespace CassandraSharp.ObjectMapper.Dialect
 {
-    using CassandraSharp.Implementation;
-    using CassandraSharp.Utils;
-
-    public static class LoggerFactory
+    public interface ICreateTableBuilder : IBuilder,
+                                           IScopeBuilder
     {
-        public static ILog Create(string customType)
-        {
-            ILog log = ServiceActivator.Create<ILog>(customType) ?? new Logger();
-            return log;
-        }
+        CqlType[] ColumnTypes { get; set; }
+
+        string[] Keys { get; set; }
+
+        bool? CompactStorage { get; set; }
     }
 }

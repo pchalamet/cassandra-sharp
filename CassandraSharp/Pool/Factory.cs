@@ -10,27 +10,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factories
+namespace CassandraSharp.Pool
 {
-    using System;
-    using CassandraSharp.Config;
-    using CassandraSharp.Pool;
+    using CassandraSharp.Utils;
 
-    internal static class PoolConfigFactory
+    internal static class Factory
     {
-        public static IPool<IConnection> Create(this PoolType @this, int poolSize)
+        public static IPool<IConnection> Create(string customType, int poolSize)
         {
-            switch (@this)
+            switch (customType)
             {
-                case PoolType.Stack:
+                case "Stack":
                     return new StackPool<IConnection>(poolSize);
 
-                case PoolType.Void:
+                case "Void":
                     return new VoidPool<IConnection>();
-            }
 
-            string msg = string.Format("Unknown connection pool type '{0}'", @this);
-            throw new ArgumentException(msg);
+                default:
+                    return ServiceActivator.Create<IPool<IConnection>>(customType, poolSize);
+            }
         }
     }
 }

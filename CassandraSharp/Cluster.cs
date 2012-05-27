@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Implementation
+namespace CassandraSharp
 {
     using System;
     using System.IO;
@@ -82,7 +82,6 @@ namespace CassandraSharp.Implementation
 
                     connection = AcquireConnection(key);
 
-                    ChangeKeyspace(connection);
                     TResult res = func(connection);
 
                     ReleaseConnection(connection, false);
@@ -104,17 +103,65 @@ namespace CassandraSharp.Implementation
                         throw;
                     }
 
-                    Thread.Sleep(BehaviorConfig.SleepBeforeRetry);
+                    if (BehaviorConfig.SleepBeforeRetry.HasValue)
+                    {
+                        Thread.Sleep(BehaviorConfig.SleepBeforeRetry.Value);
+                    }
                 }
 
                 ++tryCount;
             }
         }
 
-        public ICluster CreateChildCluster(BehaviorConfigBuilder behaviorConfigBuilder)
+        public ICluster CreateChildCluster(IBehaviorConfig cfgOverride)
         {
-            IBehaviorConfig childConfig = behaviorConfigBuilder.Override(BehaviorConfig);
+            IBehaviorConfig childConfig = cfgOverride.Override(BehaviorConfig);
             return new Cluster(childConfig, _pool, _transportFactory, _endpointsManager, _recoveryService, TimestampService, _logger, this);
+        }
+
+        public IConnection AcquireConnection(byte[] key)
+        {
+            IConnection connection;
+            if (_pool.Acquire(out connection))
+            {
+                return connection;
+            }
+
+            Endpoint endpoint = _endpointsManager.Pick(key);
+            if (null == endpoint)
+            {
+                throw new ArgumentException("Can't find any valid endpoint");
+            }
+
+            Cassandra.Client client = _transportFactory.Create(endpoint.Address);
+            connection = new Connection(client, endpoint);
+
+            ChangeKeyspace(connection);
+
+            return connection;
+        }
+
+        public void ReleaseConnection(IConnection connection, bool hasFailed)
+        {
+            // protect against exception during acquire connection
+            if (null != connection)
+            {
+                if (hasFailed)
+                {
+                    if (null != _recoveryService)
+                    {
+                        _logger.Info("marking {0} for recovery", connection.Endpoint.Address);
+                        _recoveryService.Recover(connection.Endpoint, _transportFactory, ClientRecoveredCallback);
+                    }
+
+                    _endpointsManager.Ban(connection.Endpoint);
+                    connection.SafeDispose();
+                }
+                else
+                {
+                    _pool.Release(connection);
+                }
+            }
         }
 
         private void ChangeKeyspace(IConnection connection)
@@ -150,17 +197,17 @@ namespace CassandraSharp.Implementation
             else if (ex is TimedOutException)
             {
                 connectionDead = false;
-                retry = BehaviorConfig.RetryOnTimeout;
+                retry = BehaviorConfig.RetryOnTimeout ?? false;
             }
             else if (ex is UnavailableException)
             {
                 connectionDead = false;
-                retry = BehaviorConfig.RetryOnUnavailable;
+                retry = BehaviorConfig.RetryOnUnavailable ?? false;
             }
             else if (ex is NotFoundException)
             {
                 connectionDead = false;
-                retry = BehaviorConfig.RetryOnNotFound;
+                retry = BehaviorConfig.RetryOnNotFound ?? false;
             }
 
                 // other exceptions ==> connection is not dead / do not retry
@@ -168,48 +215,6 @@ namespace CassandraSharp.Implementation
             {
                 connectionDead = false;
                 retry = false;
-            }
-        }
-
-        private IConnection AcquireConnection(byte[] key)
-        {
-            IConnection connection;
-            if (_pool.Acquire(out connection))
-            {
-                return connection;
-            }
-
-            Endpoint endpoint = _endpointsManager.Pick(key);
-            if (null == endpoint)
-            {
-                throw new ArgumentException("Can't find any valid endpoint");
-            }
-
-            Cassandra.Client client = _transportFactory.Create(endpoint.Address);
-            connection = new Connection(client, endpoint);
-            return connection;
-        }
-
-        private void ReleaseConnection(IConnection connection, bool hasFailed)
-        {
-            // protect against exception during acquire connection
-            if (null != connection)
-            {
-                if (hasFailed)
-                {
-                    if (null != _recoveryService)
-                    {
-                        _logger.Info("marking {0} for recovery", connection.Endpoint.Address);
-                        _recoveryService.Recover(connection.Endpoint, _transportFactory, ClientRecoveredCallback);
-                    }
-
-                    _endpointsManager.Ban(connection.Endpoint);
-                    connection.SafeDispose();
-                }
-                else
-                {
-                    _pool.Release(connection);
-                }
             }
         }
 

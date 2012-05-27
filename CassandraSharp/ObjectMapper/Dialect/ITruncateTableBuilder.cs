@@ -10,14 +10,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public enum EndpointStrategy
+    public interface ITruncateTableBuilder : IBuilder,
+                                             IScopeBuilder
     {
-        Custom,
-
-        Random,
-
-        Nearest
     }
 }

@@ -17,8 +17,9 @@ namespace CassandraSharp.ObjectMapper
 
     internal class ColumnDef
     {
-        private readonly PropertyInfo _pi;
         private readonly FieldInfo _fi;
+
+        private readonly PropertyInfo _pi;
 
         public ColumnDef(string name, CqlType cqlType, bool isKeyComponent, int index, MemberInfo mi)
         {
@@ -27,7 +28,7 @@ namespace CassandraSharp.ObjectMapper
             IsKeyComponent = isKeyComponent;
             Index = index;
 
-            if( mi.MemberType == MemberTypes.Property)
+            if (mi.MemberType == MemberTypes.Property)
             {
                 _pi = (PropertyInfo) mi;
                 NetType = _pi.PropertyType;
@@ -58,7 +59,7 @@ namespace CassandraSharp.ObjectMapper
 
         public void SetValue(object target, object value)
         {
-            if( null != _pi)
+            if (null != _pi)
             {
                 _pi.SetValue(target, value, null);
             }

@@ -23,7 +23,7 @@ namespace CassandraSharp.Transport
         private readonly int _timeout;
 
         public BufferedTransportFactory(TransportConfig config)
-            :base(config)
+            : base(config)
         {
             _port = config.Port;
             _timeout = config.Timeout;

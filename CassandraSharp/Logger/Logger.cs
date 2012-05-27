@@ -10,20 +10,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper
+namespace CassandraSharp.Logger
 {
-    using System;
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class ColumnAttribute : Attribute
+    public class Logger : ILog
     {
-        public ColumnAttribute()
+        public void Debug(string format, params object[] prms)
         {
-            CqlType = CqlType.Auto;
         }
 
-        public string Name { get; set; }
+        public void Info(string format, params object[] prms)
+        {
+        }
 
-        public CqlType CqlType { get; set; }
+        public void Warn(string format, params object[] prms)
+        {
+        }
+
+        public void Error(string format, params object[] prms)
+        {
+        }
+
+        public void Fatal(string format, params object[] prms)
+        {
+        }
     }
 }

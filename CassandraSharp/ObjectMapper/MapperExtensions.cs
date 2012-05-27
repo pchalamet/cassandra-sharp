@@ -14,54 +14,64 @@ namespace CassandraSharp.ObjectMapper
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
+    using System.Linq;
+    using CassandraSharp.Config;
+    using CassandraSharp.ObjectMapper.Cql3;
+    using CassandraSharp.ObjectMapper.Dialect;
 
     public static class MapperExtensions
     {
-        private static void AppendQueryModifiers(ICluster cluster, StringBuilder sbQuery)
-        {
-            sbQuery.AppendFormat(" using consistency {0} and timestamp {1}",
-                                 cluster.BehaviorConfig.WriteConsistencyLevel, cluster.TimestampService.Generate());
-            if (0 != cluster.BehaviorConfig.TTL)
-            {
-                sbQuery.AppendFormat(" and ttl {0}", cluster.BehaviorConfig.TTL);
-            }
-        }
-
-        public static IEnumerable<T> Read<T>(this ICluster cluster, T template)
-        {
-            // translate to "select"
-            throw new NotImplementedException();
-        }
-
-        public static void Write<T>(this ICluster cluster, T param)
+        public static IEnumerable<T> Select<T>(this ICluster cluster, T template) where T : new()
         {
             Type type = typeof(T);
 
             SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
             string tableName = schemaAttribute.Name ?? type.Name;
-
             IEnumerable<ColumnDef> allColumns = type.FindColumns();
+            var selectors = from columnDef in allColumns
+                            let value = columnDef.GetValue(template)
+                            where null == value
+                            select columnDef.Name;
+            var wheres = from columnDef in allColumns
+                         let value = columnDef.GetValue(template)
+                         where null != value
+                         select columnDef.Name + "=?";
 
-            StringBuilder sbInsert = new StringBuilder("insert into ");
-            StringBuilder sbJokers = new StringBuilder("(");
-            sbInsert.AppendFormat("{0} (", tableName);
-            string sep = "";
-            foreach (ColumnDef columnDef in allColumns)
-            {
-                object value = columnDef.GetValue(param);
-                if (null != value)
-                {
-                    sbInsert.Append(sep).Append(columnDef.Name);
-                    sbJokers.Append(sep).Append("?");
-                    sep = ", ";
-                }
-            }
-            sbInsert.Append(" ) values ").Append(sbJokers).Append(" )");
-            AppendQueryModifiers(cluster, sbInsert);
+            IQueryBuilder builder = new QueryBuilder();
+            builder.Columns = selectors.ToArray();
+            builder.Table = tableName;
+            builder.ConsistencyLevel = cluster.BehaviorConfig.WriteConsistencyLevel;
+            builder.Wheres = wheres.ToArray();
+            string cqlSelect = builder.Build();
 
-            string cqlInsert = sbInsert.ToString();
-            cluster.Execute(cqlInsert, param);
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+                return tmpCluster.Execute<T>(cqlSelect, template);
+        }
+
+        public static void Insert<T>(this ICluster cluster, T param)
+        {
+            Type type = typeof(T);
+
+            SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
+            IEnumerable<ColumnDef> allColumns = type.FindColumns();
+            var selectors = from columnDef in allColumns
+                            let value = columnDef.GetValue(param)
+                            where null != value
+                            select new {columnDef.Name, Setter = "?"};
+
+            IInsertBuilder builder = new InsertBuilder();
+            builder.Table = schemaAttribute.Name ?? type.Name;
+            builder.Columns = selectors.Select(x => x.Name).ToArray();
+            builder.Values = selectors.Select(x => x.Setter).ToArray();
+            builder.ConsistencyLevel = cluster.BehaviorConfig.WriteConsistencyLevel;
+            builder.TTL = cluster.BehaviorConfig.TTL;
+            builder.Timestamp = cluster.TimestampService.Generate();
+            string cqlInsert = builder.Build();
+
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+                tmpCluster.ExecuteNonQuery(cqlInsert, param);
         }
 
         public static void Delete<T>(this ICluster cluster, T template)

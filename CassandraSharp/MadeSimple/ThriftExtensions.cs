@@ -10,16 +10,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Factories
+namespace CassandraSharp.MadeSimple
 {
-    using CassandraSharp.Implementation;
-    using CassandraSharp.Utils;
+    using Apache.Cassandra;
 
-    internal static class RecoveryServiceFactory
+    public static class ThriftExtensions
     {
-        public static IRecoveryService Create(string customType)
+        public static ConsistencyLevel Get(this ConsistencyLevel? @this)
         {
-            return ServiceActivator.Create<IRecoveryService>(customType) ?? new RecoveryService();
+            return @this ?? ConsistencyLevel.QUORUM;
         }
     }
 }

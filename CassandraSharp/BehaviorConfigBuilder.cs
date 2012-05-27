@@ -12,42 +12,23 @@
 
 namespace CassandraSharp
 {
-    using Apache.Cassandra;
     using CassandraSharp.Config;
 
-    public class BehaviorConfigBuilder
+    public static class BehaviorConfigExtensions
     {
-        public string KeySpace { get; set; }
-
-        public int? MaxRetries { get; set; }
-
-        public ConsistencyLevel? ReadConsistencyLevel { get; set; }
-
-        public ConsistencyLevel? WriteConsistencyLevel { get; set; }
-
-        public int? TTL { get; set; }
-
-        public bool? RetryOnNotFound { get; set; }
-
-        public bool? RetryOnTimeout { get; set; }
-
-        public bool? RetryOnUnavailable { get; set; }
-
-        public int? SleepBeforeRetry { get; set; }
-
-        public IBehaviorConfig Override(IBehaviorConfig behaviorConfigToOverride)
+        public static IBehaviorConfig Override(this IBehaviorConfig @this, IBehaviorConfig behaviorConfigToOverride)
         {
             IBehaviorConfig behaviorConfigConfig = new BehaviorConfig
                                                        {
-                                                           KeySpace = KeySpace ?? behaviorConfigToOverride.KeySpace,
-                                                           MaxRetries = MaxRetries ?? behaviorConfigToOverride.MaxRetries,
-                                                           ReadConsistencyLevel = ReadConsistencyLevel ?? behaviorConfigToOverride.ReadConsistencyLevel,
-                                                           WriteConsistencyLevel = WriteConsistencyLevel ?? behaviorConfigToOverride.WriteConsistencyLevel,
-                                                           TTL = TTL ?? behaviorConfigToOverride.TTL,
-                                                           RetryOnNotFound = RetryOnNotFound ?? behaviorConfigToOverride.RetryOnNotFound,
-                                                           RetryOnTimeout = RetryOnTimeout ?? behaviorConfigToOverride.RetryOnTimeout,
-                                                           RetryOnUnavailable = RetryOnUnavailable ?? behaviorConfigToOverride.RetryOnUnavailable,
-                                                           SleepBeforeRetry = SleepBeforeRetry ?? behaviorConfigToOverride.SleepBeforeRetry
+                                                           KeySpace = @this.KeySpace ?? behaviorConfigToOverride.KeySpace,
+                                                           MaxRetries = @this.MaxRetries ?? behaviorConfigToOverride.MaxRetries,
+                                                           ReadConsistencyLevel = @this.ReadConsistencyLevel ?? behaviorConfigToOverride.ReadConsistencyLevel,
+                                                           WriteConsistencyLevel = @this.WriteConsistencyLevel ?? behaviorConfigToOverride.WriteConsistencyLevel,
+                                                           TTL = @this.TTL ?? behaviorConfigToOverride.TTL,
+                                                           RetryOnNotFound = @this.RetryOnNotFound ?? behaviorConfigToOverride.RetryOnNotFound,
+                                                           RetryOnTimeout = @this.RetryOnTimeout ?? behaviorConfigToOverride.RetryOnTimeout,
+                                                           RetryOnUnavailable = @this.RetryOnUnavailable ?? behaviorConfigToOverride.RetryOnUnavailable,
+                                                           SleepBeforeRetry = @this.SleepBeforeRetry ?? behaviorConfigToOverride.SleepBeforeRetry
                                                        };
 
             return behaviorConfigConfig;
