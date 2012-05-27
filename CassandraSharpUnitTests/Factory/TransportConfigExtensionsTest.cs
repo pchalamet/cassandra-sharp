@@ -14,7 +14,6 @@ namespace CassandraSharpUnitTests.Factory
 {
     using CassandraSharp;
     using CassandraSharp.Config;
-    using CassandraSharp.Factories;
     using CassandraSharp.Transport;
     using NUnit.Framework;
 
@@ -24,20 +23,18 @@ namespace CassandraSharpUnitTests.Factory
         [Test]
         public void TestCreateBuffered()
         {
-            TransportConfig config = new TransportConfig();
-            config.Type = TransportConfig.TransportType.Buffered;
+            TransportConfig config = new TransportConfig {Type = "Buffered"};
 
-            ITransportFactory transport = TransportConfigFactory.Create(config);
+            ITransportFactory transport = Factory.Create(config);
             Assert.IsTrue(transport is BufferedTransportFactory);
         }
 
         [Test]
         public void TestCreateFramed()
         {
-            TransportConfig config = new TransportConfig();
-            config.Type = TransportConfig.TransportType.Framed;
+            TransportConfig config = new TransportConfig {Type = "Framed"};
 
-            ITransportFactory transport = TransportConfigFactory.Create(config);
+            ITransportFactory transport = Factory.Create(config);
             Assert.IsTrue(transport is FramedTransportFactory);
         }
     }

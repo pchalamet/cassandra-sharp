@@ -18,7 +18,6 @@ namespace CassandraSharpUnitTests.Factory
     using CassandraSharp;
     using CassandraSharp.Config;
     using CassandraSharp.EndpointStrategy;
-    using CassandraSharp.Factories;
     using NUnit.Framework;
 
     public class CustomEndpointStrategy : IEndpointStrategy
@@ -50,10 +49,9 @@ namespace CassandraSharpUnitTests.Factory
         public void TestCreateCustom()
         {
             EndpointsConfig config = new EndpointsConfig();
-            config.Strategy = EndpointStrategy.Custom;
+            config.Strategy = "CassandraSharpUnitTests.Factory.CustomEndpointStrategy, CassandraSharpUnitTests";
 
-            IEndpointStrategy endpointStrategy = EndpointsConfigFactory.Create(config,
-                                                                               "CassandraSharpUnitTests.Factory.CustomEndpointStrategy, CassandraSharpUnitTests",
+            IEndpointStrategy endpointStrategy = Factory.Create("CassandraSharpUnitTests.Factory.CustomEndpointStrategy, CassandraSharpUnitTests",
                                                                                Enumerable.Empty<Endpoint>());
             Assert.IsTrue(endpointStrategy is CustomEndpointStrategy);
         }
@@ -61,20 +59,14 @@ namespace CassandraSharpUnitTests.Factory
         [Test]
         public void TestCreateNearest()
         {
-            EndpointsConfig config = new EndpointsConfig();
-            config.Strategy = EndpointStrategy.Nearest;
-
-            IEndpointStrategy endpointStrategy = EndpointsConfigFactory.Create(config, null, Enumerable.Empty<Endpoint>());
+            IEndpointStrategy endpointStrategy = Factory.Create("Nearest", Enumerable.Empty<Endpoint>());
             Assert.IsTrue(endpointStrategy is NearestEndpointStrategy);
         }
 
         [Test]
         public void TestCreateRandom()
         {
-            EndpointsConfig config = new EndpointsConfig();
-            config.Strategy = EndpointStrategy.Random;
-
-            IEndpointStrategy endpointStrategy = EndpointsConfigFactory.Create(config, null, Enumerable.Empty<Endpoint>());
+            IEndpointStrategy endpointStrategy = Factory.Create("Random", Enumerable.Empty<Endpoint>());
             Assert.IsTrue(endpointStrategy is RandomEndpointStrategy);
         }
     }

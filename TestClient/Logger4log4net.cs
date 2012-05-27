@@ -17,7 +17,7 @@ namespace TestClient
 
     public class Logger4Log4Net : CassandraSharp.ILog
     {
-        private readonly log4net.ILog _log = LogManager.GetLogger("TestClient");
+        private readonly ILog _log = LogManager.GetLogger("TestClient");
 
         static Logger4Log4Net()
         {

@@ -13,6 +13,7 @@
 namespace TestClient
 {
     using CassandraSharp;
+    using CassandraSharp.Config;
 
     public class MadeSimpleMinimalConfigSample : MadeSimpleSample
     {
@@ -23,7 +24,7 @@ namespace TestClient
 
         protected override void Run(ICluster cluster)
         {
-            BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder {KeySpace = "TestKS"};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = "TestKS"};
             using (ICluster configuredCluster = cluster.CreateChildCluster(cfgBuilder))
                 base.Run(configuredCluster);
         }

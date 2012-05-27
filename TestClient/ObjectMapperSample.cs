@@ -13,6 +13,7 @@
 namespace TestClient
 {
     using System;
+    using System.Collections.Generic;
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
@@ -30,7 +31,7 @@ namespace TestClient
         public string Day;
 
         [CompositeKey(Name = "time_seen", Index = 1)]
-        public DateTime TimeSeen;
+        public DateTime? TimeSeen;
 
         [Column(Name = "shipname")]
         public string ShipName;
@@ -53,27 +54,47 @@ namespace TestClient
 
         protected void Run(ICluster cluster)
         {
-            //try
-            //{
-            //    cluster.Drop<SeenShips>();
-            //}
-            //catch
-            //{
-            //}
 
-            //cluster.Create<SeenShips>();
+            cluster.CreateTable<SeenShips>();
 
-            // SELECT * FROM seen_ships WHERE day='199-A/4'
-            //AND time_seen > '7943-02-03' AND time_seen < '7943-02-28'
-            //LIMIT 12;
-
-            SeenShips seenShips = new SeenShips
+            SeenShips seenShip = new SeenShips
                                       {
                                           Day = "199-A/4", 
                                           TimeSeen = new DateTime(1973, 06, 19),
                                           ShipName = "Sunrise Avenger"
                                       };
-            cluster.Write(seenShips);
+            cluster.Insert(seenShip);
+
+
+            seenShip = new SeenShips
+            {
+                Day = "199-A/4",
+                TimeSeen = new DateTime(1973, 06, 20),
+                ShipName = "Sunrise Avenger2"
+            };
+            cluster.Insert(seenShip);
+
+
+            seenShip = new SeenShips
+            {
+                Day = "199-A/5",
+                TimeSeen = new DateTime(1973, 06, 21),
+                ShipName = "Sunrise Avenger3"
+            };
+            cluster.Insert(seenShip);
+
+
+            SeenShips queryShips = new SeenShips
+                                       {
+                                           Day = "199-A/4"
+                                       };
+            IEnumerable<SeenShips> seenShips = cluster.Select(queryShips);
+            foreach(SeenShips ss in seenShips)
+            {
+                Console.WriteLine("{0}: {1}", ss.TimeSeen, ss.ShipName);
+            }
+
+            cluster.DropTable<SeenShips>();
         }
     }
 }

@@ -16,7 +16,6 @@ namespace CassandraSharpUnitTests.Factory
     using System.Net;
     using CassandraSharp;
     using CassandraSharp.Config;
-    using CassandraSharp.Factories;
     using CassandraSharp.Snitch;
     using NUnit.Framework;
 
@@ -39,24 +38,21 @@ namespace CassandraSharpUnitTests.Factory
         [Test]
         public void TestCreateCustom()
         {
-            SnitchType snitchType = SnitchType.Custom;
-            ISnitch snitch = SnitchTypeFactory.Create(snitchType, "CassandraSharpUnitTests.Factory.CustomSnitch, CassandraSharpUnitTests");
+            ISnitch snitch = Factory.Create("CassandraSharpUnitTests.Factory.CustomSnitch, CassandraSharpUnitTests");
             Assert.IsTrue(snitch is CustomSnitch);
         }
 
         [Test]
         public void TestCreateRackInferring()
         {
-            SnitchType snitchType = SnitchType.RackInferring;
-            ISnitch snitch = SnitchTypeFactory.Create(snitchType, null);
+            ISnitch snitch = Factory.Create("RackInferring");
             Assert.IsTrue(snitch is RackInferringSnitch);
         }
 
         [Test]
         public void TestCreateSimple()
         {
-            SnitchType snitchType = SnitchType.Simple;
-            ISnitch snitch = SnitchTypeFactory.Create(snitchType, null);
+            ISnitch snitch = Factory.Create("Simple");
             Assert.IsTrue(snitch is SimpleSnitch);
         }
     }
