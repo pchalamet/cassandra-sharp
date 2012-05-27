@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MadeSimple\LongNameOrValueTest.cs" />
-    <Compile Include="ObjectMapper\Cql3Dialect\Copy of InsertBuilderTest.cs" />
+    <Compile Include="ObjectMapper\Cql3Dialect\QueryBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\InsertBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\TruncateTableBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\CreateTableBuilderTest.cs" />
