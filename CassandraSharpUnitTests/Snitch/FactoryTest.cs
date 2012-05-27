@@ -10,35 +10,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.Factory
+namespace CassandraSharpUnitTests.Snitch
 {
     using System;
     using System.Net;
     using CassandraSharp;
-    using CassandraSharp.Config;
     using CassandraSharp.Snitch;
     using NUnit.Framework;
-
-    public class CustomSnitch : ISnitch
-    {
-        public string GetDataCenter(IPAddress target)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int ComputeDistance(IPAddress source, IPAddress target)
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     [TestFixture]
     public class SnitchTypeExtensionsTest
     {
+        private class CustomSnitch : ISnitch
+        {
+            public string GetDataCenter(IPAddress target)
+            {
+                throw new NotImplementedException();
+            }
+
+            public int ComputeDistance(IPAddress source, IPAddress target)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         [Test]
         public void TestCreateCustom()
         {
-            ISnitch snitch = Factory.Create("CassandraSharpUnitTests.Factory.CustomSnitch, CassandraSharpUnitTests");
+            string customType = typeof(CustomSnitch).AssemblyQualifiedName;
+            ISnitch snitch = Factory.Create(customType);
             Assert.IsTrue(snitch is CustomSnitch);
         }
 

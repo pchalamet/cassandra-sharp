@@ -52,9 +52,9 @@ namespace CassandraSharpUnitTests.Utils
         }
 
         [Test]
-        public void TestCreateWithNull()
+        public void TestCreateWithEmpty()
         {
-            string type = null;
+            string type = "";
             const string key = "tralala";
             const int value = 42;
 
@@ -63,9 +63,9 @@ namespace CassandraSharpUnitTests.Utils
         }
 
         [Test]
-        public void TestCreateWithEmpty()
+        public void TestCreateWithNull()
         {
-            string type = "";
+            string type = null;
             const string key = "tralala";
             const int value = 42;
 

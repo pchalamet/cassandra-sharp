@@ -10,15 +10,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.Factory
+namespace CassandraSharpUnitTests.Pool
 {
     using CassandraSharp;
     using CassandraSharp.Pool;
     using NUnit.Framework;
 
     [TestFixture]
-    public class PoolConfigExtensionsTest
+    public class FactoryTest
     {
+        private class CustomPool : IPool<IConnection>
+        {
+            public CustomPool(int poolSize)
+            {
+                PoolSize = poolSize;
+            }
+
+            public int PoolSize { get; private set; }
+
+            public void Dispose()
+            {
+            }
+
+            public bool Acquire(out IConnection entry)
+            {
+                entry = null;
+                return false;
+            }
+
+            public void Release(IConnection entry)
+            {
+            }
+        }
+
+        [Test]
+        public void TestCreateCustom()
+        {
+            const int expectedPoolSize = 42;
+            string customType = typeof(CustomPool).AssemblyQualifiedName;
+            IPool<IConnection> pool = Factory.Create(customType, expectedPoolSize);
+
+            CustomPool customPool = pool as CustomPool;
+            Assert.NotNull(customPool);
+            Assert.IsTrue(customPool.PoolSize == expectedPoolSize);
+        }
+
         [Test]
         public void TestCreateStack()
         {

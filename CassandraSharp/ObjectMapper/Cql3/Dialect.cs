@@ -14,7 +14,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 {
     using CassandraSharp.ObjectMapper.Dialect;
 
-    public class Dialect : ICqlDialect
+    public class Dialect : IDialect
     {
         public ICreateTableBuilder GetCreateTableBuilder()
         {

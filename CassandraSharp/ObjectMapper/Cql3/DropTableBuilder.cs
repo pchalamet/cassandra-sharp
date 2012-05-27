@@ -23,7 +23,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
             Validate();
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("drop columnfamily {0}", Table);
+            sb.AppendFormat("drop table {0}", Table);
 
             return sb.ToString();
         }
@@ -34,7 +34,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null == Columns)
+            if (null != Columns)
             {
                 throw new ArgumentException("Columns must not be set");
             }

@@ -25,7 +25,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
             StringBuilder sb = new StringBuilder();
 
             // create table columns
-            sb.AppendFormat("create table  ({0}", Table);
+            sb.AppendFormat("create table {0} (", Table);
             for (int i = 0; i < Columns.Length; ++i)
             {
                 string name = Columns[i];
@@ -33,17 +33,17 @@ namespace CassandraSharp.ObjectMapper.Cql3
                 sb.AppendFormat("{0} {1},", name, type);
             }
 
-            string sep = " primary key (";
+            string sep = "primary key (";
             foreach (string key in Keys)
             {
                 sb.AppendFormat("{0}{1}", sep, key);
-                sep = ", ";
+                sep = ",";
             }
             sb.Append("))");
 
             if (CompactStorage.HasValue && CompactStorage.Value)
             {
-                sb.Append("with compact storage");
+                sb.Append(" with compact storage");
             }
 
             return sb.ToString();

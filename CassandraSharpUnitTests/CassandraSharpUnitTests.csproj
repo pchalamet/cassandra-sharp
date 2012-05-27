@@ -50,13 +50,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MadeSimple\LongNameOrValueTest.cs" />
+    <Compile Include="ObjectMapper\Cql3Dialect\TruncateTableBuilderTest.cs" />
+    <Compile Include="ObjectMapper\Cql3Dialect\CreateTableBuilderTest.cs" />
+    <Compile Include="ObjectMapper\Cql3Dialect\DropTableBuilderTest.cs" />
+    <Compile Include="ObjectMapper\Dialect\TruncateTableBuilderTestSuite.cs" />
+    <Compile Include="ObjectMapper\Dialect\CreateTableBuilderTestSuite.cs" />
+    <Compile Include="ObjectMapper\Dialect\DropTableBuilderTestSuite.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
-    <Compile Include="Implementation\ClusterTest.cs" />
+    <Compile Include="ClusterTest.cs" />
     <Compile Include="Utils\DisposableExtensionsTest.cs" />
-    <Compile Include="Factory\EndpointsConfigExtensionsTest.cs" />
-    <Compile Include="Factory\PoolConfigExtensionsTest.cs" />
-    <Compile Include="Factory\SnitchTypeExtensionsTest.cs" />
-    <Compile Include="Factory\TransportConfigExtensionsTest.cs" />
+    <Compile Include="EndpointStrategy\FactoryTest.cs" />
+    <Compile Include="Pool\FactoryTest.cs" />
+    <Compile Include="Snitch\FactoryTest.cs" />
+    <Compile Include="Transport\FactoryTest.cs" />
     <Compile Include="MadeSimple\ByteArrayNameOrValueTest.cs" />
     <Compile Include="MadeSimple\TimeUuidNameOrValueTest.cs" />
     <Compile Include="MadeSimple\IntNameOrValueTest.cs" />
@@ -73,9 +79,7 @@
       <Name>CassandraSharp</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ObjectMapper\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

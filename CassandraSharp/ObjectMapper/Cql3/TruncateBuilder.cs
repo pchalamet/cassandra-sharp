@@ -34,7 +34,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null == Columns)
+            if (null != Columns)
             {
                 throw new ArgumentException("Columns must not be set");
             }

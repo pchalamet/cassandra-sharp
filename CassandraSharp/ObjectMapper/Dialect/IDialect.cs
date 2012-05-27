@@ -12,7 +12,7 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface ICqlDialect
+    public interface IDialect
     {
         ICreateTableBuilder GetCreateTableBuilder();
 

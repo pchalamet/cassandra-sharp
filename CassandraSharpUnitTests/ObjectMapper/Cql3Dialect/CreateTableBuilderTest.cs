@@ -7,14 +7,17 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
-namespace CassandraSharpUnitTests.Implementation
+
+namespace CassandraSharpUnitTests.ObjectMapper.Cql3Dialect
 {
+    using CassandraSharp.ObjectMapper.Cql3;
+    using CassandraSharpUnitTests.ObjectMapper.Dialect;
     using NUnit.Framework;
 
     [TestFixture]
-    public class ClusterTest
+    public class CreateTableBuilderTest : CreateTableBuilderTestSuite<Dialect>
     {
     }
 }

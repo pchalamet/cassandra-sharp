@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.Factory
+namespace CassandraSharpUnitTests.Transport
 {
     using CassandraSharp;
     using CassandraSharp.Config;
@@ -18,7 +18,7 @@ namespace CassandraSharpUnitTests.Factory
     using NUnit.Framework;
 
     [TestFixture]
-    public class TransportConfigExtensionsTest
+    public class FactoryTest
     {
         [Test]
         public void TestCreateBuffered()
