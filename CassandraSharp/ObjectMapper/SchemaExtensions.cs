@@ -72,7 +72,7 @@ namespace CassandraSharp.ObjectMapper
 
             IDropTableBuilder builder = new DropTableBuilder();
             builder.Table = schemaAttribute.Name ?? t.Name;
-            string dropTableStmt = builder.ToString();
+            string dropTableStmt = builder.Build();
 
             IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
@@ -87,7 +87,7 @@ namespace CassandraSharp.ObjectMapper
 
             ITruncateTableBuilder tableBuilder = new TruncateTableBuilder();
             tableBuilder.Table = schemaAttribute.Name ?? t.Name;
-            string dropTableStmt = tableBuilder.ToString();
+            string dropTableStmt = tableBuilder.Build();
 
             IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))

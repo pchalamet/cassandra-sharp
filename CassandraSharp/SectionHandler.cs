@@ -14,23 +14,32 @@ namespace CassandraSharp
 {
     using System.Configuration;
     using System.Xml;
-    using System.Xml.Serialization;
     using CassandraSharp.Config;
+    using CassandraSharp.Utils;
 
     public class SectionHandler : IConfigurationSectionHandler
     {
         public object Create(object parent, object configContext, XmlNode section)
         {
+            // rename the root element - it must be named "CassandraSharpConfig"
             XmlDocument xmlDoc = new XmlDocument();
             XmlNode xmlRootNode = xmlDoc.AppendChild(xmlDoc.CreateElement("CassandraSharpConfig"));
             xmlRootNode.InnerXml = section.InnerXml;
+
+            foreach (XmlAttribute xmlAttr in section.Attributes)
+            {
+                XmlAttribute newXmlAttr = xmlDoc.CreateAttribute(xmlAttr.Name, xmlAttr.NamespaceURI);
+                newXmlAttr.Value = xmlAttr.Value;
+
+                xmlRootNode.Attributes.Append(newXmlAttr);
+            }
 
             return ReadConfig(xmlDoc);
         }
 
         private static CassandraSharpConfig ReadConfig(XmlDocument xmlDoc)
         {
-            XmlSerializer xmlSer = new XmlSerializer(typeof(CassandraSharpConfig));
+            MiniXmlSerializer xmlSer = new MiniXmlSerializer(typeof(CassandraSharpConfig));
             using (XmlReader xmlReader = new XmlNodeReader(xmlDoc))
                 return (CassandraSharpConfig) xmlSer.Deserialize(xmlReader);
         }

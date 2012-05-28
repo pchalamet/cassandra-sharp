@@ -82,6 +82,7 @@
     <Compile Include="ObjectMapper\SerializersExtensions.cs" />
     <Compile Include="ObjectMapper\PreparedQueryExtensions.cs" />
     <Compile Include="ObjectMapper\TypeExtensions.cs" />
+    <Compile Include="Utils\MiniXmlSerializer.cs" />
     <Compile Include="Utils\ServiceActivator.cs" />
     <Compile Include="Timestamp\Factory.cs" />
     <Compile Include="ILogger.cs" />

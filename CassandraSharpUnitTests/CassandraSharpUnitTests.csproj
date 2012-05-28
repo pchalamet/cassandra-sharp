@@ -46,7 +46,9 @@
       <HintPath>..\ThirdParties\NUnit\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MadeSimple\LongNameOrValueTest.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="ObjectMapper\Dialect\DropTableBuilderTestSuite.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
     <Compile Include="ClusterTest.cs" />
+    <Compile Include="SectionHandlerTest.cs" />
     <Compile Include="Utils\DisposableExtensionsTest.cs" />
     <Compile Include="EndpointStrategy\FactoryTest.cs" />
     <Compile Include="Pool\FactoryTest.cs" />
@@ -75,15 +78,22 @@
     <Compile Include="Pool\VoidPoolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Snitch\RackInferringSnitchTest.cs" />
+    <Compile Include="Utils\MiniXmlSerializerTest.cs" />
     <Compile Include="Utils\ServiceActivatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
+      <Project>{984A4B04-C71A-4550-9193-817CFACBA30A}</Project>
+      <Name>Apache.Cassandra</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj">
       <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
       <Name>CassandraSharp</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
