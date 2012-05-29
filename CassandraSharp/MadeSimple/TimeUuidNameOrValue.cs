@@ -40,6 +40,20 @@ namespace CassandraSharp.MadeSimple
             }
         }
 
+        public static INameOrValue FromNullable(DateTime? obj)
+        {
+            return obj.HasValue
+                       ? new TimeUuidNameOrValue(obj.Value)
+                       : null;
+        }
+
+        public static INameOrValue FromBuffer(byte[] buffer)
+        {
+            return null != buffer
+                       ? new TimeUuidNameOrValue(buffer)
+                       : null;
+        }
+
         public override byte[] ToByteArray()
         {
             Guid guid = GuidGenerator.GenerateTimeBasedGuid(Value);

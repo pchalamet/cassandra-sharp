@@ -19,6 +19,20 @@ namespace CassandraSharp.MadeSimple
         {
         }
 
+        public static INameOrValue FromObject(object obj)
+        {
+            return null != obj
+                       ? new ByteArrayNameOrValue((byte[]) obj)
+                       : null;
+        }
+
+        public static INameOrValue FromBuffer(byte[] obj)
+        {
+            return null != obj
+                       ? new ByteArrayNameOrValue(obj)
+                       : null;
+        }
+
         public override byte[] ToByteArray()
         {
             return Value;

@@ -56,7 +56,10 @@ namespace CassandraSharp.ObjectMapper
                             if (null != col.Value)
                             {
                                 object value = colDef.NetType.Deserialize(col.Value);
-                                t.SetDuckValue(colDef.NetName, value);
+                                if (null != value)
+                                {
+                                    t.SetDuckValue(colDef.NetName, value);
+                                }
                             }
                         }
                     }

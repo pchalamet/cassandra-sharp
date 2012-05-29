@@ -26,6 +26,20 @@ namespace CassandraSharp.MadeSimple
         {
         }
 
+        public static INameOrValue FromNullable(float? obj)
+        {
+            return obj.HasValue
+                       ? new FloatNameOrValue(obj.Value)
+                       : null;
+        }
+
+        public static INameOrValue FromBuffer(byte[] buffer)
+        {
+            return null != buffer
+                       ? new FloatNameOrValue(buffer)
+                       : null;
+        }
+
         public override byte[] ToByteArray()
         {
             byte[] value = BitConverter.GetBytes(Value);
