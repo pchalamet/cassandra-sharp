@@ -24,7 +24,7 @@ namespace CassandraSharp.ObjectMapper
     {
         public static IEnumerable<T> Select<T>(this ICluster cluster, object template) where T : new()
         {
-            Schema schema = new Schema(typeof(T));
+            Schema schema = Schema.FromCache(typeof(T));
 
             IQueryBuilder builder = new QueryBuilder();
             builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
@@ -40,7 +40,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static IEnumerable<R> Select<T, R>(this ICluster cluster, object template) where R : new()
         {
-            Schema schema = new Schema(typeof(T));
+            Schema schema = Schema.FromCache(typeof(T));
 
             IQueryBuilder builder = new QueryBuilder();
             builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
@@ -56,7 +56,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static void Insert<T>(this ICluster cluster, object param) where T : new()
         {
-            Schema schema = new Schema(typeof(T));
+            Schema schema = Schema.FromCache(typeof(T));
 
             IInsertBuilder builder = new InsertBuilder();
             builder.Table = schema.Table;
@@ -86,7 +86,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static void CreateTable<T>(this ICluster cluster) where T : new()
         {
-            Schema schema = new Schema(typeof(T));
+            Schema schema = Schema.FromCache(typeof(T));
 
             ICreateTableBuilder builder = new CreateTableBuilder();
             builder.Table = schema.Table;
@@ -120,7 +120,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static void DropTable<T>(this ICluster cluster) where T : new()
         {
-            Schema schema = new Schema(typeof(T));
+            Schema schema = Schema.FromCache(typeof(T));
 
             IDropTableBuilder builder = new DropTableBuilder();
             builder.Table = schema.Table;
@@ -133,7 +133,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static void Truncate<T>(this ICluster cluster) where T : new()
         {
-            Schema schema = new Schema(typeof(T));
+            Schema schema = Schema.FromCache(typeof(T));
 
             ITruncateTableBuilder tableBuilder = new TruncateTableBuilder();
             tableBuilder.Table = schema.Table;

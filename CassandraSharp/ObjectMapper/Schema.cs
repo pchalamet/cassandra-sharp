@@ -39,7 +39,11 @@ namespace CassandraSharp.ObjectMapper
                                                                                       {typeof(Guid?), CqlType.Uuid},
                                                                                   };
 
-        public Schema(Type schemaType)
+        private static readonly object _lock = new object();
+
+        private static readonly Dictionary<Type, Schema> _cachedSchemas = new Dictionary<Type, Schema>();
+
+        private Schema(Type schemaType)
         {
             SchemaType = schemaType;
 
@@ -64,6 +68,21 @@ namespace CassandraSharp.ObjectMapper
         public Dictionary<string, ColumnDef> CqlName2ColumnDefs { get; private set; }
 
         public Dictionary<string, ColumnDef> NetName2ColumnDefs { get; private set; }
+
+        public static Schema FromCache(Type schemaType)
+        {
+            lock (_lock)
+            {
+                Schema schema;
+                if (! _cachedSchemas.TryGetValue(schemaType, out schema))
+                {
+                    schema = new Schema(schemaType);
+                    _cachedSchemas.Add(schemaType, schema);
+                }
+
+                return schema;
+            }
+        }
 
         private static IEnumerable<ColumnDef> FindColumns(Type t)
         {
