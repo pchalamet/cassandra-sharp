@@ -44,7 +44,10 @@ namespace CassandraSharp.Utils
             object res = DeserializeCheckedElement(xmlReader, _type);
 
             // skip end tag
-            xmlReader.Read();
+            while(xmlReader.Read())
+            {
+                xmlReader.MoveToContent();
+            }
 
             if (! xmlReader.EOF)
             {

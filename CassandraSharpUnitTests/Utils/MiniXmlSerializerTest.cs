@@ -25,13 +25,13 @@ namespace CassandraSharpUnitTests.Utils
         public class TestRootClass
         {
             [XmlAttribute("nullableIntAttribute")]
-            private int? NullableIntAttribute;
+            public int? NullableIntAttribute;
 
             [XmlElement("NullableIntElement")]
-            private int? NullableIntElement;
+            public int? NullableIntElement;
 
-            [XmlAttribute("stringAttribute")]
-            private string StringAttribute;
+            [XmlElement("StringElement")]
+            public string StringElement;
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace CassandraSharpUnitTests.Utils
         {
             string xml =
                 @"<RootClass nullableIntAttribute='42'>
-                   <NullableIntElement>666</NullableIntElement>
+                   <StringElement>666</StringElement>
                  </RootClass>";
 
             MiniXmlSerializer xmlSer = new MiniXmlSerializer(typeof(TestRootClass));

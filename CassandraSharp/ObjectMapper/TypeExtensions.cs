@@ -24,7 +24,7 @@ namespace CassandraSharp.ObjectMapper
             IEnumerable<MemberInfo> fields = @this.GetFields().AsEnumerable().Cast<MemberInfo>();
             IEnumerable<MemberInfo> properties = @this.GetProperties().AsEnumerable().Cast<MemberInfo>();
 
-            return fields.Union(properties);
+            return fields.Concat(properties);
         }
 
         public static void SetDuckValue(this object @this, string name, object value)

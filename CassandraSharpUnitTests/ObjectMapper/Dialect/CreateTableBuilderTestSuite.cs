@@ -71,7 +71,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         public void TestValidateMismatchColumnsAndColumnTypes()
         {
             ICreateTableBuilder builder = CreateTableBuilder();
-            builder.ColumnTypes = builder.ColumnTypes.Union(new[] {"int"}).ToArray();
+            builder.ColumnTypes = builder.ColumnTypes.Concat(new[] {"int"}).ToArray();
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 

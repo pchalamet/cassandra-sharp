@@ -82,7 +82,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         public void TestValidateMismatchColumnsAndValues()
         {
             IInsertBuilder builder = CreateInsertBuilder();
-            builder.Values = builder.Values.Union(new[] {"3"}).ToArray();
+            builder.Values = builder.Values.Concat(new[] {"3"}).ToArray();
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
     }
