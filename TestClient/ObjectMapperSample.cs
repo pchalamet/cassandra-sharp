@@ -85,18 +85,20 @@ namespace TestClient
 
         private void CreateKeyspace(Cassandra.Client client)
         {
-            client.set_keyspace("system");
+            //client.set_keyspace("system");
             try
             {
-                client.system_drop_keyspace("twissandra");
+                client.system_drop_keyspace("Twissandra");
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine(ex);
+                Console.WriteLine(ex.InnerException);
             }
 
             KsDef ksDef = new KsDef
                               {
-                                  Name = "twissandra",
+                                  Name = "Twissandra",
                                   Strategy_class = "SimpleStrategy",
                                   Cf_defs = new List<CfDef>(),
                                   Strategy_options = new Dictionary<string, string>()
@@ -105,7 +107,7 @@ namespace TestClient
 
             client.system_add_keyspace(ksDef);
 
-            client.set_keyspace("twissandra");
+            //client.set_keyspace("twissandra");
         }
 
         protected void Run(ICluster cluster)
