@@ -49,7 +49,7 @@ namespace CassandraSharp.ObjectMapper
             builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
             string cqlSelect = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig { KeySpace = schema.Keyspace };
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
                 return tmpCluster.Execute<R>(schema, cqlSelect, template);
         }

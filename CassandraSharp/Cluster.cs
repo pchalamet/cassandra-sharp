@@ -18,7 +18,6 @@ namespace CassandraSharp
     using System.Threading;
     using Apache.Cassandra;
     using CassandraSharp.EndpointStrategy;
-    using CassandraSharp.MadeSimple;
     using CassandraSharp.Utils;
     using Thrift.Transport;
 

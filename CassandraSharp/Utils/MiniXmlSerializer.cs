@@ -64,7 +64,7 @@ namespace CassandraSharp.Utils
                 return target;
             }
 
-            if( xmlReader.IsEmptyElement)
+            if (xmlReader.IsEmptyElement)
             {
                 return null;
             }

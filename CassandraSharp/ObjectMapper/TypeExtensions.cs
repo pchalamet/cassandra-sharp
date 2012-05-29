@@ -30,7 +30,7 @@ namespace CassandraSharp.ObjectMapper
         public static void SetDuckValue(this object @this, string name, object value)
         {
             FieldInfo fi = @this.GetType().GetField(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-            if( null != fi)
+            if (null != fi)
             {
                 fi.SetValue(@this, value);
             }
@@ -55,9 +55,9 @@ namespace CassandraSharp.ObjectMapper
 
         public static Type GetDuckType(this MemberInfo @this)
         {
-            if( @this.MemberType == MemberTypes.Field)
+            if (@this.MemberType == MemberTypes.Field)
             {
-                FieldInfo fi = (FieldInfo)@this;
+                FieldInfo fi = (FieldInfo) @this;
                 return fi.FieldType;
             }
 
