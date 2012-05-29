@@ -22,10 +22,10 @@ namespace CassandraSharp.MadeSimple
         {
         }
 
-        public static INameOrValue FromNullable(object obj)
+        public static INameOrValue FromNullable(byte[] obj)
         {
             return null != obj
-                       ? new ByteArrayNameOrValue((byte[]) obj)
+                       ? new ByteArrayNameOrValue(obj)
                        : null;
         }
 

@@ -35,7 +35,7 @@ namespace CassandraSharp.ObjectMapper
                     {typeof(string), x => Utf8NameOrValue.FromNullable((string) x)},
                     {typeof(DateTime), x => new DateTimeNameOrValue((DateTime) x)},
                     {typeof(DateTime?), x => DateTimeNameOrValue.FromNullable((DateTime?) x)},
-                    {typeof(byte[]), x => ByteArrayNameOrValue.FromObject(x)},
+                    {typeof(byte[]), x => ByteArrayNameOrValue.FromNullable((byte[])x)},
                     {typeof(Decimal), x => null},
                     {typeof(Decimal?), x => null},
                     {typeof(Guid), x => new GuidNameOrValue((Guid) x)},
