@@ -21,7 +21,7 @@ namespace CassandraSharp
     ///     Pool caches object according to its policy A pool implementation must be thread safe
     /// </summary>
     /// <typeparam name="T"> Type of entries </typeparam>
-    internal interface IPool<T> : IDisposable where T : IDisposable
+    public interface IPool<T> : IDisposable where T : IDisposable
     {
         bool Acquire(out T entry);
 

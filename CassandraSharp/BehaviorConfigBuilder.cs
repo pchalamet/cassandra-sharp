@@ -17,7 +17,7 @@ namespace CassandraSharp
 {
     using CassandraSharp.Config;
 
-    public static class BehaviorConfigExtensions
+    internal static class BehaviorConfigExtensions
     {
         public static IBehaviorConfig Override(this IBehaviorConfig @this, IBehaviorConfig behaviorConfigToOverride)
         {
