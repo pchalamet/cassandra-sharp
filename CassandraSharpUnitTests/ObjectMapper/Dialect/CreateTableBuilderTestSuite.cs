@@ -14,7 +14,6 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
 {
     using System;
     using System.Linq;
-    using CassandraSharp.ObjectMapper;
     using CassandraSharp.ObjectMapper.Dialect;
     using NUnit.Framework;
 

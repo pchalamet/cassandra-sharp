@@ -46,8 +46,8 @@ namespace CassandraSharpUnitTests.Utils
 
             TestRootClass rootClass;
             using (TextReader txtReader = new StringReader(xml))
-            using(XmlReader xmlReader = XmlReader.Create(txtReader))
-                rootClass = (TestRootClass)xmlSer.Deserialize(xmlReader);
+            using (XmlReader xmlReader = XmlReader.Create(txtReader))
+                rootClass = (TestRootClass) xmlSer.Deserialize(xmlReader);
         }
     }
 }
