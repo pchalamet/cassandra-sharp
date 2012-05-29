@@ -1,4 +1,7 @@
-﻿// Licensed under the Apache License, Version 2.0 (the "License");
+﻿// cassandra-sharp - a .NET client for Apache Cassandra
+// Copyright (c) 2011-2012 Pierre Chalamet
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
@@ -17,7 +20,7 @@ namespace TestClient
 
     public class Logger4Log4Net : CassandraSharp.ILog
     {
-        private readonly ILog _log = LogManager.GetLogger("TestClient");
+        private readonly log4net.ILog _log = LogManager.GetLogger("TestClient");
 
         static Logger4Log4Net()
         {

@@ -1,4 +1,7 @@
-﻿// Licensed under the Apache License, Version 2.0 (the "License");
+﻿// cassandra-sharp - a .NET client for Apache Cassandra
+// Copyright (c) 2011-2012 Pierre Chalamet
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
@@ -18,28 +21,28 @@ namespace TestClient
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
-    [Schema("Twissandra", Name="users", Comment = "Users family")]
+    [Schema("Twissandra", Name = "users", Comment = "Users family")]
     public class Users
     {
-        [Column(Name="bio")]
+        [Column(Name = "bio")]
         public string Bio;
 
-        [Column(Name="createdAt")]
+        [Column(Name = "createdAt")]
         public DateTime CreatedAt;
 
-        [Column(Name="displayName")]
+        [Column(Name = "displayName")]
         public string DisplayName;
 
-        [CompositeKey(Name="location", Index = 1)]
+        [CompositeKey(Name = "location", Index = 1)]
         public string Location;
 
-        [Key(Name="name")]
+        [Key(Name = "name")]
         public string Name;
 
-        [Column(Name="password")]
+        [Column(Name = "password")]
         public string Password;
 
-        [Column(Name="webUrl")]
+        [Column(Name = "webUrl")]
         public string Web;
     }
 
@@ -90,7 +93,7 @@ namespace TestClient
             {
                 client.system_drop_keyspace("Twissandra");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 Console.WriteLine(ex.InnerException);
