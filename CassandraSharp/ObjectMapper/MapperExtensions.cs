@@ -16,6 +16,7 @@ namespace CassandraSharp.ObjectMapper
     using System.Collections.Generic;
     using System.Linq;
     using CassandraSharp.Config;
+    using CassandraSharp.MadeSimple;
     using CassandraSharp.ObjectMapper.Cql3;
     using CassandraSharp.ObjectMapper.Dialect;
 
@@ -35,6 +36,22 @@ namespace CassandraSharp.ObjectMapper
             IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
                 return tmpCluster.Execute<T>(schema, cqlSelect, template);
+        }
+
+        public static IEnumerable<R> Select<T, R>(this ICluster cluster, object template) where R : new()
+        {
+            Schema schema = new Schema(typeof(T));
+
+            IQueryBuilder builder = new QueryBuilder();
+            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
+            builder.Table = schema.Table;
+            builder.ConsistencyLevel = cluster.BehaviorConfig.WriteConsistencyLevel;
+            builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
+            string cqlSelect = builder.Build();
+
+            IBehaviorConfig cfgBuilder = new BehaviorConfig { KeySpace = schema.Keyspace };
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+                return tmpCluster.Execute<R>(schema, cqlSelect, template);
         }
 
         public static void Insert<T>(this ICluster cluster, object param) where T : new()
@@ -65,6 +82,66 @@ namespace CassandraSharp.ObjectMapper
         {
             // translate to "update"
             throw new NotImplementedException();
+        }
+
+        public static void CreateTable<T>(this ICluster cluster) where T : new()
+        {
+            Schema schema = new Schema(typeof(T));
+
+            ICreateTableBuilder builder = new CreateTableBuilder();
+            builder.Table = schema.Table;
+            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
+            builder.ColumnTypes = schema.CqlName2ColumnDefs.Values.Select(x => x.CqlTypeName).ToArray();
+            builder.Keys = schema.CqlName2ColumnDefs.Values.Where(x => x.IsKeyComponent).OrderBy(x => x.Index).Select(x => x.CqlName).ToArray();
+            builder.CompactStorage = schema.CompactStorage;
+            string createTableStmt = builder.Build();
+
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+                tmpCluster.ExecuteCql(createTableStmt);
+
+            //BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
+            //cfgBuilder.KeySpace = schemaAttribute.Keyspace;
+            //using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+            //{
+            //    tmpCluster.ExecuteCql(createTableStmt);
+            //}
+
+            // create indices then
+            //foreach (IndexAttribute ia in indices)
+            //{
+            //    StringBuilder sbCreateIndex = new StringBuilder();
+            //    sbCreateIndex.AppendFormat("create index on '{0}'('{1}')", tableName, ia.Name);
+
+            //    string createIndexStmt = sbCreateIndex.ToString();
+            //    tmpCluster.ExecuteCql(createIndexStmt);
+            //}
+        }
+
+        public static void DropTable<T>(this ICluster cluster) where T : new()
+        {
+            Schema schema = new Schema(typeof(T));
+
+            IDropTableBuilder builder = new DropTableBuilder();
+            builder.Table = schema.Table;
+            string dropTableStmt = builder.Build();
+
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+                tmpCluster.ExecuteCql(dropTableStmt);
+        }
+
+        public static void Truncate<T>(this ICluster cluster) where T : new()
+        {
+            Schema schema = new Schema(typeof(T));
+
+            ITruncateTableBuilder tableBuilder = new TruncateTableBuilder();
+            tableBuilder.Table = schema.Table;
+            string dropTableStmt = tableBuilder.Build();
+
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
+            using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
+                tmpCluster.ExecuteCql(dropTableStmt);
         }
     }
 }
