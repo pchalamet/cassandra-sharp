@@ -18,6 +18,7 @@ namespace CassandraSharp
     using System.Threading;
     using Apache.Cassandra;
     using CassandraSharp.EndpointStrategy;
+    using CassandraSharp.MadeSimple;
     using CassandraSharp.Utils;
     using Thrift.Transport;
 
@@ -122,19 +123,17 @@ namespace CassandraSharp
         public IConnection AcquireConnection(byte[] key)
         {
             IConnection connection;
-            if (_pool.Acquire(out connection))
+            if (!_pool.Acquire(out connection))
             {
-                return connection;
-            }
+                Endpoint endpoint = _endpointsManager.Pick(key);
+                if (null == endpoint)
+                {
+                    throw new ArgumentException("Can't find any valid endpoint");
+                }
 
-            Endpoint endpoint = _endpointsManager.Pick(key);
-            if (null == endpoint)
-            {
-                throw new ArgumentException("Can't find any valid endpoint");
+                Cassandra.Client client = _transportFactory.Create(endpoint.Address);
+                connection = new Connection(client, endpoint);
             }
-
-            Cassandra.Client client = _transportFactory.Create(endpoint.Address);
-            connection = new Connection(client, endpoint);
 
             ChangeKeyspace(connection);
 
@@ -171,6 +170,11 @@ namespace CassandraSharp
             {
                 connection.CassandraClient.set_keyspace(BehaviorConfig.KeySpace);
                 connection.KeySpace = BehaviorConfig.KeySpace;
+
+                // UNDONE: CQL3 seems to be badly broken - USE does not work actually
+                //string useKeyspace = string.Format("use {0}", connection.KeySpace);
+                //byte[] bufUseKeyspace = new Utf8NameOrValue(useKeyspace).ToByteArray();
+                //connection.CassandraClient.execute_cql_query(bufUseKeyspace, Compression.NONE);
             }
         }
 
