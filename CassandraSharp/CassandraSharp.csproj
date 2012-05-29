@@ -92,7 +92,6 @@
     <Compile Include="MadeSimple\DoubleNameOrValue.cs" />
     <Compile Include="MadeSimple\FloatNameOrValue.cs" />
     <Compile Include="ObjectMapper\MapperExtensions.cs" />
-    <Compile Include="ObjectMapper\SchemaExtensions.cs" />
     <Compile Include="ObjectMapper\ColumnAttribute.cs" />
     <Compile Include="ObjectMapper\IndexAttribute.cs" />
     <Compile Include="ObjectMapper\KeyAttribute.cs" />
