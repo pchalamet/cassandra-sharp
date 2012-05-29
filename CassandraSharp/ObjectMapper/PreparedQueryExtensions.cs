@@ -12,15 +12,14 @@
 
 namespace CassandraSharp.ObjectMapper
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Apache.Cassandra;
     using CassandraSharp.MadeSimple;
 
-    public static class PreparedQueryExtensions
+    internal static class PreparedQueryExtension
     {
-        private static IEnumerable<T> Execute<T>(Cassandra.Client client, CqlPreparedResult preparedStmt, IEnumerable<ColumnDef> allColumns, object param)
+        private static IEnumerable<T> Execute<T>(Cassandra.Client client, Schema schema, CqlPreparedResult preparedStmt, object param)
             where T : new()
         {
             // feed required columns for the query
@@ -29,9 +28,10 @@ namespace CassandraSharp.ObjectMapper
             {
                 foreach (string prmName in preparedStmt.Variable_names)
                 {
-                    ColumnDef columnDef = allColumns.First(x => x.Name == prmName);
-                    object value = columnDef.GetValue(param);
-                    byte[] prm = columnDef.NetType.Serialize(value);
+                    // find the ColumnDef in the object model from C* response
+                    ColumnDef columnDef = schema.CqlName2ColumnDefs[prmName];
+                    object value = param.GetDuckValue(columnDef.NetName);
+                    byte[] prm = value.GetType().Serialize(value);
                     prms.Add(prm);
                 }
             }
@@ -42,30 +42,22 @@ namespace CassandraSharp.ObjectMapper
             // returns results
             if (null != result.Rows)
             {
-                Type resultType = typeof(T);
-                IEnumerable<ColumnDef> resAllColumns = resultType.FindColumns();
-
-                ColumnDef keyColumn = resAllColumns.FirstOrDefault(x => x.IsKeyComponent && x.Index == 0);
                 foreach (CqlRow row in result.Rows)
                 {
                     T t = new T();
-
-                    // map key first
-                    if (null != keyColumn)
-                    {
-                        object value = keyColumn.NetType.Deserialize(row.Key);
-                        keyColumn.SetValue(t, value);
-                    }
 
                     // map columns
                     foreach (Column col in row.Columns)
                     {
                         string colName = new Utf8NameOrValue(col.Name).Value;
-                        ColumnDef colDef = resAllColumns.FirstOrDefault(x => x.Name == colName);
-                        if (null != colDef)
+                        ColumnDef colDef;
+                        if (schema.CqlName2ColumnDefs.TryGetValue(colName, out colDef))
                         {
-                            object value = colDef.NetType.Deserialize(col.Value);
-                            colDef.SetValue(t, value);
+                            if (null != col.Value)
+                            {
+                                object value = colDef.NetType.Deserialize(col.Value);
+                                t.SetDuckValue(colDef.NetName, value);
+                            }
                         }
                     }
 
@@ -74,14 +66,13 @@ namespace CassandraSharp.ObjectMapper
             }
         }
 
-        public static IEnumerable<T> Execute<T>(this ICluster cluster, string query, IEnumerable<object> prms)
-            where T : new()
+        public static IEnumerable<T> Execute<T>(this ICluster @this, Schema schema, string query, IEnumerable<object> prms) where T : new()
         {
             bool hasError = true;
             IConnection connection = null;
             try
             {
-                connection = cluster.AcquireConnection(null);
+                connection = @this.AcquireConnection(null);
                 Cassandra.Client client = connection.CassandraClient;
 
                 Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
@@ -89,10 +80,7 @@ namespace CassandraSharp.ObjectMapper
 
                 foreach (object prm in prms)
                 {
-                    Type type = prm.GetType();
-                    IEnumerable<ColumnDef> allColumns = type.FindColumns();
-
-                    foreach (T unknown in Execute<T>(client, preparedStmt, allColumns, prm))
+                    foreach (T unknown in Execute<T>(client, schema, preparedStmt, prm))
                     {
                         yield return unknown;
                     }
@@ -103,29 +91,29 @@ namespace CassandraSharp.ObjectMapper
             {
                 if (null != connection)
                 {
-                    cluster.ReleaseConnection(connection, hasError);
+                    @this.ReleaseConnection(connection, hasError);
                 }
             }
         }
 
-        public static IEnumerable<T> Execute<T>(this ICluster cluster, string query, params object[] prms)
+        public static IEnumerable<T> Execute<T>(this ICluster @this, Schema schema, string query, params object[] prms)
             where T : new()
         {
-            return cluster.Execute<T>(query, prms.AsEnumerable());
+            return @this.Execute<T>(schema, query, prms.AsEnumerable());
         }
 
-        public static int ExecuteNonQuery(this ICluster cluster, string query, IEnumerable<object> prms)
+        public static int ExecuteNonQuery(this ICluster @this, Schema schema, string query, IEnumerable<object> prms)
         {
-            int nbResults = Execute<Unit>(cluster, query, prms).Count();
+            int nbResults = @this.Execute<Unit>(schema, query, prms).Count();
             return nbResults;
         }
 
-        public static int ExecuteNonQuery(this ICluster cluster, string query, params object[] prms)
+        public static int ExecuteNonQuery(this ICluster @this, Schema schema, string query, params object[] prms)
         {
-            return cluster.ExecuteNonQuery(query, prms.AsEnumerable());
+            return @this.ExecuteNonQuery(schema, query, prms.AsEnumerable());
         }
 
-        private class Unit
+        internal class Unit
         {
         }
     }

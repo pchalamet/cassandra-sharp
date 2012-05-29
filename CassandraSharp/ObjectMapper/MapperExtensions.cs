@@ -21,66 +21,47 @@ namespace CassandraSharp.ObjectMapper
 
     public static class MapperExtensions
     {
-        public static IEnumerable<T> Select<T>(this ICluster cluster, T template) where T : new()
+        public static IEnumerable<T> Select<T>(this ICluster cluster, object template) where T : new()
         {
-            Type type = typeof(T);
-
-            SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
-            string tableName = schemaAttribute.Name ?? type.Name;
-            IEnumerable<ColumnDef> allColumns = type.FindColumns();
-            var selectors = from columnDef in allColumns
-                            let value = columnDef.GetValue(template)
-                            where null == value
-                            select columnDef.Name;
-            var wheres = from columnDef in allColumns
-                         let value = columnDef.GetValue(template)
-                         where null != value
-                         select columnDef.Name + "=?";
+            Schema schema = new Schema(typeof(T));
 
             IQueryBuilder builder = new QueryBuilder();
-            builder.Columns = selectors.ToArray();
-            builder.Table = tableName;
+            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
+            builder.Table = schema.Table;
             builder.ConsistencyLevel = cluster.BehaviorConfig.WriteConsistencyLevel;
-            builder.Wheres = wheres.ToArray();
+            builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
             string cqlSelect = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
-                return tmpCluster.Execute<T>(cqlSelect, template);
+                return tmpCluster.Execute<T>(schema, cqlSelect, template);
         }
 
-        public static void Insert<T>(this ICluster cluster, T param)
+        public static void Insert<T>(this ICluster cluster, object param) where T : new()
         {
-            Type type = typeof(T);
-
-            SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
-            IEnumerable<ColumnDef> allColumns = type.FindColumns();
-            var selectors = from columnDef in allColumns
-                            let value = columnDef.GetValue(param)
-                            where null != value
-                            select new {columnDef.Name, Setter = "?"};
+            Schema schema = new Schema(typeof(T));
 
             IInsertBuilder builder = new InsertBuilder();
-            builder.Table = schemaAttribute.Name ?? type.Name;
-            builder.Columns = selectors.Select(x => x.Name).ToArray();
-            builder.Values = selectors.Select(x => x.Setter).ToArray();
+            builder.Table = schema.Table;
+            builder.Columns = param.GetType().GetPublicMembers().Select(x => schema.NetName2ColumnDefs[x.Name].CqlName).ToArray();
+            builder.Values = Enumerable.Repeat("?", builder.Columns.Length).ToArray();
             builder.ConsistencyLevel = cluster.BehaviorConfig.WriteConsistencyLevel;
             builder.TTL = cluster.BehaviorConfig.TTL;
             builder.Timestamp = cluster.TimestampService.Generate();
             string cqlInsert = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
-                tmpCluster.ExecuteNonQuery(cqlInsert, param);
+                tmpCluster.ExecuteNonQuery(schema, cqlInsert, param);
         }
 
-        public static void Delete<T>(this ICluster cluster, T template)
+        public static void Delete<T>(this ICluster cluster, object template) where T : new()
         {
             // translate to "delete"
             throw new NotImplementedException();
         }
 
-        public static void Update<T>(this ICluster cluster, T template, T param)
+        public static void Update<T>(this ICluster cluster, object param) where T : new()
         {
             // translate to "update"
             throw new NotImplementedException();

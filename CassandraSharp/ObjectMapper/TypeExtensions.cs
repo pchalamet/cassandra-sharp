@@ -52,5 +52,17 @@ namespace CassandraSharp.ObjectMapper
             PropertyInfo pi = @this.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             return pi.GetValue(@this, null);
         }
+
+        public static Type GetDuckType(this MemberInfo @this)
+        {
+            if( @this.MemberType == MemberTypes.Field)
+            {
+                FieldInfo fi = (FieldInfo)@this;
+                return fi.FieldType;
+            }
+
+            PropertyInfo pi = (PropertyInfo) @this;
+            return pi.PropertyType;
+        }
     }
 }

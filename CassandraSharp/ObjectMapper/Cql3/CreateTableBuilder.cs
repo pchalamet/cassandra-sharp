@@ -29,7 +29,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
             for (int i = 0; i < Columns.Length; ++i)
             {
                 string name = Columns[i];
-                string type = ColumnTypes[i].ToCql();
+                string type = ColumnTypes[i];
                 sb.AppendFormat("{0} {1},", name, type);
             }
 
@@ -53,7 +53,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         public string[] Columns { get; set; }
 
-        public CqlType[] ColumnTypes { get; set; }
+        public string[] ColumnTypes { get; set; }
 
         public string[] Keys { get; set; }
 

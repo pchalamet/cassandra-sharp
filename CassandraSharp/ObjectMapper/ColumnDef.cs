@@ -13,21 +13,43 @@
 namespace CassandraSharp.ObjectMapper
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
 
     internal class ColumnDef
     {
+        private static readonly Dictionary<CqlType, string> _dataType2CqlType = new Dictionary<CqlType, string>
+                                                                                    {
+                                                                                        {CqlType.Ascii, "ascii"},
+                                                                                        {CqlType.BigInt, "bigint"},
+                                                                                        {CqlType.Blob, "blob"},
+                                                                                        {CqlType.Boolean, "boolean"},
+                                                                                        {CqlType.Counter, "counter"},
+                                                                                        {CqlType.Decimal, "decimal"},
+                                                                                        {CqlType.Double, "double"},
+                                                                                        {CqlType.Float, "float"},
+                                                                                        {CqlType.Int, "int"},
+                                                                                        {CqlType.Text, "text"},
+                                                                                        {CqlType.Timestamp, "timestamp"},
+                                                                                        {CqlType.Uuid, "uuid"},
+                                                                                        {CqlType.Varchar, "varchar"},
+                                                                                        {CqlType.Varint, "varint"},
+                                                                                    };
+
         private readonly FieldInfo _fi;
 
         private readonly PropertyInfo _pi;
 
-        public ColumnDef(string name, CqlType cqlType, bool isKeyComponent, int index, MemberInfo mi)
+        public ColumnDef(string netName, string cqlName, CqlType cqlType, bool isKeyComponent, int index, MemberInfo mi)
         {
-            Name = name;
+            CqlName = cqlName;
             CqlType = cqlType;
+            CqlTypeName = _dataType2CqlType[cqlType];
+
             IsKeyComponent = isKeyComponent;
             Index = index;
 
+            NetName = netName;
             if (mi.MemberType == MemberTypes.Property)
             {
                 _pi = (PropertyInfo) mi;
@@ -40,11 +62,15 @@ namespace CassandraSharp.ObjectMapper
             }
         }
 
-        public string Name { get; private set; }
+        public string NetName { get; private set; }
+
+        public Type NetType { get; private set; }
+
+        public string CqlName { get; private set; }
 
         public CqlType CqlType { get; private set; }
 
-        public Type NetType { get; private set; }
+        public string CqlTypeName { get; private set; }
 
         public bool IsKeyComponent { get; private set; }
 

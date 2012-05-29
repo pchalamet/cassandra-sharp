@@ -14,27 +14,58 @@ namespace TestClient
 {
     using System;
     using System.Collections.Generic;
+    using Apache.Cassandra;
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
-    //CREATE TABLE seen_ships (
-    //      day text,
-    //      time_seen timestamp,
-    //      shipname text,
-    //      PRIMARY KEY (day, time_seen)
-    //  );
-
-    [Schema("ObjectMapper", Comment = "Captain Reynolds register", Name = "seen_ships", CompactStorage = true)]
-    public class SeenShips
+    [Schema("Twissandra", Name="users", Comment = "Users family")]
+    public class Users
     {
-        [Key(Name = "day")]
-        public string Day;
+        [Column(Name="bio")]
+        public string Bio;
 
-        [Column(Name = "shipname")]
-        public string ShipName;
+        [Column(Name="createdAt")]
+        public DateTime CreatedAt;
 
-        [CompositeKey(Name = "time_seen", Index = 1)]
-        public DateTime? TimeSeen;
+        [Column(Name="displayName")]
+        public string DisplayName;
+
+        [CompositeKey(Name="location", Index = 1)]
+        public string Location;
+
+        [Key(Name="name")]
+        public string Name;
+
+        [Column(Name="password")]
+        public string Password;
+
+        [Column(Name="webUrl")]
+        public string Web;
+    }
+
+    [Schema("Twissandra", Comment = "Tweets family")]
+    public class Tweets
+    {
+        [Key]
+        public Guid InReplyToTweet;
+
+        [Column]
+        public string InReplyToUser;
+
+        [Column]
+        public string Location;
+
+        [Column]
+        public string Text;
+
+        [Column]
+        public DateTime Time;
+
+        [Column]
+        public Guid TweedId;
+
+        [Column]
+        public string User;
     }
 
     public class ObjectMapperSample
@@ -52,45 +83,51 @@ namespace TestClient
                 Run(cluster);
         }
 
-        protected void Run(ICluster cluster)
+        private void CreateKeyspace(Cassandra.Client client)
         {
-            cluster.CreateTable<SeenShips>();
-
-            SeenShips seenShip = new SeenShips
-                                     {
-                                         Day = "199-A/4",
-                                         TimeSeen = new DateTime(1973, 06, 19),
-                                         ShipName = "Sunrise Avenger"
-                                     };
-            cluster.Insert(seenShip);
-
-            seenShip = new SeenShips
-                           {
-                               Day = "199-A/4",
-                               TimeSeen = new DateTime(1973, 06, 20),
-                               ShipName = "Sunrise Avenger2"
-                           };
-            cluster.Insert(seenShip);
-
-            seenShip = new SeenShips
-                           {
-                               Day = "199-A/5",
-                               TimeSeen = new DateTime(1973, 06, 21),
-                               ShipName = "Sunrise Avenger3"
-                           };
-            cluster.Insert(seenShip);
-
-            SeenShips queryShips = new SeenShips
-                                       {
-                                           Day = "199-A/4"
-                                       };
-            IEnumerable<SeenShips> seenShips = cluster.Select(queryShips);
-            foreach (SeenShips ss in seenShips)
+            client.set_keyspace("system");
+            try
             {
-                Console.WriteLine("{0}: {1}", ss.TimeSeen, ss.ShipName);
+                client.system_drop_keyspace("twissandra");
+            }
+            catch
+            {
             }
 
-            cluster.DropTable<SeenShips>();
+            KsDef ksDef = new KsDef
+                              {
+                                  Name = "twissandra",
+                                  Strategy_class = "SimpleStrategy",
+                                  Cf_defs = new List<CfDef>(),
+                                  Strategy_options = new Dictionary<string, string>()
+                              };
+            ksDef.Strategy_options["replication_factor"] = "1";
+
+            client.system_add_keyspace(ksDef);
+
+            client.set_keyspace("twissandra");
+        }
+
+        protected void Run(ICluster cluster)
+        {
+            cluster.Execute(x => CreateKeyspace(x.CassandraClient));
+
+            cluster.CreateTable<Users>();
+            cluster.CreateTable<Tweets>();
+
+            cluster.Insert<Users>(new {Name = "User1", DisplayName = "RealName1", Location = "SF"});
+            cluster.Insert<Users>(new {Name = "User2", DisplayName = "RealName12", Location = "NY"});
+            cluster.Insert<Users>(new {Name = "User3", DisplayName = "RealName13", Location = "SF"});
+            cluster.Insert<Users>(new {Name = "User4", DisplayName = "RealName14", Location = "HK"});
+
+            IEnumerable<Users> users = cluster.Select<Users>(new {Location = "SF"});
+            foreach (Users user in users)
+            {
+                Console.WriteLine("{0}: {1}", user.Name, user.Location);
+            }
+
+            cluster.DropTable<Tweets>();
+            cluster.DropTable<Users>();
         }
     }
 }

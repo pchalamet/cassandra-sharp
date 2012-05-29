@@ -26,7 +26,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
             ICreateTableBuilder builder = dialect.GetCreateTableBuilder();
             builder.Table = "TestTable";
             builder.Columns = new[] {"A", "B"};
-            builder.ColumnTypes = new[] {CqlType.Text, CqlType.Int};
+            builder.ColumnTypes = new[] {"text", "int"};
             builder.Keys = new[] {"A"};
             return builder;
         }
@@ -56,7 +56,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         public void TestValidateEmptyColumnTypes()
         {
             ICreateTableBuilder builder = CreateTableBuilder();
-            builder.ColumnTypes = new CqlType[0];
+            builder.ColumnTypes = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 
@@ -72,7 +72,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         public void TestValidateMismatchColumnsAndColumnTypes()
         {
             ICreateTableBuilder builder = CreateTableBuilder();
-            builder.ColumnTypes = builder.ColumnTypes.Union(new[] {CqlType.Decimal}).ToArray();
+            builder.ColumnTypes = builder.ColumnTypes.Union(new[] {"int"}).ToArray();
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 

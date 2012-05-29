@@ -79,6 +79,7 @@
     <Compile Include="ObjectMapper\CqlType.cs" />
     <Compile Include="ObjectMapper\Cql3\QueryBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IScopeBuilder.cs" />
+    <Compile Include="ObjectMapper\Schema.cs" />
     <Compile Include="ObjectMapper\SerializersExtensions.cs" />
     <Compile Include="ObjectMapper\PreparedQueryExtensions.cs" />
     <Compile Include="ObjectMapper\TypeExtensions.cs" />

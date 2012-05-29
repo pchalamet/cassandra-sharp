@@ -12,8 +12,6 @@
 
 namespace CassandraSharp.ObjectMapper
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using CassandraSharp.Config;
     using CassandraSharp.MadeSimple;
@@ -22,27 +20,19 @@ namespace CassandraSharp.ObjectMapper
 
     public static class SchemaExtensions
     {
-        public static void CreateTable<T>(this ICluster cluster)
+        public static void CreateTable<T>(this ICluster cluster) where T : new()
         {
-            Type type = typeof(T);
-
-            SchemaAttribute schemaAttribute = type.FindSchemaAttribute();
-            IEnumerable<ColumnDef> allColumns = type.FindColumns();
-            string tableName = schemaAttribute.Name ?? type.Name;
-            IEnumerable<ColumnDef> keyColumns = from cdef in allColumns
-                                                where cdef.IsKeyComponent
-                                                orderby cdef.Index
-                                                select cdef;
+            Schema schema = new Schema(typeof(T));
 
             ICreateTableBuilder builder = new CreateTableBuilder();
-            builder.Table = tableName;
-            builder.Columns = allColumns.Select(x => x.Name).ToArray();
-            builder.ColumnTypes = allColumns.Select(x => x.CqlType).ToArray();
-            builder.Keys = keyColumns.Select(x => x.Name).ToArray();
-            builder.CompactStorage = schemaAttribute.CompactStorage;
+            builder.Table = schema.Table;
+            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
+            builder.ColumnTypes = schema.CqlName2ColumnDefs.Values.Select(x => x.CqlTypeName).ToArray();
+            builder.Keys = schema.CqlName2ColumnDefs.Values.Where(x => x.IsKeyComponent).OrderBy(x => x.Index).Select(x => x.CqlName).ToArray();
+            builder.CompactStorage = schema.CompactStorage;
             string createTableStmt = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
                 tmpCluster.ExecuteCql(createTableStmt);
 
@@ -64,32 +54,28 @@ namespace CassandraSharp.ObjectMapper
             //}
         }
 
-        public static void DropTable<T>(this ICluster cluster)
+        public static void DropTable<T>(this ICluster cluster) where T : new()
         {
-            Type t = typeof(T);
-
-            SchemaAttribute schemaAttribute = t.FindSchemaAttribute();
+            Schema schema = new Schema(typeof(T));
 
             IDropTableBuilder builder = new DropTableBuilder();
-            builder.Table = schemaAttribute.Name ?? t.Name;
+            builder.Table = schema.Table;
             string dropTableStmt = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
                 tmpCluster.ExecuteCql(dropTableStmt);
         }
 
-        public static void Truncate<T>(this ICluster cluster)
+        public static void Truncate<T>(this ICluster cluster) where T : new()
         {
-            Type t = typeof(T);
-
-            SchemaAttribute schemaAttribute = t.FindSchemaAttribute();
+            Schema schema = new Schema(typeof(T));
 
             ITruncateTableBuilder tableBuilder = new TruncateTableBuilder();
-            tableBuilder.Table = schemaAttribute.Name ?? t.Name;
+            tableBuilder.Table = schema.Table;
             string dropTableStmt = tableBuilder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schemaAttribute.Keyspace};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
             using (ICluster tmpCluster = cluster.CreateChildCluster(cfgBuilder))
                 tmpCluster.ExecuteCql(dropTableStmt);
         }
