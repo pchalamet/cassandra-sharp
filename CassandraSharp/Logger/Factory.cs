@@ -17,7 +17,7 @@ namespace CassandraSharp.Logger
 {
     using CassandraSharp.Utils;
 
-    public static class Factory
+    internal static class Factory
     {
         public static ILog Create(string customType)
         {

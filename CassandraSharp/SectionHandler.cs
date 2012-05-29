@@ -20,7 +20,7 @@ namespace CassandraSharp
     using CassandraSharp.Config;
     using CassandraSharp.Utils;
 
-    public class SectionHandler : IConfigurationSectionHandler
+    internal class SectionHandler : IConfigurationSectionHandler
     {
         public object Create(object parent, object configContext, XmlNode section)
         {

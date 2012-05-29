@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.Logger
 {
-    public class Logger : ILog
+    internal class Logger : ILog
     {
         public void Debug(string format, params object[] prms)
         {

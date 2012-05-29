@@ -21,7 +21,7 @@ namespace CassandraSharp.Utils
     using System.Xml;
     using System.Xml.Serialization;
 
-    public class MiniXmlSerializer
+    internal class MiniXmlSerializer
     {
         private readonly Type _type;
 

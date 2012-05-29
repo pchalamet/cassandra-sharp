@@ -17,7 +17,7 @@ namespace CassandraSharp.Timestamp
 {
     using CassandraSharp.Utils;
 
-    public static class Factory
+    internal static class Factory
     {
         public static ITimestampService Create(string customType)
         {

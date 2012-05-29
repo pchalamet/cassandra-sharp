@@ -17,7 +17,7 @@ namespace CassandraSharp.Timestamp
 {
     using System;
 
-    public class TimestampService : ITimestampService
+    internal class TimestampService : ITimestampService
     {
         public long Generate()
         {
