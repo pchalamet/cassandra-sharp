@@ -21,8 +21,14 @@ namespace CassandraSharp.Logger
     {
         public static ILog Create(string customType)
         {
-            ILog log = ServiceActivator.Create<ILog>(customType) ?? new Logger();
-            return log;
+            switch (customType)
+            {
+                case null:
+                    return new NullLogger();
+
+                default:
+                    return ServiceActivator.Create<ILog>(customType);
+            }
         }
     }
 }

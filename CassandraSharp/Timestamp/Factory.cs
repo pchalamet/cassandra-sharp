@@ -21,7 +21,14 @@ namespace CassandraSharp.Timestamp
     {
         public static ITimestampService Create(string customType)
         {
-            return ServiceActivator.Create<ITimestampService>(customType) ?? new TimestampService();
+            switch (customType)
+            {
+                case null:
+                    return new NowTimestampService();
+
+                default:
+                    return ServiceActivator.Create<ITimestampService>(customType);
+            }
         }
     }
 }

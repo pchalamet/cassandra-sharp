@@ -111,7 +111,7 @@ namespace TestClient
             IEnumerable<Users> users = cluster.Select<Users>(new {Location = "SF"});
             foreach (Users user in users)
             {
-                Console.WriteLine("{0}: {1}", user.Name, user.Location);
+                Console.WriteLine("{0} is living in {1}", user.Name, user.Location);
             }
         }
     }

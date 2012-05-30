@@ -24,6 +24,7 @@ namespace CassandraSharp.Transport
         {
             switch (@this.Type)
             {
+                case null:
                 case "Framed":
                     return new FramedTransportFactory(@this);
 

@@ -23,6 +23,7 @@ namespace CassandraSharp.Pool
         {
             switch (customType)
             {
+                case null:
                 case "Stack":
                     return new StackPool<IConnection>(poolSize);
 

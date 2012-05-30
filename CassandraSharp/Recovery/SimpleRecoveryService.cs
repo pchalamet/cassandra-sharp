@@ -22,7 +22,7 @@ namespace CassandraSharp.Recovery
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Utils;
 
-    internal class RecoveryService : IRecoveryService
+    internal class SimpleRecoveryService : IRecoveryService
     {
         private readonly object _lock;
 
@@ -30,7 +30,7 @@ namespace CassandraSharp.Recovery
 
         private readonly List<RecoveryItem> _toRecover;
 
-        public RecoveryService()
+        public SimpleRecoveryService()
         {
             _toRecover = new List<RecoveryItem>();
             _timer = new Timer(60*1000);
@@ -69,6 +69,9 @@ namespace CassandraSharp.Recovery
                 try
                 {
                     client = recoveryItem.TransportFactory.Create(recoveryItem.Endpoint.Address);
+
+                    // try running a describe to check the node responsiveness
+                    client.describe_cluster_name();
 
                     lock (_lock)
                     {

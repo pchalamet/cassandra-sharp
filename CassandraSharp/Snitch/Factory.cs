@@ -23,6 +23,7 @@ namespace CassandraSharp.Snitch
         {
             switch (customType)
             {
+                case null:
                 case "Simple":
                     return new SimpleSnitch();
 

@@ -24,6 +24,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             switch (customType)
             {
+                case null:
                 case "Random":
                     return new RandomEndpointStrategy(endpoints);
 

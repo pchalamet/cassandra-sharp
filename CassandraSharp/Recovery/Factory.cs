@@ -21,7 +21,14 @@ namespace CassandraSharp.Recovery
     {
         public static IRecoveryService Create(string customType)
         {
-            return ServiceActivator.Create<IRecoveryService>(customType) ?? new RecoveryService();
+            switch (customType)
+            {
+                case null:
+                    return new SimpleRecoveryService();
+
+                default:
+                    return ServiceActivator.Create<IRecoveryService>(customType);
+            }
         }
     }
 }
