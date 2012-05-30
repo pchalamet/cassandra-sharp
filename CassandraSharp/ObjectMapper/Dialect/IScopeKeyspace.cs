@@ -15,22 +15,8 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface IDialect
+    public interface IScopeKeyspace
     {
-        ICreateKeyspaceBuilder GetCreateKeyspaceBuilder();
-
-        IDropKeyspaceBuilder GetDropKeyspaceBuilder();
-
-        ICreateTableBuilder GetCreateTableBuilder();
-
-        IDropTableBuilder GetDropTableBuilder();
-
-        ITruncateTableBuilder GetTruncateTableBuilder();
-
-        IInsertBuilder GetInsertBuilder();
-
-        IUpdateBuilder GetUpdateBuilder();
-
-        IQueryBuilder GetQueryBuilder();
+        string Keyspace { get; set; }
     }
 }

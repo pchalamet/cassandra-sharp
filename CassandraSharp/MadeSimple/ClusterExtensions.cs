@@ -15,8 +15,8 @@
 
 namespace CassandraSharp.MadeSimple
 {
-    using System;
     using Apache.Cassandra;
+    using CassandraSharp.Utils;
 
     public static class ClusterExtensions
     {
@@ -27,10 +27,10 @@ namespace CassandraSharp.MadeSimple
 
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName, INameOrValue value)
         {
-            if (null == @this || null == columnFamily || null == key || null == columnName)
-            {
-                throw new ArgumentNullException();
-            }
+            @this.CheckArgumentNull("@this");
+            columnFamily.CheckArgumentNull("columnFamily");
+            key.CheckArgumentNull("key");
+            columnName.CheckArgumentNull("columnName");
 
             ColumnParent columnParent = new ColumnParent
                                             {
@@ -47,17 +47,17 @@ namespace CassandraSharp.MadeSimple
             @this.Execute(cnx => cnx.CassandraClient.insert(key.ConvertToByteArray(), columnParent, column, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
-        public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
+        public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName)
         {
-            if (null == @this || null == columnFamily || null == key || null == column)
-            {
-                throw new ArgumentNullException();
-            }
+            @this.CheckArgumentNull("@this");
+            columnFamily.CheckArgumentNull("columnFamily");
+            key.CheckArgumentNull("key");
+            columnName.CheckArgumentNull("columnName");
 
             ColumnPath columnPath = new ColumnPath
                                         {
                                             Column_family = columnFamily,
-                                            Column = column.ConvertToByteArray()
+                                            Column = columnName.ConvertToByteArray()
                                         };
 
             return @this.ExecuteCommand(cnx => cnx.CassandraClient.get(key.ConvertToByteArray(), columnPath, @this.BehaviorConfig.ReadConsistencyLevel.Get()));
@@ -65,10 +65,10 @@ namespace CassandraSharp.MadeSimple
 
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
         {
-            if (null == @this || null == columnFamily || null == key)
-            {
-                throw new ArgumentNullException();
-            }
+            @this.CheckArgumentNull("@this");
+            columnFamily.CheckArgumentNull("columnFamily");
+            key.CheckArgumentNull("key");
+            column.CheckArgumentNull("columnName");
 
             ColumnPath columnPath = new ColumnPath
                                         {
@@ -83,6 +83,10 @@ namespace CassandraSharp.MadeSimple
 
         public static void IncrementCounter(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName, long value)
         {
+            @this.CheckArgumentNull("@this");
+            columnFamily.CheckArgumentNull("columnFamily");
+            key.CheckArgumentNull("key");
+
             ColumnParent columnParent = new ColumnParent
                                             {
                                                 Column_family = columnFamily
@@ -91,35 +95,34 @@ namespace CassandraSharp.MadeSimple
             counterColumn.Name = columnName.ConvertToByteArray();
             counterColumn.Value = value;
 
-            @this.Execute(cnx => cnx.CassandraClient.add(key.ConvertToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
+            @this.Execute(
+                cnx => cnx.CassandraClient.add(key.ConvertToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
+        }
+
+        public static void CreateKeyspace(this ICluster @this, string name)
+        {
+            @this.CheckArgumentNull("@this");
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)
         {
-            if (null == @this)
-            {
-                throw new ArgumentNullException();
-            }
+            @this.CheckArgumentNull("@this");
+            columnFamily.CheckArgumentNull("columnFamily");
 
             @this.Execute(cnx => cnx.CassandraClient.truncate(columnFamily));
         }
 
         public static string DescribeClusterName(this ICluster @this)
         {
-            if (null == @this)
-            {
-                throw new ArgumentNullException();
-            }
+            @this.CheckArgumentNull("@this");
 
             return @this.ExecuteCommand(cnx => cnx.CassandraClient.describe_cluster_name());
         }
 
         public static CqlResult ExecuteCql(this ICluster @this, string cql)
         {
-            if (null == @this || null == cql)
-            {
-                throw new ArgumentNullException();
-            }
+            @this.CheckArgumentNull("@this");
+            cql.CheckArgumentNull("cql");
 
             byte[] query = new Utf8NameOrValue(cql).ConvertToByteArray();
             return @this.ExecuteCommand(ctx => ctx.CassandraClient.execute_cql_query(query, Compression.NONE));

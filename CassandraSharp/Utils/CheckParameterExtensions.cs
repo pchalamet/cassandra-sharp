@@ -13,24 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper.Dialect
+namespace CassandraSharp.Utils
 {
-    public interface IDialect
+    using System;
+    using System.Diagnostics;
+
+    public static class CheckParameterExtensions
     {
-        ICreateKeyspaceBuilder GetCreateKeyspaceBuilder();
-
-        IDropKeyspaceBuilder GetDropKeyspaceBuilder();
-
-        ICreateTableBuilder GetCreateTableBuilder();
-
-        IDropTableBuilder GetDropTableBuilder();
-
-        ITruncateTableBuilder GetTruncateTableBuilder();
-
-        IInsertBuilder GetInsertBuilder();
-
-        IUpdateBuilder GetUpdateBuilder();
-
-        IQueryBuilder GetQueryBuilder();
+        [Conditional("DEBUG")]
+        public static void CheckArgumentNull(this object prm, string name)
+        {
+            if (null == prm)
+            {
+                throw new ArgumentNullException(name);
+            }
+        }
     }
 }

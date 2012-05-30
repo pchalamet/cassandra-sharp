@@ -19,6 +19,16 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
     public class Dialect : IDialect
     {
+        public ICreateKeyspaceBuilder GetCreateKeyspaceBuilder()
+        {
+            return new CreateKeyspaceBuilder();
+        }
+
+        public IDropKeyspaceBuilder GetDropKeyspaceBuilder()
+        {
+            return new DropKeyspaceBuilder();
+        }
+
         public ICreateTableBuilder GetCreateTableBuilder()
         {
             return new CreateTableBuilder();

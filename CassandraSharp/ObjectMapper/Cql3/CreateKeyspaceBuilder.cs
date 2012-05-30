@@ -13,24 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper.Dialect
+namespace CassandraSharp.ObjectMapper.Cql3
 {
-    public interface IDialect
+    using System.Text;
+    using CassandraSharp.ObjectMapper.Dialect;
+    using CassandraSharp.Utils;
+
+    internal class CreateKeyspaceBuilder : ICreateKeyspaceBuilder
     {
-        ICreateKeyspaceBuilder GetCreateKeyspaceBuilder();
+        public string Build()
+        {
+            Validate();
 
-        IDropKeyspaceBuilder GetDropKeyspaceBuilder();
+            StringBuilder sb = new StringBuilder();
 
-        ICreateTableBuilder GetCreateTableBuilder();
+            sb.AppendFormat("create keyspace {0}", Keyspace);
 
-        IDropTableBuilder GetDropTableBuilder();
+            return sb.ToString();
+        }
 
-        ITruncateTableBuilder GetTruncateTableBuilder();
+        private void Validate()
+        {
+            Keyspace.CheckArgumentNull("Keyspace");
+        }
 
-        IInsertBuilder GetInsertBuilder();
-
-        IUpdateBuilder GetUpdateBuilder();
-
-        IQueryBuilder GetQueryBuilder();
+        public string Keyspace { get; set; }
     }
 }
