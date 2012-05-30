@@ -19,6 +19,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
     using System.Text;
     using Apache.Cassandra;
     using CassandraSharp.ObjectMapper.Dialect;
+    using CassandraSharp.Utils;
 
     public class InsertBuilder : IInsertBuilder
     {
@@ -78,20 +79,9 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null == Table)
-            {
-                throw new ArgumentException("Table must be set");
-            }
-
-            if (null == Columns || 0 == Columns.Length)
-            {
-                throw new ArgumentException("Columns must have at least one element");
-            }
-
-            if (null == Values || 0 == Values.Length)
-            {
-                throw new ArgumentException("Values must have at least one element");
-            }
+            Table.CheckArgumentNotNull("Table");
+            Columns.CheckArrayHasAtLeastOneElement("Columns");
+            Values.CheckArrayHasAtLeastOneElement("Values");
 
             if (Columns.Length != Values.Length)
             {

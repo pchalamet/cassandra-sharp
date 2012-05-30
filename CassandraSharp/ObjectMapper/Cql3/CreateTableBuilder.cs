@@ -18,6 +18,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
     using System;
     using System.Text;
     using CassandraSharp.ObjectMapper.Dialect;
+    using CassandraSharp.Utils;
 
     public class CreateTableBuilder : ICreateTableBuilder
     {
@@ -64,29 +65,14 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null == Columns || 0 == Columns.Length)
-            {
-                throw new ArgumentException("Columns must have at least one element");
-            }
-
-            if (null == Table)
-            {
-                throw new ArgumentException("Table must be set");
-            }
-
-            if (null == ColumnTypes || 0 == ColumnTypes.Length)
-            {
-                throw new ArgumentException("ColumnTypes must have at least one element");
-            }
+            Columns.CheckArrayHasAtLeastOneElement("Columns");
+            Table.CheckArgumentNotNull("Table");
+            ColumnTypes.CheckArrayHasAtLeastOneElement("ColumnTypes");
+            Keys.CheckArrayHasAtLeastOneElement("Keys");
 
             if (Columns.Length != ColumnTypes.Length)
             {
                 throw new ArgumentException("Columns and ColumnTypes must have the same number of elements");
-            }
-
-            if (null == Keys || 0 == Keys.Length)
-            {
-                throw new ArgumentException("Keys must have at least one element");
             }
         }
     }

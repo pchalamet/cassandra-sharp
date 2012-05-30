@@ -15,14 +15,12 @@
 
 namespace CassandraSharp.ObjectMapper.Cql3
 {
-    using System;
     using System.Text;
     using CassandraSharp.ObjectMapper.Dialect;
+    using CassandraSharp.Utils;
 
     public class TruncateTableBuilder : ITruncateTableBuilder
     {
-        public string[] Columns { get; set; }
-
         public string Build()
         {
             Validate();
@@ -37,15 +35,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null != Columns)
-            {
-                throw new ArgumentException("Columns must not be set");
-            }
-
-            if (null == Table)
-            {
-                throw new ArgumentException("Table must be set");
-            }
+            Table.CheckArgumentNotNull("Table");
         }
     }
 }

@@ -15,9 +15,9 @@
 
 namespace CassandraSharp.ObjectMapper.Cql3
 {
-    using System;
     using System.Text;
     using CassandraSharp.ObjectMapper.Dialect;
+    using CassandraSharp.Utils;
 
     public class DropTableBuilder : IDropTableBuilder
     {
@@ -35,10 +35,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null == Table)
-            {
-                throw new ArgumentException("Table must be set");
-            }
+            Table.CheckArgumentNotNull("Table");
         }
     }
 }

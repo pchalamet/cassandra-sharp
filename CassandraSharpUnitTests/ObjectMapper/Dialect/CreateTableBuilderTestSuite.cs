@@ -55,14 +55,6 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         }
 
         [Test]
-        public void TestValidateEmptyColumnTypes()
-        {
-            ICreateTableBuilder builder = CreateTableBuilder();
-            builder.ColumnTypes = new string[0];
-            Assert.Throws<ArgumentException>(() => builder.Build());
-        }
-
-        [Test]
         public void TestValidateEmptyColumns()
         {
             ICreateTableBuilder builder = CreateTableBuilder();
@@ -79,18 +71,26 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         }
 
         [Test]
-        public void TestValidateNullColumnTypes()
+        public void TestValidateColumnTypes()
         {
             ICreateTableBuilder builder = CreateTableBuilder();
+
             builder.ColumnTypes = null;
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
+
+            builder.ColumnTypes = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 
         [Test]
-        public void TestValidateNullColumns()
+        public void TestValidateColumns()
         {
             ICreateTableBuilder builder = CreateTableBuilder();
+
             builder.Columns = null;
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
+
+            builder.Columns = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 
@@ -99,7 +99,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         {
             ICreateTableBuilder builder = CreateTableBuilder();
             builder.Table = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
     }
 }

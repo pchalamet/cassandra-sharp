@@ -28,8 +28,8 @@ namespace CassandraSharp.ObjectMapper
     {
         public static IEnumerable<T> Select<T>(this ICluster @this, object template) where T : new()
         {
-            @this.CheckArgumentNull("@this");
-            template.CheckArgumentNull("template");
+            @this.CheckArgumentNotNull("@this");
+            template.CheckArgumentNotNull("template");
 
             Schema schema = Schema.FromCache(typeof(T));
 
@@ -40,15 +40,13 @@ namespace CassandraSharp.ObjectMapper
             builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
             string cqlSelect = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
-            using (ICluster tmpCluster = @this.CreateChildCluster(cfgBuilder))
-                return tmpCluster.Execute<T>(schema, cqlSelect, template);
+            return @this.Execute<T>(schema, cqlSelect, template);
         }
 
         public static IEnumerable<R> Select<T, R>(this ICluster @this, object template) where R : new()
         {
-            @this.CheckArgumentNull("@this");
-            template.CheckArgumentNull("template");
+            @this.CheckArgumentNotNull("@this");
+            template.CheckArgumentNotNull("template");
 
             Schema schema = Schema.FromCache(typeof(T));
 
@@ -59,15 +57,13 @@ namespace CassandraSharp.ObjectMapper
             builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
             string cqlSelect = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
-            using (ICluster tmpCluster = @this.CreateChildCluster(cfgBuilder))
-                return tmpCluster.Execute<R>(schema, cqlSelect, template);
+            return @this.Execute<R>(schema, cqlSelect, template);
         }
 
         public static void Insert<T>(this ICluster @this, object template) where T : new()
         {
-            @this.CheckArgumentNull("@this");
-            template.CheckArgumentNull("template");
+            @this.CheckArgumentNotNull("@this");
+            template.CheckArgumentNotNull("template");
 
             Schema schema = Schema.FromCache(typeof(T));
 
@@ -80,15 +76,13 @@ namespace CassandraSharp.ObjectMapper
             builder.Timestamp = @this.TimestampService.Generate();
             string cqlInsert = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
-            using (ICluster tmpCluster = @this.CreateChildCluster(cfgBuilder))
-                tmpCluster.ExecuteNonQuery(schema, cqlInsert, template);
+            @this.ExecuteNonQuery(schema, cqlInsert, template);
         }
 
         public static void Delete<T>(this ICluster @this, object template) where T : new()
         {
-            @this.CheckArgumentNull("@this");
-            template.CheckArgumentNull("template");
+            @this.CheckArgumentNotNull("@this");
+            template.CheckArgumentNotNull("template");
 
             // translate to "delete"
             throw new NotImplementedException();
@@ -96,16 +90,44 @@ namespace CassandraSharp.ObjectMapper
 
         public static void Update<T>(this ICluster @this, object template) where T : new()
         {
-            @this.CheckArgumentNull("@this");
-            template.CheckArgumentNull("template");
+            @this.CheckArgumentNotNull("@this");
+            template.CheckArgumentNotNull("template");
 
             // translate to "update"
             throw new NotImplementedException();
         }
 
+        public static void CreateKeyspace<T>(this ICluster @this, string strategyClass, Dictionary<string, int> replicationFactor) where T : new()
+        {
+            @this.CheckArgumentNotNull("@this");
+
+            Schema schema = Schema.FromCache(typeof(T));
+
+            ICreateKeyspaceBuilder builder = new CreateKeyspaceBuilder();
+            builder.Keyspace = schema.Keyspace;
+            builder.StrategyClass = strategyClass;
+            builder.ReplicationFactor = replicationFactor;
+            string createKeyspaceStmt = builder.Build();
+
+            @this.ExecuteCql(createKeyspaceStmt);
+        }
+
+        public static void DropKeyspace<T>(this ICluster @this) where T : new()
+        {
+            @this.CheckArgumentNotNull("@this");
+
+            Schema schema = Schema.FromCache(typeof(T));
+
+            IDropKeyspaceBuilder builder = new DropKeyspaceBuilder();
+            builder.Keyspace = schema.Keyspace;
+            string dropKeyspaceStmt = builder.Build();
+
+            @this.ExecuteCql(dropKeyspaceStmt);
+        }
+
         public static void CreateTable<T>(this ICluster @this) where T : new()
         {
-            @this.CheckArgumentNull("@this");
+            @this.CheckArgumentNotNull("@this");
 
             Schema schema = Schema.FromCache(typeof(T));
 
@@ -117,9 +139,7 @@ namespace CassandraSharp.ObjectMapper
             builder.CompactStorage = schema.CompactStorage;
             string createTableStmt = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
-            using (ICluster tmpCluster = @this.CreateChildCluster(cfgBuilder))
-                tmpCluster.ExecuteCql(createTableStmt);
+            @this.ExecuteCql(createTableStmt);
 
             //BehaviorConfigBuilder cfgBuilder = new BehaviorConfigBuilder();
             //cfgBuilder.KeySpace = schemaAttribute.Keyspace;
@@ -141,7 +161,7 @@ namespace CassandraSharp.ObjectMapper
 
         public static void DropTable<T>(this ICluster @this) where T : new()
         {
-            @this.CheckArgumentNull("@this");
+            @this.CheckArgumentNotNull("@this");
 
             Schema schema = Schema.FromCache(typeof(T));
 
@@ -149,14 +169,12 @@ namespace CassandraSharp.ObjectMapper
             builder.Table = schema.Table;
             string dropTableStmt = builder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
-            using (ICluster tmpCluster = @this.CreateChildCluster(cfgBuilder))
-                tmpCluster.ExecuteCql(dropTableStmt);
+            @this.ExecuteCql(dropTableStmt);
         }
 
         public static void Truncate<T>(this ICluster @this) where T : new()
         {
-            @this.CheckArgumentNull("@this");
+            @this.CheckArgumentNotNull("@this");
 
             Schema schema = Schema.FromCache(typeof(T));
 
@@ -164,9 +182,7 @@ namespace CassandraSharp.ObjectMapper
             tableBuilder.Table = schema.Table;
             string dropTableStmt = tableBuilder.Build();
 
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = schema.Keyspace};
-            using (ICluster tmpCluster = @this.CreateChildCluster(cfgBuilder))
-                tmpCluster.ExecuteCql(dropTableStmt);
+            @this.ExecuteCql(dropTableStmt);
         }
     }
 }

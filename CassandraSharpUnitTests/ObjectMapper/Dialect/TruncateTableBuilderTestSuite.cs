@@ -44,7 +44,7 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         {
             ITruncateTableBuilder builder = CreateTruncateTableBuilder();
             builder.Table = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
     }
 }

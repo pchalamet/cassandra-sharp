@@ -27,10 +27,10 @@ namespace CassandraSharp.MadeSimple
 
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName, INameOrValue value)
         {
-            @this.CheckArgumentNull("@this");
-            columnFamily.CheckArgumentNull("columnFamily");
-            key.CheckArgumentNull("key");
-            columnName.CheckArgumentNull("columnName");
+            @this.CheckArgumentNotNull("@this");
+            columnFamily.CheckArgumentNotNull("columnFamily");
+            key.CheckArgumentNotNull("key");
+            columnName.CheckArgumentNotNull("columnName");
 
             ColumnParent columnParent = new ColumnParent
                                             {
@@ -49,10 +49,10 @@ namespace CassandraSharp.MadeSimple
 
         public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName)
         {
-            @this.CheckArgumentNull("@this");
-            columnFamily.CheckArgumentNull("columnFamily");
-            key.CheckArgumentNull("key");
-            columnName.CheckArgumentNull("columnName");
+            @this.CheckArgumentNotNull("@this");
+            columnFamily.CheckArgumentNotNull("columnFamily");
+            key.CheckArgumentNotNull("key");
+            columnName.CheckArgumentNotNull("columnName");
 
             ColumnPath columnPath = new ColumnPath
                                         {
@@ -65,10 +65,10 @@ namespace CassandraSharp.MadeSimple
 
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
         {
-            @this.CheckArgumentNull("@this");
-            columnFamily.CheckArgumentNull("columnFamily");
-            key.CheckArgumentNull("key");
-            column.CheckArgumentNull("columnName");
+            @this.CheckArgumentNotNull("@this");
+            columnFamily.CheckArgumentNotNull("columnFamily");
+            key.CheckArgumentNotNull("key");
+            column.CheckArgumentNotNull("columnName");
 
             ColumnPath columnPath = new ColumnPath
                                         {
@@ -83,9 +83,9 @@ namespace CassandraSharp.MadeSimple
 
         public static void IncrementCounter(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName, long value)
         {
-            @this.CheckArgumentNull("@this");
-            columnFamily.CheckArgumentNull("columnFamily");
-            key.CheckArgumentNull("key");
+            @this.CheckArgumentNotNull("@this");
+            columnFamily.CheckArgumentNotNull("columnFamily");
+            key.CheckArgumentNotNull("key");
 
             ColumnParent columnParent = new ColumnParent
                                             {
@@ -101,28 +101,28 @@ namespace CassandraSharp.MadeSimple
 
         public static void CreateKeyspace(this ICluster @this, string name)
         {
-            @this.CheckArgumentNull("@this");
+            @this.CheckArgumentNotNull("@this");
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)
         {
-            @this.CheckArgumentNull("@this");
-            columnFamily.CheckArgumentNull("columnFamily");
+            @this.CheckArgumentNotNull("@this");
+            columnFamily.CheckArgumentNotNull("columnFamily");
 
             @this.Execute(cnx => cnx.CassandraClient.truncate(columnFamily));
         }
 
         public static string DescribeClusterName(this ICluster @this)
         {
-            @this.CheckArgumentNull("@this");
+            @this.CheckArgumentNotNull("@this");
 
             return @this.ExecuteCommand(cnx => cnx.CassandraClient.describe_cluster_name());
         }
 
         public static CqlResult ExecuteCql(this ICluster @this, string cql)
         {
-            @this.CheckArgumentNull("@this");
-            cql.CheckArgumentNull("cql");
+            @this.CheckArgumentNotNull("@this");
+            cql.CheckArgumentNotNull("cql");
 
             byte[] query = new Utf8NameOrValue(cql).ConvertToByteArray();
             return @this.ExecuteCommand(ctx => ctx.CassandraClient.execute_cql_query(query, Compression.NONE));

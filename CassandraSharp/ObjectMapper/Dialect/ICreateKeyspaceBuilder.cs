@@ -15,8 +15,13 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
+    using System.Collections.Generic;
+
     public interface ICreateKeyspaceBuilder : IBuilder,
                                               IScopeKeyspace
     {
+        string StrategyClass { get; set; }
+
+        Dictionary<string, int> ReplicationFactor { get; set; }
     }
 }

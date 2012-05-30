@@ -52,11 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MadeSimple\LongNameOrValueTest.cs" />
+    <Compile Include="ObjectMapper\Cql3Dialect\CreateKeyspaceBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\QueryBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\InsertBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\TruncateTableBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\CreateTableBuilderTest.cs" />
     <Compile Include="ObjectMapper\Cql3Dialect\DropTableBuilderTest.cs" />
+    <Compile Include="ObjectMapper\Dialect\CreateKeyspaceBuilderTestSuite.cs" />
     <Compile Include="ObjectMapper\Dialect\QueryBuilderTestSuite.cs" />
     <Compile Include="ObjectMapper\Dialect\InsertBuilderTestSuite.cs" />
     <Compile Include="ObjectMapper\Dialect\TruncateTableBuilderTestSuite.cs" />

@@ -22,15 +22,15 @@ namespace TestClient
 
     public abstract class Sample
     {
-        private readonly string _configName;
-
-        private readonly string _keyspace;
-
         protected Sample(string keyspace, string configName)
         {
-            _keyspace = keyspace;
-            _configName = configName;
+            Keyspace = keyspace;
+            ConfigName = configName;
         }
+
+        protected string Keyspace { get; set; }
+
+        protected string ConfigName { get; set; }
 
         public void Run()
         {
@@ -39,8 +39,18 @@ namespace TestClient
 
             try
             {
+                try
+                {
+                    DropKeyspace();
+                }
+// ReSharper disable EmptyGeneralCatchClause
+                catch
+// ReSharper restore EmptyGeneralCatchClause
+                {
+                }
+
                 CreateKeyspace();
-                using (ICluster cluster = ClusterManager.GetCluster(_configName))
+                using (ICluster cluster = ClusterManager.GetCluster(ConfigName))
                 {
                     CreateSchema(cluster);
                     RunSample(cluster);
@@ -74,14 +84,14 @@ namespace TestClient
         protected virtual void DropKeyspace()
         {
             using (ICluster cluster = ClusterManager.GetCluster("MinimalConfig"))
-                cluster.Execute(x => x.CassandraClient.system_drop_keyspace(_keyspace));
+                cluster.Execute(x => x.CassandraClient.system_drop_keyspace(Keyspace));
         }
 
         private void RecreateKeyspace(Cassandra.Client client)
         {
             try
             {
-                client.system_drop_keyspace(_keyspace);
+                client.system_drop_keyspace(Keyspace);
             }
 // ReSharper disable EmptyGeneralCatchClause
             catch
@@ -91,7 +101,7 @@ namespace TestClient
 
             KsDef ksDef = new KsDef
                               {
-                                  Name = _keyspace,
+                                  Name = Keyspace,
                                   Strategy_class = "SimpleStrategy",
                                   Cf_defs = new List<CfDef>(),
                                   Strategy_options = new Dictionary<string, string>()

@@ -19,31 +19,31 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
     using CassandraSharp.ObjectMapper.Dialect;
     using NUnit.Framework;
 
-    public class DropTableBuilderTestSuite<T> where T : IDialect, new()
+    public class CreateKeyspaceBuilderTestSuite<T> where T : IDialect, new()
     {
-        private static IDropTableBuilder CreateDropTableBuilder()
+        private static ICreateKeyspaceBuilder CreateCreateKeyspaceBuilder()
         {
             T dialect = new T();
-            IDropTableBuilder builder = dialect.GetDropTableBuilder();
-            builder.Table = "TestTable";
+            ICreateKeyspaceBuilder builder = dialect.GetCreateKeyspaceBuilder();
+            builder.Keyspace = "TestKeyspace";
             return builder;
         }
 
         [Test]
         public void TestAllParams()
         {
-            const string expectedCql = "drop table TestTable";
+            const string expectedCql = "create keyspace TestKeyspace with strategy_class=SimpleStrategy and strategy_options:replication_factor=1";
 
-            IDropTableBuilder builder = CreateDropTableBuilder();
+            ICreateKeyspaceBuilder builder = CreateCreateKeyspaceBuilder();
             string cql = builder.Build();
             Assert.AreEqual(expectedCql, cql);
         }
 
         [Test]
-        public void TestValidateTable()
+        public void TestValidateKeyspace()
         {
-            IDropTableBuilder builder = CreateDropTableBuilder();
-            builder.Table = null;
+            ICreateKeyspaceBuilder builder = CreateCreateKeyspaceBuilder();
+            builder.Keyspace = null;
             Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
     }

@@ -46,37 +46,29 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         {
             IInsertBuilder builder = CreateInsertBuilder();
             builder.Table = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
-        public void TestValidateNullColumns()
+        public void TestValidateColumns()
         {
             IInsertBuilder builder = CreateInsertBuilder();
+
             builder.Columns = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
-        }
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
 
-        [Test]
-        public void TestValidateEmptyColumns()
-        {
-            IInsertBuilder builder = CreateInsertBuilder();
             builder.Columns = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
 
         [Test]
-        public void TestValidateNullValues()
+        public void TestValidateValues()
         {
             IInsertBuilder builder = CreateInsertBuilder();
-            builder.Values = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
-        }
 
-        [Test]
-        public void TestValidateEmptyValues()
-        {
-            IInsertBuilder builder = CreateInsertBuilder();
+            builder.Values = null;
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
+
             builder.Values = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }

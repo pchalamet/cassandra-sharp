@@ -20,7 +20,7 @@ namespace TestClient
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
-    [Schema("Twissandra", Name = "users", Comment = "Users family")]
+    [Schema("twissandra", Name = "users", Comment = "Users family")]
     public class Users
     {
         [Column(Name = "bio")]
@@ -45,7 +45,7 @@ namespace TestClient
         public string Web;
     }
 
-    [Schema("Twissandra", Comment = "Tweets family")]
+    [Schema("twissandra", Comment = "Tweets family")]
     public class Tweets
     {
         [Key]
@@ -75,6 +75,18 @@ namespace TestClient
         public ObjectMapperSample()
             : base("Twissandra", "ObjectMapperConfig")
         {
+        }
+
+        protected override void CreateKeyspace()
+        {
+            using (ICluster cluster = ClusterManager.GetCluster("MinimalConfig"))
+                cluster.CreateKeyspace<Users>(null, null);
+        }
+
+        protected override void DropKeyspace()
+        {
+            using (ICluster cluster = ClusterManager.GetCluster("MinimalConfig"))
+                cluster.DropKeyspace<Users>();
         }
 
         protected override void CreateSchema(ICluster cluster)

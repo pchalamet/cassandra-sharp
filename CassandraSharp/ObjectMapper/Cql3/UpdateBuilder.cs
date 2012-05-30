@@ -18,6 +18,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
     using System;
     using Apache.Cassandra;
     using CassandraSharp.ObjectMapper.Dialect;
+    using CassandraSharp.Utils;
 
     public class UpdateBuilder : IUpdateBuilder
     {
@@ -44,15 +45,8 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            if (null == Columns || 0 == Columns.Length)
-            {
-                throw new ArgumentException("Columns must have at least one element");
-            }
-
-            if (null == Table)
-            {
-                throw new ArgumentException("Table must be set");
-            }
+            Columns.CheckArrayHasAtLeastOneElement("Columns");
+            Table.CheckArgumentNotNull("Table");
         }
     }
 }

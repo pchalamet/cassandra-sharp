@@ -36,7 +36,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            Keyspace.CheckArgumentNull("Keyspace");
+            Keyspace.CheckArgumentNotNull("Keyspace");
         }
     }
 }

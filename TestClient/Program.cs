@@ -24,11 +24,11 @@ namespace TestClient
         {
             XmlConfigurator.Configure();
 
+            new ObjectMapperSample().Run();
+
             new MadeSimpleSample("MadeSimpleConfig").Run();
             new MadeSimpleMinimalConfigSample().Run();
             new MadeSimpleSample("CustomEndpointStrategyConfig").Run();
-
-            new ObjectMapperSample().Run();
 
             ClusterManager.Shutdown();
         }

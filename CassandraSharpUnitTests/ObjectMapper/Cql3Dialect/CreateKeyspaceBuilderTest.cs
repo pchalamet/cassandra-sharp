@@ -13,30 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharpUnitTests.ObjectMapper.Cql3Dialect
 {
-    using System;
-    using System.Diagnostics;
+    using CassandraSharp.ObjectMapper.Cql3;
+    using CassandraSharpUnitTests.ObjectMapper.Dialect;
+    using NUnit.Framework;
 
-    public static class CheckParameterExtensions
+    [TestFixture]
+    public class CreateKeyspaceBuilderTest : CreateKeyspaceBuilderTestSuite<Dialect>
     {
-        [Conditional("DEBUG")]
-        public static void CheckArgumentNotNull(this object prm, string name)
-        {
-            if (null == prm)
-            {
-                throw new ArgumentNullException(name);
-            }
-        }
-
-        [Conditional("DEBUG")]
-        public static void CheckArrayHasAtLeastOneElement<T>(this T[] prm, string name)
-        {
-            prm.CheckArgumentNotNull(name);
-            if( 0 == prm.Length)
-            {
-                throw new ArgumentException(name);
-            }
-        }
     }
 }

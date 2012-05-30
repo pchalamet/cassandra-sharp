@@ -55,21 +55,17 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
         {
             IQueryBuilder builder = CreateQueryBuilder();
             builder.Table = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
-        public void TestValidateNullColumns()
+        public void TestValidateColumns()
         {
             IQueryBuilder builder = CreateQueryBuilder();
+
             builder.Columns = null;
-            Assert.Throws<ArgumentException>(() => builder.Build());
-        }
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
 
-        [Test]
-        public void TestValidateEmptyColumns()
-        {
-            IQueryBuilder builder = CreateQueryBuilder();
             builder.Columns = new string[0];
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
