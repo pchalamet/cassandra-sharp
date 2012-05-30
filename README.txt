@@ -1,6 +1,6 @@
 ABOUT
 cassandra-sharp is a .NET client for Apache Cassandra released under the Apache License 2.0.
-It is able to interact with the Cassandra using the thrift API.
+It is able to interact with the Cassandra using the thrift and CQL API.
 
 HOW TO BUILD
 To compile, use a command line and run the following commands:
@@ -28,3 +28,4 @@ This projects relies on the following third parties:
 * NUnit (http://www.nunit.org/)
   released NUnit license
 * NuGet (http://nuget.org/)
+  released under Apache License 2.0
