@@ -21,14 +21,14 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
     public class UpdateBuilder : IUpdateBuilder
     {
+        public string Table { get; set; }
+
         public string Build()
         {
             Validate();
 
             throw new NotImplementedException();
         }
-
-        public string Table { get; set; }
 
         public string[] Columns { get; set; }
 

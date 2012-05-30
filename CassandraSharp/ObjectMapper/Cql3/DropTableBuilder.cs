@@ -32,7 +32,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
         }
 
         public string Table { get; set; }
-        
+
         private void Validate()
         {
             if (null == Table)

@@ -21,6 +21,8 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
     public class TruncateTableBuilder : ITruncateTableBuilder
     {
+        public string[] Columns { get; set; }
+
         public string Build()
         {
             Validate();
@@ -32,8 +34,6 @@ namespace CassandraSharp.ObjectMapper.Cql3
         }
 
         public string Table { get; set; }
-
-        public string[] Columns { get; set; }
 
         private void Validate()
         {

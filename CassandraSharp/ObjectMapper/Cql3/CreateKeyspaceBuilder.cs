@@ -32,11 +32,11 @@ namespace CassandraSharp.ObjectMapper.Cql3
             return sb.ToString();
         }
 
+        public string Keyspace { get; set; }
+
         private void Validate()
         {
             Keyspace.CheckArgumentNull("Keyspace");
         }
-
-        public string Keyspace { get; set; }
     }
 }
