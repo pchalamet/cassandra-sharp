@@ -39,16 +39,6 @@ namespace TestClient
 
             try
             {
-                try
-                {
-                    DropKeyspace();
-                }
-// ReSharper disable EmptyGeneralCatchClause
-                catch
-// ReSharper restore EmptyGeneralCatchClause
-                {
-                }
-
                 CreateKeyspace();
                 using (ICluster cluster = ClusterManager.GetCluster(ConfigName))
                 {
@@ -56,7 +46,6 @@ namespace TestClient
                     RunSample(cluster);
                     DropSchema(cluster);
                 }
-                DropKeyspace();
 
                 Console.WriteLine();
                 Console.WriteLine("TEST COMPLETED SUCCESSFULLY");
@@ -68,6 +57,10 @@ namespace TestClient
                 Console.WriteLine("TEST FAILED WITH ERROR:");
                 Console.WriteLine(ex);
                 Console.WriteLine("===========================================================================");
+            }
+            finally
+            {
+                DropKeyspace();
             }
             Console.WriteLine();
             Console.WriteLine();

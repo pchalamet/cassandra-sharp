@@ -99,9 +99,20 @@ namespace CassandraSharp.MadeSimple
                 cnx => cnx.CassandraClient.add(key.ConvertToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
-        public static void CreateKeyspace(this ICluster @this, string name)
+        public static void CreateTable(this ICluster @this, string name)
         {
-            @this.CheckArgumentNotNull("@this");
+            CfDef cfDef = new CfDef
+                              {
+                                  Name = name,
+                                  Keyspace = @this.BehaviorConfig.KeySpace
+                              };
+
+            @this.Execute(cnx => cnx.CassandraClient.system_add_column_family(cfDef));
+        }
+
+        public static void DropTable(this ICluster @this, string name)
+        {
+            @this.Execute(cnx => cnx.CassandraClient.system_drop_column_family(name));
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)

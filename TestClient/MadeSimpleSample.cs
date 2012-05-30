@@ -27,28 +27,27 @@ namespace TestClient
 
         protected override void CreateSchema(ICluster cluster)
         {
-            cluster.ExecuteCql(
-                "create table users (bio text,createdat timestamp,displayname text,location text,name text,password text,weburl text,primary key (name,location))");
+            cluster.CreateTable("Users");
         }
 
         protected override void DropSchema(ICluster cluster)
         {
-            cluster.ExecuteCql("drop table users");
+            cluster.DropTable("Users");
         }
 
         protected override void RunSample(ICluster cluster)
         {
-            cluster.Insert("users", new Utf8NameOrValue("User1"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName1"));
-            cluster.Insert("users", new Utf8NameOrValue("User1"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("SF"));
+            cluster.Insert("Users", new Utf8NameOrValue("User1"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName1"));
+            cluster.Insert("Users", new Utf8NameOrValue("User1"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("SF"));
 
-            cluster.Insert("users", new Utf8NameOrValue("User2"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName2"));
-            cluster.Insert("users", new Utf8NameOrValue("User2"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("NY"));
+            cluster.Insert("Users", new Utf8NameOrValue("User2"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName2"));
+            cluster.Insert("Users", new Utf8NameOrValue("User2"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("NY"));
 
-            cluster.Insert("users", new Utf8NameOrValue("User3"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName3"));
-            cluster.Insert("users", new Utf8NameOrValue("User3"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("SF"));
+            cluster.Insert("Users", new Utf8NameOrValue("User3"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName3"));
+            cluster.Insert("Users", new Utf8NameOrValue("User3"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("SF"));
 
-            cluster.Insert("users", new Utf8NameOrValue("User4"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName4"));
-            cluster.Insert("users", new Utf8NameOrValue("User4"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("HK"));
+            cluster.Insert("Users", new Utf8NameOrValue("User4"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName4"));
+            cluster.Insert("Users", new Utf8NameOrValue("User4"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("HK"));
         }
     }
 }
