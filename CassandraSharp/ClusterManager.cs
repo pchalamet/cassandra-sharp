@@ -21,7 +21,7 @@ namespace CassandraSharp
     using System.Net;
     using System.Runtime.CompilerServices;
     using CassandraSharp.Config;
-    using CassandraSharp.EndpointStrategy;
+    using CassandraSharp.Snitch;
     using CassandraSharp.Utils;
 
     public class ClusterManager
@@ -56,11 +56,11 @@ namespace CassandraSharp
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = Snitch.Factory.Create(clusterConfig.Endpoints.Snitch);
+            IEndpointSnitch snitch = Factory.Create(clusterConfig.Endpoints.Snitch);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager = Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch);
+            IEndpointStrategy endpointsManager = EndpointStrategy.Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch);
             IPool<Token, IConnection> pool = Pool.Factory.Create(clusterConfig.Endpoints.Pool, transportConfig.PoolSize);
 
             // get timestamp service

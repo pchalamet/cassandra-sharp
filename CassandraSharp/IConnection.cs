@@ -24,8 +24,6 @@ namespace CassandraSharp
     /// </summary>
     public interface IConnection : IDisposable
     {
-        void KeepAlive();
-
         string KeySpace { get; set; }
 
         string User { get; set; }
@@ -33,5 +31,7 @@ namespace CassandraSharp
         IPAddress Endpoint { get; }
 
         Cassandra.Client CassandraClient { get; }
+
+        void KeepAlive();
     }
 }
