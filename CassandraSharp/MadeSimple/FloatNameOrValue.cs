@@ -36,21 +36,21 @@ namespace CassandraSharp.MadeSimple
                        : null;
         }
 
-        public static INameOrValue FromBuffer(byte[] buffer)
+        public static INameOrValue FromNullableByteArray(byte[] buffer)
         {
             return null != buffer
                        ? new FloatNameOrValue(buffer)
                        : null;
         }
 
-        public override byte[] ToByteArray()
+        public override byte[] ConvertToByteArray()
         {
             byte[] value = BitConverter.GetBytes(Value);
             Array.Reverse(value);
             return value;
         }
 
-        protected override float FromByteArray(byte[] value)
+        protected override float ConvertFromByteArray(byte[] value)
         {
             byte[] buffer = new byte[value.Length];
             value.CopyTo(buffer, 0);

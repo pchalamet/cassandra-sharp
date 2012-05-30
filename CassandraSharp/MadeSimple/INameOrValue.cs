@@ -19,6 +19,6 @@ namespace CassandraSharp.MadeSimple
     {
         object RawValue { get; }
 
-        byte[] ToByteArray();
+        byte[] ConvertToByteArray();
     }
 }

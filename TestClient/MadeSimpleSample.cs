@@ -15,66 +15,40 @@
 
 namespace TestClient
 {
-    using System;
-    using System.Collections.Generic;
-    using Apache.Cassandra;
     using CassandraSharp;
     using CassandraSharp.MadeSimple;
 
-    public class MadeSimpleSample
+    public class MadeSimpleSample : Sample
     {
-        private readonly string _configName;
-
-        public MadeSimpleSample(string configName)
+        public MadeSimpleSample(string config)
+            : base("MadeSimple", config)
         {
-            _configName = configName;
         }
 
-        public void Run()
+        protected override void CreateSchema(ICluster cluster)
         {
-            using (ICluster cluster = ClusterManager.GetCluster(_configName))
-                Run(cluster);
+            cluster.ExecuteCql(
+                "create table users (bio text,createdat timestamp,displayname text,location text,name text,password text,weburl text,primary key (name,location))");
         }
 
-        protected virtual void Run(ICluster cluster)
+        protected override void DropSchema(ICluster cluster)
         {
-            // initialize schema
-            try
-            {
-                cluster.ExecuteCql("drop table People");
-            }
-            catch
-            {
-            }
-            cluster.ExecuteCql("create table People (firstname text primary key) with default_validation=blob");
+            cluster.ExecuteCql("drop table users");
+        }
 
-            // insert data
-            List<byte[]> prms;
-            CqlResult result;
+        protected override void RunSample(ICluster cluster)
+        {
+            cluster.Insert("users", new Utf8NameOrValue("User1"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName1"));
+            cluster.Insert("users", new Utf8NameOrValue("User1"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("SF"));
 
-            Utf8NameOrValue insert = new Utf8NameOrValue("insert into People (firstname, lastname, birthyear) values (?, ?, ?)");
-            CqlPreparedResult preparedInsert = cluster.ExecuteCommand(ctx => ctx.CassandraClient.prepare_cql_query(insert.ToByteArray(), Compression.NONE));
+            cluster.Insert("users", new Utf8NameOrValue("User2"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName2"));
+            cluster.Insert("users", new Utf8NameOrValue("User2"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("NY"));
 
-            Utf8NameOrValue firstName = new Utf8NameOrValue("pierre");
-            Utf8NameOrValue lastName = new Utf8NameOrValue("chalamet");
-            IntNameOrValue birthyear = new IntNameOrValue(1973);
+            cluster.Insert("users", new Utf8NameOrValue("User3"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName3"));
+            cluster.Insert("users", new Utf8NameOrValue("User3"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("SF"));
 
-            prms = new List<byte[]> {firstName.ToByteArray(), lastName.ToByteArray(), birthyear.ToByteArray()};
-            result = cluster.ExecuteCommand(ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedInsert.ItemId, prms));
-
-            prms = new List<byte[]> {new Utf8NameOrValue("isabelle").ToByteArray(), lastName.ToByteArray(), new IntNameOrValue(1972).ToByteArray()};
-            result = cluster.ExecuteCommand(ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedInsert.ItemId, prms));
-
-            //result = cluster.ExecuteCql("select * from People where firstname in (?)");
-            //DumpCqlResult(result);
-
-            // query data
-            Utf8NameOrValue select = new Utf8NameOrValue("select lastname, birthyear from People where firstname in (?, ?)");
-            CqlPreparedResult preparedSelect = cluster.ExecuteCommand(ctx => ctx.CassandraClient.prepare_cql_query(select.ToByteArray(), Compression.NONE));
-
-            prms = new List<byte[]> {firstName.ToByteArray(), new Utf8NameOrValue("isabelle").ToByteArray()};
-            result = cluster.ExecuteCommand(ctx => ctx.CassandraClient.execute_prepared_cql_query(preparedSelect.ItemId, prms));
-            result.Dump(Console.Out);
+            cluster.Insert("users", new Utf8NameOrValue("User4"), new Utf8NameOrValue("Name"), new Utf8NameOrValue("RealName4"));
+            cluster.Insert("users", new Utf8NameOrValue("User4"), new Utf8NameOrValue("Location"), new Utf8NameOrValue("HK"));
         }
     }
 }

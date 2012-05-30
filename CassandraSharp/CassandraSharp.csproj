@@ -56,7 +56,6 @@
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\Factory.cs" />
     <Compile Include="MadeSimple\DateTimeNameOrValue.cs" />
-    <Compile Include="MadeSimple\ThriftExtensions.cs" />
     <Compile Include="ObjectMapper\ColumnDef.cs" />
     <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
     <Compile Include="ObjectMapper\Cql3\Dialect.cs" />

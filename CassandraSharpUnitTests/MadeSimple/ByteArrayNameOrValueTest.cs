@@ -31,7 +31,7 @@ namespace CassandraSharpUnitTests.MadeSimple
             Assert.IsTrue(byteArrayNameOrValue.Value[2] == 3);
             Assert.IsTrue(byteArrayNameOrValue.Value[3] == 4);
 
-            byte[] buffer = byteArrayNameOrValue.ToByteArray();
+            byte[] buffer = byteArrayNameOrValue.ConvertToByteArray();
             Assert.IsTrue(buffer.Length == 4);
             Assert.IsTrue(buffer[0] == 1);
             Assert.IsTrue(buffer[1] == 2);

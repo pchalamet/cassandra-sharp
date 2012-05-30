@@ -82,7 +82,7 @@ namespace CassandraSharp.ObjectMapper
                 Cassandra.Client client = connection.CassandraClient;
 
                 Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
-                CqlPreparedResult preparedStmt = connection.CassandraClient.prepare_cql_query(novQuery.ToByteArray(), Compression.NONE);
+                CqlPreparedResult preparedStmt = connection.CassandraClient.prepare_cql_query(novQuery.ConvertToByteArray(), Compression.NONE);
 
                 foreach (object prm in prms)
                 {

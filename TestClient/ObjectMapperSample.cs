@@ -17,7 +17,6 @@ namespace TestClient
 {
     using System;
     using System.Collections.Generic;
-    using Apache.Cassandra;
     using CassandraSharp;
     using CassandraSharp.ObjectMapper;
 
@@ -71,68 +70,37 @@ namespace TestClient
         public string User;
     }
 
-    public class ObjectMapperSample
+    public class ObjectMapperSample : Sample
     {
-        private readonly string _configName;
-
-        public ObjectMapperSample(string configName)
+        public ObjectMapperSample()
+            : base("Twissandra", "ObjectMapperConfig")
         {
-            _configName = configName;
         }
 
-        public void Run()
+        protected override void CreateSchema(ICluster cluster)
         {
-            using (ICluster cluster = ClusterManager.GetCluster(_configName))
-                Run(cluster);
-        }
-
-        private void CreateKeyspace(Cassandra.Client client)
-        {
-            //client.set_keyspace("system");
-            try
-            {
-                client.system_drop_keyspace("Twissandra");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                Console.WriteLine(ex.InnerException);
-            }
-
-            KsDef ksDef = new KsDef
-                              {
-                                  Name = "Twissandra",
-                                  Strategy_class = "SimpleStrategy",
-                                  Cf_defs = new List<CfDef>(),
-                                  Strategy_options = new Dictionary<string, string>()
-                              };
-            ksDef.Strategy_options["replication_factor"] = "1";
-
-            client.system_add_keyspace(ksDef);
-
-            //client.set_keyspace("twissandra");
-        }
-
-        protected void Run(ICluster cluster)
-        {
-            cluster.Execute(x => CreateKeyspace(x.CassandraClient));
-
             cluster.CreateTable<Users>();
             cluster.CreateTable<Tweets>();
+        }
 
+        protected override void DropSchema(ICluster cluster)
+        {
+            cluster.DropTable<Tweets>();
+            cluster.DropTable<Users>();
+        }
+
+        protected override void RunSample(ICluster cluster)
+        {
             cluster.Insert<Users>(new {Name = "User1", DisplayName = "RealName1", Location = "SF"});
-            cluster.Insert<Users>(new {Name = "User2", DisplayName = "RealName12", Location = "NY"});
-            cluster.Insert<Users>(new {Name = "User3", DisplayName = "RealName13", Location = "SF"});
-            cluster.Insert<Users>(new {Name = "User4", DisplayName = "RealName14", Location = "HK"});
+            cluster.Insert<Users>(new {Name = "User2", DisplayName = "RealName2", Location = "NY"});
+            cluster.Insert<Users>(new {Name = "User3", DisplayName = "RealName3", Location = "SF"});
+            cluster.Insert<Users>(new {Name = "User4", DisplayName = "RealName4", Location = "HK"});
 
             IEnumerable<Users> users = cluster.Select<Users>(new {Location = "SF"});
             foreach (Users user in users)
             {
                 Console.WriteLine("{0}: {1}", user.Name, user.Location);
             }
-
-            cluster.DropTable<Tweets>();
-            cluster.DropTable<Users>();
         }
     }
 }

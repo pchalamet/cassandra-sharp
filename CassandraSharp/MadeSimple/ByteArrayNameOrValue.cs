@@ -29,19 +29,19 @@ namespace CassandraSharp.MadeSimple
                        : null;
         }
 
-        public static INameOrValue FromBuffer(byte[] obj)
+        public static INameOrValue FromNullableByteArray(byte[] obj)
         {
             return null != obj
                        ? new ByteArrayNameOrValue(obj)
                        : null;
         }
 
-        public override byte[] ToByteArray()
+        public override byte[] ConvertToByteArray()
         {
             return Value;
         }
 
-        protected override byte[] FromByteArray(byte[] value)
+        protected override byte[] ConvertFromByteArray(byte[] value)
         {
             return value;
         }

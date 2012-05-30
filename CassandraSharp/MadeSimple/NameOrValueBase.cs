@@ -20,7 +20,7 @@ namespace CassandraSharp.MadeSimple
         protected NameOrValueBase(byte[] value)
         {
 // ReSharper disable DoNotCallOverridableMethodsInConstructor
-            Value = FromByteArray(value);
+            Value = ConvertFromByteArray(value);
 // ReSharper restore DoNotCallOverridableMethodsInConstructor
         }
 
@@ -38,8 +38,8 @@ namespace CassandraSharp.MadeSimple
             get { return Value; }
         }
 
-        public abstract byte[] ToByteArray();
+        public abstract byte[] ConvertToByteArray();
 
-        protected abstract T FromByteArray(byte[] value);
+        protected abstract T ConvertFromByteArray(byte[] value);
     }
 }

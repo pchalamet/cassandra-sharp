@@ -50,20 +50,20 @@ namespace CassandraSharp.MadeSimple
                        : null;
         }
 
-        public static INameOrValue FromBuffer(byte[] buffer)
+        public static INameOrValue FromNullableByteArray(byte[] buffer)
         {
             return null != buffer
                        ? new TimeUuidNameOrValue(buffer)
                        : null;
         }
 
-        public override byte[] ToByteArray()
+        public override byte[] ConvertToByteArray()
         {
             Guid guid = GuidGenerator.GenerateTimeBasedGuid(Value);
             return guid.ToByteArray();
         }
 
-        protected override DateTime FromByteArray(byte[] value)
+        protected override DateTime ConvertFromByteArray(byte[] value)
         {
             Guid guid = new Guid(value);
             DateTime result = GuidGenerator.GetDateTime(guid);

@@ -20,14 +20,15 @@ namespace TestClient
 
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             XmlConfigurator.Configure();
 
-            //new MadeSimpleSample("MadeSimple").Run();
-            //new MadeSimpleMinimalConfigSample("MinimalConfig").Run();
-            //new MadeSimpleSample("CustomEndpointStrategy").Run();
-            new ObjectMapperSample("ObjectMapper").Run();
+            new MadeSimpleSample("MadeSimpleConfig").Run();
+            new MadeSimpleMinimalConfigSample().Run();
+            new MadeSimpleSample("CustomEndpointStrategyConfig").Run();
+
+            new ObjectMapperSample().Run();
 
             ClusterManager.Shutdown();
         }

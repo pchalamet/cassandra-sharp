@@ -20,16 +20,30 @@ namespace TestClient
 
     public class MadeSimpleMinimalConfigSample : MadeSimpleSample
     {
-        public MadeSimpleMinimalConfigSample(string configName)
-            : base(configName)
+        public MadeSimpleMinimalConfigSample()
+            : base("MinimalConfig")
         {
         }
 
-        protected override void Run(ICluster cluster)
+        protected override void CreateSchema(ICluster cluster)
         {
-            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = "TestKS"};
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = "MadeSimple"};
             using (ICluster configuredCluster = cluster.CreateChildCluster(cfgBuilder))
-                base.Run(configuredCluster);
+                base.CreateSchema(configuredCluster);
+        }
+
+        protected override void DropSchema(ICluster cluster)
+        {
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = "MadeSimple"};
+            using (ICluster configuredCluster = cluster.CreateChildCluster(cfgBuilder))
+                base.DropSchema(configuredCluster);
+        }
+
+        protected override void RunSample(ICluster cluster)
+        {
+            IBehaviorConfig cfgBuilder = new BehaviorConfig {KeySpace = "MadeSimple"};
+            using (ICluster configuredCluster = cluster.CreateChildCluster(cfgBuilder))
+                base.RunSample(configuredCluster);
         }
     }
 }

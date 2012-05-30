@@ -13,15 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.MadeSimple
+namespace TestClient
 {
-    using Apache.Cassandra;
+    using System.Net;
+    using CassandraSharp;
 
-    public static class ThriftExtensions
+    public class CustomSnitch : ISnitch
     {
-        public static ConsistencyLevel Get(this ConsistencyLevel? @this)
+        public string GetDataCenter(IPAddress target)
         {
-            return @this ?? ConsistencyLevel.QUORUM;
+            return "Dacenter1";
+        }
+
+        public int ComputeDistance(IPAddress source, IPAddress target)
+        {
+            return 0;
         }
     }
 }

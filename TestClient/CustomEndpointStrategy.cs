@@ -13,27 +13,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace TestClient
 {
-    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using CassandraSharp;
+    using CassandraSharp.EndpointStrategy;
 
-    internal static class ServiceActivator
+    public class CustomEndpointStrategy : IEndpointStrategy
     {
-        public static T Create<T>(string customType, params object[] prms)
+        private readonly IEnumerable<Endpoint> _endpoints;
+
+        public CustomEndpointStrategy(IEnumerable<Endpoint> endpoints)
         {
-            if (string.IsNullOrEmpty(customType))
-            {
-                return default(T);
-            }
+            _endpoints = endpoints;
+        }
 
-            Type type = Type.GetType(customType);
-            if (null == type || !typeof(T).IsAssignableFrom(type))
-            {
-                string invalidTypeMsg = string.Format("'{0}' is not a valid type", customType);
-                throw new ArgumentException(invalidTypeMsg);
-            }
+        public Endpoint Pick(byte[] keyHint)
+        {
+            return _endpoints.First();
+        }
 
-            return (T) Activator.CreateInstance(type, prms);
+        public void Ban(Endpoint endpoint)
+        {
+        }
+
+        public void Permit(Endpoint endpoint)
+        {
         }
     }
 }

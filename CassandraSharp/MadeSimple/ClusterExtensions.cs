@@ -20,6 +20,11 @@ namespace CassandraSharp.MadeSimple
 
     public static class ClusterExtensions
     {
+        private static ConsistencyLevel Get(this ConsistencyLevel? @this)
+        {
+            return @this ?? ConsistencyLevel.QUORUM;
+        }
+
         public static void Insert(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue columnName, INameOrValue value)
         {
             if (null == @this || null == columnFamily || null == key || null == columnName)
@@ -34,12 +39,12 @@ namespace CassandraSharp.MadeSimple
 
             Column column = new Column
                                 {
-                                    Name = columnName.ToByteArray(),
-                                    Value = value.ToByteArray(),
+                                    Name = columnName.ConvertToByteArray(),
+                                    Value = value.ConvertToByteArray(),
                                     Timestamp = @this.TimestampService.Generate()
                                 };
 
-            @this.Execute(cnx => cnx.CassandraClient.insert(key.ToByteArray(), columnParent, column, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
+            @this.Execute(cnx => cnx.CassandraClient.insert(key.ConvertToByteArray(), columnParent, column, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
         public static ColumnOrSuperColumn Get(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
@@ -52,10 +57,10 @@ namespace CassandraSharp.MadeSimple
             ColumnPath columnPath = new ColumnPath
                                         {
                                             Column_family = columnFamily,
-                                            Column = column.ToByteArray()
+                                            Column = column.ConvertToByteArray()
                                         };
 
-            return @this.ExecuteCommand(cnx => cnx.CassandraClient.get(key.ToByteArray(), columnPath, @this.BehaviorConfig.ReadConsistencyLevel.Get()));
+            return @this.ExecuteCommand(cnx => cnx.CassandraClient.get(key.ConvertToByteArray(), columnPath, @this.BehaviorConfig.ReadConsistencyLevel.Get()));
         }
 
         public static void Remove(this ICluster @this, string columnFamily, INameOrValue key, INameOrValue column)
@@ -68,11 +73,11 @@ namespace CassandraSharp.MadeSimple
             ColumnPath columnPath = new ColumnPath
                                         {
                                             Column_family = columnFamily,
-                                            Column = column.ToByteArray()
+                                            Column = column.ConvertToByteArray()
                                         };
 
             @this.Execute(cnx =>
-                          cnx.CassandraClient.remove(key.ToByteArray(), columnPath, @this.TimestampService.Generate(),
+                          cnx.CassandraClient.remove(key.ConvertToByteArray(), columnPath, @this.TimestampService.Generate(),
                                                      @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
@@ -83,10 +88,10 @@ namespace CassandraSharp.MadeSimple
                                                 Column_family = columnFamily
                                             };
             CounterColumn counterColumn = new CounterColumn();
-            counterColumn.Name = columnName.ToByteArray();
+            counterColumn.Name = columnName.ConvertToByteArray();
             counterColumn.Value = value;
 
-            @this.Execute(cnx => cnx.CassandraClient.add(key.ToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
+            @this.Execute(cnx => cnx.CassandraClient.add(key.ConvertToByteArray(), columnParent, counterColumn, @this.BehaviorConfig.WriteConsistencyLevel.Get()));
         }
 
         public static void Truncate(this ICluster @this, string columnFamily)
@@ -116,7 +121,7 @@ namespace CassandraSharp.MadeSimple
                 throw new ArgumentNullException();
             }
 
-            byte[] query = new Utf8NameOrValue(cql).ToByteArray();
+            byte[] query = new Utf8NameOrValue(cql).ConvertToByteArray();
             return @this.ExecuteCommand(ctx => ctx.CassandraClient.execute_cql_query(query, Compression.NONE));
         }
     }

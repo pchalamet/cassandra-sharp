@@ -45,29 +45,29 @@ namespace CassandraSharp.ObjectMapper
         private static readonly Dictionary<Type, Func<byte[], INameOrValue>> _netType2NameOrValueFromByteArray =
             new Dictionary<Type, Func<byte[], INameOrValue>>
                 {
-                    {typeof(int), x => IntNameOrValue.FromBuffer(x)},
-                    {typeof(int?), x => IntNameOrValue.FromBuffer(x)},
-                    {typeof(long), x => LongNameOrValue.FromBuffer(x)},
-                    {typeof(long?), x => LongNameOrValue.FromBuffer(x)},
-                    {typeof(float), x => FloatNameOrValue.FromBuffer(x)},
-                    {typeof(float?), x => FloatNameOrValue.FromBuffer(x)},
-                    {typeof(double), x => DoubleNameOrValue.FromBuffer(x)},
-                    {typeof(double?), x => DoubleNameOrValue.FromBuffer(x)},
-                    {typeof(string), x => Utf8NameOrValue.FromBuffer(x)},
-                    {typeof(DateTime), x => DateTimeNameOrValue.FromBuffer(x)},
-                    {typeof(DateTime?), x => DateTimeNameOrValue.FromBuffer(x)},
-                    {typeof(byte[]), x => ByteArrayNameOrValue.FromBuffer(x)},
+                    {typeof(int), x => IntNameOrValue.FromNullableByteArray(x)},
+                    {typeof(int?), x => IntNameOrValue.FromNullableByteArray(x)},
+                    {typeof(long), x => LongNameOrValue.FromNullableByteArray(x)},
+                    {typeof(long?), x => LongNameOrValue.FromNullableByteArray(x)},
+                    {typeof(float), x => FloatNameOrValue.FromNullableByteArray(x)},
+                    {typeof(float?), x => FloatNameOrValue.FromNullableByteArray(x)},
+                    {typeof(double), x => DoubleNameOrValue.FromNullableByteArray(x)},
+                    {typeof(double?), x => DoubleNameOrValue.FromNullableByteArray(x)},
+                    {typeof(string), x => Utf8NameOrValue.FromNullableByteArray(x)},
+                    {typeof(DateTime), x => DateTimeNameOrValue.FromNullableByteArray(x)},
+                    {typeof(DateTime?), x => DateTimeNameOrValue.FromNullableByteArray(x)},
+                    {typeof(byte[]), x => ByteArrayNameOrValue.FromNullableByteArray(x)},
                     {typeof(Decimal), x => null},
                     {typeof(Decimal?), x => null},
-                    {typeof(Guid), x => GuidNameOrValue.FromBuffer(x)},
-                    {typeof(Guid?), x => GuidNameOrValue.FromBuffer(x)},
+                    {typeof(Guid), x => GuidNameOrValue.FromNullableByteArray(x)},
+                    {typeof(Guid?), x => GuidNameOrValue.FromNullableByteArray(x)},
                 };
 
         public static byte[] Serialize(this Type mit, object miv)
         {
             Func<object, INameOrValue> converter = _netType2NameOrValueFromValue[mit];
             INameOrValue nov = converter(miv);
-            return nov.ToByteArray();
+            return nov.ConvertToByteArray();
         }
 
         public static object Deserialize(this Type mit, byte[] value)

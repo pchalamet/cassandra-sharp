@@ -38,7 +38,7 @@ namespace CassandraSharpUnitTests.MadeSimple
             TimeUuidNameOrValue timeUuidNameOrValue = new TimeUuidNameOrValue(now);
             Assert.IsTrue(timeUuidNameOrValue.Value == now);
 
-            byte[] buffer = timeUuidNameOrValue.ToByteArray();
+            byte[] buffer = timeUuidNameOrValue.ConvertToByteArray();
 
             TimeUuidNameOrValue timeUuidName2 = new TimeUuidNameOrValue(buffer);
             Assert.IsTrue(timeUuidName2.Value == now);

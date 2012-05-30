@@ -36,19 +36,19 @@ namespace CassandraSharp.MadeSimple
                        : null;
         }
 
-        public static INameOrValue FromBuffer(byte[] buffer)
+        public static INameOrValue FromNullableByteArray(byte[] buffer)
         {
             return null != buffer
                        ? new GuidNameOrValue(buffer)
                        : null;
         }
 
-        public override byte[] ToByteArray()
+        public override byte[] ConvertToByteArray()
         {
             return Value.ToByteArray();
         }
 
-        protected override Guid FromByteArray(byte[] value)
+        protected override Guid ConvertFromByteArray(byte[] value)
         {
             return new Guid(value);
         }

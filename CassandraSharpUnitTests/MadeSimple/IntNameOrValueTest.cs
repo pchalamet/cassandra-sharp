@@ -27,7 +27,7 @@ namespace CassandraSharpUnitTests.MadeSimple
             IntNameOrValue intNameOrValue = new IntNameOrValue(0x04030201);
             Assert.IsTrue(intNameOrValue.Value == 0x04030201);
 
-            byte[] buffer = intNameOrValue.ToByteArray();
+            byte[] buffer = intNameOrValue.ConvertToByteArray();
             Assert.IsTrue(buffer[0] == 0x04);
             Assert.IsTrue(buffer[1] == 0x03);
             Assert.IsTrue(buffer[2] == 0x02);

@@ -27,7 +27,7 @@ namespace CassandraSharpUnitTests.MadeSimple
             Utf8NameOrValue utf8NameOrValue = new Utf8NameOrValue("ABCD");
             Assert.IsTrue(utf8NameOrValue.Value == "ABCD");
 
-            byte[] buffer = utf8NameOrValue.ToByteArray();
+            byte[] buffer = utf8NameOrValue.ConvertToByteArray();
             Assert.IsTrue(buffer[0] == 'A');
             Assert.IsTrue(buffer[1] == 'B');
             Assert.IsTrue(buffer[2] == 'C');

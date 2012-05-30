@@ -175,7 +175,7 @@ namespace CassandraSharp
 
                 // UNDONE: CQL3 seems to be badly broken - USE does not work actually
                 //string useKeyspace = string.Format("use {0}", connection.KeySpace);
-                //byte[] bufUseKeyspace = new Utf8NameOrValue(useKeyspace).ToByteArray();
+                //byte[] bufUseKeyspace = new Utf8NameOrValue(useKeyspace).ConvertToByteArray();
                 //connection.CassandraClient.execute_cql_query(bufUseKeyspace, Compression.NONE);
             }
         }

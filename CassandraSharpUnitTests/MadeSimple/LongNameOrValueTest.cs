@@ -27,7 +27,7 @@ namespace CassandraSharpUnitTests.MadeSimple
             LongNameOrValue longNameOrValue = new LongNameOrValue(0x0807060504030201);
             Assert.IsTrue(longNameOrValue.Value == 0x0807060504030201);
 
-            byte[] buffer = longNameOrValue.ToByteArray();
+            byte[] buffer = longNameOrValue.ConvertToByteArray();
             Assert.IsTrue(buffer[0] == 0x08);
             Assert.IsTrue(buffer[1] == 0x07);
             Assert.IsTrue(buffer[2] == 0x06);

@@ -36,20 +36,20 @@ namespace CassandraSharp.MadeSimple
                        : null;
         }
 
-        public static INameOrValue FromBuffer(byte[] buffer)
+        public static INameOrValue FromNullableByteArray(byte[] buffer)
         {
             return null != buffer
                        ? new Utf8NameOrValue(buffer)
                        : null;
         }
 
-        public override byte[] ToByteArray()
+        public override byte[] ConvertToByteArray()
         {
             byte[] result = Encoding.UTF8.GetBytes(Value);
             return result;
         }
 
-        protected override string FromByteArray(byte[] value)
+        protected override string ConvertFromByteArray(byte[] value)
         {
             string result = Encoding.UTF8.GetString(value);
             return result;
