@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.ObjectMapper.Cql3
 {
-    using System;
     using System.Text;
     using CassandraSharp.ObjectMapper.Dialect;
     using CassandraSharp.Utils;

@@ -15,16 +15,27 @@
 
 namespace CassandraSharp.Snitch
 {
+    using System.Collections.Generic;
     using System.Net;
 
-    internal class SimpleSnitch : ISnitch
+    internal class SimpleSnitch : IEndpointSnitch
     {
-        public string GetDataCenter(IPAddress target)
+        public string GetRack(IPAddress endpoint)
+        {
+            return "rack1";
+        }
+
+        public string GetDatacenter(IPAddress endpoint)
         {
             return "datacenter1";
         }
 
-        public int ComputeDistance(IPAddress source, IPAddress target)
+        public List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress)
+        {
+            return new List<IPAddress>(unsortedAddress);
+        }
+
+        public int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2)
         {
             return 0;
         }

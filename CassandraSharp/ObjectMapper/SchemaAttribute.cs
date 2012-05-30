@@ -16,7 +16,6 @@
 namespace CassandraSharp.ObjectMapper
 {
     using System;
-    using System.Collections.Generic;
 
     public enum RowCacheProvider
     {

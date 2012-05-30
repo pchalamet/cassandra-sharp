@@ -17,30 +17,31 @@ namespace CassandraSharp.EndpointStrategy
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Runtime.CompilerServices;
 
     internal class RandomEndpointStrategy : IEndpointStrategy
     {
-        private readonly List<Endpoint> _bannedEndpoints;
+        private readonly List<IPAddress> _bannedEndpoints;
 
-        private readonly List<Endpoint> _healthyEndpoints;
+        private readonly List<IPAddress> _healthyEndpoints;
 
         private readonly Random _rnd;
 
-        public RandomEndpointStrategy(IEnumerable<Endpoint> endpoints)
+        public RandomEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
         {
-            _healthyEndpoints = new List<Endpoint>(endpoints);
-            _bannedEndpoints = new List<Endpoint>();
+            _healthyEndpoints = new List<IPAddress>(endpoints);
+            _bannedEndpoints = new List<IPAddress>();
             _rnd = new Random();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Endpoint Pick(byte[] keyHint)
+        public IPAddress Pick(byte[] keyHint)
         {
             if (0 < _healthyEndpoints.Count)
             {
                 int candidate = _rnd.Next(_healthyEndpoints.Count);
-                Endpoint endpoint = _healthyEndpoints[candidate];
+                IPAddress endpoint = _healthyEndpoints[candidate];
                 return endpoint;
             }
 
@@ -48,7 +49,7 @@ namespace CassandraSharp.EndpointStrategy
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Ban(Endpoint endpoint)
+        public void Ban(IPAddress endpoint)
         {
             if (_healthyEndpoints.Remove(endpoint))
             {
@@ -57,7 +58,7 @@ namespace CassandraSharp.EndpointStrategy
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Permit(Endpoint endpoint)
+        public void Permit(IPAddress endpoint)
         {
             if (_bannedEndpoints.Remove(endpoint))
             {

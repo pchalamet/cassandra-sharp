@@ -28,6 +28,7 @@ namespace TestClient
             new MadeSimpleMinimalConfigSample().Run();
             new MadeSimpleSample("CustomEndpointStrategyConfig").Run();
 
+            // only works with C* 1.1.1
             new ObjectMapperSample().Run();
 
             ClusterManager.Shutdown();

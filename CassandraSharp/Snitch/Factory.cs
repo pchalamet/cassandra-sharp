@@ -19,7 +19,7 @@ namespace CassandraSharp.Snitch
 
     internal static class Factory
     {
-        public static ISnitch Create(string customType)
+        public static IEndpointSnitch Create(string customType)
         {
             switch (customType)
             {
@@ -31,7 +31,7 @@ namespace CassandraSharp.Snitch
                     return new RackInferringSnitch();
 
                 default:
-                    return ServiceActivator.Create<ISnitch>(customType);
+                    return ServiceActivator.Create<IEndpointSnitch>(customType);
             }
         }
     }

@@ -16,11 +16,11 @@
 namespace CassandraSharp
 {
     using System;
+    using System.Net;
     using Apache.Cassandra;
-    using CassandraSharp.EndpointStrategy;
 
     public interface IRecoveryService : IDisposable
     {
-        void Recover(Endpoint connection, ITransportFactory transportFactory, Action<Endpoint, Cassandra.Client> clientRecoveredCallback);
+        void Recover(IPAddress connection, ITransportFactory transportFactory, Action<IPAddress, Cassandra.Client> clientRecoveredCallback);
     }
 }

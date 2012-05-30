@@ -34,14 +34,11 @@ namespace CassandraSharp
 
         public static ICluster GetCluster(string name)
         {
+            name.CheckArgumentNotNull("name");
+
             if (null == _config)
             {
                 throw new InvalidOperationException("ClusterManager is not initialized");
-            }
-
-            if (null == name)
-            {
-                throw new ArgumentNullException("name");
             }
 
             ClusterConfig clusterConfig = GetClusterConfig(name);
@@ -50,15 +47,8 @@ namespace CassandraSharp
 
         public static ICluster GetCluster(ClusterConfig clusterConfig)
         {
-            if (null == clusterConfig)
-            {
-                throw new ArgumentNullException("clusterConfig");
-            }
-
-            if (null == clusterConfig.Endpoints)
-            {
-                throw new ArgumentNullException("clusterConfig.Endpoints");
-            }
+            clusterConfig.CheckArgumentNotNull("clusterConfig");
+            clusterConfig.Endpoints.CheckArgumentNotNull("clusterConfig.Endpoints");
 
             IBehaviorConfig behaviorConfig = clusterConfig.BehaviorConfig ?? new BehaviorConfig();
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
@@ -66,13 +56,11 @@ namespace CassandraSharp
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            ISnitch snitch = Snitch.Factory.Create(clusterConfig.Endpoints.Snitch);
-
-            IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
-            IEnumerable<Endpoint> endpoints = GetEndpoints(clusterConfig.Endpoints, snitch, clientAddress);
+            IEndpointSnitch snitch = Snitch.Factory.Create(clusterConfig.Endpoints.Snitch);
+            IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find);
 
             // create endpoint strategy
-            IEndpointStrategy endpointsManager = Factory.Create(clusterConfig.Endpoints.Strategy, endpoints);
+            IEndpointStrategy endpointsManager = Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch);
             IPool<IConnection> pool = Pool.Factory.Create(null, transportConfig.PoolSize);
 
             // get timestamp service
@@ -81,24 +69,6 @@ namespace CassandraSharp
             // create the cluster now
             ITransportFactory transportFactory = Transport.Factory.Create(transportConfig);
             return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, _logger);
-        }
-
-        private static IEnumerable<Endpoint> GetEndpoints(EndpointsConfig config, ISnitch snitch, IPAddress clientAddress)
-        {
-            List<Endpoint> endpoints = new List<Endpoint>();
-            foreach (string server in config.Servers)
-            {
-                IPAddress serverAddress = NetworkFinder.Find(server);
-                if (null != serverAddress)
-                {
-                    string datacenter = snitch.GetDataCenter(serverAddress);
-                    int proximity = snitch.ComputeDistance(clientAddress, serverAddress);
-                    Endpoint endpoint = new Endpoint(server, serverAddress, datacenter, proximity);
-                    endpoints.Add(endpoint);
-                }
-            }
-
-            return endpoints;
         }
 
         private static ClusterConfig GetClusterConfig(string name)
@@ -141,14 +111,11 @@ namespace CassandraSharp
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void Configure(CassandraSharpConfig config)
         {
+            config.CheckArgumentNotNull("config");
+
             if (null != _config)
             {
                 throw new InvalidOperationException("ClusterManager is already initialized");
-            }
-
-            if (null == config)
-            {
-                throw new ArgumentNullException("config");
             }
 
             _recoveryService = Recovery.Factory.Create(config.Recovery);

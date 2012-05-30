@@ -17,9 +17,9 @@ namespace CassandraSharp.Recovery
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Timers;
     using Apache.Cassandra;
-    using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Utils;
 
     internal class SimpleRecoveryService : IRecoveryService
@@ -38,7 +38,7 @@ namespace CassandraSharp.Recovery
             _lock = new object();
         }
 
-        public void Recover(Endpoint endpoint, ITransportFactory transportFactory, Action<Endpoint, Cassandra.Client> clientRecoveredCallback)
+        public void Recover(IPAddress endpoint, ITransportFactory transportFactory, Action<IPAddress, Cassandra.Client> clientRecoveredCallback)
         {
             lock (_lock)
             {
@@ -68,7 +68,7 @@ namespace CassandraSharp.Recovery
                 Cassandra.Client client = null;
                 try
                 {
-                    client = recoveryItem.TransportFactory.Create(recoveryItem.Endpoint.Address);
+                    client = recoveryItem.TransportFactory.Create(recoveryItem.Endpoint);
 
                     // try running a describe to check the node responsiveness
                     client.describe_cluster_name();
@@ -102,18 +102,18 @@ namespace CassandraSharp.Recovery
 
         private class RecoveryItem
         {
-            public RecoveryItem(Endpoint endpoint, ITransportFactory transportFactory, Action<Endpoint, Cassandra.Client> clientRecoveredCallback)
+            public RecoveryItem(IPAddress endpoint, ITransportFactory transportFactory, Action<IPAddress, Cassandra.Client> clientRecoveredCallback)
             {
                 Endpoint = endpoint;
                 TransportFactory = transportFactory;
                 ClientRecoveredCallback = clientRecoveredCallback;
             }
 
-            public Endpoint Endpoint { get; private set; }
+            public IPAddress Endpoint { get; private set; }
 
             public ITransportFactory TransportFactory { get; private set; }
 
-            public Action<Endpoint, Cassandra.Client> ClientRecoveredCallback { get; private set; }
+            public Action<IPAddress, Cassandra.Client> ClientRecoveredCallback { get; private set; }
         }
     }
 }

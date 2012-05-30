@@ -18,8 +18,10 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using CassandraSharp;
     using CassandraSharp.EndpointStrategy;
+    using CassandraSharp.Snitch;
     using NUnit.Framework;
 
     [TestFixture]
@@ -29,24 +31,24 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         private class CustomEndpointStrategy : IEndpointStrategy
 // ReSharper restore ClassNeverInstantiated.Local
         {
-            public CustomEndpointStrategy(IEnumerable<Endpoint> endpoints)
+            public CustomEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
             {
                 Endpoints = endpoints;
             }
 
-            public IEnumerable<Endpoint> Endpoints { get; set; }
+            public IEnumerable<IPAddress> Endpoints { get; set; }
 
-            public Endpoint Pick(byte[] keyHint)
+            public IPAddress Pick(byte[] keyHint)
             {
                 throw new NotImplementedException();
             }
 
-            public void Ban(Endpoint endpoint)
+            public void Ban(IPAddress endpoint)
             {
                 throw new NotImplementedException();
             }
 
-            public void Permit(Endpoint endpoint)
+            public void Permit(IPAddress endpoint)
             {
                 throw new NotImplementedException();
             }
@@ -57,26 +59,26 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         {
             string customType = typeof(CustomEndpointStrategy).AssemblyQualifiedName;
 
-            IEnumerable<Endpoint> endpoints = new List<Endpoint> {new Endpoint("toto", null, "dc1", 666)};
-            IEndpointStrategy endpointStrategy = Factory.Create(customType, endpoints);
+            IEnumerable<IPAddress> endpoints = new List<IPAddress> {null};
+            IEndpointStrategy endpointStrategy = CassandraSharp.EndpointStrategy.Factory.Create(customType, endpoints, new SimpleSnitch());
 
             CustomEndpointStrategy customEndpointStrategy = endpointStrategy as CustomEndpointStrategy;
             Assert.IsNotNull(customEndpointStrategy);
-            Endpoint customEndpoint = customEndpointStrategy.Endpoints.Single();
+            IPAddress customEndpoint = customEndpointStrategy.Endpoints.Single();
             Assert.AreEqual(customEndpoint, endpoints.Single());
         }
 
         [Test]
         public void TestCreateNearest()
         {
-            IEndpointStrategy endpointStrategy = Factory.Create("Nearest", Enumerable.Empty<Endpoint>());
+            IEndpointStrategy endpointStrategy = CassandraSharp.EndpointStrategy.Factory.Create("Nearest", Enumerable.Empty<IPAddress>(), new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is NearestEndpointStrategy);
         }
 
         [Test]
         public void TestCreateRandom()
         {
-            IEndpointStrategy endpointStrategy = Factory.Create("Random", Enumerable.Empty<Endpoint>());
+            IEndpointStrategy endpointStrategy = CassandraSharp.EndpointStrategy.Factory.Create("Random", Enumerable.Empty<IPAddress>(), new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is RandomEndpointStrategy);
         }
     }

@@ -15,17 +15,17 @@
 
 namespace CassandraSharp
 {
-    using CassandraSharp.EndpointStrategy;
+    using System.Net;
 
     /// <summary>
     ///     IEndpointStrategy helps choosing a server to connect to Implementation must be thread safe
     /// </summary>
     public interface IEndpointStrategy
     {
-        Endpoint Pick(byte[] keyHint);
+        IPAddress Pick(byte[] keyHint);
 
-        void Ban(Endpoint endpoint);
+        void Ban(IPAddress endpoint);
 
-        void Permit(Endpoint endpoint);
+        void Permit(IPAddress endpoint);
     }
 }

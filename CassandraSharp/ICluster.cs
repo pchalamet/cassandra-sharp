@@ -32,6 +32,6 @@ namespace CassandraSharp
 
         ICluster CreateChildCluster(IBehaviorConfig cfgOverride);
 
-        TResult ExecuteCommand<TResult>(Func<IConnection, TResult> func, Func<byte[]> ketFunc);
+        TResult ExecuteCommand<TResult>(Func<IConnection, TResult> func, Func<byte[]> keyFunc);
     }
 }

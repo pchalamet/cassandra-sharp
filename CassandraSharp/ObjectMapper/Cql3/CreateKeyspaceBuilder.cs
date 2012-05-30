@@ -37,7 +37,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
                                                                                  {
                                                                                      {"replication_factor", 1}
                                                                                  };
-            foreach(var stratOpt in replicationFactor)
+            foreach (var stratOpt in replicationFactor)
             {
                 sb.AppendFormat(" and strategy_options:{0}={1}", stratOpt.Key, stratOpt.Value);
             }

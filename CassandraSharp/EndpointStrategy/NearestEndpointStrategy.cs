@@ -16,26 +16,25 @@
 namespace CassandraSharp.EndpointStrategy
 {
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Net;
     using System.Runtime.CompilerServices;
+    using CassandraSharp.Utils;
 
     internal class NearestEndpointStrategy : IEndpointStrategy
     {
-        private readonly List<Endpoint> _bannedEndpoints;
+        private readonly List<IPAddress> _bannedEndpoints;
 
-        private readonly List<Endpoint> _healthyEndpoints;
+        private readonly List<IPAddress> _healthyEndpoints;
 
-        public NearestEndpointStrategy(IEnumerable<Endpoint> endpoints)
+        public NearestEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
         {
-            // order endpoints by proximity
-            _healthyEndpoints = (from endpoint in endpoints
-                                 orderby endpoint.Proximity
-                                 select endpoint).ToList();
-            _bannedEndpoints = new List<Endpoint>();
+            IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
+            _healthyEndpoints = snitch.GetSortedListByProximity(clientAddress, endpoints);
+            _bannedEndpoints = new List<IPAddress>();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Endpoint Pick(byte[] keyHint)
+        public IPAddress Pick(byte[] keyHint)
         {
             if (0 < _healthyEndpoints.Count)
             {
@@ -46,7 +45,7 @@ namespace CassandraSharp.EndpointStrategy
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Ban(Endpoint endPoint)
+        public void Ban(IPAddress endPoint)
         {
             if (_healthyEndpoints.Remove(endPoint))
             {
@@ -55,7 +54,7 @@ namespace CassandraSharp.EndpointStrategy
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Permit(Endpoint endPoint)
+        public void Permit(IPAddress endPoint)
         {
             if (_bannedEndpoints.Remove(endPoint))
             {

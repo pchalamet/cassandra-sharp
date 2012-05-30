@@ -13,26 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.EndpointStrategy
+namespace CassandraSharp
 {
+    using System.Collections.Generic;
     using System.Net;
 
-    public class Endpoint
+    public interface IEndpointSnitch
     {
-        public Endpoint(string hostName, IPAddress address, string datacenter, int proximity)
-        {
-            Hostname = hostName;
-            Address = address;
-            Datacenter = datacenter;
-            Proximity = proximity;
-        }
+        string GetRack(IPAddress endpoint);
 
-        public string Hostname { get; private set; }
+        string GetDatacenter(IPAddress endpoint);
 
-        public IPAddress Address { get; private set; }
+        List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress);
 
-        public int Proximity { get; private set; }
-
-        public string Datacenter { get; private set; }
+        int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2);
     }
 }

@@ -72,9 +72,7 @@ namespace CassandraSharpUnitTests.Utils
 
             using (TextReader txtReader = new StringReader(xml))
             using (XmlReader xmlReader = XmlReader.Create(txtReader))
-            {
                 Assert.Throws<XmlException>(() => xmlSer.Deserialize(xmlReader));
-            }
         }
 
         [Test]
@@ -89,10 +87,7 @@ namespace CassandraSharpUnitTests.Utils
 
             using (TextReader txtReader = new StringReader(xml))
             using (XmlReader xmlReader = XmlReader.Create(txtReader))
-            {
                 Assert.Throws<XmlException>(() => xmlSer.Deserialize(xmlReader));
-            }
         }
-
     }
 }

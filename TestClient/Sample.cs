@@ -48,19 +48,30 @@ namespace TestClient
                 }
 
                 Console.WriteLine();
+                Console.WriteLine("===========================================================================");
                 Console.WriteLine("TEST COMPLETED SUCCESSFULLY");
                 Console.WriteLine("===========================================================================");
             }
             catch (Exception ex)
             {
                 Console.WriteLine();
+                Console.WriteLine("===========================================================================");
                 Console.WriteLine("TEST FAILED WITH ERROR:");
-                Console.WriteLine(ex);
+                Console.WriteLine(ex.Message);
                 Console.WriteLine("===========================================================================");
             }
             finally
             {
-                DropKeyspace();
+                try
+                {
+                    DropKeyspace();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("ERROR WHILE DROPPING KEYSPACE:");
+                    Console.WriteLine(ex.Message);
+                }
             }
             Console.WriteLine();
             Console.WriteLine();

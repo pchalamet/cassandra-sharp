@@ -18,7 +18,6 @@ namespace CassandraSharp.ObjectMapper
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using CassandraSharp.Config;
     using CassandraSharp.MadeSimple;
     using CassandraSharp.ObjectMapper.Cql3;
     using CassandraSharp.ObjectMapper.Dialect;

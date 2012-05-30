@@ -15,17 +15,28 @@
 
 namespace TestClient
 {
+    using System.Collections.Generic;
     using System.Net;
     using CassandraSharp;
 
-    public class CustomSnitch : ISnitch
+    public class CustomSnitch : IEndpointSnitch
     {
-        public string GetDataCenter(IPAddress target)
+        public string GetRack(IPAddress endpoint)
         {
-            return "Dacenter1";
+            return "rack1";
         }
 
-        public int ComputeDistance(IPAddress source, IPAddress target)
+        public string GetDatacenter(IPAddress endpoint)
+        {
+            return "datacenter1";
+        }
+
+        public List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress)
+        {
+            return new List<IPAddress>(unsortedAddress);
+        }
+
+        public int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2)
         {
             return 0;
         }

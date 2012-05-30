@@ -17,16 +17,16 @@ namespace CassandraSharp
 {
     using System;
     using System.IO;
+    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using Apache.Cassandra;
-    using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Utils;
     using Thrift.Transport;
 
     internal class Cluster : ICluster
     {
-        private readonly IEndpointStrategy _endpointsManager;
+        private readonly IEndpointStrategy _endpointStrategy;
 
         private readonly ILog _logger;
 
@@ -38,19 +38,19 @@ namespace CassandraSharp
 
         private readonly ITransportFactory _transportFactory;
 
-        public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager,
+        public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointStrategy,
                        IRecoveryService recoveryService, ITimestampService timestampService, ILog logger)
-            : this(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, logger, null)
+            : this(behaviorConfig, pool, transportFactory, endpointStrategy, recoveryService, timestampService, logger, null)
         {
         }
 
-        private Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointsManager,
+        private Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointStrategy,
                         IRecoveryService recoveryService, ITimestampService timestampService, ILog logger, ICluster parentCluster)
         {
             BehaviorConfig = behaviorConfig;
             TimestampService = timestampService;
             _pool = pool;
-            _endpointsManager = endpointsManager;
+            _endpointStrategy = endpointStrategy;
             _recoveryService = recoveryService;
             _transportFactory = transportFactory;
             _logger = logger;
@@ -75,32 +75,29 @@ namespace CassandraSharp
             while (true)
             {
                 IConnection connection = null;
+                bool connectionDead = true;
                 try
                 {
-                    byte[] key = null;
-                    if (null != keyFunc)
-                    {
-                        key = keyFunc();
-                    }
+                    // extract the key from the command
+                    byte[] key = null != keyFunc
+                                     ? keyFunc()
+                                     : null;
 
+                    // execute the action
                     connection = AcquireConnection(key);
-
                     TResult res = func(connection);
-
-                    ReleaseConnection(connection, false);
+                    connectionDead = false;
 
                     return res;
                 }
                 catch (Exception ex)
                 {
-                    bool connectionDead;
                     bool retry;
                     DecipherException(ex, out connectionDead, out retry);
 
                     _logger.Error("Exception during command processing: connectionDead={0} retry={1} : {2}", connectionDead, retry, ex.Message);
 
-                    ReleaseConnection(connection, connectionDead);
-                    if (!retry || tryCount >= BehaviorConfig.MaxRetries)
+                    if (!retry || !BehaviorConfig.MaxRetries.HasValue || tryCount >= BehaviorConfig.MaxRetries)
                     {
                         _logger.Fatal("Max retry count reached");
                         throw;
@@ -111,6 +108,13 @@ namespace CassandraSharp
                         Thread.Sleep(BehaviorConfig.SleepBeforeRetry.Value);
                     }
                 }
+                finally
+                {
+                    if (null != connection)
+                    {
+                        ReleaseConnection(connection, connectionDead);
+                    }
+                }
 
                 ++tryCount;
             }
@@ -119,7 +123,7 @@ namespace CassandraSharp
         public ICluster CreateChildCluster(IBehaviorConfig cfgOverride)
         {
             IBehaviorConfig childConfig = cfgOverride.Override(BehaviorConfig);
-            return new Cluster(childConfig, _pool, _transportFactory, _endpointsManager, _recoveryService, TimestampService, _logger, this);
+            return new Cluster(childConfig, _pool, _transportFactory, _endpointStrategy, _recoveryService, TimestampService, _logger, this);
         }
 
         public IConnection AcquireConnection(byte[] key)
@@ -127,41 +131,58 @@ namespace CassandraSharp
             IConnection connection;
             if (!_pool.Acquire(out connection))
             {
-                Endpoint endpoint = _endpointsManager.Pick(key);
+                // pick an endpoint
+                IPAddress endpoint = _endpointStrategy.Pick(key);
                 if (null == endpoint)
                 {
                     throw new ArgumentException("Can't find any valid endpoint");
                 }
 
-                Cassandra.Client client = _transportFactory.Create(endpoint.Address);
-                connection = new Connection(client, endpoint);
+                // try to create a new connection
+                // if this fails then recover the endpoint
+                try
+                {
+                    Cassandra.Client client = _transportFactory.Create(endpoint);
+                    connection = new Connection(client, endpoint);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error("Exception while creating transport for endpoint {0} : {1}", endpoint, ex.Message);
+
+                    MarkEndpointForRecovery(endpoint);
+                    throw;
+                }
             }
 
+            // initialize the context of the connection
             ChangeKeyspace(connection);
-
             return connection;
         }
 
         public void ReleaseConnection(IConnection connection, bool hasFailed)
         {
-            // protect against exception during acquire connection
-            if (null != connection)
-            {
-                if (hasFailed)
-                {
-                    if (null != _recoveryService)
-                    {
-                        _logger.Info("marking {0} for recovery", connection.Endpoint.Address);
-                        _recoveryService.Recover(connection.Endpoint, _transportFactory, ClientRecoveredCallback);
-                    }
+            connection.CheckArgumentNotNull("connection");
 
-                    _endpointsManager.Ban(connection.Endpoint);
-                    connection.SafeDispose();
-                }
-                else
-                {
-                    _pool.Release(connection);
-                }
+            // protect against exception during acquire connection
+            if (hasFailed)
+            {
+                MarkEndpointForRecovery(connection.Endpoint);
+                connection.SafeDispose();
+            }
+            else
+            {
+                _pool.Release(connection);
+            }
+        }
+
+        private void MarkEndpointForRecovery(IPAddress endpoint)
+        {
+            _endpointStrategy.Ban(endpoint);
+
+            if (null != _recoveryService)
+            {
+                _logger.Info("marking {0} for recovery", endpoint);
+                _recoveryService.Recover(endpoint, _transportFactory, ClientRecoveredCallback);
             }
         }
 
@@ -224,18 +245,18 @@ namespace CassandraSharp
             }
         }
 
-        private void ClientRecoveredCallback(Endpoint endpoint, Cassandra.Client client)
+        private void ClientRecoveredCallback(IPAddress endpoint, Cassandra.Client client)
         {
-            _logger.Info("{0} is recovered", endpoint.Address);
+            _logger.Info("{0} is recovered", endpoint);
 
-            _endpointsManager.Permit(endpoint);
+            _endpointStrategy.Permit(endpoint);
             Connection connection = new Connection(client, endpoint);
             _pool.Release(connection);
         }
 
         private class Connection : IConnection
         {
-            public Connection(Cassandra.Client client, Endpoint endpoint)
+            public Connection(Cassandra.Client client, IPAddress endpoint)
             {
                 Endpoint = endpoint;
                 CassandraClient = client;
@@ -250,7 +271,7 @@ namespace CassandraSharp
 
             public string User { get; set; }
 
-            public Endpoint Endpoint { get; private set; }
+            public IPAddress Endpoint { get; private set; }
 
             public Cassandra.Client CassandraClient { get; private set; }
         }

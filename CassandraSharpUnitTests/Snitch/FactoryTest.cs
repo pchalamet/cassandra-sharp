@@ -16,6 +16,7 @@
 namespace CassandraSharpUnitTests.Snitch
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using CassandraSharp;
     using CassandraSharp.Snitch;
@@ -24,14 +25,24 @@ namespace CassandraSharpUnitTests.Snitch
     [TestFixture]
     public class SnitchTypeExtensionsTest
     {
-        private class CustomSnitch : ISnitch
+        private class CustomSnitch : IEndpointSnitch
         {
-            public string GetDataCenter(IPAddress target)
+            public string GetRack(IPAddress endpoint)
             {
                 throw new NotImplementedException();
             }
 
-            public int ComputeDistance(IPAddress source, IPAddress target)
+            public string GetDatacenter(IPAddress endpoint)
+            {
+                throw new NotImplementedException();
+            }
+
+            public List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress)
+            {
+                throw new NotImplementedException();
+            }
+
+            public int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2)
             {
                 throw new NotImplementedException();
             }
@@ -41,21 +52,21 @@ namespace CassandraSharpUnitTests.Snitch
         public void TestCreateCustom()
         {
             string customType = typeof(CustomSnitch).AssemblyQualifiedName;
-            ISnitch snitch = Factory.Create(customType);
+            IEndpointSnitch snitch = Factory.Create(customType);
             Assert.IsTrue(snitch is CustomSnitch);
         }
 
         [Test]
         public void TestCreateRackInferring()
         {
-            ISnitch snitch = Factory.Create("RackInferring");
+            IEndpointSnitch snitch = Factory.Create("RackInferring");
             Assert.IsTrue(snitch is RackInferringSnitch);
         }
 
         [Test]
         public void TestCreateSimple()
         {
-            ISnitch snitch = Factory.Create("Simple");
+            IEndpointSnitch snitch = Factory.Create("Simple");
             Assert.IsTrue(snitch is SimpleSnitch);
         }
     }

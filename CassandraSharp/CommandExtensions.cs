@@ -16,18 +16,23 @@
 namespace CassandraSharp
 {
     using System;
+    using CassandraSharp.Utils;
 
     public static class CommandExtensions
     {
         // keep compatibility with old ICluster interface (the one withtout keyFunc)
         public static TResult ExecuteCommand<TResult>(this ICluster @this, Func<IConnection, TResult> func)
         {
+            func.CheckArgumentNotNull("func");
+
             return @this.ExecuteCommand(func, null);
         }
 
         // execute an action (ie: no return value) with cluster override
         public static void Execute(this ICluster @this, Action<IConnection> action)
         {
+            action.CheckArgumentNotNull("func");
+
             Func<IConnection, object> func = client =>
                                                  {
                                                      action(client);

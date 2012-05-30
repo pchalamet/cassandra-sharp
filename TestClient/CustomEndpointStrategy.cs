@@ -17,28 +17,28 @@ namespace TestClient
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using CassandraSharp;
-    using CassandraSharp.EndpointStrategy;
 
     public class CustomEndpointStrategy : IEndpointStrategy
     {
-        private readonly IEnumerable<Endpoint> _endpoints;
+        private readonly IEnumerable<IPAddress> _endpoints;
 
-        public CustomEndpointStrategy(IEnumerable<Endpoint> endpoints)
+        public CustomEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
         {
             _endpoints = endpoints;
         }
 
-        public Endpoint Pick(byte[] keyHint)
+        public IPAddress Pick(byte[] keyHint)
         {
-            return _endpoints.First();
+            return _endpoints.FirstOrDefault();
         }
 
-        public void Ban(Endpoint endpoint)
+        public void Ban(IPAddress endpoint)
         {
         }
 
-        public void Permit(Endpoint endpoint)
+        public void Permit(IPAddress endpoint)
         {
         }
     }

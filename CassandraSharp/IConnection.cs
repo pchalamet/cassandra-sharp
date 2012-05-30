@@ -16,8 +16,8 @@
 namespace CassandraSharp
 {
     using System;
+    using System.Net;
     using Apache.Cassandra;
-    using CassandraSharp.EndpointStrategy;
 
     /// <summary>
     ///     Internal interface to keep track of Cassandra connections
@@ -28,7 +28,7 @@ namespace CassandraSharp
 
         string User { get; set; }
 
-        Endpoint Endpoint { get; }
+        IPAddress Endpoint { get; }
 
         Cassandra.Client CassandraClient { get; }
     }
