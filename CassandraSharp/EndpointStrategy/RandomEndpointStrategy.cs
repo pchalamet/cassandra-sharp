@@ -36,7 +36,7 @@ namespace CassandraSharp.EndpointStrategy
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public IPAddress Pick(byte[] keyHint)
+        public IPAddress Pick(Token token)
         {
             if (0 < _healthyEndpoints.Count)
             {

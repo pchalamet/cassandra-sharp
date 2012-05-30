@@ -38,7 +38,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
 
             public IEnumerable<IPAddress> Endpoints { get; set; }
 
-            public IPAddress Pick(byte[] keyHint)
+            public IPAddress Pick(Token token)
             {
                 throw new NotImplementedException();
             }

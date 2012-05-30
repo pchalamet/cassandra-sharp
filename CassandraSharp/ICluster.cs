@@ -26,9 +26,7 @@ namespace CassandraSharp
 
         ITimestampService TimestampService { get; }
 
-        IConnection AcquireConnection(byte[] key);
-
-        void ReleaseConnection(IConnection connection, bool hasFailed);
+        IConnection AcquireConnection(Token token);
 
         ICluster CreateChildCluster(IBehaviorConfig cfgOverride);
 

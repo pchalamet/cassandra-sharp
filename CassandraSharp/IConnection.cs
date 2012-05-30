@@ -24,6 +24,8 @@ namespace CassandraSharp
     /// </summary>
     public interface IConnection : IDisposable
     {
+        void KeepAlive();
+
         string KeySpace { get; set; }
 
         string User { get; set; }

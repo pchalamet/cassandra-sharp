@@ -28,20 +28,21 @@ namespace CassandraSharpUnitTests.Pool
         public void TestBehavior()
         {
             Mock<IDisposable> mock = new Mock<IDisposable>();
+            Token token = new Token(new byte[0]);
 
-            IPool<IDisposable> pool = new VoidPool<IDisposable>();
+            IPool<Token, IDisposable> pool = new VoidPool<Token, IDisposable>();
 
             // nothing should be aquired
             IDisposable disposable;
-            Assert.IsFalse(pool.Acquire(out disposable));
+            Assert.IsFalse(pool.Acquire(token, out disposable));
             Assert.IsNull(disposable);
 
             // should be released
-            pool.Release(mock.Object);
+            pool.Release(token, mock.Object);
             mock.Verify(x => x.Dispose());
 
             // nothing should be acquired
-            Assert.IsFalse(pool.Acquire(out disposable));
+            Assert.IsFalse(pool.Acquire(token, out disposable));
             Assert.IsNull(disposable);
 
             // dispose must dispose everything

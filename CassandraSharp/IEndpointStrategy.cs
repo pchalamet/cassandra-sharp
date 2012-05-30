@@ -22,7 +22,7 @@ namespace CassandraSharp
     /// </summary>
     public interface IEndpointStrategy
     {
-        IPAddress Pick(byte[] keyHint);
+        IPAddress Pick(Token token);
 
         void Ban(IPAddress endpoint);
 

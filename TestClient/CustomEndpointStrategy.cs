@@ -29,7 +29,7 @@ namespace TestClient
             _endpoints = endpoints;
         }
 
-        public IPAddress Pick(byte[] keyHint)
+        public IPAddress Pick(Token token)
         {
             return _endpoints.FirstOrDefault();
         }

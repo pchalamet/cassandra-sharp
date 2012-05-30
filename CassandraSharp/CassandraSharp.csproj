@@ -89,6 +89,8 @@
     <Compile Include="ObjectMapper\SerializersExtensions.cs" />
     <Compile Include="ObjectMapper\PreparedQueryExtensions.cs" />
     <Compile Include="ObjectMapper\TypeExtensions.cs" />
+    <Compile Include="Pool\PooledConnection.cs" />
+    <Compile Include="Token.cs" />
     <Compile Include="Utils\CheckParameterExtensions.cs" />
     <Compile Include="Utils\MiniXmlSerializer.cs" />
     <Compile Include="Utils\ServiceActivator.cs" />

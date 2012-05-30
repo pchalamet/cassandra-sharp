@@ -20,20 +20,29 @@ namespace CassandraSharp.Pool
     using System.Runtime.CompilerServices;
     using CassandraSharp.Utils;
 
-    internal class StackPool<T> : IPool<T> where T : IDisposable
+    internal class StackPool<T, E> : IPool<T, E> where T : IComparable<T>, IEquatable<T>
+                                                 where E : IDisposable
     {
-        private readonly Stack<T> _entries;
+        private readonly Stack<E> _entries;
 
         private readonly int _poolSize;
 
         public StackPool(int poolSize)
         {
             _poolSize = poolSize;
-            _entries = new Stack<T>();
+            _entries = new Stack<E>();
+        }
+
+        public void Dispose()
+        {
+            foreach (E entry in _entries)
+            {
+                entry.SafeDispose();
+            }
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public bool Acquire(out T entry)
+        public bool Acquire(T token, out E entry)
         {
             if (0 < _entries.Count)
             {
@@ -41,12 +50,12 @@ namespace CassandraSharp.Pool
                 return true;
             }
 
-            entry = default(T);
+            entry = default(E);
             return false;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Release(T entry)
+        public void Release(T token, E entry)
         {
             int count = _entries.Count;
             if (count < _poolSize)
@@ -54,14 +63,6 @@ namespace CassandraSharp.Pool
                 _entries.Push(entry);
             }
             else
-            {
-                entry.SafeDispose();
-            }
-        }
-
-        public void Dispose()
-        {
-            foreach (T entry in _entries)
             {
                 entry.SafeDispose();
             }

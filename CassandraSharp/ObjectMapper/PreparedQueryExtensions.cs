@@ -74,11 +74,8 @@ namespace CassandraSharp.ObjectMapper
 
         public static IEnumerable<T> Execute<T>(this ICluster @this, Schema schema, string query, IEnumerable<object> prms) where T : new()
         {
-            bool hasError = true;
-            IConnection connection = null;
-            try
+            using (IConnection connection = @this.AcquireConnection(null))
             {
-                connection = @this.AcquireConnection(null);
                 Cassandra.Client client = connection.CassandraClient;
 
                 Utf8NameOrValue novQuery = new Utf8NameOrValue(query);
@@ -91,14 +88,8 @@ namespace CassandraSharp.ObjectMapper
                         yield return unknown;
                     }
                 }
-                hasError = false;
-            }
-            finally
-            {
-                if (null != connection)
-                {
-                    @this.ReleaseConnection(connection, hasError);
-                }
+
+                connection.KeepAlive();
             }
         }
 

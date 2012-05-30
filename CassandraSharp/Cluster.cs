@@ -21,6 +21,7 @@ namespace CassandraSharp
     using System.Net.Sockets;
     using System.Threading;
     using Apache.Cassandra;
+    using CassandraSharp.Pool;
     using CassandraSharp.Utils;
     using Thrift.Transport;
 
@@ -32,19 +33,19 @@ namespace CassandraSharp
 
         private readonly ICluster _parentCluster;
 
-        private readonly IPool<IConnection> _pool;
+        private readonly IPool<Token, IConnection> _pool;
 
         private readonly IRecoveryService _recoveryService;
 
         private readonly ITransportFactory _transportFactory;
 
-        public Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointStrategy,
+        public Cluster(IBehaviorConfig behaviorConfig, IPool<Token, IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointStrategy,
                        IRecoveryService recoveryService, ITimestampService timestampService, ILog logger)
             : this(behaviorConfig, pool, transportFactory, endpointStrategy, recoveryService, timestampService, logger, null)
         {
         }
 
-        private Cluster(IBehaviorConfig behaviorConfig, IPool<IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointStrategy,
+        private Cluster(IBehaviorConfig behaviorConfig, IPool<Token, IConnection> pool, ITransportFactory transportFactory, IEndpointStrategy endpointStrategy,
                         IRecoveryService recoveryService, ITimestampService timestampService, ILog logger, ICluster parentCluster)
         {
             BehaviorConfig = behaviorConfig;
@@ -75,7 +76,6 @@ namespace CassandraSharp
             while (true)
             {
                 IConnection connection = null;
-                bool connectionDead = true;
                 try
                 {
                     // extract the key from the command
@@ -83,26 +83,36 @@ namespace CassandraSharp
                                      ? keyFunc()
                                      : null;
 
-                    // execute the action
-                    connection = AcquireConnection(key);
+                    // execute the action : acquire, run & keep alive
+                    connection = AcquireConnection(null);
                     TResult res = func(connection);
-                    connectionDead = false;
+                    connection.KeepAlive();
 
                     return res;
                 }
                 catch (Exception ex)
                 {
+                    // try to understand what's happened
+                    bool connectionDead;
                     bool retry;
                     DecipherException(ex, out connectionDead, out retry);
 
-                    _logger.Error("Exception during command processing: connectionDead={0} retry={1} : {2}", connectionDead, retry, ex.Message);
+                    _logger.Error("Command failed (connectionDead={0} retry={1}) with error {2}", connectionDead, retry, ex.Message);
 
+                    // keep the connection alive if the error is not linked to transport
+                    if (null != connection && !connectionDead)
+                    {
+                        connection.KeepAlive();
+                    }
+
+                    // should we retry ?
                     if (!retry || !BehaviorConfig.MaxRetries.HasValue || tryCount >= BehaviorConfig.MaxRetries)
                     {
                         _logger.Fatal("Max retry count reached");
                         throw;
                     }
 
+                    // wait a little bit before trying again
                     if (BehaviorConfig.SleepBeforeRetry.HasValue)
                     {
                         Thread.Sleep(BehaviorConfig.SleepBeforeRetry.Value);
@@ -110,10 +120,9 @@ namespace CassandraSharp
                 }
                 finally
                 {
-                    if (null != connection)
-                    {
-                        ReleaseConnection(connection, connectionDead);
-                    }
+                    // Dispose either recycle or close the connection
+                    // accordingly to the logic above
+                    connection.SafeDispose();
                 }
 
                 ++tryCount;
@@ -126,63 +135,48 @@ namespace CassandraSharp
             return new Cluster(childConfig, _pool, _transportFactory, _endpointStrategy, _recoveryService, TimestampService, _logger, this);
         }
 
-        public IConnection AcquireConnection(byte[] key)
+        public IConnection AcquireConnection(Token token)
         {
-            IConnection connection;
-            if (!_pool.Acquire(out connection))
+            IConnection connection = null;
+            try
             {
-                // pick an endpoint
-                IPAddress endpoint = _endpointStrategy.Pick(key);
-                if (null == endpoint)
+                if (!_pool.Acquire(token, out connection))
                 {
-                    throw new ArgumentException("Can't find any valid endpoint");
+                    // pick an endpoint
+                    IPAddress endpoint = _endpointStrategy.Pick(token);
+                    if (null == endpoint)
+                    {
+                        throw new ArgumentException("Can't find any valid endpoint");
+                    }
+
+                    // try to create a new connection - if this fails, recover the endpoint
+                    Cassandra.Client client = CreateClientOrMarkEndpointForRecovery(endpoint, token);
+                    connection = new PooledConnection(client, endpoint, token, _pool);
                 }
 
-                // try to create a new connection
-                // if this fails then recover the endpoint
-                try
-                {
-                    Cassandra.Client client = _transportFactory.Create(endpoint);
-                    connection = new Connection(client, endpoint);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error("Exception while creating transport for endpoint {0} : {1}", endpoint, ex.Message);
-
-                    MarkEndpointForRecovery(endpoint);
-                    throw;
-                }
+                // initialize the context of the connection
+                ChangeKeyspace(connection);
+                return connection;
             }
-
-            // initialize the context of the connection
-            ChangeKeyspace(connection);
-            return connection;
-        }
-
-        public void ReleaseConnection(IConnection connection, bool hasFailed)
-        {
-            connection.CheckArgumentNotNull("connection");
-
-            // protect against exception during acquire connection
-            if (hasFailed)
+            catch
             {
-                MarkEndpointForRecovery(connection.Endpoint);
                 connection.SafeDispose();
-            }
-            else
-            {
-                _pool.Release(connection);
+                throw;
             }
         }
 
-        private void MarkEndpointForRecovery(IPAddress endpoint)
+        private Cassandra.Client CreateClientOrMarkEndpointForRecovery(IPAddress endpoint, Token token)
         {
-            _endpointStrategy.Ban(endpoint);
-
-            if (null != _recoveryService)
+            try
             {
-                _logger.Info("marking {0} for recovery", endpoint);
-                _recoveryService.Recover(endpoint, _transportFactory, ClientRecoveredCallback);
+                Cassandra.Client client = _transportFactory.Create(endpoint);
+                return client;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Error creating transport for endpoint {0} : {1}", endpoint, ex.Message);
+                MarkEndpointForRecovery(endpoint, token);
+                throw;
             }
         }
 
@@ -198,6 +192,19 @@ namespace CassandraSharp
                 //string useKeyspace = string.Format("use {0}", connection.KeySpace);
                 //byte[] bufUseKeyspace = new Utf8NameOrValue(useKeyspace).ConvertToByteArray();
                 //connection.CassandraClient.execute_cql_query(bufUseKeyspace, Compression.NONE);
+            }
+        }
+
+        private void MarkEndpointForRecovery(IPAddress endpoint, Token token)
+        {
+            _endpointStrategy.Ban(endpoint);
+
+            if (null != _recoveryService)
+            {
+                _logger.Info("marking {0} for recovery", endpoint);
+
+                Action<IPAddress, Cassandra.Client> cbRecovery = (a, c) => ClientRecoveredCallback(a, c, token);
+                _recoveryService.Recover(endpoint, _transportFactory, cbRecovery);
             }
         }
 
@@ -245,35 +252,15 @@ namespace CassandraSharp
             }
         }
 
-        private void ClientRecoveredCallback(IPAddress endpoint, Cassandra.Client client)
+        private void ClientRecoveredCallback(IPAddress endpoint, Cassandra.Client client, Token token)
         {
             _logger.Info("{0} is recovered", endpoint);
 
             _endpointStrategy.Permit(endpoint);
-            Connection connection = new Connection(client, endpoint);
-            _pool.Release(connection);
-        }
 
-        private class Connection : IConnection
-        {
-            public Connection(Cassandra.Client client, IPAddress endpoint)
-            {
-                Endpoint = endpoint;
-                CassandraClient = client;
-            }
-
-            public void Dispose()
-            {
-                CassandraClient.InputProtocol.Transport.Close();
-            }
-
-            public string KeySpace { get; set; }
-
-            public string User { get; set; }
-
-            public IPAddress Endpoint { get; private set; }
-
-            public Cassandra.Client CassandraClient { get; private set; }
+            // wrap the Client into a new connection (and keeping it alive to avoid closing it)
+            using (IConnection connection = new PooledConnection(client, endpoint, token, _pool))
+                connection.KeepAlive();
         }
     }
 }

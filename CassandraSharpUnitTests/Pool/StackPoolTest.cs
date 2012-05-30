@@ -27,34 +27,35 @@ namespace CassandraSharpUnitTests.Pool
         [Test]
         public void TestBehavior()
         {
+            Token token = new Token(new byte[0]);
             Mock<IDisposable> mock1 = new Mock<IDisposable>();
             Mock<IDisposable> mock2 = new Mock<IDisposable>();
             Mock<IDisposable> mock3 = new Mock<IDisposable>();
 
-            IPool<IDisposable> pool = new StackPool<IDisposable>(2);
+            IPool<Token, IDisposable> pool = new StackPool<Token, IDisposable>(2);
 
             // nothing should be aquired
             IDisposable disposable;
-            Assert.IsFalse(pool.Acquire(out disposable));
+            Assert.IsFalse(pool.Acquire(token, out disposable));
             Assert.IsNull(disposable);
 
             // no dispose (1 bucket free)
-            pool.Release(mock1.Object);
+            pool.Release(token, mock1.Object);
             mock1.Verify(x => x.Dispose(), Times.Never());
 
             // acquire should be ok
-            Assert.IsTrue(pool.Acquire(out disposable));
+            Assert.IsTrue(pool.Acquire(token, out disposable));
             mock1.Verify(x => x.Dispose(), Times.Never());
             Assert.IsNotNull(disposable);
 
             // no release (0 bucket free)
-            pool.Release(disposable);
-            pool.Release(mock2.Object);
+            pool.Release(token, disposable);
+            pool.Release(token, mock2.Object);
             mock1.Verify(x => x.Dispose(), Times.Never());
             mock2.Verify(x => x.Dispose(), Times.Never());
 
             // should release since no free bucket
-            pool.Release(mock3.Object);
+            pool.Release(token, mock3.Object);
             mock3.Verify(x => x.Dispose());
 
             // dispose must dispose everything

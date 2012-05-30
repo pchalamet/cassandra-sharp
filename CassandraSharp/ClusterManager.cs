@@ -61,7 +61,7 @@ namespace CassandraSharp
 
             // create endpoint strategy
             IEndpointStrategy endpointsManager = Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch);
-            IPool<IConnection> pool = Pool.Factory.Create(null, transportConfig.PoolSize);
+            IPool<Token, IConnection> pool = Pool.Factory.Create(clusterConfig.Endpoints.Pool, transportConfig.PoolSize);
 
             // get timestamp service
             ITimestampService timestampService = Timestamp.Factory.Create(clusterConfig.Endpoints.Timestamp);

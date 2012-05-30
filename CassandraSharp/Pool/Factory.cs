@@ -19,19 +19,19 @@ namespace CassandraSharp.Pool
 
     internal static class Factory
     {
-        public static IPool<IConnection> Create(string customType, int poolSize)
+        public static IPool<Token, IConnection> Create(string customType, int poolSize)
         {
             switch (customType)
             {
                 case null:
                 case "Stack":
-                    return new StackPool<IConnection>(poolSize);
+                    return new StackPool<Token, IConnection>(poolSize);
 
                 case "Void":
-                    return new VoidPool<IConnection>();
+                    return new VoidPool<Token, IConnection>();
 
                 default:
-                    return ServiceActivator.Create<IPool<IConnection>>(customType, poolSize);
+                    return ServiceActivator.Create<IPool<Token, IConnection>>(customType, poolSize);
             }
         }
     }

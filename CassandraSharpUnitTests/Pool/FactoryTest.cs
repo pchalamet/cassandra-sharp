@@ -22,7 +22,7 @@ namespace CassandraSharpUnitTests.Pool
     [TestFixture]
     public class FactoryTest
     {
-        private class CustomPool : IPool<IConnection>
+        private class CustomPool : IPool<Token, IConnection>
         {
             public CustomPool(int poolSize)
             {
@@ -35,13 +35,13 @@ namespace CassandraSharpUnitTests.Pool
             {
             }
 
-            public bool Acquire(out IConnection entry)
+            public bool Acquire(Token token, out IConnection entry)
             {
                 entry = null;
                 return false;
             }
 
-            public void Release(IConnection entry)
+            public void Release(Token token, IConnection entry)
             {
             }
         }
@@ -51,7 +51,7 @@ namespace CassandraSharpUnitTests.Pool
         {
             const int expectedPoolSize = 42;
             string customType = typeof(CustomPool).AssemblyQualifiedName;
-            IPool<IConnection> pool = Factory.Create(customType, expectedPoolSize);
+            IPool<Token, IConnection> pool = Factory.Create(customType, expectedPoolSize);
 
             CustomPool customPool = pool as CustomPool;
             Assert.NotNull(customPool);
@@ -61,15 +61,15 @@ namespace CassandraSharpUnitTests.Pool
         [Test]
         public void TestCreateStack()
         {
-            IPool<IConnection> pool = Factory.Create("Stack", 1);
-            Assert.IsTrue(pool is StackPool<IConnection>);
+            IPool<Token, IConnection> pool = Factory.Create("Stack", 1);
+            Assert.IsTrue(pool is StackPool<Token, IConnection>);
         }
 
         [Test]
         public void TestCreateVoid()
         {
-            IPool<IConnection> pool = Factory.Create("Void", 1);
-            Assert.IsTrue(pool is VoidPool<IConnection>);
+            IPool<Token, IConnection> pool = Factory.Create("Void", 1);
+            Assert.IsTrue(pool is VoidPool<Token, IConnection>);
         }
     }
 }

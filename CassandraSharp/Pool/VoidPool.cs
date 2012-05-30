@@ -18,19 +18,21 @@ namespace CassandraSharp.Pool
     using System;
     using CassandraSharp.Utils;
 
-    internal class VoidPool<T> : IPool<T> where T : IDisposable
+    internal class VoidPool<T, E> : IPool<T, E>
+        where T : IComparable<T>, IEquatable<T>
+        where E : IDisposable
     {
         public void Dispose()
         {
         }
 
-        public bool Acquire(out T entry)
+        public bool Acquire(T token, out E entry)
         {
-            entry = default(T);
+            entry = default(E);
             return false;
         }
 
-        public void Release(T entry)
+        public void Release(T token, E entry)
         {
             entry.SafeDispose();
         }
