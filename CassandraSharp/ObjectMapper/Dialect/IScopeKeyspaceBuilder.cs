@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface IScopeKeyspace
+    public interface IScopeKeyspaceBuilder
     {
         string Keyspace { get; set; }
     }

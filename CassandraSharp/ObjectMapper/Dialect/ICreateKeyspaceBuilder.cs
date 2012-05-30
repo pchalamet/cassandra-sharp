@@ -18,7 +18,7 @@ namespace CassandraSharp.ObjectMapper.Dialect
     using System.Collections.Generic;
 
     public interface ICreateKeyspaceBuilder : IBuilder,
-                                              IScopeKeyspace
+                                              IScopeKeyspaceBuilder
     {
         string StrategyClass { get; set; }
 

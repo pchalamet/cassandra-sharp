@@ -18,7 +18,7 @@ namespace CassandraSharp.ObjectMapper.Dialect
     public interface IInsertBuilder : IBuilder,
                                       IScopeTableBuilder,
                                       IScopeColumnsBuilder,
-                                      IValueSetter,
+                                      IValueSetterBuilder,
                                       IConsistencyLevelBuilder
     {
     }

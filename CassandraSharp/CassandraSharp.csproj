@@ -76,11 +76,11 @@
     <Compile Include="ObjectMapper\Dialect\IWhereBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IInsertBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IQueryBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IScopeKeyspace.cs" />
+    <Compile Include="ObjectMapper\Dialect\IScopeKeyspaceBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IScopeTableBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\ITruncateTableBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IUpdateBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IValueSetter.cs" />
+    <Compile Include="ObjectMapper\Dialect\IValueSetterBuilder.cs" />
     <Compile Include="ObjectMapper\CqlType.cs" />
     <Compile Include="ObjectMapper\Cql3\QueryBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IScopeColumnsBuilder.cs" />

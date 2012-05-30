@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface IValueSetter
+    public interface IValueSetterBuilder
     {
         string[] Values { get; set; }
 

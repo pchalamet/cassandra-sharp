@@ -38,5 +38,17 @@ namespace CassandraSharp.Utils
                 throw new ArgumentException(name);
             }
         }
+
+        [Conditional("DEBUG")]
+        public static void CheckArrayHasSameDimensionsThan<T>(this T[] prm, string name)
+        {
+            prm.CheckArgumentNotNull(name);
+            if (0 == prm.Length)
+            {
+                throw new ArgumentException(name);
+            }
+        }
+
+
     }
 }
