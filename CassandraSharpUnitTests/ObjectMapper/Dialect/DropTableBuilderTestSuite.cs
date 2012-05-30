@@ -46,13 +46,5 @@ namespace CassandraSharpUnitTests.ObjectMapper.Dialect
             builder.Table = null;
             Assert.Throws<ArgumentException>(() => builder.Build());
         }
-
-        [Test]
-        public void TestValidateColumns()
-        {
-            IDropTableBuilder builder = CreateDropTableBuilder();
-            builder.Columns = new string[0];
-            Assert.Throws<ArgumentException>(() => builder.Build());
-        }
     }
 }

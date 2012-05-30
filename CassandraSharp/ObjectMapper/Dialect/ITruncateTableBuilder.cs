@@ -16,7 +16,7 @@
 namespace CassandraSharp.ObjectMapper.Dialect
 {
     public interface ITruncateTableBuilder : IBuilder,
-                                             IScopeBuilder
+                                             IScopeTableBuilder
     {
     }
 }

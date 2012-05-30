@@ -72,8 +72,8 @@
     <Compile Include="ObjectMapper\Dialect\IDialect.cs" />
     <Compile Include="ObjectMapper\Dialect\ICreateTableBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IDropKeyspaceBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IDropTable.cs" />
-    <Compile Include="ObjectMapper\Dialect\IFilterBuilder.cs" />
+    <Compile Include="ObjectMapper\Dialect\IDropTableBuilder.cs" />
+    <Compile Include="ObjectMapper\Dialect\IWhereBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IInsertBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IQueryBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IScopeKeyspace.cs" />
@@ -83,7 +83,7 @@
     <Compile Include="ObjectMapper\Dialect\IValueSetter.cs" />
     <Compile Include="ObjectMapper\CqlType.cs" />
     <Compile Include="ObjectMapper\Cql3\QueryBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IScopeBuilder.cs" />
+    <Compile Include="ObjectMapper\Dialect\IScopeColumnsBuilder.cs" />
     <Compile Include="ObjectMapper\Schema.cs" />
     <Compile Include="ObjectMapper\SerializersExtensions.cs" />
     <Compile Include="ObjectMapper\PreparedQueryExtensions.cs" />

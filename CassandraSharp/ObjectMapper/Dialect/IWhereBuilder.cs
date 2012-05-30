@@ -15,10 +15,8 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface IScopeBuilder
+    public interface IWhereBuilder
     {
-        string Table { get; set; }
-
-        string[] Columns { get; set; }
+        string[] Wheres { get; set; }
     }
 }

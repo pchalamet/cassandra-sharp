@@ -15,8 +15,8 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface IFilterBuilder
+    public interface IScopeColumnsBuilder
     {
-        string[] Wheres { get; set; }
+        string[] Columns { get; set; }
     }
 }

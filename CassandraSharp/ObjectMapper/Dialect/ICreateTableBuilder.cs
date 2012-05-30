@@ -16,7 +16,8 @@
 namespace CassandraSharp.ObjectMapper.Dialect
 {
     public interface ICreateTableBuilder : IBuilder,
-                                           IScopeBuilder
+                                           IScopeTableBuilder,
+                                           IScopeColumnsBuilder
     {
         string[] ColumnTypes { get; set; }
 

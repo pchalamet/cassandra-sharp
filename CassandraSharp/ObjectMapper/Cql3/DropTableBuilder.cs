@@ -32,16 +32,9 @@ namespace CassandraSharp.ObjectMapper.Cql3
         }
 
         public string Table { get; set; }
-
-        public string[] Columns { get; set; }
-
+        
         private void Validate()
         {
-            if (null != Columns)
-            {
-                throw new ArgumentException("Columns must not be set");
-            }
-
             if (null == Table)
             {
                 throw new ArgumentException("Table must be set");
