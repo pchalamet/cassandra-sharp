@@ -250,6 +250,7 @@ namespace CassandraSharp.Utils
 
             if (isScalar)
             {
+                xmlReader.Read();
                 string value = xmlReader.Value;
                 SetAttribute(target, mi, value);
             }

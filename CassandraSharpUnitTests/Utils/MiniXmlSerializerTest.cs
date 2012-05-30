@@ -51,6 +51,48 @@ namespace CassandraSharpUnitTests.Utils
             using (TextReader txtReader = new StringReader(xml))
             using (XmlReader xmlReader = XmlReader.Create(txtReader))
                 rootClass = (TestRootClass) xmlSer.Deserialize(xmlReader);
+
+            Assert.IsNotNull(rootClass);
+            Assert.IsNotNull(rootClass.NullableIntAttribute);
+            Assert.IsNull(rootClass.NullableIntElement);
+            Assert.IsNotNull(rootClass.StringElement);
+            Assert.AreEqual(42, rootClass.NullableIntAttribute);
+            Assert.AreEqual("666", rootClass.StringElement);
         }
+
+        [Test]
+        public void TestMalformedXml()
+        {
+            string xml =
+                @"<RootClass nullableIntAttribute='42'>
+                   <StringElement>666</StringElemen>
+                 </RootClass>";
+
+            MiniXmlSerializer xmlSer = new MiniXmlSerializer(typeof(TestRootClass));
+
+            using (TextReader txtReader = new StringReader(xml))
+            using (XmlReader xmlReader = XmlReader.Create(txtReader))
+            {
+                Assert.Throws<XmlException>(() => xmlSer.Deserialize(xmlReader));
+            }
+        }
+
+        [Test]
+        public void TestMalformedXmlMissingEnd()
+        {
+            string xml =
+                @"<RootClass nullableIntAttribute='42'>
+                   <StringElement>666</StringElement>
+                 ";
+
+            MiniXmlSerializer xmlSer = new MiniXmlSerializer(typeof(TestRootClass));
+
+            using (TextReader txtReader = new StringReader(xml))
+            using (XmlReader xmlReader = XmlReader.Create(txtReader))
+            {
+                Assert.Throws<XmlException>(() => xmlSer.Deserialize(xmlReader));
+            }
+        }
+
     }
 }
