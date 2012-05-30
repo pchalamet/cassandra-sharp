@@ -21,34 +21,33 @@ namespace CassandraSharp.Utils
     public static class CheckParameterExtensions
     {
         [Conditional("DEBUG")]
-        public static void CheckArgumentNotNull(this object prm, string name)
+        public static void CheckArgumentNotNull(this object @this, string name)
         {
-            if (null == prm)
+            if (null == @this)
             {
                 throw new ArgumentNullException(name);
             }
         }
 
         [Conditional("DEBUG")]
-        public static void CheckArrayHasAtLeastOneElement<T>(this T[] prm, string name)
+        public static void CheckArrayHasAtLeastOneElement<T>(this T[] @this, string name)
         {
-            prm.CheckArgumentNotNull(name);
-            if( 0 == prm.Length)
+            @this.CheckArgumentNotNull(name);
+            if (0 == @this.Length)
             {
-                throw new ArgumentException(name);
+                throw new ArgumentException("Array must have at least one element", name);
             }
         }
 
         [Conditional("DEBUG")]
-        public static void CheckArrayHasSameDimensionsThan<T>(this T[] prm, string name)
+        public static void CheckArrayIsSameLengthAs<T1, T2>(this T1[] @this, T2[] otherPrm, string thisName, string otherName)
         {
-            prm.CheckArgumentNotNull(name);
-            if (0 == prm.Length)
+            @this.CheckArgumentNotNull(thisName);
+            otherPrm.CheckArgumentNotNull(otherName);
+            if (@this.Length != otherPrm.Length)
             {
-                throw new ArgumentException(name);
+                throw new ArgumentException("Arrays must have the same length", thisName + "/" + otherName);
             }
         }
-
-
     }
 }

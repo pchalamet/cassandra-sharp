@@ -82,11 +82,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
             Table.CheckArgumentNotNull("Table");
             Columns.CheckArrayHasAtLeastOneElement("Columns");
             Values.CheckArrayHasAtLeastOneElement("Values");
-
-            if (Columns.Length != Values.Length)
-            {
-                throw new ArgumentException("Columns and Values must have the same number of elements");
-            }
+            Columns.CheckArrayIsSameLengthAs(Values, "Columns", "Values");
         }
     }
 }
