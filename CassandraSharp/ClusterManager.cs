@@ -88,12 +88,9 @@ namespace CassandraSharp
         [MethodImpl(MethodImplOptions.Synchronized)]
         private static IRecoveryService FindRecoveryService(bool recover)
         {
-            if (! recover)
-            {
-                return null;
-            }
-
-            return _recoveryService;
+            return ! recover
+                       ? null
+                       : _recoveryService;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
