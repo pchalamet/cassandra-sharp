@@ -42,23 +42,23 @@ namespace CassandraSharp.ObjectMapper.Cql3
                 sep = ",";
             }
             sb.Append(")");
-            sep = "";
 
+            sep = " using ";
             if (null != ConsistencyLevel)
             {
-                sb.AppendFormat(" using consistency {0}", ConsistencyLevel.Value);
+                sb.AppendFormat("{0}consistency {1}", sep, ConsistencyLevel.Value);
                 sep = " and ";
             }
 
             if (null != Timestamp)
             {
-                sb.AppendFormat("{0} timestamp {1}", sep, Timestamp.Value);
+                sb.AppendFormat("{0}timestamp {1}", sep, Timestamp.Value);
                 sep = " and ";
             }
 
             if (null != TTL)
             {
-                sb.AppendFormat("{0} ttl {1}", sep, TTL.Value);
+                sb.AppendFormat("{0}ttl {1}", sep, TTL.Value);
             }
 
             return sb.ToString();

@@ -19,7 +19,8 @@ namespace CassandraSharp.ObjectMapper.Dialect
                                       IScopeTableBuilder,
                                       IScopeColumnsBuilder,
                                       IValueSetterBuilder,
-                                      IConsistencyLevelBuilder
+                                      IConsistencyLevelBuilder,
+                                      ITimestampBuilder
     {
     }
 }

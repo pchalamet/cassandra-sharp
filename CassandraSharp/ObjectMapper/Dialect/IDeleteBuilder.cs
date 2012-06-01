@@ -15,10 +15,9 @@
 
 namespace CassandraSharp.ObjectMapper.Dialect
 {
-    public interface IUpdateBuilder : IBuilder,
+    public interface IDeleteBuilder : IBuilder,
                                       IScopeTableBuilder,
                                       IScopeColumnsBuilder,
-                                      IValueSetterBuilder,
                                       IWhereBuilder,
                                       IConsistencyLevelBuilder,
                                       ITimestampBuilder

@@ -60,6 +60,7 @@
     <Compile Include="ObjectMapper\ColumnDef.cs" />
     <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
     <Compile Include="ObjectMapper\Cql3\CreateKeyspaceBuilder.cs" />
+    <Compile Include="ObjectMapper\Cql3\DeleteBuilder.cs" />
     <Compile Include="ObjectMapper\Cql3\Dialect.cs" />
     <Compile Include="ObjectMapper\Cql3\CreateTableBuilder.cs" />
     <Compile Include="ObjectMapper\Cql3\DropKeyspaceBuilder.cs" />
@@ -70,10 +71,12 @@
     <Compile Include="ObjectMapper\Dialect\IConsistencyLevelBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\ICreateKeyspaceBuilder.cs" />
+    <Compile Include="ObjectMapper\Dialect\IDeleteBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IDialect.cs" />
     <Compile Include="ObjectMapper\Dialect\ICreateTableBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IDropKeyspaceBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IDropTableBuilder.cs" />
+    <Compile Include="ObjectMapper\Dialect\ITimestampBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IWhereBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IInsertBuilder.cs" />
     <Compile Include="ObjectMapper\Dialect\IQueryBuilder.cs" />

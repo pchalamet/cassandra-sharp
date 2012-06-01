@@ -13,15 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.ObjectMapper.Dialect
+namespace CassandraSharpUnitTests.ObjectMapper.Cql3Dialect
 {
-    public interface IUpdateBuilder : IBuilder,
-                                      IScopeTableBuilder,
-                                      IScopeColumnsBuilder,
-                                      IValueSetterBuilder,
-                                      IWhereBuilder,
-                                      IConsistencyLevelBuilder,
-                                      ITimestampBuilder
+    using CassandraSharp.ObjectMapper.Cql3;
+    using CassandraSharpUnitTests.ObjectMapper.Dialect;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class UpdateBuilderTest : UpdateBuilderTestSuite<Dialect>
     {
     }
 }

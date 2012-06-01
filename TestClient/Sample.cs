@@ -57,7 +57,7 @@ namespace TestClient
                 Console.WriteLine();
                 Console.WriteLine("===========================================================================");
                 Console.WriteLine("TEST FAILED WITH ERROR:");
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex);
                 Console.WriteLine("===========================================================================");
             }
             finally
@@ -70,7 +70,7 @@ namespace TestClient
                 {
                     Console.WriteLine();
                     Console.WriteLine("ERROR WHILE DROPPING KEYSPACE:");
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex);
                 }
             }
             Console.WriteLine();

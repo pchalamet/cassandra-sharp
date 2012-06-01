@@ -15,9 +15,9 @@
 
 namespace CassandraSharp.ObjectMapper
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using CassandraSharp.MadeSimple;
     using CassandraSharp.ObjectMapper.Cql3;
     using CassandraSharp.ObjectMapper.Dialect;
@@ -25,82 +25,186 @@ namespace CassandraSharp.ObjectMapper
 
     public static class MapperExtensions
     {
-        public static IEnumerable<T> Select<T>(this ICluster @this, object template) where T : new()
+        public static IEnumerable<TS> Select<TS>(this ICluster @this, object where) where TS : new()
         {
-            @this.CheckArgumentNotNull("@this");
-            template.CheckArgumentNotNull("template");
-
-            Schema schema = Schema.FromCache(typeof(T));
-
-            IQueryBuilder builder = new QueryBuilder();
-            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
-            builder.Table = schema.Table;
-            builder.ConsistencyLevel = @this.BehaviorConfig.WriteConsistencyLevel;
-            builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
-            string cqlSelect = builder.Build();
-
-            return @this.Execute<T>(schema, cqlSelect, template);
+            return @this.Select<TS, TS>(where);
         }
 
-        public static IEnumerable<R> Select<T, R>(this ICluster @this, object template) where R : new()
+        public static IEnumerable<TR> Select<TS, TR>(this ICluster @this, object where) where TR : new()
         {
             @this.CheckArgumentNotNull("@this");
-            template.CheckArgumentNotNull("template");
+            where.CheckArgumentNotNull("where");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
+
+            // where is composed with non null fields
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            foreach (MemberInfo mi in where.GetType().GetPublicMembers())
+            {
+                string name = mi.Name;
+                object value = where.GetDuckValue(name);
+                if (null != value)
+                {
+                    string cqlName = schema.NetName2ColumnDefs[name].CqlName;
+                    dic.Add(cqlName, value);
+                }
+            }
 
             IQueryBuilder builder = new QueryBuilder();
-            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
             builder.Table = schema.Table;
+            builder.Columns = schema.CqlName2ColumnDefs.Keys.ToArray();
+            builder.Wheres = dic.Keys.Select(x => x + "=?").ToArray();
             builder.ConsistencyLevel = @this.BehaviorConfig.WriteConsistencyLevel;
-            builder.Wheres = template.GetType().GetPublicMembers().Select(x => x.Name + "=?").ToArray();
-            string cqlSelect = builder.Build();
 
-            return @this.Execute<R>(schema, cqlSelect, template);
+            string cql = builder.Build();
+            return @this.Execute<TR>(schema, cql, dic);
         }
 
-        public static void Insert<T>(this ICluster @this, object template) where T : new()
+        public static void Insert<TS>(this ICluster @this, object template) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
             template.CheckArgumentNotNull("template");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
+
+            // insert only non null values
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            foreach(MemberInfo mi in template.GetType().GetPublicMembers())
+            {
+                string name = mi.Name;
+                object value = template.GetDuckValue(name);
+                if( null != value)
+                {
+                    string cqlName = schema.NetName2ColumnDefs[name].CqlName;
+                    dic.Add(cqlName, value);
+                }
+            }
 
             IInsertBuilder builder = new InsertBuilder();
             builder.Table = schema.Table;
-            builder.Columns = template.GetType().GetPublicMembers().Select(x => schema.NetName2ColumnDefs[x.Name].CqlName).ToArray();
+            builder.Columns = dic.Keys.ToArray();
             builder.Values = Enumerable.Repeat("?", builder.Columns.Length).ToArray();
             builder.ConsistencyLevel = @this.BehaviorConfig.WriteConsistencyLevel;
             builder.TTL = @this.BehaviorConfig.TTL;
             builder.Timestamp = @this.TimestampService.Generate();
-            string cqlInsert = builder.Build();
 
-            @this.ExecuteNonQuery(schema, cqlInsert, template);
+            string cql = builder.Build();
+            @this.ExecuteNonQuery(schema, cql, dic);
         }
 
-        public static void Delete<T>(this ICluster @this, object template) where T : new()
+        public static void Delete<TS>(this ICluster @this, object template, object where) where TS : new()
+        {
+            @this.CheckArgumentNotNull("@this");
+
+            Schema schema = Schema.FromCache(typeof(TS));
+
+            IDeleteBuilder builder = new DeleteBuilder();
+            builder.Table = schema.Table;
+            
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+
+            // if template is provided then just delete available fields
+            if (null != template)
+            {
+                foreach (MemberInfo mi in template.GetType().GetPublicMembers())
+                {
+                    string name = mi.Name;
+                    object value = template.GetDuckValue(name);
+                    if (null != value)
+                    {
+                        string cqlName = schema.NetName2ColumnDefs[name].CqlName;
+                        dic.Add(cqlName, value);
+                    }
+                }
+
+                builder.Columns = dic.Keys.ToArray();
+            }
+            else
+            {
+                // no template then delete the entire row
+                builder.Columns = new string[0];
+            }
+
+            // if where is provided then use all non null fields as filter
+            if (null != where)
+            {
+                List<string> wheres = new List<string>();
+                foreach (MemberInfo mi in where.GetType().GetPublicMembers())
+                {
+                    string name = mi.Name;
+                    object value = where.GetDuckValue(name);
+                    if (null != value)
+                    {
+                        string cqlName = schema.NetName2ColumnDefs[name].CqlName;
+                        dic.Add(cqlName, value);
+                        wheres.Add(cqlName + "=?");
+                    }
+                }
+
+                builder.Wheres = wheres.ToArray();
+            }
+            builder.ConsistencyLevel = @this.BehaviorConfig.WriteConsistencyLevel;
+
+            string cql = builder.Build();
+            @this.ExecuteNonQuery(schema, cql, dic);
+        }
+
+        public static void Update<TS>(this ICluster @this, object template, object where) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
             template.CheckArgumentNotNull("template");
 
-            // translate to "delete"
-            throw new NotImplementedException();
+            Schema schema = Schema.FromCache(typeof(TS));
+
+            // find updated columns (not null)
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            foreach (MemberInfo mi in template.GetType().GetPublicMembers())
+            {
+                string name = mi.Name;
+                object value = template.GetDuckValue(name);
+                if (null != value)
+                {
+                    string cqlName = schema.NetName2ColumnDefs[name].CqlName;
+                    dic.Add(cqlName, value);
+                }
+            }
+
+            IUpdateBuilder builder = new UpdateBuilder();
+            builder.Table = schema.Table;
+            builder.Columns = dic.Keys.ToArray();
+            builder.Values = Enumerable.Repeat("?", builder.Columns.Length).ToArray();
+            if (null != where)
+            {
+                // find where columns (not null)
+                List<string> wheres = new List<string>();
+                foreach (MemberInfo mi in where.GetType().GetPublicMembers())
+                {
+                    string name = mi.Name;
+                    object value = where.GetDuckValue(name);
+                    if (null != value)
+                    {
+                        string cqlName = schema.NetName2ColumnDefs[name].CqlName;
+                        dic.Add(cqlName, value);
+                        wheres.Add(cqlName + "=?");
+                    }
+                }
+
+                builder.Wheres = wheres.ToArray();
+            }
+            builder.ConsistencyLevel = @this.BehaviorConfig.WriteConsistencyLevel;
+            builder.TTL = @this.BehaviorConfig.TTL;
+            builder.Timestamp = @this.TimestampService.Generate();
+
+            string cql = builder.Build();
+
+            @this.ExecuteNonQuery(schema, cql, dic);
         }
 
-        public static void Update<T>(this ICluster @this, object template) where T : new()
-        {
-            @this.CheckArgumentNotNull("@this");
-            template.CheckArgumentNotNull("template");
-
-            // translate to "update"
-            throw new NotImplementedException();
-        }
-
-        public static void CreateKeyspace<T>(this ICluster @this, string strategyClass, Dictionary<string, int> replicationFactor) where T : new()
+        public static void CreateKeyspace<TS>(this ICluster @this, string strategyClass, Dictionary<string, int> replicationFactor) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
 
             ICreateKeyspaceBuilder builder = new CreateKeyspaceBuilder();
             builder.Keyspace = schema.Keyspace;
@@ -111,11 +215,11 @@ namespace CassandraSharp.ObjectMapper
             @this.ExecuteCql(createKeyspaceStmt);
         }
 
-        public static void DropKeyspace<T>(this ICluster @this) where T : new()
+        public static void DropKeyspace<TS>(this ICluster @this) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
 
             IDropKeyspaceBuilder builder = new DropKeyspaceBuilder();
             builder.Keyspace = schema.Keyspace;
@@ -124,11 +228,11 @@ namespace CassandraSharp.ObjectMapper
             @this.ExecuteCql(dropKeyspaceStmt);
         }
 
-        public static void CreateTable<T>(this ICluster @this) where T : new()
+        public static void CreateTable<TS>(this ICluster @this) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
 
             ICreateTableBuilder builder = new CreateTableBuilder();
             builder.Table = schema.Table;
@@ -158,11 +262,11 @@ namespace CassandraSharp.ObjectMapper
             //}
         }
 
-        public static void DropTable<T>(this ICluster @this) where T : new()
+        public static void DropTable<TS>(this ICluster @this) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
 
             IDropTableBuilder builder = new DropTableBuilder();
             builder.Table = schema.Table;
@@ -171,11 +275,11 @@ namespace CassandraSharp.ObjectMapper
             @this.ExecuteCql(dropTableStmt);
         }
 
-        public static void Truncate<T>(this ICluster @this) where T : new()
+        public static void TruncateTable<TS>(this ICluster @this) where TS : new()
         {
             @this.CheckArgumentNotNull("@this");
 
-            Schema schema = Schema.FromCache(typeof(T));
+            Schema schema = Schema.FromCache(typeof(TS));
 
             ITruncateTableBuilder tableBuilder = new TruncateTableBuilder();
             tableBuilder.Table = schema.Table;

@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.ObjectMapper.Cql3
 {
-    using System;
+    using System.Text;
     using Apache.Cassandra;
     using CassandraSharp.ObjectMapper.Dialect;
     using CassandraSharp.Utils;
@@ -28,7 +28,45 @@ namespace CassandraSharp.ObjectMapper.Cql3
         {
             Validate();
 
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("update {0}", Table);
+
+            string sep = " using ";
+            if (null != ConsistencyLevel)
+            {
+                sb.AppendFormat("{0}consistency {1}", sep, ConsistencyLevel.Value);
+                sep = " and ";
+            }
+
+            if (null != Timestamp)
+            {
+                sb.AppendFormat("{0}timestamp {1}", sep, Timestamp.Value);
+                sep = " and ";
+            }
+
+            if (null != TTL)
+            {
+                sb.AppendFormat("{0}ttl {1}", sep, TTL.Value);
+            }
+
+            sep = " set ";
+            for (int i = 0; i < Columns.Length; ++i)
+            {
+                sb.AppendFormat("{0}{1}={2}", sep, Columns[i], Values[i]);
+                sep = ",";
+            }
+
+            if (null != Wheres)
+            {
+                sep = " where ";
+                foreach (string where in Wheres)
+                {
+                    sb.AppendFormat("{0}{1}", sep, where);
+                    sep = " and ";
+                }
+            }
+
+            return sb.ToString();
         }
 
         public string[] Columns { get; set; }
@@ -45,8 +83,10 @@ namespace CassandraSharp.ObjectMapper.Cql3
 
         private void Validate()
         {
-            Columns.CheckArrayHasAtLeastOneElement("Columns");
             Table.CheckArgumentNotNull("Table");
+            Columns.CheckArrayHasAtLeastOneElement("Columns");
+            Values.CheckArrayHasAtLeastOneElement("Values");
+            Columns.CheckArrayIsSameLengthAs(Values, "Columns", "Values");
         }
     }
 }

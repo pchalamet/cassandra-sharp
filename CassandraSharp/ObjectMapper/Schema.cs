@@ -57,7 +57,7 @@ namespace CassandraSharp.ObjectMapper
 
             IEnumerable<ColumnDef> allColumns = FindColumns(schemaType);
             NetName2ColumnDefs = allColumns.ToDictionary(x => x.NetName);
-            CqlName2ColumnDefs = allColumns.ToDictionary(x => x.CqlName.ToLower());
+            CqlName2ColumnDefs = allColumns.ToDictionary(x => x.CqlName);
         }
 
         public Type SchemaType { get; private set; }
@@ -96,7 +96,7 @@ namespace CassandraSharp.ObjectMapper
 
                 if (null != ca)
                 {
-                    string cqlName = ca.Name ?? netName;
+                    string cqlName = (ca.Name ?? netName).ToLower();
                     int index = 0;
 
                     CqlType cqlType = ca.CqlType;

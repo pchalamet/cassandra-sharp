@@ -19,8 +19,6 @@ namespace CassandraSharp.ObjectMapper.Dialect
     {
         string[] Values { get; set; }
 
-        long? Timestamp { get; set; }
-
         long? TTL { get; set; }
     }
 }

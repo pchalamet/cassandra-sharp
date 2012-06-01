@@ -20,26 +20,35 @@ namespace CassandraSharp.ObjectMapper.Cql3
     using CassandraSharp.ObjectMapper.Dialect;
     using CassandraSharp.Utils;
 
-    public class QueryBuilder : IQueryBuilder
+    internal class DeleteBuilder : IDeleteBuilder
     {
         public string Build()
         {
             Validate();
 
             StringBuilder sb = new StringBuilder();
-            string sep = "select ";
-            foreach (string selector in Columns)
+            sb.AppendFormat("delete");
+            string sep = " ";
+            if (null != Columns)
             {
-                sb.AppendFormat("{0}{1}", sep, selector);
-                sep = ",";
+                foreach (string selector in Columns)
+                {
+                    sb.AppendFormat("{0}{1}", sep, selector);
+                    sep = ",";
+                }
             }
-
             sb.AppendFormat(" from {0}", Table);
 
             sep = " using ";
             if (null != ConsistencyLevel)
             {
-                sb.AppendFormat("{0}consistency {1}", sep, ConsistencyLevel);
+                sb.AppendFormat("{0}consistency {1}", sep, ConsistencyLevel.Value);
+                sep = " and ";
+            }
+
+            if (null != Timestamp)
+            {
+                sb.AppendFormat("{0}timestamp {1}", sep, Timestamp.Value);
             }
 
             if (null != Wheres)
@@ -55,17 +64,18 @@ namespace CassandraSharp.ObjectMapper.Cql3
             return sb.ToString();
         }
 
-        public ConsistencyLevel? ConsistencyLevel { get; set; }
-
         public string Table { get; set; }
-
-        public string[] Wheres { get; set; }
 
         public string[] Columns { get; set; }
 
+        public ConsistencyLevel? ConsistencyLevel { get; set; }
+
+        public long? Timestamp { get; set; }
+
+        public string[] Wheres { get; set; }
+
         private void Validate()
         {
-            Columns.CheckArrayHasAtLeastOneElement("Columns");
             Table.CheckArgumentNotNull("Table");
         }
     }
