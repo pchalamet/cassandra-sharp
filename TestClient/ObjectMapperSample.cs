@@ -103,14 +103,14 @@ namespace TestClient
 
         protected override void RunSample(ICluster cluster)
         {
-            cluster.Insert<Users>(new Users {Name = "User1", DisplayName = "RealName1", Location = "SF"});
-            cluster.Insert<Users>(new Users {Name = "User2", DisplayName = "RealName2", Location = "NY"});
-            cluster.Insert<Users>(new Users {Name = "User3", DisplayName = "RealName3", Location = "SF"});
-            cluster.Insert<Users>(new Users {Name = "User4", DisplayName = "RealName4", Location = "HK"});
-            cluster.Update<Users>(template: new Users {DisplayName = "UpdatedRealName3"},
-                                  where: new Users {Name = "User3", Location = "SF"});
+            cluster.Insert<Users>(new {Name = "User1", DisplayName = "RealName1", Location = "SF"});
+            cluster.Insert<Users>(new {Name = "User2", DisplayName = "RealName2", Location = "NY"});
+            cluster.Insert<Users>(new {Name = "User3", DisplayName = "RealName3", Location = "SF"});
+            cluster.Insert<Users>(new {Name = "User4", DisplayName = "RealName4", Location = "HK"});
+            cluster.Update<Users>(template: new {DisplayName = "UpdatedRealName3"},
+                                  where: new {Name = "User3", Location = "SF"});
             cluster.Delete<Users>(template: null,
-                                  where: new Users {Name = "User1", Location = "SF"});
+                                  where: new {Name = "User1", Location = "SF"});
 
             IEnumerable<Users> users = cluster.Select<Users>(new Users {Location = "SF"});
             foreach (Users user in users)

@@ -91,7 +91,7 @@ namespace CassandraSharp.ObjectMapper
             }
         }
 
-        public static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, IEnumerable<Dictionary<string, object>> prms)
+        private static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, IEnumerable<Dictionary<string, object>> prms)
             where TR : new()
         {
             using (IConnection connection = @this.AcquireConnection(null))
@@ -113,21 +113,29 @@ namespace CassandraSharp.ObjectMapper
             }
         }
 
-        public static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, params Dictionary<string, object>[] prms) where TR : new()
+        // =========================================================
+        // QUERY
+        // =========================================================
+        internal static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, params Dictionary<string, object>[] prms) where TR : new()
         {
             return @this.Execute<TR>(schema, query, prms.AsEnumerable());
         }
 
-        public static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, params object[] prms) where TR : new()
+        public static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, IEnumerable<object> prms) where TR : new()
         {
             IEnumerable<Dictionary<string, object>> dicPrms = prms.Select(x => x.ToDictionary(schema));
             return @this.Execute<TR>(schema, query, dicPrms);
         }
 
+        public static IEnumerable<TR> Execute<TR>(this ICluster @this, Schema schema, string query, params object[] prms) where TR : new()
+        {
+            return @this.Execute<TR>(schema, query, prms.AsEnumerable());
+        }
+
         // =========================================================
         // NON QUERY
         // =========================================================
-        public static int ExecuteNonQuery(this ICluster @this, Schema schema, string query, params Dictionary<string, object>[] prms)
+        internal static int ExecuteNonQuery(this ICluster @this, Schema schema, string query, params Dictionary<string, object>[] prms)
         {
             int nbResults = @this.Execute<Unit>(schema, query, prms.AsEnumerable()).Count();
             return nbResults;
@@ -145,7 +153,7 @@ namespace CassandraSharp.ObjectMapper
             return @this.ExecuteNonQuery(schema, query, prms.AsEnumerable());
         }
 
-        internal class Unit
+        private class Unit
         {
         }
     }
