@@ -69,11 +69,11 @@ namespace CassandraSharp.ObjectMapper
 
             // insert only non null values
             Dictionary<string, object> dic = new Dictionary<string, object>();
-            foreach(MemberInfo mi in template.GetType().GetPublicMembers())
+            foreach (MemberInfo mi in template.GetType().GetPublicMembers())
             {
                 string name = mi.Name;
                 object value = template.GetDuckValue(name);
-                if( null != value)
+                if (null != value)
                 {
                     string cqlName = schema.NetName2ColumnDefs[name].CqlName;
                     dic.Add(cqlName, value);
@@ -100,7 +100,7 @@ namespace CassandraSharp.ObjectMapper
 
             IDeleteBuilder builder = new DeleteBuilder();
             builder.Table = schema.Table;
-            
+
             Dictionary<string, object> dic = new Dictionary<string, object>();
 
             // if template is provided then just delete available fields
@@ -198,6 +198,12 @@ namespace CassandraSharp.ObjectMapper
             string cql = builder.Build();
 
             @this.ExecuteNonQuery(schema, cql, dic);
+        }
+
+        public static void CreateKeyspace<TS>(this ICluster @this, int replicationFactor) where TS : new()
+        {
+            Dictionary<string, int> replicationFactors = new Dictionary<string, int> {{"replication_factor", replicationFactor}};
+            @this.CreateKeyspace<TS>("SimpleStrategy", replicationFactors);
         }
 
         public static void CreateKeyspace<TS>(this ICluster @this, string strategyClass, Dictionary<string, int> replicationFactor) where TS : new()

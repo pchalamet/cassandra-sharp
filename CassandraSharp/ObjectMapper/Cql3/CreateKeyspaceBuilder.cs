@@ -33,11 +33,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
             string strategyClass = StrategyClass ?? "SimpleStrategy";
             sb.AppendFormat(" with strategy_class={0}", strategyClass);
 
-            Dictionary<string, int> replicationFactor = ReplicationFactor ?? new Dictionary<string, int>
-                                                                                 {
-                                                                                     {"replication_factor", 1}
-                                                                                 };
-            foreach (var stratOpt in replicationFactor)
+            foreach (var stratOpt in ReplicationFactor)
             {
                 sb.AppendFormat(" and strategy_options:{0}={1}", stratOpt.Key, stratOpt.Value);
             }
@@ -54,6 +50,7 @@ namespace CassandraSharp.ObjectMapper.Cql3
         private void Validate()
         {
             Keyspace.CheckArgumentNotNull("Keyspace");
+            ReplicationFactor.CheckArgumentNotNull("ReplicationFactor");
         }
     }
 }

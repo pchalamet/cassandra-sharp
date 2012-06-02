@@ -80,7 +80,7 @@ namespace TestClient
         protected override void CreateKeyspace()
         {
             using (ICluster cluster = ClusterManager.GetCluster("MinimalConfig"))
-                cluster.CreateKeyspace<Users>(null, null);
+                cluster.CreateKeyspace<Users>(1);
         }
 
         protected override void DropKeyspace()
