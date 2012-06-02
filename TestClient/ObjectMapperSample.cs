@@ -109,8 +109,12 @@ namespace TestClient
             cluster.Insert<Users>(new {Name = "User4", DisplayName = "RealName4", Location = "HK"});
             cluster.Update<Users>(template: new {DisplayName = "UpdatedRealName3"},
                                   where: new {Name = "User3", Location = "SF"});
+
+            // TODO: this does not seem to work correctly
+            //        it looks like the delete is not performed in Cassandra 1.1.1
+            //        when the full composite key is provided (adding Location="SF" silently fails)
             cluster.Delete<Users>(template: null,
-                                  where: new {Name = "User1", Location = "SF"});
+                                  where: new {Name = "User1"});
 
             IEnumerable<Users> users = cluster.Select<Users>(new Users {Location = "SF"});
             foreach (Users user in users)

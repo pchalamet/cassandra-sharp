@@ -144,6 +144,7 @@ namespace CassandraSharp.ObjectMapper
                 builder.Wheres = wheres.ToArray();
             }
             builder.ConsistencyLevel = @this.BehaviorConfig.WriteConsistencyLevel;
+            builder.Timestamp = @this.TimestampService.Generate();
 
             string cql = builder.Build();
             @this.ExecuteNonQuery(schema, cql, dic);
