@@ -15,7 +15,7 @@ If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/
 
 
 Configuration
--------------
+=============
 	<configSections>
 		<section name="CassandraSharp" type="CassandraSharp.SectionHandler, CassandraSharp" />
 	</configSections>
@@ -29,7 +29,7 @@ Configuration
 	</CassandraSharp>
 
 Client
-------
+======
 	using System;
 	using System.Collections.Generic;
 	using CassandraSharp;
@@ -88,5 +88,5 @@ Client
 	}
 
 Thanks
-------
+======
 JetBrains provided a free licence of Resharper for the cassandra-sharp project. Big thanks for the awesome product.
