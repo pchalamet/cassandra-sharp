@@ -19,7 +19,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 
     internal class ColumnSpec : IColumnSpec
     {
-        public ColumnSpec(int index, string keyspace, string table, string name, ColumnType type, string customData)
+        public ColumnSpec(int index, string keyspace, string table, string name, ColumnType type, string customData, ColumnType collectionType)
         {
             Index = index;
             Keyspace = keyspace;
@@ -27,6 +27,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             Name = name;
             Type = type;
             CustomData = customData;
+            CollectionType = collectionType;
         }
 
         public int Index { get; private set; }
@@ -40,5 +41,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         public ColumnType Type { get; private set; }
 
         public string CustomData { get; private set; }
+
+        public ColumnType CollectionType { get; private set; }
     }
 }

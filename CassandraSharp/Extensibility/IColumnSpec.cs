@@ -28,5 +28,7 @@ namespace CassandraSharp.Extensibility
         ColumnType Type { get; }
 
         string CustomData { get; }
+
+        ColumnType CollectionType { get; }
     }
 }

@@ -204,12 +204,21 @@ namespace CassandraSharp.CQLBinaryProtocol
                 string colName = frameReader.ReadString();
                 ColumnType colType = (ColumnType) frameReader.ReadShort();
                 string colCustom = null;
-                if (colType == ColumnType.Custom)
+                ColumnType colSubType = ColumnType.Custom;
+                switch (colType)
                 {
-                    colCustom = frameReader.ReadString();
+                    case ColumnType.Custom:
+                        colCustom = frameReader.ReadString();
+                        break;
+
+                    case ColumnType.List:
+                    case ColumnType.Map:
+                    case ColumnType.Set:
+                        colSubType = (ColumnType)frameReader.ReadShort();
+                        break;
                 }
 
-                columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom);
+                columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colSubType);
             }
 
             return columnSpecs;
