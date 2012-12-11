@@ -21,9 +21,10 @@ namespace CassandraSharp.Config
     {
         public TransportConfig()
         {
-            Port = 9160;
-            Type = "Framed";
+            Port = 9042;
+            Type = "CqlBinary";
             Recoverable = true;
+            CqlVersion = "3.0.0";
         }
 
         [XmlAttribute("port")]
@@ -31,12 +32,6 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("type")]
         public string Type { get; set; }
-
-        [XmlAttribute("timeout")]
-        public int Timeout { get; set; }
-
-        [XmlAttribute("poolSize")]
-        public int PoolSize { get; set; }
 
         [XmlAttribute("recoverable")]
         public bool Recoverable { get; set; }

@@ -16,23 +16,20 @@
 namespace CassandraSharp.Transport
 {
     using CassandraSharp.Config;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
     {
-        public static ITransportFactory Create(TransportConfig @this)
+        public static IConnectionFactory Create(TransportConfig @this)
         {
             switch (@this.Type)
             {
-                case null:
-                case "Framed":
-                    return new FramedTransportFactory(@this);
-
-                case "Buffered":
-                    return new BufferedTransportFactory(@this);
+                case "CqlBinary":
+                    return new ConnectionFactory(@this);
 
                 default:
-                    return ServiceActivator.Create<ITransportFactory>(@this.Type, @this);
+                    return ServiceActivator.Create<IConnectionFactory>(@this.Type, @this);
             }
         }
     }

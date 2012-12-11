@@ -21,11 +21,13 @@ namespace CassandraSharp
     using System.Net;
     using System.Runtime.CompilerServices;
     using CassandraSharp.Config;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
     using CassandraSharp.Utils;
 
     public class ClusterManager
     {
+
         private static CassandraSharpConfig _config;
 
         private static IRecoveryService _recoveryService;
@@ -50,7 +52,7 @@ namespace CassandraSharp
             clusterConfig.CheckArgumentNotNull("clusterConfig");
             clusterConfig.Endpoints.CheckArgumentNotNull("clusterConfig.Endpoints");
 
-            IBehaviorConfig behaviorConfig = clusterConfig.BehaviorConfig ?? new BehaviorConfig();
+            //IBehaviorConfig behaviorConfig = clusterConfig.BehaviorConfig ?? new BehaviorConfig();
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
 
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
@@ -59,16 +61,13 @@ namespace CassandraSharp
             IEndpointSnitch snitch = Factory.Create(clusterConfig.Endpoints.Snitch);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find);
 
-            // create endpoint strategy
+            // create required services
             IEndpointStrategy endpointsManager = EndpointStrategy.Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch);
-            IPool<Token, IConnection> pool = Pool.Factory.Create(clusterConfig.Endpoints.Pool, transportConfig.PoolSize);
-
-            // get timestamp service
-            ITimestampService timestampService = Timestamp.Factory.Create(clusterConfig.Endpoints.Timestamp);
+            //ITimestampService timestampService = Timestamp.Factory.Create(clusterConfig.Endpoints.Timestamp);
+            IConnectionFactory connectionFactory = Transport.Factory.Create(transportConfig);
 
             // create the cluster now
-            ITransportFactory transportFactory = Transport.Factory.Create(transportConfig);
-            return new Cluster(behaviorConfig, pool, transportFactory, endpointsManager, recoveryService, timestampService, _logger);
+            return new Cluster(endpointsManager, _logger, connectionFactory, recoveryService);
         }
 
         private static ClusterConfig GetClusterConfig(string name)
@@ -89,8 +88,8 @@ namespace CassandraSharp
         private static IRecoveryService FindRecoveryService(bool recover)
         {
             return ! recover
-                       ? null
-                       : _recoveryService;
+                           ? null
+                           : _recoveryService;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

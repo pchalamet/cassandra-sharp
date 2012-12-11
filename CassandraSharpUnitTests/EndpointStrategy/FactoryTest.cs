@@ -21,6 +21,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using System.Net;
     using CassandraSharp;
     using CassandraSharp.EndpointStrategy;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
     using NUnit.Framework;
 
@@ -49,6 +50,11 @@ namespace CassandraSharpUnitTests.EndpointStrategy
             }
 
             public void Permit(IPAddress endpoint)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Update(IEnumerable<IPAddress> endpoints)
             {
                 throw new NotImplementedException();
             }

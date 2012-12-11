@@ -17,6 +17,7 @@ namespace CassandraSharp.Snitch
 {
     using System.Collections.Generic;
     using System.Net;
+    using CassandraSharp.Extensibility;
 
     internal class SimpleSnitch : IEndpointSnitch
     {

@@ -1,0 +1,7 @@
+TODO:
+- discovery
+- retry strategy
+- connection provider should be token aware
+- use timestamp somewhere
+- use TTL somewhere
+- event support

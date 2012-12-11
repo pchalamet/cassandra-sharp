@@ -21,7 +21,15 @@ if "%VERSION%" == "" (
 	set VERSION=0.0.0.0
 )
 
-msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=%FLAVOR% cassandra-sharp.targets || goto :done
+set VERSIONSTATUS=%3
+if "%VERSIONSTATUS%" == "" (
+	echo WARNING: missing version status as parameter ^(see %~n0 /?^)
+	echo WARNING: using VERSIONSTATUS=ALPHA instead
+	echo.
+	set VERSIONSTATUS=ALPHA
+)
+
+msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=%FLAVOR% /p:VersionStatus=%VERSIONSTATUS% cassandra-sharp.targets || goto :done
 
 :done
 popd
@@ -30,9 +38,10 @@ goto :eof
 
 :usage
 echo usage:
-echo    %~n0 ^<flavor^> ^<version^>
+echo    %~n0 ^<flavor^> ^<version^> ^<status^>
 echo.
 echo where:
 echo    flavor  : Debug or Release
 echo    version : format is AAA.BBB.CCC.DDD
+echo    status  : ALPHA, BETA, RTM
 goto :done

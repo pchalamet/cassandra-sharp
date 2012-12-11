@@ -1,13 +1,10 @@
-Apache.Cassandra/bin/
-Apache.Cassandra/gen-csharp/
-Apache.Cassandra/obj/
+CassandraClient/bin/
+CassandraClient/bin/
 CassandraSharp/bin/
 CassandraSharp/obj/
 CassandraSharpUnitTests/bin/
 CassandraSharpUnitTests/obj/
+cqlsh/obj/
+cqlsh/obj/
 OutDir/
-TestClient/bin/
-TestClient/obj/
-Thrift/bin/
-Thrift/obj/
 cassandra-sharp-version.cs

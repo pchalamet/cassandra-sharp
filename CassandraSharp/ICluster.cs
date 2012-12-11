@@ -22,14 +22,6 @@ namespace CassandraSharp
     /// </summary>
     public interface ICluster : IDisposable
     {
-        IBehaviorConfig BehaviorConfig { get; }
-
-        ITimestampService TimestampService { get; }
-
-        IConnection AcquireConnection(Token token);
-
-        ICluster CreateChildCluster(IBehaviorConfig cfgOverride);
-
-        TResult ExecuteCommand<TResult>(Func<IConnection, TResult> func, Func<byte[]> keyFunc);
+        IConnection GetConnection(Token token);
     }
 }

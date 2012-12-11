@@ -4,6 +4,7 @@
 
     <PropertyGroup>
         <Version>0.0.0.0</Version>		
+        <VersionStatus></VersionStatus>		
     </PropertyGroup>
 	
 	<PropertyGroup>
@@ -20,24 +21,11 @@
 	</PropertyGroup>
 	
     <PropertyGroup>
-        <Thrift>Tools\Thrift\thrift-0.8.0.exe</Thrift>
-        <ThriftInput>Apache.Cassandra\cassandra.thrift</ThriftInput>
-        <ThriftOutput>Apache.Cassandra</ThriftOutput>
-    </PropertyGroup>
-	
-    <PropertyGroup>
-        <ThriftInput>Apache.Cassandra\cassandra.thrift</ThriftInput>
-        <ThriftOutput>Apache.Cassandra</ThriftOutput>
-    </PropertyGroup>
-	
-    <PropertyGroup>
-        <ILMerge>Tools\ILMerge\ILMerge.exe</ILMerge>
-        <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp.dll</CassandraSharpAssembly>
-        <ApacheCassandraAssembly>Apache.Cassandra\bin\$(Configuration)\Apache.Cassandra.dll</ApacheCassandraAssembly>
-        <ThriftAssembly>Thrift\bin\$(Configuration)\Thrift.dll</ThriftAssembly>
+		<CassandraSharpProjectName>cassandra-sharp</CassandraSharpProjectName>
+        <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp</CassandraSharpAssembly>
+        <CQLShAssembly>cqlsh\bin\$(Configuration)\cqlsh</CQLShAssembly>
         <Log4NetAssembly>ThirdParties\log4net\log4net.dll</Log4NetAssembly>
-        <KeyFile>cassandra-sharp.snk</KeyFile>
-        <cassandra-sharpAssembly>$(OutDir)\cassandra-sharp</cassandra-sharpAssembly>
+        <KeyFile>CassandraSharp.snk</KeyFile>
     </PropertyGroup>
 
 	<Target Name="Clean">
@@ -48,26 +36,19 @@
 	</Target>
 	
     <Target Name="GenerateAssemblyInfo">
-        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)" OutputFile="cassandra-sharp-version.cs" />
+        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)-$(VersionStatus)" OutputFile="$(CassandraSharpProjectName)-version.cs" />
     </Target>
 
-    <Target Name="GenerateThrift">
-        <Exec Command="$(Thrift) -o $(ThriftOutput) --gen csharp $(ThriftInput)" />
+    <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo">
+        <MSBuild Projects="$(CassandraSharpProjectName).sln" />
     </Target>
 
-    <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo;GenerateThrift">
-        <MSBuild Projects="cassandra-sharp.sln" />
-    </Target>
-
-    <Target Name="Merge" DependsOnTargets="Clean">
-        <Exec Command="$(ILMerge) /t:library /out:$(cassandra-sharpAssembly).dll /keyfile:$(KeyFile) $(CassandraSharpAssembly) $(ApacheCassandraAssembly) $(ThriftAssembly)" />
-    </Target>
-
-	<Target Name="BuildZipPackage" DependsOnTargets="Compile;Merge">
+	<Target Name="BuildZipPackage" DependsOnTargets="Clean;Compile">
         <ItemGroup>
-            <ZipFilesCopy Include="$(cassandra-sharpAssembly).dll" />
-            <ZipFilesCopy Include="$(cassandra-sharpAssembly).pdb" />
-			<ZipFilesCopy Include="$(Log4NetAssembly)" />
+            <ZipFilesCopy Include="$(CassandraSharpAssembly).dll" />
+            <ZipFilesCopy Include="$(CassandraSharpAssembly).pdb" />
+            <ZipFilesCopy Include="$(CQLShAssembly).exe" />
+            <ZipFilesCopy Include="$(CQLShAssembly).pdb" />
         </ItemGroup>
 		
 		<Copy SourceFiles="@(ZipFilesCopy)" DestinationFolder="$(ZipDir)" />
@@ -76,16 +57,18 @@
             <ZipFiles Include="$(ZipDir)\**\*.*" />
         </ItemGroup>
 		
-        <Zip ZipFileName="OutDir\cassandra-sharp-bin-$(Version).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
+        <Zip ZipFileName="OutDir\$(CassandraSharpProjectName)-bin-$(Version)-$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
 	</Target>
 	
-	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile;Merge">
-		<Copy SourceFiles="$(cassandra-sharpAssembly).dll" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
-		<Copy SourceFiles="$(cassandra-sharpAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
-		<Copy SourceFiles="$(Log4NetAssembly)" DestinationFolder="$(NuGetPackageDir)\lib\net35" />
-		<Copy SourceFiles="cassandra-sharp.nuspec" DestinationFolder="$(NuGetPackageDir)" />
-		<XmlPoke XmlInputPath="$(NuGetPackageDir)\cassandra-sharp.nuspec" Query="/package/metadata/version" Value="$(Version)" />
-		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\cassandra-sharp.nuspec -OutputDirectory OutDir" />
+	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile">
+		<Copy SourceFiles="$(CassandraSharpAssembly).dll" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="$(CassandraSharpAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="$(CQLShAssembly).exe" DestinationFolder="$(NuGetPackageDir)\bin" />
+		<Copy SourceFiles="$(CQLShAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\bin" />
+		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
+		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)" />
+		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/summary" Value="$(CassandraSharpProjectName)-bin-$(Version)-$(VersionStatus)" />
+		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory OutDir" />
 	</Target>
 	
     <Target Name="GenerateVersion" DependsOnTargets="BuildZipPackage;BuildNuGetPackage">

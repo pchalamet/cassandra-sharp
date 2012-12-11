@@ -18,7 +18,7 @@ namespace CassandraSharp.Utils
     using System;
     using System.Diagnostics;
 
-    public static class CheckParameterExtensions
+    internal static class CheckParameterExtensions
     {
         [Conditional("DEBUG")]
         public static void CheckArgumentNotNull(this object @this, string name)

@@ -19,6 +19,7 @@ namespace CassandraSharp.EndpointStrategy
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.CompilerServices;
+    using CassandraSharp.Extensibility;
 
     internal class RandomEndpointStrategy : IEndpointStrategy
     {
@@ -63,6 +64,18 @@ namespace CassandraSharp.EndpointStrategy
             if (_bannedEndpoints.Remove(endpoint))
             {
                 _healthyEndpoints.Add(endpoint);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void Update(IEnumerable<IPAddress> endpoints)
+        {
+            foreach (IPAddress endpoint in endpoints)
+            {
+                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                {
+                    _healthyEndpoints.Add(endpoint);
+                }
             }
         }
     }

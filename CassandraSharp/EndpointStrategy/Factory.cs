@@ -17,6 +17,7 @@ namespace CassandraSharp.EndpointStrategy
 {
     using System.Collections.Generic;
     using System.Net;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
@@ -26,6 +27,7 @@ namespace CassandraSharp.EndpointStrategy
             switch (customType)
             {
                 case null:
+                case "":
                 case "Random":
                     return new RandomEndpointStrategy(endpoints, snitch);
 

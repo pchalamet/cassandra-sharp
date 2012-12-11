@@ -17,8 +17,8 @@ namespace CassandraSharp
 {
     using System.Configuration;
     using System.Xml;
+    using System.Xml.Serialization;
     using CassandraSharp.Config;
-    using CassandraSharp.Utils;
 
     internal class SectionHandler : IConfigurationSectionHandler
     {
@@ -42,9 +42,10 @@ namespace CassandraSharp
 
         private static CassandraSharpConfig ReadConfig(XmlDocument xmlDoc)
         {
-            MiniXmlSerializer xmlSer = new MiniXmlSerializer(typeof(CassandraSharpConfig));
+            XmlSerializer xmlSer = new XmlSerializer(typeof(CassandraSharpConfig));
+            //MiniXmlSerializer xmlSer = new MiniXmlSerializer(typeof(CassandraSharpConfig));
             using (XmlReader xmlReader = new XmlNodeReader(xmlDoc))
-                return (CassandraSharpConfig) xmlSer.Deserialize(xmlReader);
+                return (CassandraSharpConfig)xmlSer.Deserialize(xmlReader);
         }
     }
 }

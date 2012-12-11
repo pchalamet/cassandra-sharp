@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Recovery
 {
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
@@ -23,7 +24,10 @@ namespace CassandraSharp.Recovery
         {
             switch (customType)
             {
-                case null:
+                case "Null":
+                    return new NullRecoveryService();
+
+                case "Simple":
                     return new SimpleRecoveryService();
 
                 default:

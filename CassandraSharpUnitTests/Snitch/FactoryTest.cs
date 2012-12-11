@@ -19,6 +19,7 @@ namespace CassandraSharpUnitTests.Snitch
     using System.Collections.Generic;
     using System.Net;
     using CassandraSharp;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
     using NUnit.Framework;
 

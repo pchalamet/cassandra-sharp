@@ -5,6 +5,7 @@
     <version>0.0.0.0</version>
     <authors>Pierre Chalamet</authors>
     <owners>Pierre Chalamet</owners>
+	<summary></summary>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>http://code.google.com/p/cassandra-sharp/</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>

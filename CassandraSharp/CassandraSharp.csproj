@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CassandraSharp</RootNamespace>
     <AssemblyName>CassandraSharp</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -32,141 +32,113 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
-    <Compile Include="BehaviorConfigBuilder.cs" />
-    <Compile Include="Data\CassandraCommand.cs" />
-    <Compile Include="Data\CassandraConnection.cs" />
-    <Compile Include="Data\CassandraDataParameterCollection.cs" />
-    <Compile Include="Data\CassandraParameter.cs" />
-    <Compile Include="IEndpointSnitch.cs" />
+    <Compile Include="CQLBinaryProtocol\WindowedReadStream.cs" />
+    <Compile Include="Exceptions\AlreadyExistsException.cs" />
+    <Compile Include="Exceptions\CassandraException.cs" />
+    <Compile Include="Exceptions\InvalidException.cs" />
+    <Compile Include="Exceptions\ReadTimeOutException.cs" />
+    <Compile Include="Exceptions\ClientRequestAbortedException.cs" />
+    <Compile Include="Exceptions\SyntaxException.cs" />
+    <Compile Include="Exceptions\UnauthorizedException.cs" />
+    <Compile Include="Exceptions\UnknownResponseException.cs" />
+    <Compile Include="Exceptions\UnpreparedException.cs" />
+    <Compile Include="Exceptions\WriteTimeOutException.cs" />
+    <Compile Include="CQLBinaryProtocol\BigEndianExtensions.cs" />
+    <Compile Include="ErrorCodes.cs" />
+    <Compile Include="CQLBinaryProtocol\FrameHeaderFlags.cs" />
+    <Compile Include="CQLBinaryProtocol\FrameType.cs" />
+    <Compile Include="CQLPoco\CQLPocoExtensions.cs" />
+    <Compile Include="CQLPoco\DataMapperFactory.cs" />
+    <Compile Include="CQLPoco\DataSource.cs" />
+    <Compile Include="CQLPoco\InstanceBuilder.cs" />
+    <Compile Include="CQLPropertyBag\CQLPropertyBagExtensions.cs" />
+    <Compile Include="CQLPropertyBag\DataMapperFactory.cs" />
+    <Compile Include="CQLPropertyBag\DataSource.cs" />
+    <Compile Include="CQL\CQLExtensions.cs" />
+    <Compile Include="Extensibility\IDataMapperFactory.cs" />
+    <Compile Include="Extensibility\IDataSource.cs" />
+    <Compile Include="CQLBinaryProtocol\ColumnSpec.cs" />
+    <Compile Include="Extensibility\IColumnSpec.cs" />
+    <Compile Include="CQLBinaryProtocol\ColumnSpecExtensions.cs" />
+    <Compile Include="Extensibility\ColumnType.cs" />
+    <Compile Include="CQLBinaryProtocol\BigEndianStreamExtensions.cs" />
+    <Compile Include="CQLPropertyBag\InstanceBuilder.cs" />
+    <Compile Include="Extensibility\IFrameReader.cs" />
+    <Compile Include="Extensibility\IFrameWriter.cs" />
+    <Compile Include="Transport\FrameReader.cs" />
+    <Compile Include="Transport\FrameWriter.cs" />
+    <Compile Include="Extensibility\IInstanceBuilder.cs" />
+    <Compile Include="MessageOpcodes.cs" />
+    <Compile Include="CQLBinaryProtocol\CQLCommandHelpers.cs" />
+    <Compile Include="CQLBinaryProtocol\MetadataFlags.cs" />
+    <Compile Include="CQLBinaryProtocol\PreparedQuery.cs" />
+    <Compile Include="CQLBinaryProtocol\ResultOpcode.cs" />
+    <Compile Include="Exceptions\TimeOutException.cs" />
+    <Compile Include="Exceptions\UnavailableException.cs" />
+    <Compile Include="Cluster.cs" />
+    <Compile Include="FailureEventArgs.cs" />
+    <Compile Include="IPreparedQuery.cs" />
+    <Compile Include="Discovery\Factory.cs" />
+    <Compile Include="Discovery\NullDiscoveryService.cs" />
+    <Compile Include="Discovery\SimpleDiscoveryService.cs" />
+    <Compile Include="Extensibility\IDiscoveryService.cs" />
+    <Compile Include="Extensibility\IEndpointSnitch.cs" />
     <Compile Include="Logger\NullLogger.cs" />
     <Compile Include="Logger\Factory.cs" />
-    <Compile Include="MadeSimple\DateTimeNameOrValue.cs" />
-    <Compile Include="ObjectMapper\ColumnDef.cs" />
-    <Compile Include="ObjectMapper\CompositeKeyAttribute.cs" />
-    <Compile Include="ObjectMapper\Cql3\CreateKeyspaceBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\DeleteBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\Dialect.cs" />
-    <Compile Include="ObjectMapper\Cql3\CreateTableBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\DropKeyspaceBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\DropTableBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\InsertBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\TruncateBuilder.cs" />
-    <Compile Include="ObjectMapper\Cql3\UpdateBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IConsistencyLevelBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\ICreateKeyspaceBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IDeleteBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IDialect.cs" />
-    <Compile Include="ObjectMapper\Dialect\ICreateTableBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IDropKeyspaceBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IDropTableBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\ITimestampBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IWhereBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IInsertBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IQueryBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IScopeKeyspaceBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IScopeTableBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\ITruncateTableBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IUpdateBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IValueSetterBuilder.cs" />
-    <Compile Include="ObjectMapper\CqlType.cs" />
-    <Compile Include="ObjectMapper\Cql3\QueryBuilder.cs" />
-    <Compile Include="ObjectMapper\Dialect\IScopeColumnsBuilder.cs" />
-    <Compile Include="ObjectMapper\Schema.cs" />
-    <Compile Include="ObjectMapper\SerializersExtensions.cs" />
-    <Compile Include="ObjectMapper\PreparedQueryExtensions.cs" />
-    <Compile Include="ObjectMapper\TypeExtensions.cs" />
-    <Compile Include="Pool\PooledConnection.cs" />
+    <Compile Include="ConsistencyLevel.cs" />
+    <Compile Include="Recovery\NullRecoveryService.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="Transport\Connection.cs" />
+    <Compile Include="Transport\ConnectionFactory.cs" />
+    <Compile Include="Transport\DebugStream.cs" />
     <Compile Include="Utils\CheckParameterExtensions.cs" />
     <Compile Include="Utils\MiniXmlSerializer.cs" />
     <Compile Include="Utils\ServiceActivator.cs" />
-    <Compile Include="Timestamp\Factory.cs" />
-    <Compile Include="ILogger.cs" />
-    <Compile Include="ITimestampService.cs" />
-    <Compile Include="MadeSimple\GuidNameOrValue.cs" />
-    <Compile Include="MadeSimple\DoubleNameOrValue.cs" />
-    <Compile Include="MadeSimple\FloatNameOrValue.cs" />
-    <Compile Include="ObjectMapper\MapperExtensions.cs" />
-    <Compile Include="ObjectMapper\ColumnAttribute.cs" />
-    <Compile Include="ObjectMapper\IndexAttribute.cs" />
-    <Compile Include="ObjectMapper\KeyAttribute.cs" />
-    <Compile Include="ObjectMapper\SchemaAttribute.cs" />
+    <Compile Include="Extensibility\ILogger.cs" />
     <Compile Include="Recovery\Factory.cs" />
-    <Compile Include="IBehaviorConfig.cs" />
-    <Compile Include="IRecoveryService.cs" />
-    <Compile Include="MadeSimple\LongNameOrValue.cs" />
-    <Compile Include="MadeSimple\INameOrValue.cs" />
-    <Compile Include="MadeSimple\NameOrValueBase.cs" />
-    <Compile Include="MadeSimple\ByteArrayNameOrValue.cs" />
-    <Compile Include="MadeSimple\IntNameOrValue.cs" />
-    <Compile Include="MadeSimple\TimeUuidNameOrValue.cs" />
-    <Compile Include="MadeSimple\Utf8NameOrValue.cs" />
-    <Compile Include="Cluster.cs" />
-    <Compile Include="CommandExtensions.cs" />
+    <Compile Include="Extensibility\IBehaviorConfig.cs" />
+    <Compile Include="Extensibility\IRecoveryService.cs" />
     <Compile Include="ClusterManager.cs" />
-    <Compile Include="MadeSimple\ClusterExtensions.cs" />
     <Compile Include="Config\BehaviorConfig.cs" />
     <Compile Include="Config\CassandraSharpConfig.cs" />
     <Compile Include="Config\ClusterConfig.cs" />
     <Compile Include="Config\EndpointsConfig.cs" />
     <Compile Include="Recovery\SimpleRecoveryService.cs" />
-    <Compile Include="Transport\BaseTransportFactory.cs" />
     <Compile Include="Utils\DisposableExtensions.cs" />
-    <Compile Include="Pool\Factory.cs" />
     <Compile Include="Snitch\Factory.cs" />
     <Compile Include="EndpointStrategy\Factory.cs" />
     <Compile Include="Transport\Factory.cs" />
-    <Compile Include="Utils\GuidGenerator.cs" />
-    <Compile Include="Utils\GuidVersion.cs" />
     <Compile Include="Utils\NetworkFinder.cs" />
     <Compile Include="EndpointStrategy\NearestEndpointStrategy.cs" />
-    <Compile Include="Pool\ConcurrentBagPool.cs" />
-    <Compile Include="Pool\VoidPool.cs" />
     <Compile Include="SectionHandler.cs" />
     <Compile Include="Config\TransportConfig.cs" />
     <Compile Include="Config\XmlConfigurator.cs" />
-    <Compile Include="Pool\StackPool.cs" />
     <Compile Include="IConnection.cs" />
-    <Compile Include="IPool.cs" />
-    <Compile Include="IEndpointStrategy.cs" />
+    <Compile Include="Extensibility\IEndpointStrategy.cs" />
     <Compile Include="EndpointStrategy\RandomEndpointStrategy.cs" />
     <Compile Include="ICluster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Snitch\RackInferringSnitch.cs" />
     <Compile Include="Snitch\SimpleSnitch.cs" />
-    <Compile Include="Timestamp\NowTimestampService.cs" />
-    <Compile Include="Transport\BufferedTransportFactory.cs" />
-    <Compile Include="Transport\FramedTransportFactory.cs" />
-    <Compile Include="ITransportFactory.cs" />
+    <Compile Include="Extensibility\IConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
-      <Project>{984A4B04-C71A-4550-9193-817CFACBA30A}</Project>
-      <Name>Apache.Cassandra</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Thrift\Thrift.csproj">
-      <Project>{81DA65BC-9ACD-4271-9ED0-84A3B3A1FB7A}</Project>
-      <Name>Thrift</Name>
-    </ProjectReference>
+    <None Include="..\..\cassandra-sharp.snk" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

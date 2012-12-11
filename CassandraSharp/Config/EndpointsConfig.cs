@@ -31,13 +31,7 @@ namespace CassandraSharp.Config
         [XmlAttribute("snitch")]
         public string Snitch { get; set; }
 
-        [XmlAttribute("pool")]
-        public string Pool { get; set; }
-
         [XmlAttribute("strategy")]
         public string Strategy { get; set; }
-
-        [XmlAttribute("timestamp")]
-        public string Timestamp { get; set; }
     }
 }

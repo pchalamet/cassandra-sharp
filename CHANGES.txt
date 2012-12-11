@@ -1,3 +1,17 @@
+version 2.0.2.0 (alpha2)
+- fix deadlock when query fails
+- expose IFrameReader and IFrameWriter instead of Stream
+
+version 2.0.1.0 (alpha1)
+- full async support with both streaming and future
+- no buffering while reading
+- reliable error handling while performing async IO
+
+version 2.0.0.0 (beta)
+- most part of CassandraSharp is rewritten
+- support only CQL, Thrift is dead
+- missing features will be brought again is future versions
+
 version 1.0.0.0 (beta)
 - compatible with Cassandra 1.1.1
 - CassandraSharp.ObjectMapper : cql based simple object mapper (only compatible with Cassandra 1.1.1)

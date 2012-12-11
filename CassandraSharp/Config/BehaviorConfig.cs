@@ -16,35 +16,35 @@
 namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
-    using Apache.Cassandra;
+    using CassandraSharp.Extensibility;
 
     public class BehaviorConfig : IBehaviorConfig
     {
-        [XmlAttribute("keyspace")]
-        public string KeySpace { get; set; }
+        //[XmlAttribute("keyspace")]
+        //public string KeySpace { get; set; }
 
-        [XmlAttribute("readCL")]
-        public ConsistencyLevel? ReadConsistencyLevel { get; set; }
+        //[XmlAttribute("readCL")]
+        //public ConsistencyLevel? DefaultReadCL { get; set; }
 
-        [XmlAttribute("ttl")]
-        public int? TTL { get; set; }
+        //[XmlAttribute("ttl")]
+        //public int? DefaultTTL { get; set; }
 
-        [XmlAttribute("writeCL")]
-        public ConsistencyLevel? WriteConsistencyLevel { get; set; }
+        //[XmlAttribute("writeCL")]
+        //public ConsistencyLevel? DefaultWriteCL { get; set; }
 
-        [XmlAttribute("maxRetries")]
-        public int? MaxRetries { get; set; }
+        //[XmlAttribute("maxRetries")]
+        //public int? MaxRetries { get; set; }
 
-        [XmlAttribute("retryOnNotFound")]
-        public bool? RetryOnNotFound { get; set; }
+        //[XmlAttribute("retryOnNotFound")]
+        //public bool? RetryOnNotFound { get; set; }
 
-        [XmlAttribute("retryOnTimeout")]
-        public bool? RetryOnTimeout { get; set; }
+        //[XmlAttribute("retryOnTimeout")]
+        //public bool? RetryOnTimeout { get; set; }
 
-        [XmlAttribute("retryOnUnavailable")]
-        public bool? RetryOnUnavailable { get; set; }
+        //[XmlAttribute("retryOnUnavailable")]
+        //public bool? RetryOnUnavailable { get; set; }
 
-        [XmlAttribute("sleepBeforeRetry")]
-        public int? SleepBeforeRetry { get; set; }
+        //[XmlAttribute("sleepBeforeRetry")]
+        //public int? SleepBeforeRetry { get; set; }
     }
 }

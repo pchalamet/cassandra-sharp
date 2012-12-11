@@ -20,6 +20,12 @@ namespace CassandraSharp.Config
     [XmlRoot("CassandraSharpConfig")]
     public class CassandraSharpConfig
     {
+        public CassandraSharpConfig()
+        {
+            Recovery = "Simple";
+            Logger = "Null";
+        }
+
         [XmlAttribute("recovery")]
         public string Recovery { get; set; }
 

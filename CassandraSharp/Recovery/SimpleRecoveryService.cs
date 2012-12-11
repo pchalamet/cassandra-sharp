@@ -19,7 +19,7 @@ namespace CassandraSharp.Recovery
     using System.Collections.Generic;
     using System.Net;
     using System.Timers;
-    using Apache.Cassandra;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal class SimpleRecoveryService : IRecoveryService
@@ -34,15 +34,15 @@ namespace CassandraSharp.Recovery
         {
             _toRecover = new List<RecoveryItem>();
             _timer = new Timer(60*1000);
-            _timer.Elapsed += TryRecover;
+            _timer.Elapsed += (s, e) => TryRecover();
             _lock = new object();
         }
 
-        public void Recover(IPAddress endpoint, ITransportFactory transportFactory, Action<IPAddress, Cassandra.Client> clientRecoveredCallback)
+        public void Recover(IPAddress endpoint, IConnectionFactory connectionFactory, Action<IConnection> clientRecoveredCallback)
         {
             lock (_lock)
             {
-                RecoveryItem recoveryItem = new RecoveryItem(endpoint, transportFactory, clientRecoveredCallback);
+                RecoveryItem recoveryItem = new RecoveryItem(endpoint, connectionFactory, clientRecoveredCallback);
                 _toRecover.Add(recoveryItem);
 
                 _timer.Enabled = true;
@@ -51,11 +51,10 @@ namespace CassandraSharp.Recovery
 
         public void Dispose()
         {
-            _timer.Enabled = false;
             _timer.SafeDispose();
         }
 
-        private void TryRecover(object sender, ElapsedEventArgs e)
+        private void TryRecover()
         {
             List<RecoveryItem> toRecover;
             lock (_lock)
@@ -65,32 +64,21 @@ namespace CassandraSharp.Recovery
 
             foreach (RecoveryItem recoveryItem in toRecover)
             {
-                Cassandra.Client client = null;
                 try
                 {
-                    client = recoveryItem.TransportFactory.Create(recoveryItem.Endpoint);
-
-                    // try running a describe to check the node responsiveness
-                    client.describe_cluster_name();
+                    IConnection client = recoveryItem.ConnectionFactory.Create(recoveryItem.Endpoint);
 
                     lock (_lock)
                     {
                         _toRecover.Remove(recoveryItem);
                     }
 
-                    recoveryItem.ClientRecoveredCallback(recoveryItem.Endpoint, client);
+                    recoveryItem.ClientRecoveredCallback(client);
                 }
 // ReSharper disable EmptyGeneralCatchClause
                 catch
 // ReSharper restore EmptyGeneralCatchClause
                 {
-                }
-                finally
-                {
-                    if (null != client && client.OutputProtocol.Transport.IsOpen)
-                    {
-                        client.OutputProtocol.Transport.Close();
-                    }
                 }
             }
 
@@ -102,18 +90,18 @@ namespace CassandraSharp.Recovery
 
         private class RecoveryItem
         {
-            public RecoveryItem(IPAddress endpoint, ITransportFactory transportFactory, Action<IPAddress, Cassandra.Client> clientRecoveredCallback)
+            public RecoveryItem(IPAddress endpoint, IConnectionFactory connectionFactory, Action<IConnection> clientRecoveredCallback)
             {
                 Endpoint = endpoint;
-                TransportFactory = transportFactory;
+                ConnectionFactory = connectionFactory;
                 ClientRecoveredCallback = clientRecoveredCallback;
             }
 
             public IPAddress Endpoint { get; private set; }
 
-            public ITransportFactory TransportFactory { get; private set; }
+            public IConnectionFactory ConnectionFactory { get; private set; }
 
-            public Action<IPAddress, Cassandra.Client> ClientRecoveredCallback { get; private set; }
+            public Action<IConnection> ClientRecoveredCallback { get; private set; }
         }
     }
 }

@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Logger
 {
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
@@ -23,7 +24,7 @@ namespace CassandraSharp.Logger
         {
             switch (customType)
             {
-                case null:
+                case "Null":
                     return new NullLogger();
 
                 default:

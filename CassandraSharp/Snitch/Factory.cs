@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Snitch
 {
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
@@ -23,7 +24,6 @@ namespace CassandraSharp.Snitch
         {
             switch (customType)
             {
-                case null:
                 case "Simple":
                     return new SimpleSnitch();
 

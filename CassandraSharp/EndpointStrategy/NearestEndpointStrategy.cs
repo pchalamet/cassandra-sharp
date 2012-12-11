@@ -18,19 +18,26 @@ namespace CassandraSharp.EndpointStrategy
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.CompilerServices;
+    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal class NearestEndpointStrategy : IEndpointStrategy
     {
         private readonly List<IPAddress> _bannedEndpoints;
 
+        private readonly IPAddress _clientAddress;
+
         private readonly List<IPAddress> _healthyEndpoints;
+
+        private readonly IEndpointSnitch _snitch;
 
         public NearestEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
         {
+            _snitch = snitch;
             IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
             _healthyEndpoints = snitch.GetSortedListByProximity(clientAddress, endpoints);
             _bannedEndpoints = new List<IPAddress>();
+            _clientAddress = NetworkFinder.Find(Dns.GetHostName());
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -59,6 +66,26 @@ namespace CassandraSharp.EndpointStrategy
             if (_bannedEndpoints.Remove(endPoint))
             {
                 _healthyEndpoints.Add(endPoint);
+                _healthyEndpoints.Sort((a1, a2) => _snitch.CompareEndpoints(_clientAddress, a1, a2));
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void Update(IEnumerable<IPAddress> endpoints)
+        {
+            bool updated = false;
+            foreach (IPAddress endpoint in endpoints)
+            {
+                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                {
+                    _healthyEndpoints.Add(endpoint);
+                    updated = true;
+                }
+            }
+
+            if (updated)
+            {
+                _healthyEndpoints.Sort((a1, a2) => _snitch.CompareEndpoints(_clientAddress, a1, a2));
             }
         }
     }

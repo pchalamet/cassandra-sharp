@@ -16,22 +16,20 @@
 namespace CassandraSharp
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
-    using Apache.Cassandra;
+    using System.Threading.Tasks;
+    using CassandraSharp.Extensibility;
 
     /// <summary>
     ///     Internal interface to keep track of Cassandra connections
     /// </summary>
-    public interface IConnection : IDisposable
+    public interface IConnection
     {
-        string KeySpace { get; set; }
-
-        string User { get; set; }
-
         IPAddress Endpoint { get; }
 
-        Cassandra.Client CassandraClient { get; }
+        Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader);
 
-        void KeepAlive();
+        event EventHandler<FailureEventArgs> OnFailure;
     }
 }

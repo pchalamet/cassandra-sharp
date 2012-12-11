@@ -34,5 +34,11 @@ namespace CassandraSharp.Utils
                 }
             }
         }
+
+        public static void SafeDispose(this object @this)
+        {
+            IDisposable disposable = @this as IDisposable;
+            disposable.SafeDispose();
+        }
     }
 }
