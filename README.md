@@ -1,9 +1,10 @@
 cassandra-sharp
 ===============
 cassandra-sharp is a .NET client for Apache Cassandra. It supports (starting from version 2) only CQL binary protocol and as a consequence is only compatible with Cassandra 1.2+.
-cassandra-sharp support async operations and efficient memory usage (streaming as much as it can) exposed as TPL tasks. Futures are also supported as well. Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety. Starting from version 2, cassandra-sharp is only .NET 4.0+ compatible.
+cassandra-sharp support async operations exposed as TPL tasks and efficient memory usage (streaming as much as it can). Futures are also supported as well. Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety. Starting from version 2, cassandra-sharp is only .NET 4.0+ compatible.
 
-cassandra-sharp supports the following features:
+Features
+========
 * async operations
 * streaming support with IEnumerable
 * extensible rowset mapping
@@ -12,10 +13,16 @@ cassandra-sharp supports the following features:
 
 If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.
 
+How to build
+============
+To compile, use a command line and run the following commands:
+	GenerateVersion.cmd <flavor> <VersionNumber> <VersionStatus>
+NOTE: type "GenerateVersion.cmd /?" for more info.
+  
+You will find a package named "cassandra-sharp-bin-<VersionNumber>.zip" in the OutDir folder.
 
-
-Configuration
-=============
+Sample configuration
+====================
 	<configSections>
 		<section name="CassandraSharp" type="CassandraSharp.SectionHandler, CassandraSharp" />
 	</configSections>
@@ -28,8 +35,8 @@ Configuration
 		</Cluster>
 	</CassandraSharp>
 
-Client
-======
+Sample client
+=============
 	using System;
 	using System.Collections.Generic;
 	using CassandraSharp;
