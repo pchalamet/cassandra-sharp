@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C1D252B7-D766-4C28-9C46-0696F896846C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CassandraSharp</RootNamespace>
+    <AssemblyName>CassandraSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\cassandra-sharp-version.cs">
+      <Link>Properties\cassandra-sharp-version.cs</Link>
+    </Compile>
+    <Compile Include="CQLBinaryProtocol\WindowedReadStream.cs" />
+    <Compile Include="Exceptions\AlreadyExistsException.cs" />
+    <Compile Include="Exceptions\CassandraException.cs" />
+    <Compile Include="Exceptions\InvalidException.cs" />
+    <Compile Include="Exceptions\ReadTimeOutException.cs" />
+    <Compile Include="Exceptions\ClientRequestAbortedException.cs" />
+    <Compile Include="Exceptions\SyntaxException.cs" />
+    <Compile Include="Exceptions\UnauthorizedException.cs" />
+    <Compile Include="Exceptions\UnknownResponseException.cs" />
+    <Compile Include="Exceptions\UnpreparedException.cs" />
+    <Compile Include="Exceptions\WriteTimeOutException.cs" />
+    <Compile Include="CQLBinaryProtocol\BigEndianExtensions.cs" />
+    <Compile Include="ErrorCodes.cs" />
+    <Compile Include="CQLBinaryProtocol\FrameHeaderFlags.cs" />
+    <Compile Include="CQLBinaryProtocol\FrameType.cs" />
+    <Compile Include="CQLPoco\CQLPocoExtensions.cs" />
+    <Compile Include="CQLPoco\DataMapperFactory.cs" />
+    <Compile Include="CQLPoco\DataSource.cs" />
+    <Compile Include="CQLPoco\InstanceBuilder.cs" />
+    <Compile Include="CQLPropertyBag\CQLPropertyBagExtensions.cs" />
+    <Compile Include="CQLPropertyBag\DataMapperFactory.cs" />
+    <Compile Include="CQLPropertyBag\DataSource.cs" />
+    <Compile Include="CQL\CQLExtensions.cs" />
+    <Compile Include="Extensibility\IDataMapperFactory.cs" />
+    <Compile Include="Extensibility\IDataSource.cs" />
+    <Compile Include="CQLBinaryProtocol\ColumnSpec.cs" />
+    <Compile Include="Extensibility\IColumnSpec.cs" />
+    <Compile Include="CQLBinaryProtocol\ColumnSpecExtensions.cs" />
+    <Compile Include="Extensibility\ColumnType.cs" />
+    <Compile Include="CQLBinaryProtocol\BigEndianStreamExtensions.cs" />
+    <Compile Include="CQLPropertyBag\InstanceBuilder.cs" />
+    <Compile Include="Extensibility\IFrameReader.cs" />
+    <Compile Include="Extensibility\IFrameWriter.cs" />
+    <Compile Include="Transport\FrameReader.cs" />
+    <Compile Include="Transport\FrameWriter.cs" />
+    <Compile Include="Extensibility\IInstanceBuilder.cs" />
+    <Compile Include="MessageOpcodes.cs" />
+    <Compile Include="CQLBinaryProtocol\CQLCommandHelpers.cs" />
+    <Compile Include="CQLBinaryProtocol\MetadataFlags.cs" />
+    <Compile Include="CQLBinaryProtocol\PreparedQuery.cs" />
+    <Compile Include="CQLBinaryProtocol\ResultOpcode.cs" />
+    <Compile Include="Exceptions\TimeOutException.cs" />
+    <Compile Include="Exceptions\UnavailableException.cs" />
+    <Compile Include="Cluster.cs" />
+    <Compile Include="FailureEventArgs.cs" />
+    <Compile Include="IPreparedQuery.cs" />
+    <Compile Include="Discovery\Factory.cs" />
+    <Compile Include="Discovery\NullDiscoveryService.cs" />
+    <Compile Include="Discovery\SimpleDiscoveryService.cs" />
+    <Compile Include="Extensibility\IDiscoveryService.cs" />
+    <Compile Include="Extensibility\IEndpointSnitch.cs" />
+    <Compile Include="Logger\NullLogger.cs" />
+    <Compile Include="Logger\Factory.cs" />
+    <Compile Include="ConsistencyLevel.cs" />
+    <Compile Include="Recovery\NullRecoveryService.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="Transport\Connection.cs" />
+    <Compile Include="Transport\ConnectionFactory.cs" />
+    <Compile Include="Transport\DebugStream.cs" />
+    <Compile Include="Utils\CheckParameterExtensions.cs" />
+    <Compile Include="Utils\MiniXmlSerializer.cs" />
+    <Compile Include="Utils\ServiceActivator.cs" />
+    <Compile Include="Extensibility\ILogger.cs" />
+    <Compile Include="Recovery\Factory.cs" />
+    <Compile Include="Extensibility\IBehaviorConfig.cs" />
+    <Compile Include="Extensibility\IRecoveryService.cs" />
+    <Compile Include="ClusterManager.cs" />
+    <Compile Include="Config\BehaviorConfig.cs" />
+    <Compile Include="Config\CassandraSharpConfig.cs" />
+    <Compile Include="Config\ClusterConfig.cs" />
+    <Compile Include="Config\EndpointsConfig.cs" />
+    <Compile Include="Recovery\SimpleRecoveryService.cs" />
+    <Compile Include="Utils\DisposableExtensions.cs" />
+    <Compile Include="Snitch\Factory.cs" />
+    <Compile Include="EndpointStrategy\Factory.cs" />
+    <Compile Include="Transport\Factory.cs" />
+    <Compile Include="Utils\NetworkFinder.cs" />
+    <Compile Include="EndpointStrategy\NearestEndpointStrategy.cs" />
+    <Compile Include="SectionHandler.cs" />
+    <Compile Include="Config\TransportConfig.cs" />
+    <Compile Include="Config\XmlConfigurator.cs" />
+    <Compile Include="IConnection.cs" />
+    <Compile Include="Extensibility\IEndpointStrategy.cs" />
+    <Compile Include="EndpointStrategy\RandomEndpointStrategy.cs" />
+    <Compile Include="ICluster.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Snitch\RackInferringSnitch.cs" />
+    <Compile Include="Snitch\SimpleSnitch.cs" />
+    <Compile Include="Extensibility\IConnectionFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\cassandra-sharp.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

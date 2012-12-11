@@ -1,0 +1,10 @@
+CassandraClient/bin/
+CassandraClient/bin/
+CassandraSharp/bin/
+CassandraSharp/obj/
+CassandraSharpUnitTests/bin/
+CassandraSharpUnitTests/obj/
+cqlsh/obj/
+cqlsh/obj/
+OutDir/
+cassandra-sharp-version.cs

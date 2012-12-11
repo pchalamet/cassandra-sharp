@@ -1,0 +1,82 @@
+version 2.0.2.0 (beta2)
+- fix deadlock when query fails
+- expose IFrameReader and IFrameWriter instead of Stream
+- release stream id earlier
+
+version 2.0.1.0 (beta1)
+- full async support with both streaming and future
+- no buffering while reading
+- reliable error handling while performing async IO
+
+version 2.0.0.0 (beta)
+- most part of CassandraSharp is rewritten
+- support only CQL, Thrift is dead
+- missing features will be brought again is future versions
+
+version 1.0.0.0 (beta)
+- compatible with Cassandra 1.1.1
+- CassandraSharp.ObjectMapper : cql based simple object mapper (only compatible with Cassandra 1.1.1)
+- CassandraSharp.Data : ado.net implementation (IDbConnection, IDbCommand, IDbParameter). As of now, this is a work in progress.
+- CassandraSharp.MadeSimple : previously ClusterExtentions but with a bit less methods to keep it simple
+- removed log4net dependency, logging is pluggable ==> use CassandraSharpConfig/Logger to provide ILog implementation (must be thread safe)
+- recovery manager class is pluggable ==> use CassandraSharpConfig/Recovery to provide IRecoveryService implementation (must be thread safe)
+- timestamp service is pluggable ==> use EndpointsConfig/Timestamp to provide ITimestampService implementation (must be thread safe)
+- endpoint strategy is pluggable ==> EndpointsConfig/Strategy to provide your own strategy (must be thread safe)
+- endpoint snitch is pluggable ==> EndpointsConfig/Snitch to provide your own snitch (must be thread safe)
+- cql version can be requested via TransportConfig/CqlVersion
+
+- BREAKING CHANGES IN CONFIG
+  Strategies are configured via EndpointsConfig/@strategy : either Random, Nearest or your own type name
+  Snitches are configured via EndpointsConfig/@snitch : either Simple, RackInferring or your own type name
+  User and password are configured respectively with TransportConfig/@user and TransportConfig/@password
+
+version 0.6.4.0
+- Thrift interface update (Cassandra 1.0)
+
+version 0.6.3.0
+- custom endpoint strategy
+  
+version 0.6.1.0
+- remove NuGet for packages dependencies (unsecure)
+- using Thrift 0.8 (recompiled)
+- using log4net 1.2.11 (official bin new key)
+- Thrift is merged with cassandra-sharp.dll
+- fix NPE in authentication
+
+0.6.0.0
+- support for endpoint recovery
+
+0.5.4.0
+- support for NuGet. Package name is cassandra-sharp
+- log4net and Thrift are shipped with the zip package
+- Thrift is no more merge in the cassandra-sharp.dll (BREAKING CHANGE)
+
+0.5.1.0
+- minor fix for user/password change when overriding cluster config
+
+0.5.0.0
+- new mechanism to override a cluster configuration to handle a batch of commands (BREAKING CHANGE)
+- poolSize is moved from BehaviorConfig? to TransportConfig? (BREAKING CHANGE)
+- ICluster interface changed (BREAKING CHANGE)
+- SetKeySpace removed - this was not safe (BREAKING CHANGE)
+
+version 0.4.0.0
+- support for authentication
+- tested against Cassandra 1.0
+- using Cassandra 1.0.3 Thrift interface
+
+version 0.3.3.0
+- exception logging
+- counter support
+- NotFoundException specific behavior
+- TTL support
+
+version 0.3.0.0
+- added timeout configuration
+- fixed bug when exception thrown during acquire connection
+
+version 0.2
+- build system
+
+version 0.1
+- initial version

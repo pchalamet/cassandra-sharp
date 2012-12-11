@@ -1,0 +1,77 @@
+<Project ToolsVersion="4.0" DefaultTargets="Compile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <Import Project="Tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+
+    <PropertyGroup>
+        <Version>0.0.0.0</Version>		
+        <VersionStatus></VersionStatus>		
+    </PropertyGroup>
+	
+	<PropertyGroup>
+		<OutDir>OutDir\$(Configuration)</OutDir>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<ZipDir>OutDir\Zip</ZipDir>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NuGet>Tools\NuGet\NuGet.exe</NuGet>
+		<NuGetPackageDir>OutDir\NuGetPackage</NuGetPackageDir>
+	</PropertyGroup>
+	
+    <PropertyGroup>
+		<CassandraSharpProjectName>cassandra-sharp</CassandraSharpProjectName>
+        <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp</CassandraSharpAssembly>
+        <CQLShAssembly>cqlsh\bin\$(Configuration)\cqlsh</CQLShAssembly>
+        <Log4NetAssembly>ThirdParties\log4net\log4net.dll</Log4NetAssembly>
+        <KeyFile>CassandraSharp.snk</KeyFile>
+    </PropertyGroup>
+
+	<Target Name="Clean">
+		<Exec Command="rmdir /q /s OutDir" />
+		<MakeDir Directories="$(OutDir)" />
+		<MakeDir Directories="$(ZipDir)" />
+		<MakeDir Directories="$(NuGetPackageDir)" />
+	</Target>
+	
+    <Target Name="GenerateAssemblyInfo">
+        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)-$(VersionStatus)" OutputFile="$(CassandraSharpProjectName)-version.cs" />
+    </Target>
+
+    <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo">
+        <MSBuild Projects="$(CassandraSharpProjectName).sln" />
+    </Target>
+
+	<Target Name="BuildZipPackage" DependsOnTargets="Clean;Compile">
+        <ItemGroup>
+            <ZipFilesCopy Include="$(CassandraSharpAssembly).dll" />
+            <ZipFilesCopy Include="$(CassandraSharpAssembly).pdb" />
+            <ZipFilesCopy Include="$(CQLShAssembly).exe" />
+            <ZipFilesCopy Include="$(CQLShAssembly).pdb" />
+        </ItemGroup>
+		
+		<Copy SourceFiles="@(ZipFilesCopy)" DestinationFolder="$(ZipDir)" />
+
+        <ItemGroup>
+            <ZipFiles Include="$(ZipDir)\**\*.*" />
+        </ItemGroup>
+		
+        <Zip ZipFileName="OutDir\$(CassandraSharpProjectName)-bin-$(Version)-$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
+	</Target>
+	
+	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile">
+		<Copy SourceFiles="$(CassandraSharpAssembly).dll" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="$(CassandraSharpAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="$(CQLShAssembly).exe" DestinationFolder="$(NuGetPackageDir)\bin" />
+		<Copy SourceFiles="$(CQLShAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\bin" />
+		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
+		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)" />
+		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/summary" Value="$(CassandraSharpProjectName)-bin-$(Version)-$(VersionStatus)" />
+		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory OutDir" />
+	</Target>
+	
+    <Target Name="GenerateVersion" DependsOnTargets="BuildZipPackage;BuildNuGetPackage">
+    </Target>
+
+</Project>
