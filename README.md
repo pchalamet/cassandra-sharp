@@ -15,11 +15,13 @@ If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/
 
 How to build
 ============
-To compile, use a command line and run the following commands:
+To build cassandra-sharp, run this command: 
+
 	GenerateVersion.cmd <flavor> <VersionNumber> <VersionStatus>
+	
 NOTE: type "GenerateVersion.cmd /?" for more info.
   
-You will find a package named "cassandra-sharp-bin-<VersionNumber>.zip" in the OutDir folder.
+You will find a package named "cassandra-sharp-bin-<VersionNumber>-<VersionStatus>.zip" in the OutDir folder.
 
 Sample configuration
 ====================
@@ -97,3 +99,10 @@ Sample client
 Thanks
 ======
 JetBrains provided a free licence of Resharper for the cassandra-sharp project. Big thanks for the awesome product.
+
+This projects also relies on the following third parties:
+* MSBuild Community Tasks Project (http://msbuildtasks.tigris.org/) released under BSD License (http://opensource.org/licenses/bsd-license.php)
+* Moq (http://code.google.com/p/moq/) released under New BSD License
+* NUnit (http://www.nunit.org/) released NUnit license
+* NuGet (http://nuget.org/) released under Apache License 2.0
+* Command Line Argument Parser Library (http://commandlinearguments.codeplex.com/) released under Microsoft Public License (Ms-PL)
