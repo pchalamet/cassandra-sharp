@@ -60,6 +60,9 @@ namespace cqlsh
 
         private static void Run(string hostname, IEnumerable<string> statements)
         {
+            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            ClusterManager.Configure(cassandraSharpConfig);
+
             ClusterConfig clusterConfig = new ClusterConfig
                 {
                         BehaviorConfig = null,
@@ -163,6 +166,8 @@ namespace cqlsh
                 string line = Console.ReadLine();
                 yield return line;
             }
+// ReSharper disable FunctionNeverReturns
         }
+// ReSharper restore FunctionNeverReturns
     }
 }
