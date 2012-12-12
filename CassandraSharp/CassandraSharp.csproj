@@ -46,7 +46,7 @@
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
-    <Compile Include="CQLBinaryProtocol\WindowedReadStream.cs" />
+    <Compile Include="Transport\WindowedReadStream.cs" />
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Exceptions\CassandraException.cs" />
     <Compile Include="Exceptions\InvalidException.cs" />
@@ -57,7 +57,7 @@
     <Compile Include="Exceptions\UnknownResponseException.cs" />
     <Compile Include="Exceptions\UnpreparedException.cs" />
     <Compile Include="Exceptions\WriteTimeOutException.cs" />
-    <Compile Include="CQLBinaryProtocol\BigEndianExtensions.cs" />
+    <Compile Include="CQLBinaryProtocol\ArrayExtensions.cs" />
     <Compile Include="ErrorCodes.cs" />
     <Compile Include="CQLBinaryProtocol\FrameHeaderFlags.cs" />
     <Compile Include="CQLBinaryProtocol\FrameType.cs" />
@@ -73,7 +73,7 @@
     <Compile Include="Extensibility\IDataSource.cs" />
     <Compile Include="CQLBinaryProtocol\ColumnSpec.cs" />
     <Compile Include="Extensibility\IColumnSpec.cs" />
-    <Compile Include="CQLBinaryProtocol\ColumnSpecExtensions.cs" />
+    <Compile Include="CQLBinaryProtocol\ValueSerialization.cs" />
     <Compile Include="Extensibility\ColumnType.cs" />
     <Compile Include="CQLBinaryProtocol\BigEndianStreamExtensions.cs" />
     <Compile Include="CQLPropertyBag\InstanceBuilder.cs" />

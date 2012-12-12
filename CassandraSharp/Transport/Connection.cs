@@ -167,7 +167,7 @@ namespace CassandraSharp.Transport
                     }
 
                     // yield all rows - no lock required on input stream since we are the only one allowed to read
-                    using (FrameReader frameReader = FrameReader.ReadBody(_inputStream))
+                    using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _config.Streaming))
                     {
                         foreach (object row in EnumerableOrEmptyEnumerable(reader(frameReader)))
                         {
@@ -256,7 +256,9 @@ namespace CassandraSharp.Transport
                     return null;
                 };
 
+// ReSharper disable ReturnValueOfPureMethodIsNotUsed
             Execute(writer, reader).Result.Count();
+// ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
         private void ReadifyConnection()
@@ -284,7 +286,9 @@ namespace CassandraSharp.Transport
                     return null;
                 };
 
+// ReSharper disable ReturnValueOfPureMethodIsNotUsed
             Execute(writer, reader).Result.Count();
+// ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
         private struct RequestState

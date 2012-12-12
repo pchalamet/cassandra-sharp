@@ -168,7 +168,11 @@ namespace CassandraSharp.CQLBinaryProtocol
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
                     byte[] rawData = frameReader.ReadBytes();
-                    object data = colSpec.Deserialize(rawData);
+                    object data = null;
+                    if (null != rawData)
+                    {
+                        data = colSpec.Deserialize(rawData);
+                    }
                     instanceBuilder.Set(colSpec, data);
                 }
 
@@ -204,7 +208,8 @@ namespace CassandraSharp.CQLBinaryProtocol
                 string colName = frameReader.ReadString();
                 ColumnType colType = (ColumnType) frameReader.ReadShort();
                 string colCustom = null;
-                ColumnType colSubType = ColumnType.Custom;
+                ColumnType colKeyType = ColumnType.Custom;
+                ColumnType colValueType = ColumnType.Custom;
                 switch (colType)
                 {
                     case ColumnType.Custom:
@@ -212,13 +217,17 @@ namespace CassandraSharp.CQLBinaryProtocol
                         break;
 
                     case ColumnType.List:
-                    case ColumnType.Map:
                     case ColumnType.Set:
-                        colSubType = (ColumnType)frameReader.ReadShort();
+                        colValueType = (ColumnType)frameReader.ReadShort();
+                        break;
+
+                    case ColumnType.Map:
+                        colKeyType = (ColumnType)frameReader.ReadShort();
+                        colValueType = (ColumnType)frameReader.ReadShort();
                         break;
                 }
 
-                columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colSubType);
+                columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colKeyType, colValueType);
             }
 
             return columnSpecs;

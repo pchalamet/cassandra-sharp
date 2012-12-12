@@ -16,7 +16,6 @@
 namespace CassandraSharp.Extensibility
 {
     using System.Collections.Generic;
-    using CassandraSharp.CQLBinaryProtocol;
 
     public interface IFrameReader
     {

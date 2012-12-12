@@ -17,11 +17,11 @@ namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
 
-    internal static class BigEndianExtensions
+    internal static class ArrayExtensions
     {
         private static readonly bool _isLittleEndian;
 
-        static BigEndianExtensions()
+        static ArrayExtensions()
         {
             const int t = 1;
             byte[] buffer = BitConverter.GetBytes(t);

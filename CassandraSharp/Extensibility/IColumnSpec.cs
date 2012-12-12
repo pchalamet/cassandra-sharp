@@ -25,10 +25,12 @@ namespace CassandraSharp.Extensibility
 
         string Name { get; }
 
-        ColumnType Type { get; }
+        ColumnType ColumnType { get; }
 
         string CustomData { get; }
 
-        ColumnType CollectionType { get; }
+        ColumnType CollectionKeyType { get; }
+
+        ColumnType CollectionValueType { get; }
     }
 }

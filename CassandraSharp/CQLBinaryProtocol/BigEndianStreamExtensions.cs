@@ -120,6 +120,11 @@ namespace CassandraSharp.CQLBinaryProtocol
         public static byte[] ReadBytes(this Stream stream)
         {
             int len = stream.ReadInt();
+            if (-1 == len)
+            {
+                return null;
+            }
+
             byte[] data = new byte[len];
             if (0 < len)
             {

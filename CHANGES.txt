@@ -1,3 +1,9 @@
+version 2.0.3.0 (beta3)
+- support for list, set, map
+- fixed null byte array
+- support for streaming directly from socket (default) or from memory stream
+- tabular display in cqlsh
+
 version 2.0.2.0 (beta2)
 - fix deadlock when query fails
 - expose IFrameReader and IFrameWriter instead of Stream

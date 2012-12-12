@@ -23,60 +23,42 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class FrameReader : IFrameReader, IDisposable
+    internal class FrameReader : IFrameReader,
+                                 IDisposable
     {
-        private readonly WindowedReadStream _ms;
+        private readonly Stream _ms;
 
-        private FrameReader(Stream stream)
+        private FrameReader(Stream stream, bool streaming)
         {
             MessageOpcode = (MessageOpcodes) stream.ReadByte();
             int bodyLen = stream.ReadInt();
-            _ms = new WindowedReadStream(stream, bodyLen);
+            if (streaming)
+            {
+                _ms = new WindowedReadStream(stream, bodyLen);
+            }
+            else
+            {
+                byte[] buffer = new byte[bodyLen];
+                if (0 < bodyLen)
+                {
+                    stream.Read(buffer, 0, bodyLen);
+                    _ms = new MemoryStream(buffer);
+                }
+            }
 
             if (MessageOpcodes.Error == MessageOpcode)
             {
                 using (this)
-                {
                     ThrowError();
-                }
             }
         }
-
-        public MessageOpcodes MessageOpcode { get; private set; }
 
         public void Dispose()
         {
             _ms.SafeDispose();
         }
 
-        public static FrameReader ReadFullFrame(Stream stream, out byte streamId)
-        {
-            streamId = ReadStreamId(stream);
-            return ReadBody(stream);
-        }
-
-        public static FrameReader ReadBody(Stream stream)
-        {
-            return new FrameReader(stream);
-        }
-
-        public static byte ReadStreamId(Stream stream)
-        {
-            FrameType version = (FrameType) stream.ReadByte();
-            if (0 == (version & FrameType.Response))
-            {
-                throw new ArgumentException("Expecting response frame");
-            }
-            if (FrameType.ProtocolVersion != (version & FrameType.ProtocolVersionMask))
-            {
-                throw new ArgumentException("Unknown protocol version");
-            }
-
-            FrameHeaderFlags flags = (FrameHeaderFlags) stream.ReadByte();
-
-            byte streamId = (byte) stream.ReadByte();
-            return streamId;
-        }
+        public MessageOpcodes MessageOpcode { get; private set; }
 
         public byte ReadByte()
         {
@@ -116,6 +98,29 @@ namespace CassandraSharp.Transport
         public Dictionary<string, string[]> ReadStringMultimap()
         {
             return _ms.ReadStringMultimap();
+        }
+
+        public static FrameReader ReadBody(Stream stream, bool streaming)
+        {
+            return new FrameReader(stream, streaming);
+        }
+
+        public static byte ReadStreamId(Stream stream)
+        {
+            FrameType version = (FrameType) stream.ReadByte();
+            if (0 == (version & FrameType.Response))
+            {
+                throw new ArgumentException("Expecting response frame");
+            }
+            if (FrameType.ProtocolVersion != (version & FrameType.ProtocolVersionMask))
+            {
+                throw new ArgumentException("Unknown protocol version");
+            }
+
+            FrameHeaderFlags flags = (FrameHeaderFlags) stream.ReadByte();
+
+            byte streamId = (byte) stream.ReadByte();
+            return streamId;
         }
 
         private void ThrowError()
