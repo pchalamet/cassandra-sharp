@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("CassandraSharp")]
-[assembly: AssemblyDescription("CassandraSharp is a .NET client for Apache Cassandra")]
+[assembly: AssemblyDescription("cassandra-sharp is a .NET client for Apache Cassandra")]
 #if DEBUG
 
 [assembly: AssemblyConfiguration("Debug")]
@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 #endif
 
 [assembly: AssemblyCompany("Pierre Chalamet")]
-[assembly: AssemblyProduct("CassandraSharp")]
+[assembly: AssemblyProduct("cassandra-sharp")]
 [assembly: AssemblyCopyright("(c) 2011-2012 Pierre Chalamet")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

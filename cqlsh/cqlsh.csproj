@@ -42,6 +42,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\cassandra-sharp-version.cs">
+      <Link>Properties\cassandra-sharp-version.cs</Link>
+    </Compile>
     <Compile Include="CliArgs.cs" />
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="Program.cs" />
