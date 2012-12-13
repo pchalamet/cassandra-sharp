@@ -1,6 +1,6 @@
 <Project ToolsVersion="4.0" DefaultTargets="Compile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-    <Import Project="Tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+    <Import Project="ThirdParties\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
 
     <PropertyGroup>
         <Version>0.0.0.0</Version>		
@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NuGet>Tools\NuGet\NuGet.exe</NuGet>
+		<NuGet>ThirdParties\NuGet\NuGet.exe</NuGet>
 		<NuGetPackageDir>OutDir\NuGetPackage</NuGetPackageDir>
 	</PropertyGroup>
 	

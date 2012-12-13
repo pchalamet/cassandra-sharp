@@ -1,5 +1,5 @@
-CassandraClient/bin/
-CassandraClient/bin/
+Samples/bin/
+Samples/bin/
 CassandraSharp/bin/
 CassandraSharp/obj/
 CassandraSharpUnitTests/bin/

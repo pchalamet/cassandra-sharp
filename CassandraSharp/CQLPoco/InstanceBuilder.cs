@@ -33,6 +33,9 @@ namespace CassandraSharp.CQLPoco
 
         public void Set(IColumnSpec columnSpec, object data)
         {
+            if (null == data)
+                return;
+
             if (! TrySet(columnSpec.Name, data))
             {
                 if (columnSpec.Name.Contains("_"))
