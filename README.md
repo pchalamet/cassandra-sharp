@@ -6,10 +6,11 @@ cassandra-sharp support async operations exposed as TPL tasks and efficient memo
 Features
 ========
 * async operations
-* streaming support with IEnumerable
-* extensible rowset mapping
 * TPL integration (compatible with C# 5 async)
-* robust connection handling (connection can be recovered)
+* streaming support with IEnumerable (compatible with Linq)
+* extensible rowset mapping (poco and map provided out of the box)
+* robust connection handling (connection can then be recovered)
+* multiple extension points
 
 If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.
 
