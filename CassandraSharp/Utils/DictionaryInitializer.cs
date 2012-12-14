@@ -13,19 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace cqlsh
+namespace CassandraSharp.Utils
 {
-    internal class CliArgs
+    using System.Collections.Generic;
+
+    internal class DictionaryInitializer<K, V> : IDictionaryInitializer
     {
-// ReSharper restore InconsistentNaming
+        private readonly Dictionary<K, V> _collection = new Dictionary<K, V>();
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
-        public bool CheckConnection = true;
+        public void Add(object key, object value)
+        {
+            K tkey = (K) key;
+            V vvalue = (V) value;
+            _collection.Add(tkey, vvalue);
+        }
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
-        public string File = null;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
-        public string Hostname = null;
+        public object Collection
+        {
+            get { return _collection; }
+        }
     }
 }

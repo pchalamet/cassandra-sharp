@@ -13,19 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace cqlsh
+namespace CassandraSharp.Utils
 {
-    internal class CliArgs
+    internal interface ICollectionInitializer
     {
-// ReSharper restore InconsistentNaming
+        object Collection { get; }
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
-        public bool CheckConnection = true;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
-        public string File = null;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
-        public string Hostname = null;
+        void Add(object t);
     }
 }

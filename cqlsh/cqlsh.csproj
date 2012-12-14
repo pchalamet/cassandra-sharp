@@ -46,9 +46,17 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="CliArgs.cs" />
+    <Compile Include="StatementReader\StatementSplitter.cs" />
+    <Compile Include="StatementReader\ConsoleInput.cs" />
+    <Compile Include="StatementReader\FileInput.cs" />
     <Compile Include="CommandLineArguments.cs" />
+    <Compile Include="IStatementReader.cs" />
+    <Compile Include="IResultWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultWriter\RowKeyValue.cs" />
+    <Compile Include="ResultWriter\Tabular.cs" />
+    <Compile Include="ResultWriter\ValueFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

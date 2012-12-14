@@ -1,16 +1,20 @@
-version 2.0.3.0 (beta3)
+version 2.0.4.0 (beta)
+- change cqlsh value formatting
+- fixed map/set/list bin reader
+
+version 2.0.3.0 (beta)
 - support for list, set, map
 - fixed null byte array
 - support for streaming directly from socket (default) or from memory stream
 - tabular display in cqlsh
 - created Samples project (removed CassandraClient)
 
-version 2.0.2.0 (beta2)
+version 2.0.2.0 (beta)
 - fix deadlock when query fails
 - expose IFrameReader and IFrameWriter instead of Stream
 - release stream id earlier
 
-version 2.0.1.0 (beta1)
+version 2.0.1.0 (beta)
 - full async support with both streaming and future
 - no buffering while reading
 - reliable error handling while performing async IO

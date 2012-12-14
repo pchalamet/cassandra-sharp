@@ -204,7 +204,7 @@
 //    11/23/2004 Added support for default values.
 //    02/23/2005 Fix bug with short name and default arguments.
 //////////////////////////////////////////////////////////////////////////////
-namespace CommandLine
+namespace cqlsh
 {
     using System;
     using System.Diagnostics;
@@ -466,7 +466,7 @@ namespace CommandLine
 
         private class HelpArgument 
         { 
-            [ArgumentAttribute(ArgumentType.AtMostOnce, ShortName="?")] 
+            [Argument(ArgumentType.AtMostOnce, ShortName="?")] 
             public bool help = false; 
         } 
 

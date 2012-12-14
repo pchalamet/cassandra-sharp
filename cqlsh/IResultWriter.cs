@@ -15,17 +15,10 @@
 
 namespace cqlsh
 {
-    internal class CliArgs
+    using System.Collections.Generic;
+
+    internal interface IResultWriter
     {
-// ReSharper restore InconsistentNaming
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
-        public bool CheckConnection = true;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
-        public string File = null;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
-        public string Hostname = null;
+        void Write(IEnumerable<Dictionary<string, object>> rowSet);
     }
 }

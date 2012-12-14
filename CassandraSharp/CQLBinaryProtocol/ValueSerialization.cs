@@ -22,6 +22,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Net;
     using System.Text;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
 
     internal static class ValueSerialization
     {
@@ -154,8 +155,8 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.List:
                     colType = columnSpec.CollectionValueType.ToType();
-                    Type typedList = typeof(IList<>).MakeGenericType(colType);
-                    IList list = (IList) Activator.CreateInstance(typedList);
+                    Type typedColl = typeof(ListInitializer<>).MakeGenericType(colType);
+                    ICollectionInitializer list = (ICollectionInitializer) Activator.CreateInstance(typedColl);
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
                         short nbElem = ms.ReadShort();
@@ -165,15 +166,15 @@ namespace CassandraSharp.CQLBinaryProtocol
                             object elem = Deserialize(columnSpec.CollectionValueType, elemRawData);
                             list.Add(elem);
                         }
-                        data = list;
+                        data = list.Collection;
                     }
                     break;
 
                 case ColumnType.Map:
                     Type keyType = columnSpec.CollectionKeyType.ToType();
                     colType = columnSpec.CollectionValueType.ToType();
-                    Type typedMap = typeof(IDictionary<,>).MakeGenericType(keyType, colType);
-                    IDictionary map = (IDictionary) Activator.CreateInstance(typedMap);
+                    Type typedDic = typeof(DictionaryInitializer<,>).MakeGenericType(keyType, colType);
+                    IDictionaryInitializer dic = (IDictionaryInitializer) Activator.CreateInstance(typedDic);
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
                         short nbElem = ms.ReadShort();
@@ -183,26 +184,26 @@ namespace CassandraSharp.CQLBinaryProtocol
                             byte[] elemRawValue = ms.ReadShortBytes();
                             object key = Deserialize(columnSpec.CollectionValueType, elemRawKey);
                             object value = Deserialize(columnSpec.CollectionValueType, elemRawValue);
-                            map.Add(key, value);
+                            dic.Add(key, value);
                         }
-                        data = map;
+                        data = dic.Collection;
                     }
                     break;
 
                 case ColumnType.Set:
                     colType = columnSpec.CollectionValueType.ToType();
-                    Type typedSet = typeof(ISet<>).MakeGenericType(colType);
-                    IList set = (IList) Activator.CreateInstance(typedSet);
+                    Type typedSet = typeof(HashSetInitializer<>).MakeGenericType(colType);
+                    ICollectionInitializer set = (ICollectionInitializer) Activator.CreateInstance(typedSet);
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
                         short nbElem = ms.ReadShort();
-                        while (0 < nbElem)
+                        while (0 < nbElem--)
                         {
                             byte[] elemRawData = ms.ReadShortBytes();
                             object elem = Deserialize(columnSpec.CollectionValueType, elemRawData);
                             set.Add(elem);
                         }
-                        data = set;
+                        data = set.Collection;
                     }
                     break;
             }

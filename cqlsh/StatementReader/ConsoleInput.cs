@@ -13,19 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace cqlsh
+namespace cqlsh.StatementReader
 {
-    internal class CliArgs
+    using System;
+    using System.Collections.Generic;
+
+    public class ConsoleInput : IStatementReader
     {
-// ReSharper restore InconsistentNaming
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
-        public bool CheckConnection = true;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
-        public string File = null;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
-        public string Hostname = null;
+        public IEnumerable<string> Read()
+        {
+            while (true)
+            {
+                Console.Write("cqlsh> ");
+                string line = Console.ReadLine();
+                yield return line;
+            }
+// ReSharper disable FunctionNeverReturns
+        }
+// ReSharper restore FunctionNeverReturns
     }
 }

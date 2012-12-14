@@ -46,6 +46,11 @@
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
+    <Compile Include="Utils\DictionaryInitializer.cs" />
+    <Compile Include="Utils\HashSetInitializer.cs" />
+    <Compile Include="Utils\ICollectionInitializer.cs" />
+    <Compile Include="Utils\IDictionaryInitializer.cs" />
+    <Compile Include="Utils\ListInitializer.cs" />
     <Compile Include="Transport\WindowedReadStream.cs" />
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Exceptions\CassandraException.cs" />
