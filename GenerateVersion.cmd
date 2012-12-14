@@ -16,7 +16,7 @@ if "%FLAVOR%" == "" (
 set VERSION=%2
 if "%VERSION%" == "" (
 	echo WARNING: missing version as parameter ^(see %~n0 /?^)
-	echo WARNING: using VERSION=0.0.0.0 instead
+	echo WARNING: using VERSION=0.0.0 instead
 	echo.
 	set VERSION=0.0.0.0
 )
