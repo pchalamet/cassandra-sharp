@@ -24,6 +24,6 @@ cassandra-sharp does only support:
 * CQL 3.0 (Binary Protocol)
 * Apache Cassandra 1.2+
 </description>
-    <tags>Apache Cassandra .net40 .net45 database nosql</tags>
+    <tags>apache cassandra .net40 .net45 database nosql</tags>
   </metadata>
 </package>
