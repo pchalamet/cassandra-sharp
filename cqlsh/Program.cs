@@ -16,34 +16,28 @@
 namespace cqlsh
 {
     using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
     using CassandraSharp.Config;
+    using cqlsh.Parser;
     using cqlsh.ResultWriter;
     using cqlsh.StatementReader;
 
     internal class Program
     {
-        private static IResultWriter _display;
-
         private static CliArgs _cliArgs;
 
         private static int Main(string[] args)
         {
             _cliArgs = new CliArgs();
-            if (!Parser.ParseArguments(args, _cliArgs))
+            if (!CommandLineParser.ParseArguments(args, _cliArgs))
             {
-                string usage = Parser.ArgumentsUsage(typeof(CliArgs));
+                string usage = CommandLineParser.ArgumentsUsage(typeof(CliArgs));
                 Console.WriteLine(usage);
                 return 5;
             }
 
-            _display = new Tabular(15);
-
             string hostname = _cliArgs.Hostname;
-            IStatementReader statementInput = new ConsoleInput();
+            IStatementReader statementInput = new ConsoleInput(hostname);
             if (null != _cliArgs.File)
             {
                 statementInput = new FileInput(_cliArgs.File);
@@ -79,35 +73,73 @@ namespace cqlsh
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
+                CommandContext.Instance.Cluster = cluster;
+
                 if (_cliArgs.CheckConnection)
                 {
                     const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
-                    ExecuteCQLStatement(cluster, checkStatement, new Tabular());
+                    if (!ExecuteCommand(checkStatement))
+                    {
+                        return;
+                    }
                 }
 
                 foreach (string statement in statementReader.Read())
                 {
-                    ExecuteCQLStatement(cluster, statement, _display);
+                    ExecuteCommand(statement);
+
+                    if (CommandContext.Instance.Exit)
+                    {
+                        return;
+                    }
                 }
             }
         }
 
-        private static void ExecuteCQLStatement(ICluster cluster, string statement, IResultWriter resultWriter)
+        private static bool ExecuteCommand(string cmd)
         {
             try
             {
-                Task<IEnumerable<Dictionary<string, object>>> res = cluster.Execute(statement, ConsistencyLevel.QUORUM);
-                resultWriter.Write(res.Result);
+                Scanner scanner = new Scanner();
+                Parser.Parser parser = new Parser.Parser(scanner);
+                ParseTree parseTree = parser.Parse(cmd);
+                if (0 < parseTree.Errors.Count)
+                {
+                    Console.WriteLine(parseTree.Errors[0].Message);
+                    return false;
+                }
+
+                object result = parseTree.Eval(null);
+                ICommand command = (ICommand) result;
+
+                CommandContext.Instance.ResultWriter = GetResultWriter();
+                command.Execute();
+                return true;
             }
             catch (Exception ex)
             {
-                if (null != ex.InnerException)
+                while (null != ex.InnerException)
                 {
                     ex = ex.InnerException;
                 }
 
-                Console.WriteLine("Command failed with error: {0}", ex.Message);
+                Console.WriteLine(ex.Message);
+                return false;
             }
+            finally
+            {
+                Console.WriteLine();
+            }
+        }
+
+        private static IResultWriter GetResultWriter()
+        {
+            if (CommandContext.Instance.Tabular)
+            {
+                return new Tabular(CommandContext.Instance.ColumnWidth);
+            }
+
+            return new RowKeyValue();
         }
     }
 }

@@ -102,8 +102,9 @@ Thanks
 JetBrains provided a free licence of Resharper for the cassandra-sharp project. Big thanks for the awesome product.
 
 This projects also relies on the following third parties:
-* MSBuild Community Tasks Project (http://msbuildtasks.tigris.org/) released under BSD License (http://opensource.org/licenses/bsd-license.php)
+* MSBuild Community Tasks Project (http://msbuildtasks.tigris.org/) released under BSD License
 * Moq (http://code.google.com/p/moq/) released under New BSD License
 * NUnit (http://www.nunit.org/) released NUnit license
 * NuGet (http://nuget.org/) released under Apache License 2.0
 * Command Line Argument Parser Library (http://commandlinearguments.codeplex.com/) released under Microsoft Public License (Ms-PL)
+* Tiny Parser Generator (http://www.codeproject.com/Articles/28294/a-Tiny-Parser-Generator-v1-2) released under Code Project Open License (CPOL)

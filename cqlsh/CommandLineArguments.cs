@@ -400,7 +400,7 @@ namespace cqlsh
     /// Arguments which are array types are collection arguments. Collection
     /// arguments can be specified multiple times.
     /// </summary>
-    public sealed class Parser
+    public sealed class CommandLineParser
     {
         /// <summary>
         /// The System Defined new line string.
@@ -410,7 +410,7 @@ namespace cqlsh
         /// <summary>
         /// Don't ever call this.
         /// </summary>
-        private Parser() { }
+        private CommandLineParser() { }
         
         /// <summary>
         /// Parses Command Line Arguments. Displays usage message to Console.Out
@@ -423,10 +423,10 @@ namespace cqlsh
         /// <returns> true if no errors were detected. </returns>
         public static bool ParseArgumentsWithUsage(string [] arguments, object destination)
         {
-            if (Parser.ParseHelp(arguments) || !Parser.ParseArguments(arguments, destination))
+            if (CommandLineParser.ParseHelp(arguments) || !CommandLineParser.ParseArguments(arguments, destination))
             {
                 // error encountered in arguments. Display usage message
-                System.Console.Write(Parser.ArgumentsUsage(destination.GetType()));
+                System.Console.Write(CommandLineParser.ArgumentsUsage(destination.GetType()));
                 return false;
             }
             
@@ -443,7 +443,7 @@ namespace cqlsh
         /// <returns> true if no errors were detected. </returns>
         public static bool ParseArguments(string [] arguments, object destination)
         {
-            return Parser.ParseArguments(arguments, destination, new ErrorReporter(Console.Error.WriteLine));
+            return CommandLineParser.ParseArguments(arguments, destination, new ErrorReporter(Console.Error.WriteLine));
         }
         
         /// <summary>
@@ -456,7 +456,7 @@ namespace cqlsh
         /// <returns> true if no errors were detected. </returns>
         public static bool ParseArguments(string[] arguments, object destination, ErrorReporter reporter)
         {
-            Parser parser = new Parser(destination.GetType(), reporter);
+            CommandLineParser parser = new CommandLineParser(destination.GetType(), reporter);
             return parser.Parse(arguments, destination);
         }
 
@@ -477,7 +477,7 @@ namespace cqlsh
         /// <returns> Returns true if args contains /? or /help. </returns>
         public static bool ParseHelp(string[] args)
         {
-            Parser helpParser = new Parser(typeof(HelpArgument), new ErrorReporter(NullErrorReporter));
+            CommandLineParser helpParser = new CommandLineParser(typeof(HelpArgument), new ErrorReporter(NullErrorReporter));
             HelpArgument helpArgument = new HelpArgument();
             helpParser.Parse(args, helpArgument);
             return helpArgument.help;
@@ -493,7 +493,7 @@ namespace cqlsh
         /// <returns> Printable string containing a user friendly description of command line arguments. </returns>
         public static string ArgumentsUsage(Type argumentType)
         {
-            int screenWidth = Parser.GetConsoleWindowWidth();
+            int screenWidth = CommandLineParser.GetConsoleWindowWidth();
             if (screenWidth == 0)
                 screenWidth = 80;
             return ArgumentsUsage(argumentType, screenWidth);
@@ -508,7 +508,7 @@ namespace cqlsh
         /// <returns> Printable string containing a user friendly description of command line arguments. </returns>
         public static string ArgumentsUsage(Type argumentType, int columns)
         {
-            return (new Parser(argumentType, null)).GetUsageString(columns);
+            return (new CommandLineParser(argumentType, null)).GetUsageString(columns);
         }
 
         private const int STD_OUTPUT_HANDLE  = -11;
@@ -600,7 +600,7 @@ namespace cqlsh
         /// </summary>
         /// <param name="argumentSpecification"> The type of object to  parse. </param>
         /// <param name="reporter"> The destination for parse errors. </param>
-        public Parser(Type argumentSpecification, ErrorReporter reporter)
+        public CommandLineParser(Type argumentSpecification, ErrorReporter reporter)
         {
             this.reporter = reporter;
             this.arguments = new ArrayList();
@@ -1091,12 +1091,12 @@ namespace cqlsh
         {
             public Argument(ArgumentAttribute attribute, FieldInfo field, ErrorReporter reporter)
             {
-                this.longName = Parser.LongName(attribute, field);
-                this.explicitShortName = Parser.ExplicitShortName(attribute);
-                this.shortName = Parser.ShortName(attribute, field);
-                this.hasHelpText = Parser.HasHelpText(attribute);
-                this.helpText = Parser.HelpText(attribute, field);
-                this.defaultValue = Parser.DefaultValue(attribute, field);
+                this.longName = CommandLineParser.LongName(attribute, field);
+                this.explicitShortName = CommandLineParser.ExplicitShortName(attribute);
+                this.shortName = CommandLineParser.ShortName(attribute, field);
+                this.hasHelpText = CommandLineParser.HasHelpText(attribute);
+                this.helpText = CommandLineParser.HelpText(attribute, field);
+                this.defaultValue = CommandLineParser.DefaultValue(attribute, field);
                 this.elementType = ElementType(field);
                 this.flags = Flags(attribute, field);
                 this.field = field;

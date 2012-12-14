@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CassandraSharp.targets = CassandraSharp.targets
 		CHANGES.txt = CHANGES.txt
 		LICENSE-2.0.txt = LICENSE-2.0.txt
-		README.txt = README.txt
+		README.md = README.md
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject

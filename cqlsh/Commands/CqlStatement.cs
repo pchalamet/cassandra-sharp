@@ -13,30 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace cqlsh.StatementReader
+namespace cqlsh.Commands
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using CassandraSharp;
+    using CassandraSharp.CQLPropertyBag;
 
-    public class ConsoleInput : IStatementReader
+    internal class CqlStatement : ICommand
     {
-        private readonly string _hostname;
+        private readonly string _statement;
 
-        public ConsoleInput(string hostname)
+        public CqlStatement(string statement)
         {
-            _hostname = hostname;
+            _statement = statement;
         }
 
-        public IEnumerable<string> Read()
+        public void Execute()
         {
-            while (true)
-            {
-                Console.Write("{0}> ", _hostname);
-                string line = Console.ReadLine();
-                yield return line;
-            }
-// ReSharper disable FunctionNeverReturns
+            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Instance.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
+            CommandContext.Instance.ResultWriter.Write(res.Result);
         }
-// ReSharper restore FunctionNeverReturns
     }
 }

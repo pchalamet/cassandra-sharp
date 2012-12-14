@@ -1,8 +1,5 @@
 OutDir/
 cassandra-sharp-version.cs
-*.pdb
-*.dll
-*.exe
 *.suo
 *.user
 */bin/
