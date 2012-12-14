@@ -22,6 +22,9 @@ namespace cqlsh
         [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
         public bool CheckConnection = true;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Display banner", ShortName = "b")]
+        public bool Banner = true;
+
         [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
         public string File = null;
 

@@ -1,6 +1,9 @@
 version 2.0.4.0 (beta)
 - change cqlsh value formatting
 - fixed map/set/list bin reader
+- ExecuteNonQuery for prepared statement
+- cqlsh debug logger
+- commands handling refactoring
 
 version 2.0.3.0 (beta)
 - support for list, set, map

@@ -36,7 +36,7 @@
 	</Target>
 	
     <Target Name="GenerateAssemblyInfo">
-        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)-$(VersionStatus)" OutputFile="$(CassandraSharpProjectName)-version.cs" />
+        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)$(VersionStatus)" OutputFile="$(CassandraSharpProjectName)-version.cs" />
     </Target>
 
     <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo">
@@ -57,7 +57,7 @@
             <ZipFiles Include="$(ZipDir)\**\*.*" />
         </ItemGroup>
 		
-        <Zip ZipFileName="$(OutDir)\$(CassandraSharpProjectName)-bin-$(Version)-$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
+        <Zip ZipFileName="$(OutDir)\$(CassandraSharpProjectName)-bin-$(Version)$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
 	</Target>
 	
 	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile">
@@ -67,7 +67,7 @@
 		<Copy SourceFiles="$(CQLShAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\bin" />
 		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)" />
-		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/summary" Value="$(CassandraSharpProjectName)-bin-$(Version)-$(VersionStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/summary" Value="$(CassandraSharpProjectName)-bin-$(Version)$(VersionStatus)" />
 		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory $(OutDir)" />
 	</Target>
 	

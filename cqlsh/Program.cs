@@ -78,11 +78,17 @@ namespace cqlsh
 
                 if (_cliArgs.CheckConnection)
                 {
+                    Console.WriteLine("Connecting to {0}:", hostname);
                     const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
                     if (!ExecuteCommand(checkStatement))
                     {
                         return;
                     }
+                }
+
+                if (_cliArgs.Banner)
+                {
+                    ExecuteCommand("!help");
                 }
 
                 foreach (string statement in statementReader.Read())

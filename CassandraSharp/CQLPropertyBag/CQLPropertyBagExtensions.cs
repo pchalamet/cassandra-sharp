@@ -29,10 +29,10 @@ namespace CassandraSharp.CQLPropertyBag
             return CQLCommandHelpers.Query<Dictionary<string, object>>(cluster, cql, cl, factory);
         }
 
-        public static Task<IEnumerable<Dictionary<string, object>>> Execute(this IPreparedQuery preparedQuery, ConsistencyLevel cl, params object[] prms)
+        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, ConsistencyLevel cl, params object[] prms)
         {
             IDataMapperFactory factory = new DataMapperFactory(prms);
-            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<Dictionary<string, object>>());
+            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
         }
     }
 }

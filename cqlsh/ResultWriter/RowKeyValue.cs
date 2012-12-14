@@ -35,7 +35,6 @@ namespace cqlsh.ResultWriter
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine();
         }
     }
 }

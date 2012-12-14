@@ -24,9 +24,15 @@ if "%VERSION%" == "" (
 set VERSIONSTATUS=%3
 if "%VERSIONSTATUS%" == "" (
 	echo WARNING: missing version status as parameter ^(see %~n0 /?^)
-	echo WARNING: using VERSIONSTATUS=ALPHA instead
+	echo WARNING: using VERSIONSTATUS=alpha instead
 	echo.
-	set VERSIONSTATUS=ALPHA
+	set VERSIONSTATUS=alpha
+)
+
+if "%VERSIONSTATUS%" == "rtm" (
+	set VERSIONSTATUS=
+) else (
+	set VERSIONSTATUS=-%VERSIONSTATUS%
 )
 
 msbuild /t:GenerateVersion /p:Version=%VERSION% /p:Configuration=%FLAVOR% /p:VersionStatus=%VERSIONSTATUS% cassandra-sharp.targets || goto :done

@@ -43,7 +43,7 @@ namespace CassandraSharp.CQL
             return connection.Execute(writer, reader).ContinueWith(res => (IPreparedQuery) res.Result.Single());
         }
 
-        public static Task<int> Execute(this IPreparedQuery preparedQuery, ConsistencyLevel cl)
+        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, ConsistencyLevel cl, params object[] prms)
         {
             return preparedQuery.Execute(cl, null).ContinueWith(res => res.Result.Count());
         }

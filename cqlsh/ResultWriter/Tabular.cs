@@ -88,7 +88,6 @@ namespace cqlsh.ResultWriter
 
                 Console.WriteLine(rowValues);
                 Console.WriteLine(rowSeparator);
-                Console.WriteLine();
             }
         }
     }

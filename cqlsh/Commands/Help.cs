@@ -21,11 +21,17 @@ namespace cqlsh.Commands
     {
         public void Execute()
         {
-            Console.WriteLine("help : display help");
-            Console.WriteLine("exit : exit cqlsh");
-            Console.WriteLine("reset : reset environment");
-            Console.WriteLine("tab=<bool> : enable tabular result output");
-            Console.WriteLine("colwidth=<int> : set column width for tabular result output");
+            Console.WriteLine("Available commands:");
+            Console.WriteLine("  help            - display help");
+            Console.WriteLine("  exit            - exit cqlsh");
+            Console.WriteLine("  reset           - reset environment");
+            Console.WriteLine("  tab=<bool>      - enable tabular result output");
+            Console.WriteLine("  colwidth=<int>  - set column width for tabular result output");
+            Console.WriteLine("  log=<bool>      - enable debug logger");
+            Console.WriteLine();
+            Console.WriteLine("Statements end with ';'");
+            Console.WriteLine("  - Commands start with '!'");
+            Console.WriteLine("  - CQL command are entered as is");
         }
     }
 }
