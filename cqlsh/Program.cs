@@ -60,6 +60,7 @@ namespace cqlsh
         private static void Run(string hostname, IStatementReader statementReader)
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            cassandraSharpConfig.Logger = typeof(ConsoleDebugLogger).AssemblyQualifiedName;
             ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig

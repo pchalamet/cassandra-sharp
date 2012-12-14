@@ -16,9 +16,16 @@
 namespace CassandraSharp.Utils
 {
     using System;
+    using System.Linq;
+    using System.Reflection;
 
     internal static class ServiceActivator
     {
+        public static string GetTypeName<T>()
+        {
+            return typeof(T).AssemblyQualifiedName;
+        }
+
         public static T Create<T>(string customType, params object[] prms)
         {
             if (string.IsNullOrEmpty(customType))
@@ -33,7 +40,17 @@ namespace CassandraSharp.Utils
                 throw new ArgumentException(invalidTypeMsg);
             }
 
-            return (T) Activator.CreateInstance(type, prms);
+            // mini-dependency injection
+            ConstructorInfo ci = type.GetConstructors().Single();
+            ParameterInfo[] pis = ci.GetParameters();
+            object[] ciPrms = new object[pis.Length];
+            for (int idx = 0; idx < ciPrms.Length; ++idx)
+            {
+                Type piType = pis[idx].ParameterType;
+                ciPrms[idx] = prms.First(piType.IsInstanceOfType);
+            }
+
+            return (T) Activator.CreateInstance(type, ciPrms);
         }
     }
 }

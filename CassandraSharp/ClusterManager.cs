@@ -27,12 +27,11 @@ namespace CassandraSharp
 
     public class ClusterManager
     {
-
         private static CassandraSharpConfig _config;
 
         private static IRecoveryService _recoveryService;
 
-        private static ILog _logger;
+        private static ILogger _logger;
 
         public static ICluster GetCluster(string name)
         {
@@ -52,22 +51,20 @@ namespace CassandraSharp
             clusterConfig.CheckArgumentNotNull("clusterConfig");
             clusterConfig.Endpoints.CheckArgumentNotNull("clusterConfig.Endpoints");
 
-            //IBehaviorConfig behaviorConfig = clusterConfig.BehaviorConfig ?? new BehaviorConfig();
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
-
             IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = Factory.Create(clusterConfig.Endpoints.Snitch);
+            IEndpointSnitch snitch = Factory.Create(clusterConfig.Endpoints.Snitch, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find);
 
             // create required services
-            IEndpointStrategy endpointsManager = EndpointStrategy.Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch);
-            //ITimestampService timestampService = Timestamp.Factory.Create(clusterConfig.Endpoints.Timestamp);
-            IConnectionFactory connectionFactory = Transport.Factory.Create(transportConfig);
+            IEndpointStrategy endpointsManager = EndpointStrategy.Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch, _logger);
+            IConnectionFactory connectionFactory = Transport.Factory.Create(transportConfig.Type, transportConfig, _logger);
 
             // create the cluster now
-            return new Cluster(endpointsManager, _logger, connectionFactory, recoveryService);
+            ICluster cluster = Cluster.Factory.Create("Default", endpointsManager, _logger, connectionFactory, recoveryService);
+            return cluster;
         }
 
         private static ClusterConfig GetClusterConfig(string name)
@@ -114,10 +111,8 @@ namespace CassandraSharp
                 throw new InvalidOperationException("ClusterManager is already initialized");
             }
 
-            _recoveryService = Recovery.Factory.Create(config.Recovery);
-
             _logger = Logger.Factory.Create(config.Logger);
-
+            _recoveryService = Recovery.Factory.Create(config.Recovery, _logger);
             _config = config;
         }
     }

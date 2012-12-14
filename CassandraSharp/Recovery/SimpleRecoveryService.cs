@@ -24,14 +24,17 @@ namespace CassandraSharp.Recovery
 
     internal class SimpleRecoveryService : IRecoveryService
     {
+        private readonly ILogger _logger;
+
         private readonly object _lock;
 
         private readonly Timer _timer;
 
         private readonly List<RecoveryItem> _toRecover;
 
-        public SimpleRecoveryService()
+        public SimpleRecoveryService(ILogger logger)
         {
+            _logger = logger;
             _toRecover = new List<RecoveryItem>();
             _timer = new Timer(60*1000);
             _timer.Elapsed += (s, e) => TryRecover();
@@ -56,6 +59,8 @@ namespace CassandraSharp.Recovery
 
         private void TryRecover()
         {
+            _logger.Debug("Trying to recover endpoints");
+
             List<RecoveryItem> toRecover;
             lock (_lock)
             {
@@ -66,7 +71,9 @@ namespace CassandraSharp.Recovery
             {
                 try
                 {
+                    _logger.Debug("Trying to recover endpoint {0}", recoveryItem.Endpoint);
                     IConnection client = recoveryItem.ConnectionFactory.Create(recoveryItem.Endpoint);
+                    _logger.Debug("Endpoint {0} successfully recovered", recoveryItem.Endpoint);
 
                     lock (_lock)
                     {
@@ -75,10 +82,9 @@ namespace CassandraSharp.Recovery
 
                     recoveryItem.ClientRecoveredCallback(client);
                 }
-// ReSharper disable EmptyGeneralCatchClause
                 catch
-// ReSharper restore EmptyGeneralCatchClause
                 {
+                    _logger.Debug("Failed to recover endpoint {0}", recoveryItem.Endpoint);
                 }
             }
 

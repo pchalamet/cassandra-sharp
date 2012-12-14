@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Cluster
 {
     using System;
     using System.Collections.Generic;
@@ -31,11 +31,11 @@ namespace CassandraSharp
 
         private readonly Dictionary<IPAddress, IConnection> _ip2Connection;
 
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         private readonly IRecoveryService _recoveryService;
 
-        public Cluster(IEndpointStrategy endpointStrategy, ILog logger,
+        public Cluster(IEndpointStrategy endpointStrategy, ILogger logger,
                        IConnectionFactory connectionFactory, IRecoveryService recoveryService)
         {
             _ip2Connection = new Dictionary<IPAddress, IConnection>();
@@ -137,7 +137,7 @@ namespace CassandraSharp
         {
             lock (_globalLock)
             {
-                _logger.Info("{0} is recovered", connection.Endpoint);
+                _logger.Info("Endpoint {0} is recovered", connection.Endpoint);
 
                 _ip2Connection.Add(connection.Endpoint, connection);
                 _endpointStrategy.Permit(connection.Endpoint);

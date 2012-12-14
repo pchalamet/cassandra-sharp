@@ -13,21 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
+namespace CassandraSharp.Cluster
 {
-    using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
     {
-        public static IConnectionFactory Create(string customType, params object[] prms)
+        public static ICluster Create(string customType, params object[] prms)
         {
-            if (customType == "CqlBinary")
+            if (customType == "Default")
             {
-                customType = ServiceActivator.GetTypeName<ConnectionFactory>();
+                customType = ServiceActivator.GetTypeName<Cluster>();
             }
 
-            return ServiceActivator.Create<IConnectionFactory>(customType, prms);
+            return ServiceActivator.Create<ICluster>(customType, prms);
         }
     }
 }

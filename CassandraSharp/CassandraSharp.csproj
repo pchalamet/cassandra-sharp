@@ -46,6 +46,7 @@
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
+    <Compile Include="Cluster\Factory.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
     <Compile Include="Utils\ICollectionInitializer.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="CQLBinaryProtocol\ResultOpcode.cs" />
     <Compile Include="Exceptions\TimeOutException.cs" />
     <Compile Include="Exceptions\UnavailableException.cs" />
-    <Compile Include="Cluster.cs" />
+    <Compile Include="Cluster\Cluster.cs" />
     <Compile Include="FailureEventArgs.cs" />
     <Compile Include="IPreparedQuery.cs" />
     <Compile Include="Discovery\Factory.cs" />

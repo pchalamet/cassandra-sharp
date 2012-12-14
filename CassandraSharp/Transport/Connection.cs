@@ -41,6 +41,8 @@ namespace CassandraSharp.Transport
 
         private readonly TransportConfig _config;
 
+        private readonly ILogger _logger;
+
         private readonly object _globalLock = new object();
 
         private readonly Stream _inputStream;
@@ -55,10 +57,11 @@ namespace CassandraSharp.Transport
 
         private bool _failed;
 
-        public Connection(IPAddress address, TransportConfig config)
+        public Connection(IPAddress address, TransportConfig config, ILogger logger)
         {
             Endpoint = address;
             _config = config;
+            _logger = logger;
             _tcpClient = new TcpClient();
             _tcpClient.Connect(address, _config.Port);
 
@@ -76,12 +79,15 @@ namespace CassandraSharp.Transport
                 _requestStates[idx].Lock = new object();
             }
 
+            _logger.Debug("Ready'ing connection for {0}", Endpoint);
             GetOptions();
             ReadifyConnection();
+            _logger.Debug("Connection to {0} is ready", Endpoint);
         }
 
         public void Dispose()
         {
+            _logger.Debug("Connection to {0} is being disposed", Endpoint);
             lock (_globalLock)
             {
                 _tcpClient.SafeDispose();
@@ -97,6 +103,7 @@ namespace CassandraSharp.Transport
             {
                 while (0 == _availableStreamIds.Count)
                 {
+                    _logger.Debug("Waiting for available stream id for {0}", Endpoint);
                     ThrowClientRequestAbortedIfConnectionFailed();
                     Monitor.Wait(_globalLock);
                 }
@@ -104,6 +111,7 @@ namespace CassandraSharp.Transport
 
                 // get the stream id and initialize async reader context
                 streamId = _availableStreamIds.Pop();
+                _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
 
                 // startup a new read task
                 _currReadTask = null != _currReadTask
@@ -125,8 +133,12 @@ namespace CassandraSharp.Transport
             {
                 ThrowClientRequestAbortedIfConnectionFailed();
 
+                _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
+
                 using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId))
                     writer(frameWriter);
+
+                _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
             }
 
             // return a promise to stream results
@@ -157,6 +169,8 @@ namespace CassandraSharp.Transport
                         Monitor.Wait(_requestStates[streamId].Lock);
                     }
 
+                    _logger.Debug("Starting reading stream {0}@{1}", streamId, Endpoint);
+
                     lock (_globalLock)
                     {
                         // release stream id (since result streaming has started)
@@ -174,6 +188,8 @@ namespace CassandraSharp.Transport
                             yield return row;
                         }                            
                     }
+
+                    _logger.Debug("Done reading stream {0}@{1}", streamId, Endpoint);
                 }
                 finally
                 {
@@ -196,6 +212,8 @@ namespace CassandraSharp.Transport
                 // read stream id - we are the only one reading so no lock required
                 byte streamId = FrameReader.ReadStreamId(_inputStream);
 
+                _logger.Debug("Stream {0}@{1} is available", streamId, Endpoint);
+
                 // acquire request lock
                 lock (_requestStates[streamId].Lock)
                 {
@@ -208,6 +226,8 @@ namespace CassandraSharp.Transport
                     // wait for request handler to complete
                     Monitor.Wait(_requestStates[streamId].Lock);
                 }
+
+                _logger.Debug("Stream {0}@{1} is completed", streamId, Endpoint);
             }
             catch (Exception ex)
             {
@@ -223,6 +243,8 @@ namespace CassandraSharp.Transport
                 {
                     return;
                 }
+
+                _logger.Error("Connection to {0} is broken", Endpoint);
 
                 _failed = true;
 

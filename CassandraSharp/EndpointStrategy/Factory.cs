@@ -15,28 +15,23 @@
 
 namespace CassandraSharp.EndpointStrategy
 {
-    using System.Collections.Generic;
-    using System.Net;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal static class Factory
     {
-        public static IEndpointStrategy Create(string customType, IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
+        public static IEndpointStrategy Create(string customType, params object[] prms)
         {
-            switch (customType)
+            if (customType == "Random")
             {
-                case null:
-                case "":
-                case "Random":
-                    return new RandomEndpointStrategy(endpoints, snitch);
-
-                case "Nearest":
-                    return new NearestEndpointStrategy(endpoints, snitch);
-
-                default:
-                    return ServiceActivator.Create<IEndpointStrategy>(customType, endpoints, snitch);
+                customType = ServiceActivator.GetTypeName<RandomEndpointStrategy>();
             }
+            else if (customType == "Nearest")
+            {
+                customType = ServiceActivator.GetTypeName<NearestEndpointStrategy>();
+            }
+
+            return ServiceActivator.Create<IEndpointStrategy>(customType, prms);
         }
     }
 }

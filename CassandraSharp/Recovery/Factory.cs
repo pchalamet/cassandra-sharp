@@ -20,19 +20,18 @@ namespace CassandraSharp.Recovery
 
     internal static class Factory
     {
-        public static IRecoveryService Create(string customType)
+        public static IRecoveryService Create(string customType, params object[] prms)
         {
-            switch (customType)
+            if (customType == "Null")
             {
-                case "Null":
-                    return new NullRecoveryService();
-
-                case "Simple":
-                    return new SimpleRecoveryService();
-
-                default:
-                    return ServiceActivator.Create<IRecoveryService>(customType);
+                customType = ServiceActivator.GetTypeName<NullRecoveryService>();
             }
+            else if (customType == "Simple")
+            {
+                customType = ServiceActivator.GetTypeName<SimpleRecoveryService>();
+            }
+
+            return ServiceActivator.Create<IRecoveryService>(customType, prms);
         }
     }
 }

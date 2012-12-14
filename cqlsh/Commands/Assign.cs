@@ -42,6 +42,10 @@ namespace cqlsh.Commands
                     CommandContext.Instance.Tabular = (bool) _value;
                     break;
 
+                case "log":
+                    ConsoleDebugLogger.Enabled = (bool) _value;
+                    break;
+
                 default:
                     throw new ArgumentException(string.Format("Unknown property {0}", identifier));
             }

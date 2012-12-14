@@ -20,16 +20,14 @@ namespace CassandraSharp.Logger
 
     internal static class Factory
     {
-        public static ILog Create(string customType)
+        public static ILogger Create(string customType, params object[] prms)
         {
-            switch (customType)
+            if (customType == "Null")
             {
-                case "Null":
-                    return new NullLogger();
-
-                default:
-                    return ServiceActivator.Create<ILog>(customType);
+                customType = ServiceActivator.GetTypeName<NullLogger>();                
             }
+
+            return ServiceActivator.Create<ILogger>(customType, prms);
         }
     }
 }

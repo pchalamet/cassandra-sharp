@@ -23,14 +23,19 @@ namespace CassandraSharp.Transport
     {
         private readonly TransportConfig _config;
 
-        public ConnectionFactory(TransportConfig config)
+        private readonly ILogger _logger;
+
+        public ConnectionFactory(TransportConfig config, ILogger logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         public IConnection Create(IPAddress address)
         {
-            Connection connection = new Connection(address, _config);
+            _logger.Debug("Creating connection to {0}", address);
+
+            Connection connection = new Connection(address, _config, _logger);
             return connection;
         }
     }

@@ -13,30 +13,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Logger
+namespace cqlsh
 {
+    using System;
     using CassandraSharp.Extensibility;
 
-    internal class NullLogger : ILogger
+    internal class ConsoleDebugLogger : ILogger
     {
+        private static readonly object _lock = new object();
+
+        public ConsoleDebugLogger()
+        {
+            Enabled = false;
+        }
+
+        public static bool Enabled { get; set; }
+
         public void Debug(string format, params object[] prms)
         {
+            Log(format, prms);
         }
 
         public void Info(string format, params object[] prms)
         {
+            Log(format, prms);
         }
 
         public void Warn(string format, params object[] prms)
         {
+            Log(format, prms);
         }
 
         public void Error(string format, params object[] prms)
         {
+            Log(format, prms);
         }
 
         public void Fatal(string format, params object[] prms)
         {
+            Log(format, prms);
+        }
+
+        public void Log(string format, object[] prms)
+        {
+            lock (_lock)
+            {
+                if (Enabled)
+                {
+                    Console.WriteLine(format, prms);
+                }
+            }
         }
     }
 }

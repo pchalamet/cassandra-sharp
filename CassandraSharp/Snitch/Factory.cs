@@ -20,19 +20,18 @@ namespace CassandraSharp.Snitch
 
     internal static class Factory
     {
-        public static IEndpointSnitch Create(string customType)
+        public static IEndpointSnitch Create(string customType, params object[] prms)
         {
-            switch (customType)
+            if (customType == "Simple")
             {
-                case "Simple":
-                    return new SimpleSnitch();
-
-                case "RackInferring":
-                    return new RackInferringSnitch();
-
-                default:
-                    return ServiceActivator.Create<IEndpointSnitch>(customType);
+                customType = ServiceActivator.GetTypeName<SimpleSnitch>();
             }
+            else if (customType == "RackInferring")
+            {
+                customType = ServiceActivator.GetTypeName<RackInferringSnitch>();
+            }
+
+            return ServiceActivator.Create<IEndpointSnitch>(customType, prms);
         }
     }
 }

@@ -53,6 +53,7 @@
     <Compile Include="Commands\Exit.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Commands\Reset.cs" />
+    <Compile Include="ConsoleDebugLogger.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="Parser\Parser.cs" />
     <Compile Include="Parser\ParseTree.cs" />
