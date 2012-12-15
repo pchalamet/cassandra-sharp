@@ -65,10 +65,14 @@ namespace cqlsh
 
             ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        BehaviorConfig = null,
+                        Transport = new TransportConfig
+                            {
+                                    User = _cliArgs.User,
+                                    Password = _cliArgs.Password,
+                            },
                         Endpoints = new EndpointsConfig
                             {
-                                    Servers = new[] {hostname}
+                                    Servers = new[] {hostname},
                             }
                 };
 

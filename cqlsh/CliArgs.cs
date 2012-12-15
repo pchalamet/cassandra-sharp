@@ -30,5 +30,12 @@ namespace cqlsh
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
         public string Hostname = null;
+
+        [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
+        public string User = null;
+
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Password", ShortName = "p")]
+        public string Password = null;
+
     }
 }
