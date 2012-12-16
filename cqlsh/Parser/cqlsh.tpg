@@ -1,27 +1,38 @@
 <% @TinyPG Namespace="cqlsh.Parser" Language="c#"  %>
 
-EXIT			-> @"exit";
-TRUE			-> "true";
-FALSE			-> "false";
-HELP			-> "help";
-RESET			-> "reset";
-[Skip] WHITESPACE 	-> @"\s+";
-EOF               	-> @"^$";
-STRING             	-> @"@?\""(\""\""|[^\""])*\""";
-INTEGER	      	-> @"[0-9]+";
-IDENTIFIER        	-> @"[a-zA-Z_][a-zA-Z0-9_]*";
-ASSIGN            	-> @"=";
-BANG			-> "!";
-EVERYTHING		-> "[^!]*";
+EXIT					-> @"exit";
+TRUE					-> "true";
+FALSE					-> "false";
+HELP					-> "help";
+RESET					-> "reset";
+[Skip] WHITESPACE 			-> @"\s+";
+EOF               			-> @"^$";
+STRING             			-> @"@?\""(\""\""|[^\""])*\""";
+INTEGER	      			-> @"[0-9]+";
+IDENTIFIER        			-> @"[a-zA-Z_][a-zA-Z0-9_]*";
+ASSIGN            			-> @"=";
+BANG					-> "!";
+EVERYTHING				-> "[.]+";
+EVERYTHING_BUT_START_WITH_BANG	-> "[^!]+[.]*";
+MINUS					-> "-";
+EQUAL					-> "=";
 
-String			-> STRING { return Default($STRING); };
-Integer		-> INTEGER { return int.Parse((string)$INTEGER); };
-Bool			-> TRUE | FALSE { return null != $TRUE; };
-Value			-> String | Integer | Bool { return Default($String, $Integer, $Bool); };
-SetProperty 		-> IDENTIFIER ASSIGN Value { return new cqlsh.Commands.Assign($IDENTIFIER , $Value); };
-Exit 			-> EXIT { return new cqlsh.Commands.Exit(); };
-Help			-> HELP { return new cqlsh.Commands.Help(); };
-Reset			-> RESET { return new cqlsh.Commands.Reset(); };
-Command		-> Exit | SetProperty | Reset | Help { return Default($Exit, $SetProperty, $Reset, $Help); };
-CqlCommand		-> EVERYTHING { return new cqlsh.Commands.CqlStatement((string)$EVERYTHING); };
-Start 			-> ((BANG Command) | (CqlCommand)) EOF { return Default($Command, $CqlCommand); };
+String					-> STRING { return Default($STRING); };
+Integer				-> INTEGER { return int.Parse((string)$INTEGER); };
+Bool					-> TRUE | FALSE { return null != $TRUE; };
+Identifier				-> IDENTIFIER { return Default($IDENTIFIER); };
+Value					-> String | Integer | Bool { return Default($String, $Integer, $Bool); };
+Parameters				-> (Identifier EQUAL Value)* 
+						{ 
+							var res = new List<KeyValuePair<string, object>>();
+							for(int i=0; $Identifier[i] != null; ++i)
+							{
+								var elem = new KeyValuePair<string, object>((string)$Identifier[i], $Value[i]);
+								res.Add(elem);
+							}
+							return res.ToArray();
+						};
+
+CommandWithParameters		-> Identifier Parameters { return new cqlsh.Commands.GenericCommand((string)$Identifier, (KeyValuePair<string, object>[])$Parameters); };
+CqlCommand				-> EVERYTHING_BUT_START_WITH_BANG { return new cqlsh.Commands.CqlStatement((string)$EVERYTHING_BUT_START_WITH_BANG); };
+Start					-> (BANG CommandWithParameters | CqlCommand) EOF { return Default($CommandWithParameters, $CqlCommand); }; 

@@ -78,7 +78,7 @@ namespace cqlsh
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
-                CommandContext.Instance.Cluster = cluster;
+                CommandContext.Cluster = cluster;
 
                 if (_cliArgs.CheckConnection)
                 {
@@ -99,7 +99,7 @@ namespace cqlsh
                 {
                     ExecuteCommand(statement);
 
-                    if (CommandContext.Instance.Exit)
+                    if (CommandContext.Exit)
                     {
                         return;
                     }
@@ -123,18 +123,26 @@ namespace cqlsh
                 object result = parseTree.Eval(null);
                 ICommand command = (ICommand) result;
 
-                CommandContext.Instance.ResultWriter = GetResultWriter();
+                CommandContext.ResultWriter = GetResultWriter();
                 command.Execute();
                 return true;
             }
             catch (Exception ex)
             {
-                while (null != ex.InnerException)
+                if (CommandContext.DebugLog)
                 {
-                    ex = ex.InnerException;
+                    Console.WriteLine("Command execution failed with error:\n{0}", ex);
+                }
+                else
+                {
+                    while (null != ex.InnerException)
+                    {
+                        ex = ex.InnerException;
+                    }
+
+                    Console.WriteLine("Command execution failed with error '{0}'", ex.Message);
                 }
 
-                Console.WriteLine(ex.Message);
                 return false;
             }
             finally
@@ -145,9 +153,9 @@ namespace cqlsh
 
         private static IResultWriter GetResultWriter()
         {
-            if (CommandContext.Instance.Tabular)
+            if (CommandContext.Tabular)
             {
-                return new Tabular(CommandContext.Instance.ColumnWidth);
+                return new Tabular(CommandContext.ColumnWidth);
             }
 
             return new RowKeyValue();

@@ -16,6 +16,12 @@ Features
 
 If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.
 
+Getting binaries
+================
+Binaries are available through NuGet : http://www.nuget.org/packages/cassandra-sharp
+
+Zip archive are also available at Google Code (since GitHub removed binaries uploads) : http://code.google.com/p/cassandra-sharp/downloads/list
+
 How to build
 ============
 To build cassandra-sharp, run this command: 
@@ -24,7 +30,8 @@ To build cassandra-sharp, run this command:
 	
 NOTE: type "GenerateVersion.cmd /?" for more info.
   
-You will find a package named "cassandra-sharp-bin-<VersionNumber>-<VersionStatus>.zip" in the OutDir folder.
+You will find a package named in the OutDir folder:
+	cassandra-sharp-bin-<VersionNumber>-<VersionStatus>.zip
 
 Sample configuration
 ====================

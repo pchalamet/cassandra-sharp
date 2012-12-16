@@ -83,9 +83,21 @@ namespace cqlsh.Parser
             Patterns.Add(TokenType.BANG, regex);
             Tokens.Add(TokenType.BANG);
 
-            regex = new Regex("[^!]*", RegexOptions.Compiled);
+            regex = new Regex("[.]+", RegexOptions.Compiled);
             Patterns.Add(TokenType.EVERYTHING, regex);
             Tokens.Add(TokenType.EVERYTHING);
+
+            regex = new Regex("[^!]+[.]*", RegexOptions.Compiled);
+            Patterns.Add(TokenType.EVERYTHING_BUT_START_WITH_BANG, regex);
+            Tokens.Add(TokenType.EVERYTHING_BUT_START_WITH_BANG);
+
+            regex = new Regex("-", RegexOptions.Compiled);
+            Patterns.Add(TokenType.MINUS, regex);
+            Tokens.Add(TokenType.MINUS);
+
+            regex = new Regex("=", RegexOptions.Compiled);
+            Patterns.Add(TokenType.EQUAL, regex);
+            Tokens.Add(TokenType.EQUAL);
 
 
         }
@@ -214,29 +226,30 @@ namespace cqlsh.Parser
             String  = 2,
             Integer = 3,
             Bool    = 4,
-            Value   = 5,
-            SetProperty= 6,
-            Exit    = 7,
-            Help    = 8,
-            Reset   = 9,
-            Command = 10,
-            CqlCommand= 11,
-            Start   = 12,
+            Identifier= 5,
+            Value   = 6,
+            Parameters= 7,
+            CommandWithParameters= 8,
+            CqlCommand= 9,
+            Start   = 10,
 
             //Terminal tokens:
-            EXIT    = 13,
-            TRUE    = 14,
-            FALSE   = 15,
-            HELP    = 16,
-            RESET   = 17,
-            WHITESPACE= 18,
-            EOF     = 19,
-            STRING  = 20,
-            INTEGER = 21,
-            IDENTIFIER= 22,
-            ASSIGN  = 23,
-            BANG    = 24,
-            EVERYTHING= 25
+            EXIT    = 11,
+            TRUE    = 12,
+            FALSE   = 13,
+            HELP    = 14,
+            RESET   = 15,
+            WHITESPACE= 16,
+            EOF     = 17,
+            STRING  = 18,
+            INTEGER = 19,
+            IDENTIFIER= 20,
+            ASSIGN  = 21,
+            BANG    = 22,
+            EVERYTHING= 23,
+            EVERYTHING_BUT_START_WITH_BANG= 24,
+            MINUS   = 25,
+            EQUAL   = 26
     }
 
     public class Token

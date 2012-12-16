@@ -19,22 +19,28 @@ namespace cqlsh
 
     internal class CommandContext
     {
-        public static CommandContext Instance = new CommandContext();
+        static CommandContext()
+        {
+            Reset();
+        }
 
-        public CommandContext()
+        public static bool Exit { get; set; }
+
+        public static int ColumnWidth { get; set; }
+
+        public static bool Tabular { get; set; }
+
+        public static bool DebugLog { get; set; }
+
+        public static ICluster Cluster { get; set; }
+
+        public static IResultWriter ResultWriter { get; set; }
+
+        public static void Reset()
         {
             ColumnWidth = 15;
             Tabular = true;
+            DebugLog = false;
         }
-
-        public bool Exit { get; set; }
-
-        public int ColumnWidth { get; set; }
-
-        public bool Tabular { get; set; }
-
-        public ICluster Cluster { get; set; }
-
-        public IResultWriter ResultWriter { get; set; }
     }
 }

@@ -18,7 +18,6 @@ namespace cqlsh.Commands
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPropertyBag;
 
     internal class CqlStatement : ICommand
@@ -30,13 +29,18 @@ namespace cqlsh.Commands
             _statement = statement;
         }
 
+        public string Describe()
+        {
+            return "execute CQL statement";
+        }
+
         public void Execute()
         {
             //Task<IPreparedQuery> prepared = CommandContext.Instance.Cluster.Prepare(_statement);
             //Task<IEnumerable<Dictionary<string, object>>> res = prepared.Result.Execute<Dictionary<string, object>>(ConsistencyLevel.QUORUM);
 
-            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Instance.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
-            CommandContext.Instance.ResultWriter.Write(res.Result);
+            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
+            CommandContext.ResultWriter.Write(res.Result);
         }
     }
 }

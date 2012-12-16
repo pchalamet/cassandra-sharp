@@ -16,22 +16,44 @@
 namespace cqlsh.Commands
 {
     using System;
+    using System.Collections.Generic;
 
     internal class Help : ICommand
     {
+        public string Describe()
+        {
+            return "display help";
+        }
+
         public void Execute()
         {
-            Console.WriteLine("Available commands:");
-            Console.WriteLine("  help            - display help");
-            Console.WriteLine("  exit            - exit cqlsh");
-            Console.WriteLine("  reset           - reset environment");
-            Console.WriteLine("  tab=<bool>      - enable tabular result output");
-            Console.WriteLine("  colwidth=<int>  - set column width for tabular result output");
-            Console.WriteLine("  log=<bool>      - enable debug logger");
+            int cmdMaxLen = 0;
+            foreach (var cmdType in GenericCommand.GetRegisteredCommands())
+            {
+                cmdMaxLen = Math.Max(cmdMaxLen, cmdType.Key.Length);
+            }
+
+            Console.WriteLine("Commands:");
+            string format = string.Format("  !{{0,-{0}}} - ", cmdMaxLen);
+            foreach (var cmdType in GenericCommand.GetRegisteredCommands())
+            {
+                ICommand cmd = (ICommand) Activator.CreateInstance(cmdType.Value);
+                string description = cmd.Describe();
+                string startOfLine = string.Format(format, cmdType.Key);
+                string nextStartOfLine = new string(' ', startOfLine.Length);
+                string[] lines = description.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
+                {
+                    Console.WriteLine("{0}{1}", startOfLine, line);
+                    startOfLine = nextStartOfLine;
+                }
+            }
+            Console.WriteLine("  CQL query");
+
             Console.WriteLine();
-            Console.WriteLine("Statements end with ';'");
-            Console.WriteLine("  - Commands start with '!'");
-            Console.WriteLine("  - CQL command are entered as is");
+            Console.WriteLine("Examples:");
+            Console.WriteLine("  !set log=true colwidth=20;");
+            Console.WriteLine("  select * from system.local;");
         }
     }
 }

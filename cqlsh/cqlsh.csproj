@@ -47,10 +47,12 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="CliArgs.cs" />
-    <Compile Include="Commands\Assign.cs" />
+    <Compile Include="Commands\Set.cs" />
     <Compile Include="CommandContext.cs" />
+    <Compile Include="Commands\ClearScreen.cs" />
     <Compile Include="Commands\CqlStatement.cs" />
     <Compile Include="Commands\Exit.cs" />
+    <Compile Include="Commands\GenericCommand.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Commands\Reset.cs" />
     <Compile Include="ConsoleDebugLogger.cs" />

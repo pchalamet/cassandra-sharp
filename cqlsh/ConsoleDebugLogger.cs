@@ -22,13 +22,6 @@ namespace cqlsh
     {
         private static readonly object _lock = new object();
 
-        public ConsoleDebugLogger()
-        {
-            Enabled = false;
-        }
-
-        public static bool Enabled { get; set; }
-
         public void Debug(string format, params object[] prms)
         {
             Log(format, prms);
@@ -58,7 +51,7 @@ namespace cqlsh
         {
             lock (_lock)
             {
-                if (Enabled)
+                if (CommandContext.DebugLog)
                 {
                     Console.WriteLine(format, prms);
                 }

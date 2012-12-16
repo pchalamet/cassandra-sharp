@@ -15,16 +15,18 @@
 
 namespace cqlsh.Commands
 {
-    internal class Reset : ICommand
-    {
-        public string Describe()
-        {
-            return "reset environment";
-        }
+    using System;
 
+    internal class ClearScreen : ICommand
+    {
         public void Execute()
         {
-            CommandContext.Reset();
+            Console.Clear();
+        }
+
+        public string Describe()
+        {
+            return "clear screen";
         }
     }
 }

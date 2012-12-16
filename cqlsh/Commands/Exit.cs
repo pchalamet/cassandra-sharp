@@ -17,9 +17,14 @@ namespace cqlsh.Commands
 {
     internal class Exit : ICommand
     {
+        public string Describe()
+        {
+            return "exit cqlsh";
+        }
+
         public void Execute()
         {
-            CommandContext.Instance.Exit = true;
+            CommandContext.Exit = true;
         }
     }
 }
