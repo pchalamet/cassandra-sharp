@@ -117,3 +117,5 @@ This projects also relies on the following third parties:
 * NuGet (http://nuget.org/) released under Apache License 2.0
 * Command Line Argument Parser Library (http://commandlinearguments.codeplex.com/) released under Microsoft Public License (Ms-PL)
 * Tiny Parser Generator (http://www.codeproject.com/Articles/28294/a-Tiny-Parser-Generator-v1-2) released under Code Project Open License (CPOL)
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/8727d7a4294e4c1821f74094438ca26d "githalytics.com")](http://githalytics.com/pchalamet/cassandra-sharp)
