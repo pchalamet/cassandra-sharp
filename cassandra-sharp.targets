@@ -67,7 +67,6 @@
 		<Copy SourceFiles="$(CQLShAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\bin" />
 		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)$(VersionStatus)" />
-		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/summary" Value="$(CassandraSharpProjectName)-bin-$(Version)$(VersionStatus)" />
 		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory $(OutDir)" />
 	</Target>
 	
