@@ -15,25 +15,25 @@
 
 namespace cqlsh.ResultWriter
 {
-    using System;
     using System.Collections.Generic;
+    using System.IO;
 
     public class RowKeyValue : IResultWriter
     {
-        public void Write(IEnumerable<Dictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet)
         {
             int rowNum = 0;
             foreach (var row in rowSet)
             {
-                Console.Write("{0,-2}: ", rowNum++);
+                txtWriter.Write("{0,-2}: ", rowNum++);
                 string offset = "";
                 foreach (var col in row)
                 {
                     string sValue = ValueFormatter.Format(col.Value);
-                    Console.WriteLine("{0}{1} : {2} ", offset, col.Key, sValue);
+                    txtWriter.WriteLine("{0}{1} : {2} ", offset, col.Key, sValue);
                     offset = "    ";
                 }
-                Console.WriteLine();
+                txtWriter.WriteLine();
             }
         }
     }

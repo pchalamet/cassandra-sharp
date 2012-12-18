@@ -13,26 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace cqlsh.Commands
+namespace cqlsh.ResultWriter
 {
     using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
+    using System.IO;
 
-    internal class CqlStatement : CommandBase
+    internal class CSV : IResultWriter
     {
-        private readonly string _statement;
-
-        public CqlStatement(string statement)
+        public void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet)
         {
-            _statement = statement;
-        }
-
-        public override void Execute()
-        {
-            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
-            CommandContext.ResultWriter.Write(CommandContext.TextWriter, res.Result);
         }
     }
 }

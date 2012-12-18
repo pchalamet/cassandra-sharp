@@ -15,14 +15,10 @@
 
 namespace cqlsh.Commands
 {
-    internal class Reset : ICommand
+    [Description("reset environment")]
+    internal class Reset : CommandBase
     {
-        public string Describe()
-        {
-            return "reset environment";
-        }
-
-        public void Execute()
+        public override void Execute()
         {
             CommandContext.Reset();
         }

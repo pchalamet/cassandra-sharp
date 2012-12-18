@@ -16,9 +16,10 @@
 namespace cqlsh
 {
     using System.Collections.Generic;
+    using System.IO;
 
     internal interface IResultWriter
     {
-        void Write(IEnumerable<Dictionary<string, object>> rowSet);
+        void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet);
     }
 }

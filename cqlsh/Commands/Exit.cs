@@ -15,14 +15,10 @@
 
 namespace cqlsh.Commands
 {
-    internal class Exit : ICommand
+    [Description("exit cqlsh")]
+    internal class Exit : CommandBase
     {
-        public string Describe()
-        {
-            return "exit cqlsh";
-        }
-
-        public void Execute()
+        public override void Execute()
         {
             CommandContext.Exit = true;
         }

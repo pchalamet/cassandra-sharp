@@ -15,24 +15,18 @@
 
 namespace cqlsh.Commands
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
+    using System;
 
-    internal class CqlStatement : CommandBase
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    public class DescriptionAttribute : Attribute
     {
-        private readonly string _statement;
-
-        public CqlStatement(string statement)
+        public DescriptionAttribute(string description)
         {
-            _statement = statement;
+            Description = description;
         }
 
-        public override void Execute()
-        {
-            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
-            CommandContext.ResultWriter.Write(CommandContext.TextWriter, res.Result);
-        }
+        public bool Mandatory { get; set; }
+
+        public string Description { get; set; }
     }
 }

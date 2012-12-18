@@ -18,8 +18,7 @@ namespace cqlsh
     using System;
     using CassandraSharp;
     using CassandraSharp.Config;
-    using cqlsh.Parser;
-    using cqlsh.ResultWriter;
+    using cqlsh.Commands;
     using cqlsh.StatementReader;
 
     internal class Program
@@ -84,7 +83,8 @@ namespace cqlsh
                 {
                     Console.WriteLine("Connecting to {0}:", hostname);
                     const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
-                    if (!ExecuteCommand(checkStatement))
+                    new Exec {Statement = checkStatement}.Execute();
+                    if (CommandContext.LastCommandFailed)
                     {
                         return;
                     }
@@ -92,73 +92,18 @@ namespace cqlsh
 
                 if (_cliArgs.Banner)
                 {
-                    ExecuteCommand("!help");
+                    new Exec {Statement = "!help"}.Execute();
                 }
 
                 foreach (string statement in statementReader.Read())
                 {
-                    ExecuteCommand(statement);
-
+                    new Exec {Statement = statement}.Execute();
                     if (CommandContext.Exit)
                     {
                         return;
                     }
                 }
             }
-        }
-
-        private static bool ExecuteCommand(string cmd)
-        {
-            try
-            {
-                Scanner scanner = new Scanner();
-                Parser.Parser parser = new Parser.Parser(scanner);
-                ParseTree parseTree = parser.Parse(cmd);
-                if (0 < parseTree.Errors.Count)
-                {
-                    Console.WriteLine(parseTree.Errors[0].Message);
-                    return false;
-                }
-
-                object result = parseTree.Eval(null);
-                ICommand command = (ICommand) result;
-
-                CommandContext.ResultWriter = GetResultWriter();
-                command.Execute();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                if (CommandContext.DebugLog)
-                {
-                    Console.WriteLine("Command execution failed with error:\n{0}", ex);
-                }
-                else
-                {
-                    while (null != ex.InnerException)
-                    {
-                        ex = ex.InnerException;
-                    }
-
-                    Console.WriteLine("Command execution failed with error '{0}'", ex.Message);
-                }
-
-                return false;
-            }
-            finally
-            {
-                Console.WriteLine();
-            }
-        }
-
-        private static IResultWriter GetResultWriter()
-        {
-            if (CommandContext.Tabular)
-            {
-                return new Tabular(CommandContext.ColumnWidth);
-            }
-
-            return new RowKeyValue();
         }
     }
 }

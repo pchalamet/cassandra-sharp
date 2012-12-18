@@ -15,8 +15,8 @@
 
 namespace cqlsh.ResultWriter
 {
-    using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Text;
 
     public class Tabular : IResultWriter
@@ -24,7 +24,7 @@ namespace cqlsh.ResultWriter
         private readonly int _maxWidth;
 
         public Tabular()
-            : this(20)
+                : this(20)
         {
         }
 
@@ -33,7 +33,7 @@ namespace cqlsh.ResultWriter
             _maxWidth = maxWidth;
         }
 
-        public void Write(IEnumerable<Dictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet)
         {
             string colFormat = string.Format("{{0,-{0}}}", _maxWidth);
             string rowSeparator = null;
@@ -66,9 +66,9 @@ namespace cqlsh.ResultWriter
                     rowSeparator = sbRowSeparator.ToString();
                     string headerSeparator = rowSeparator.Replace('-', '=');
 
-                    Console.WriteLine(rowSeparator);
-                    Console.WriteLine(header);
-                    Console.WriteLine(headerSeparator);
+                    txtWriter.WriteLine(rowSeparator);
+                    txtWriter.WriteLine(header);
+                    txtWriter.WriteLine(headerSeparator);
                 }
 
                 StringBuilder sbValues = new StringBuilder();
@@ -86,8 +86,8 @@ namespace cqlsh.ResultWriter
                 sbValues.Append(" |");
                 string rowValues = sbValues.ToString();
 
-                Console.WriteLine(rowValues);
-                Console.WriteLine(rowSeparator);
+                txtWriter.WriteLine(rowValues);
+                txtWriter.WriteLine(rowSeparator);
             }
         }
     }

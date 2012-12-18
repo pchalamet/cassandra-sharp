@@ -176,14 +176,11 @@ namespace cqlsh.Parser
                 case TokenType.String:
                     Value = EvalString(tree, paramlist);
                     break;
-                case TokenType.Integer:
-                    Value = EvalInteger(tree, paramlist);
-                    break;
-                case TokenType.Bool:
-                    Value = EvalBool(tree, paramlist);
-                    break;
                 case TokenType.Identifier:
                     Value = EvalIdentifier(tree, paramlist);
+                    break;
+                case TokenType.Integer:
+                    Value = EvalInteger(tree, paramlist);
                     break;
                 case TokenType.Value:
                     Value = EvalValue(tree, paramlist);
@@ -210,43 +207,41 @@ namespace cqlsh.Parser
 
         protected virtual object EvalString(ParseTree tree, params object[] paramlist)
         {
-            return Default(this.GetValue(tree, TokenType.STRING, 0));
-        }
-
-        protected virtual object EvalInteger(ParseTree tree, params object[] paramlist)
-        {
-            return int.Parse((string)this.GetValue(tree, TokenType.INTEGER, 0));
-        }
-
-        protected virtual object EvalBool(ParseTree tree, params object[] paramlist)
-        {
-            return null != this.GetValue(tree, TokenType.TRUE, 0);
+            var str = (string)this.GetValue(tree, TokenType.STRING, 0);
+                                            		str = str.Substring(1, str.Length-2);
+                                            		return str;
         }
 
         protected virtual object EvalIdentifier(ParseTree tree, params object[] paramlist)
         {
-            return Default(this.GetValue(tree, TokenType.IDENTIFIER, 0));
+            return this.GetValue(tree, TokenType.IDENTIFIER, 0);
+        }
+
+        protected virtual object EvalInteger(ParseTree tree, params object[] paramlist)
+        {
+            return this.GetValue(tree, TokenType.INTEGER, 0);
         }
 
         protected virtual object EvalValue(ParseTree tree, params object[] paramlist)
         {
-            return Default(this.GetValue(tree, TokenType.String, 0), this.GetValue(tree, TokenType.Integer, 0), this.GetValue(tree, TokenType.Bool, 0));
+            return Default(this.GetValue(tree, TokenType.String, 0), this.GetValue(tree, TokenType.Identifier, 0), this.GetValue(tree, TokenType.Integer, 0));
         }
 
         protected virtual object EvalParameters(ParseTree tree, params object[] paramlist)
         {
-            var res = new List<KeyValuePair<string, object>>();
+            var res = new Dictionary<string, string>();
         							for(int i=0; this.GetValue(tree, TokenType.Identifier, i) != null; ++i)
         							{
-        								var elem = new KeyValuePair<string, object>((string)this.GetValue(tree, TokenType.Identifier, i), this.GetValue(tree, TokenType.Value, i));
-        								res.Add(elem);
+        								var prmName = ((string)this.GetValue(tree, TokenType.Identifier, i)).ToLower();
+        								var prmValue = (string)this.GetValue(tree, TokenType.Value, i);
+        								res[prmName] = prmValue;
         							}
-        							return res.ToArray();
+        							return res;
         }
 
         protected virtual object EvalCommandWithParameters(ParseTree tree, params object[] paramlist)
         {
-            return new cqlsh.Commands.GenericCommand((string)this.GetValue(tree, TokenType.Identifier, 0), (KeyValuePair<string, object>[])this.GetValue(tree, TokenType.Parameters, 0));
+            return new cqlsh.Commands.ShellCommand((string)this.GetValue(tree, TokenType.Identifier, 0), (Dictionary<string, string>)this.GetValue(tree, TokenType.Parameters, 0));
         }
 
         protected virtual object EvalCqlCommand(ParseTree tree, params object[] paramlist)

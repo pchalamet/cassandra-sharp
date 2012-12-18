@@ -17,9 +17,10 @@ namespace cqlsh.Commands
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
-    internal class GenericCommand : ICommand
+    internal class ShellCommand : CommandBase
     {
         private static readonly Dictionary<string, Type> _registeredCommands = new Dictionary<string, Type>
             {
@@ -28,24 +29,21 @@ namespace cqlsh.Commands
                     {"exit", typeof(Exit)},
                     {"reset", typeof(Reset)},
                     {"cls", typeof(ClearScreen)},
+                    {"exec", typeof(Exec)},
+                    {"source", typeof(Source)},
             };
 
         private readonly string _name;
 
-        private readonly KeyValuePair<string, object>[] _parameters;
+        private readonly Dictionary<string, string> _parameters;
 
-        public GenericCommand(string name, KeyValuePair<string, object>[] parameters)
+        public ShellCommand(string name, Dictionary<string, string> parameters)
         {
             _name = name;
             _parameters = parameters;
         }
 
-        public string Describe()
-        {
-            throw new InvalidOperationException("GenericCommand.Describe should not be called");
-        }
-
-        public void Execute()
+        public override void Execute()
         {
             Type cmdType;
             if (!_registeredCommands.TryGetValue(_name, out cmdType))
@@ -57,7 +55,7 @@ namespace cqlsh.Commands
 
             // feed parameters
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.SetProperty;
-            foreach (KeyValuePair<string, object> prm in _parameters)
+            foreach (KeyValuePair<string, string> prm in _parameters)
             {
                 PropertyInfo pi = cmd.GetType().GetProperty(prm.Key, bindingFlags);
                 if (null == pi)
@@ -67,7 +65,8 @@ namespace cqlsh.Commands
 
                 try
                 {
-                    pi.SetValue(cmd, prm.Value, null);
+                    object value = ParseValue(pi.PropertyType, prm.Value);
+                    pi.SetValue(cmd, value, null);
                 }
                 catch
                 {
@@ -75,7 +74,43 @@ namespace cqlsh.Commands
                 }
             }
 
+            foreach (PropertyInfo pi in cmd.GetType().GetProperties(bindingFlags))
+            {
+                string piName = pi.Name.ToLower();
+                DescriptionAttribute prmAttribute =
+                        (DescriptionAttribute) pi.GetCustomAttributes(typeof(DescriptionAttribute), true).SingleOrDefault();
+                if (null != prmAttribute && prmAttribute.Mandatory)
+                {
+                    if (! _parameters.ContainsKey(piName))
+                    {
+                        throw new ArgumentException(string.Format("Parameter {0} is missing", pi.Name));
+                    }
+                }
+            }
+
+            cmd.Validate();
             cmd.Execute();
+        }
+
+        private object ParseValue(Type propertyType, string prmValue)
+        {
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                propertyType = propertyType.GetGenericArguments()[0];
+            }
+
+            object value;
+            if (propertyType.IsEnum)
+            {
+                value = Enum.Parse(propertyType, prmValue, true);
+            }
+            else
+            {
+                MethodInfo mi = propertyType.GetMethod("Parse", new[] {typeof(string)});
+                value = mi.Invoke(null, new object[] {prmValue});
+            }
+
+            return value;
         }
 
         public static IEnumerable<KeyValuePair<string, Type>> GetRegisteredCommands()

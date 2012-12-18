@@ -1,3 +1,10 @@
+version 2.0.6.0 (beta)
+- cqlsh changes:
+  changed cqlsh help system
+  added source & exec
+  support for enum for cqlsh command args
+  fix source when error encountered
+
 version 2.0.5.0 (beta)
 - refactoring of cqlsh grammar - no modification required to add new commands
 - generic help based on registered commands

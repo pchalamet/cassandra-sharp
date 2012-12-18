@@ -35,26 +35,6 @@ namespace cqlsh.Parser
             SkipList = new List<TokenType>();
             SkipList.Add(TokenType.WHITESPACE);
 
-            regex = new Regex(@"exit", RegexOptions.Compiled);
-            Patterns.Add(TokenType.EXIT, regex);
-            Tokens.Add(TokenType.EXIT);
-
-            regex = new Regex("true", RegexOptions.Compiled);
-            Patterns.Add(TokenType.TRUE, regex);
-            Tokens.Add(TokenType.TRUE);
-
-            regex = new Regex("false", RegexOptions.Compiled);
-            Patterns.Add(TokenType.FALSE, regex);
-            Tokens.Add(TokenType.FALSE);
-
-            regex = new Regex("help", RegexOptions.Compiled);
-            Patterns.Add(TokenType.HELP, regex);
-            Tokens.Add(TokenType.HELP);
-
-            regex = new Regex("reset", RegexOptions.Compiled);
-            Patterns.Add(TokenType.RESET, regex);
-            Tokens.Add(TokenType.RESET);
-
             regex = new Regex(@"\s+", RegexOptions.Compiled);
             Patterns.Add(TokenType.WHITESPACE, regex);
             Tokens.Add(TokenType.WHITESPACE);
@@ -67,17 +47,17 @@ namespace cqlsh.Parser
             Patterns.Add(TokenType.STRING, regex);
             Tokens.Add(TokenType.STRING);
 
-            regex = new Regex(@"[0-9]+", RegexOptions.Compiled);
+            regex = new Regex(@"\b", RegexOptions.Compiled);
+            Patterns.Add(TokenType.WORD, regex);
+            Tokens.Add(TokenType.WORD);
+
+            regex = new Regex(@"[+-]?[0-9]+", RegexOptions.Compiled);
             Patterns.Add(TokenType.INTEGER, regex);
             Tokens.Add(TokenType.INTEGER);
 
             regex = new Regex(@"[a-zA-Z_][a-zA-Z0-9_]*", RegexOptions.Compiled);
             Patterns.Add(TokenType.IDENTIFIER, regex);
             Tokens.Add(TokenType.IDENTIFIER);
-
-            regex = new Regex(@"=", RegexOptions.Compiled);
-            Patterns.Add(TokenType.ASSIGN, regex);
-            Tokens.Add(TokenType.ASSIGN);
 
             regex = new Regex("!", RegexOptions.Compiled);
             Patterns.Add(TokenType.BANG, regex);
@@ -224,32 +204,26 @@ namespace cqlsh.Parser
 
             //Non terminal tokens:
             String  = 2,
-            Integer = 3,
-            Bool    = 4,
-            Identifier= 5,
-            Value   = 6,
-            Parameters= 7,
-            CommandWithParameters= 8,
-            CqlCommand= 9,
-            Start   = 10,
+            Identifier= 3,
+            Integer = 4,
+            Value   = 5,
+            Parameters= 6,
+            CommandWithParameters= 7,
+            CqlCommand= 8,
+            Start   = 9,
 
             //Terminal tokens:
-            EXIT    = 11,
-            TRUE    = 12,
-            FALSE   = 13,
-            HELP    = 14,
-            RESET   = 15,
-            WHITESPACE= 16,
-            EOF     = 17,
-            STRING  = 18,
-            INTEGER = 19,
-            IDENTIFIER= 20,
-            ASSIGN  = 21,
-            BANG    = 22,
-            EVERYTHING= 23,
-            EVERYTHING_BUT_START_WITH_BANG= 24,
-            MINUS   = 25,
-            EQUAL   = 26
+            WHITESPACE= 10,
+            EOF     = 11,
+            STRING  = 12,
+            WORD    = 13,
+            INTEGER = 14,
+            IDENTIFIER= 15,
+            BANG    = 16,
+            EVERYTHING= 17,
+            EVERYTHING_BUT_START_WITH_BANG= 18,
+            MINUS   = 19,
+            EQUAL   = 20
     }
 
     public class Token

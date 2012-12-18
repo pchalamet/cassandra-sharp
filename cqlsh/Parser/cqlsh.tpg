@@ -1,38 +1,36 @@
 <% @TinyPG Namespace="cqlsh.Parser" Language="c#"  %>
 
-EXIT					-> @"exit";
-TRUE					-> "true";
-FALSE					-> "false";
-HELP					-> "help";
-RESET					-> "reset";
 [Skip] WHITESPACE 			-> @"\s+";
 EOF               			-> @"^$";
 STRING             			-> @"@?\""(\""\""|[^\""])*\""";
-INTEGER	      			-> @"[0-9]+";
+WORD                   		->  @"\b";
+INTEGER	      			-> @"[+-]?[0-9]+";
 IDENTIFIER        			-> @"[a-zA-Z_][a-zA-Z0-9_]*";
-ASSIGN            			-> @"=";
 BANG					-> "!";
 EVERYTHING				-> "[.]+";
 EVERYTHING_BUT_START_WITH_BANG	-> "[^!]+[.]*";
 MINUS					-> "-";
 EQUAL					-> "=";
 
-String					-> STRING { return Default($STRING); };
-Integer				-> INTEGER { return int.Parse((string)$INTEGER); };
-Bool					-> TRUE | FALSE { return null != $TRUE; };
-Identifier				-> IDENTIFIER { return Default($IDENTIFIER); };
-Value					-> String | Integer | Bool { return Default($String, $Integer, $Bool); };
+String					-> STRING {  var str = (string)$STRING;
+                                    		str = str.Substring(1, str.Length-2);
+                                    		return str; };
+Identifier				-> IDENTIFIER { return $IDENTIFIER; };
+Integer				-> INTEGER { return $INTEGER; };
+Value					-> String| Identifier | Integer { return Default($String, $Identifier, $Integer); };
+
 Parameters				-> (Identifier EQUAL Value)* 
 						{ 
-							var res = new List<KeyValuePair<string, object>>();
+							var res = new Dictionary<string, string>();
 							for(int i=0; $Identifier[i] != null; ++i)
 							{
-								var elem = new KeyValuePair<string, object>((string)$Identifier[i], $Value[i]);
-								res.Add(elem);
+								var prmName = ((string)$Identifier[i]).ToLower();
+								var prmValue = (string)$Value[i];
+								res[prmName] = prmValue;
 							}
-							return res.ToArray();
+							return res;
 						};
 
-CommandWithParameters		-> Identifier Parameters { return new cqlsh.Commands.GenericCommand((string)$Identifier, (KeyValuePair<string, object>[])$Parameters); };
+CommandWithParameters		-> Identifier Parameters { return new cqlsh.Commands.ShellCommand((string)$Identifier, (Dictionary<string, string>)$Parameters); };
 CqlCommand				-> EVERYTHING_BUT_START_WITH_BANG { return new cqlsh.Commands.CqlStatement((string)$EVERYTHING_BUT_START_WITH_BANG); };
 Start					-> (BANG CommandWithParameters | CqlCommand) EOF { return Default($CommandWithParameters, $CqlCommand); }; 

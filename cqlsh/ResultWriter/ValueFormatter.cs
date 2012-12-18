@@ -18,24 +18,21 @@ namespace cqlsh.ResultWriter
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
 
     public static class ValueFormatter
     {
-        private static Type GetGenericCollectionItemType(Type type)
+        private static bool IsGenericCollection(Type type)
         {
-            return type.GetInterfaces()
-                       .Where(face => face.IsGenericType &&
-                                      face.GetGenericTypeDefinition() == typeof(ICollection<>))
-                       .Select(face => face.GetGenericArguments()[0])
-                       .FirstOrDefault();
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>);
         }
 
         public static string Format(object value)
         {
             if (null == value)
+            {
                 return string.Empty;
+            }
 
             // dictionary
             IDictionary map = value as IDictionary;
@@ -66,10 +63,9 @@ namespace cqlsh.ResultWriter
             }
 
             // ICollection<T>
-            Type typeCollection = GetGenericCollectionItemType(value.GetType());
-            if (null != typeCollection)
+            if (IsGenericCollection(value.GetType()))
             {
-                IEnumerable coll = (IEnumerable)value;
+                IEnumerable coll = (IEnumerable) value;
                 StringBuilder sb = new StringBuilder();
                 string sep = "";
                 foreach (object elem in coll)

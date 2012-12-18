@@ -15,10 +15,18 @@
 
 namespace cqlsh
 {
+    using System.IO;
     using CassandraSharp;
 
     internal class CommandContext
     {
+        public enum OutputFormatter
+        {
+            Tabular,
+
+            RowKey,
+        }
+
         static CommandContext()
         {
             Reset();
@@ -28,18 +36,24 @@ namespace cqlsh
 
         public static int ColumnWidth { get; set; }
 
-        public static bool Tabular { get; set; }
+        public static OutputFormatter Formatter { get; set; }
 
         public static bool DebugLog { get; set; }
+
+        public static bool LastCommandFailed { get; set; }
 
         public static ICluster Cluster { get; set; }
 
         public static IResultWriter ResultWriter { get; set; }
 
+        public static TextWriter TextWriter { get; set; }
+
+        public static string OutputFile { get; set; }
+
         public static void Reset()
         {
             ColumnWidth = 15;
-            Tabular = true;
+            Formatter = OutputFormatter.Tabular;
             DebugLog = false;
         }
     }

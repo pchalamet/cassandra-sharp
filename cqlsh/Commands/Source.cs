@@ -15,24 +15,27 @@
 
 namespace cqlsh.Commands
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
+    using cqlsh.StatementReader;
 
-    internal class CqlStatement : CommandBase
+    [Description("load statements from specific file")]
+    internal class Source : CommandBase
     {
-        private readonly string _statement;
-
-        public CqlStatement(string statement)
-        {
-            _statement = statement;
-        }
+        [Description("File containing statements", Mandatory = true)]
+        public string File { get; set; }
 
         public override void Execute()
         {
-            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
-            CommandContext.ResultWriter.Write(CommandContext.TextWriter, res.Result);
+            IStatementReader statementReader = new FileInput(File);
+            statementReader = new StatementSplitter(statementReader);
+            foreach (string statement in statementReader.Read())
+            {
+                new Exec {Statement = statement}.Execute();
+
+                if (CommandContext.Exit || CommandContext.LastCommandFailed)
+                {
+                    return;
+                }
+            }
         }
     }
 }

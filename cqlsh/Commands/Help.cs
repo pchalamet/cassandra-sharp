@@ -16,35 +16,59 @@
 namespace cqlsh.Commands
 {
     using System;
-    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
 
-    internal class Help : ICommand
+    [Description("display help")]
+    internal class Help : CommandBase
     {
-        public string Describe()
-        {
-            return "display help";
-        }
-
-        public void Execute()
+        public override void Execute()
         {
             int cmdMaxLen = 0;
-            foreach (var cmdType in GenericCommand.GetRegisteredCommands())
+            foreach (var cmdType in ShellCommand.GetRegisteredCommands())
             {
                 cmdMaxLen = Math.Max(cmdMaxLen, cmdType.Key.Length);
             }
 
             Console.WriteLine("Commands:");
             string format = string.Format("  !{{0,-{0}}} - ", cmdMaxLen);
-            foreach (var cmdType in GenericCommand.GetRegisteredCommands())
+            foreach (var cmdType in ShellCommand.GetRegisteredCommands())
             {
                 ICommand cmd = (ICommand) Activator.CreateInstance(cmdType.Value);
-                string description = cmd.Describe();
+                DescriptionAttribute cmdAttribute =
+                        (DescriptionAttribute) cmdType.Value.GetCustomAttributes(typeof(DescriptionAttribute), true).SingleOrDefault();
+                string cmdDescription = null != cmdAttribute
+                                                ? cmdAttribute.Description
+                                                : "";
                 string startOfLine = string.Format(format, cmdType.Key);
                 string nextStartOfLine = new string(' ', startOfLine.Length);
-                string[] lines = description.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = cmdDescription.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in lines)
                 {
                     Console.WriteLine("{0}{1}", startOfLine, line);
+                    startOfLine = nextStartOfLine;
+                }
+
+                foreach (PropertyInfo propertyInfo in cmd.GetType().GetProperties())
+                {
+                    string friendlyType = GetFriendlyPropertyType(propertyInfo);
+                    DescriptionAttribute prmAttribute =
+                            (DescriptionAttribute) propertyInfo.GetCustomAttributes(typeof(DescriptionAttribute), true).SingleOrDefault();
+                    string prmDescription = "";
+                    string beforeType = "[";
+                    string afterType = "]";
+                    if (null != prmAttribute)
+                    {
+                        prmDescription = prmAttribute.Description;
+                        if (prmAttribute.Mandatory)
+                        {
+                            beforeType = "<";
+                            afterType = ">";
+                        }
+                    }
+
+                    Console.WriteLine("{0}  -> {1}={2}{3}{4} : {5}", startOfLine, propertyInfo.Name, beforeType, friendlyType, afterType, prmDescription);
                     startOfLine = nextStartOfLine;
                 }
             }
@@ -54,6 +78,42 @@ namespace cqlsh.Commands
             Console.WriteLine("Examples:");
             Console.WriteLine("  !set log=true colwidth=20;");
             Console.WriteLine("  select * from system.local;");
+        }
+
+        private static string GetFriendlyPropertyType(PropertyInfo propertyInfo)
+        {
+            Type type = propertyInfo.PropertyType;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            if (type.IsEnum)
+            {
+                string[] enumValues = Enum.GetNames(type);
+                StringBuilder sbEnums = new StringBuilder();
+                string sep = "";
+                foreach (string enumValue in enumValues)
+                {
+                    sbEnums.Append(sep).Append(enumValue);
+                    sep = ",";
+                }
+                return sbEnums.ToString();
+            }
+
+            if (type == typeof(int))
+            {
+                return "int";
+            }
+            if (type == typeof(string))
+            {
+                return "string";
+            }
+            if (type == typeof(bool))
+            {
+                return "bool";
+            }
+            return type.Name;
         }
     }
 }

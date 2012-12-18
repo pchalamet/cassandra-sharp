@@ -17,16 +17,12 @@ namespace cqlsh.Commands
 {
     using System;
 
-    internal class ClearScreen : ICommand
+    [Description("clear screen")]
+    internal class ClearScreen : CommandBase
     {
-        public void Execute()
+        public override void Execute()
         {
             Console.Clear();
-        }
-
-        public string Describe()
-        {
-            return "clear screen";
         }
     }
 }

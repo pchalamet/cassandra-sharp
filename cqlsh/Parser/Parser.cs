@@ -55,63 +55,6 @@ namespace cqlsh.Parser
             parent.Token.UpdateRange(node.Token);
         }
 
-        private void ParseInteger(ParseNode parent)
-        {
-            Token tok;
-            ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Integer), "Integer");
-            parent.Nodes.Add(node);
-
-            tok = scanner.Scan(TokenType.INTEGER);
-            n = node.CreateNode(tok, tok.ToString() );
-            node.Token.UpdateRange(tok);
-            node.Nodes.Add(n);
-            if (tok.Type != TokenType.INTEGER) {
-                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.INTEGER.ToString(), 0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
-                return;
-            }
-
-            parent.Token.UpdateRange(node.Token);
-        }
-
-        private void ParseBool(ParseNode parent)
-        {
-            Token tok;
-            ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Bool), "Bool");
-            parent.Nodes.Add(node);
-
-            tok = scanner.LookAhead(TokenType.TRUE, TokenType.FALSE);
-            switch (tok.Type)
-            {
-                case TokenType.TRUE:
-                    tok = scanner.Scan(TokenType.TRUE);
-                    n = node.CreateNode(tok, tok.ToString() );
-                    node.Token.UpdateRange(tok);
-                    node.Nodes.Add(n);
-                    if (tok.Type != TokenType.TRUE) {
-                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.TRUE.ToString(), 0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
-                        return;
-                    }
-                    break;
-                case TokenType.FALSE:
-                    tok = scanner.Scan(TokenType.FALSE);
-                    n = node.CreateNode(tok, tok.ToString() );
-                    node.Token.UpdateRange(tok);
-                    node.Nodes.Add(n);
-                    if (tok.Type != TokenType.FALSE) {
-                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.FALSE.ToString(), 0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
-                        return;
-                    }
-                    break;
-                default:
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, 0, tok.StartPos, tok.StartPos, tok.Length));
-                    break;
-            }
-
-            parent.Token.UpdateRange(node.Token);
-        }
-
         private void ParseIdentifier(ParseNode parent)
         {
             Token tok;
@@ -131,6 +74,25 @@ namespace cqlsh.Parser
             parent.Token.UpdateRange(node.Token);
         }
 
+        private void ParseInteger(ParseNode parent)
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Integer), "Integer");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.INTEGER);
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.INTEGER) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.INTEGER.ToString(), 0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        }
+
         private void ParseValue(ParseNode parent)
         {
             Token tok;
@@ -138,18 +100,17 @@ namespace cqlsh.Parser
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Value), "Value");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.STRING, TokenType.INTEGER, TokenType.TRUE, TokenType.FALSE);
+            tok = scanner.LookAhead(TokenType.STRING, TokenType.IDENTIFIER, TokenType.INTEGER);
             switch (tok.Type)
             {
                 case TokenType.STRING:
                     ParseString(node);
                     break;
+                case TokenType.IDENTIFIER:
+                    ParseIdentifier(node);
+                    break;
                 case TokenType.INTEGER:
                     ParseInteger(node);
-                    break;
-                case TokenType.TRUE:
-                case TokenType.FALSE:
-                    ParseBool(node);
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, 0, tok.StartPos, tok.StartPos, tok.Length));

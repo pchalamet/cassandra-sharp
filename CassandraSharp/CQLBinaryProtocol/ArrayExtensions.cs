@@ -19,18 +19,9 @@ namespace CassandraSharp.CQLBinaryProtocol
 
     internal static class ArrayExtensions
     {
-        private static readonly bool _isLittleEndian;
-
-        static ArrayExtensions()
-        {
-            const int t = 1;
-            byte[] buffer = BitConverter.GetBytes(t);
-            _isLittleEndian = buffer[0] == 1;
-        }
-
         public static void ReverseIfLittleEndian(this byte[] buffer)
         {
-            if (_isLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(buffer);
             }

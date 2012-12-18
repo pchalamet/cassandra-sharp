@@ -18,7 +18,7 @@ if "%VERSION%" == "" (
 	echo WARNING: missing version as parameter ^(see %~n0 /?^)
 	echo WARNING: using VERSION=0.0.0 instead
 	echo.
-	set VERSION=0.0.0.0
+	set VERSION=0.0.0
 )
 
 set VERSIONSTATUS=%3
@@ -48,6 +48,6 @@ echo    %~n0 ^<flavor^> ^<version^> ^<status^>
 echo.
 echo where:
 echo    flavor  : Debug or Release
-echo    version : format is AAA.BBB.CCC.DDD
-echo    status  : ALPHA, BETA, RTM
+echo    version : format is AAA.BBB.CCC
+echo    status  : alpha, beta, rtm
 goto :done

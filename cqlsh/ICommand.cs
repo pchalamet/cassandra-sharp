@@ -17,8 +17,7 @@ namespace cqlsh
 {
     internal interface ICommand
     {
-        string Describe();
-
+        void Validate();
         void Execute();
     }
 }
