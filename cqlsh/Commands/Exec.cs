@@ -65,10 +65,6 @@ namespace cqlsh.Commands
                     Console.WriteLine("Command execution failed with error '{0}'", ex.Message);
                 }
             }
-            finally
-            {
-                Console.WriteLine();
-            }
         }
 
         private static IResultWriter GetResultWriter()

@@ -17,13 +17,11 @@ namespace cqlsh
 {
     internal class CliArgs
     {
-// ReSharper restore InconsistentNaming
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Display banner", ShortName = "b")]
+        public bool Banner = true;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
         public bool CheckConnection = true;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Display banner", ShortName = "b")]
-        public bool Banner = true;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
         public string File = null;
@@ -31,11 +29,10 @@ namespace cqlsh
         [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
         public string Hostname = null;
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
-        public string User = null;
-
         [Argument(ArgumentType.AtMostOnce, HelpText = "Password", ShortName = "p")]
         public string Password = null;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
+        public string User = null;
     }
 }

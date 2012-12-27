@@ -99,12 +99,12 @@ namespace cqlsh.Commands
                 propertyType = propertyType.GetGenericArguments()[0];
             }
 
-            object value;
+            object value = prmValue;
             if (propertyType.IsEnum)
             {
                 value = Enum.Parse(propertyType, prmValue, true);
             }
-            else
+            else if(propertyType != typeof(string))
             {
                 MethodInfo mi = propertyType.GetMethod("Parse", new[] {typeof(string)});
                 value = mi.Invoke(null, new object[] {prmValue});

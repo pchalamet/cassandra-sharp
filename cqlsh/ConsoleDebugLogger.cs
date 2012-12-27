@@ -47,12 +47,13 @@ namespace cqlsh
             Log(format, prms);
         }
 
-        public void Log(string format, object[] prms)
+        private static void Log(string format, object[] prms)
         {
             lock (_lock)
             {
                 if (CommandContext.DebugLog)
                 {
+                    Console.Write("{0} [{1}] - ", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId);
                     Console.WriteLine(format, prms);
                 }
             }
