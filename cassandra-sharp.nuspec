@@ -20,10 +20,9 @@ Major features:
 * multiple extension points
 
 cassandra-sharp does only support:
-* .NET 4.0+
+* .NET 4.0+ (Microsoft .NET or Mono)
 * CQL 3.0 (Binary Protocol)
 * Apache Cassandra 1.2+
-* Microsoft .NET or Mono
 </description>
     <tags>apache cassandra .net40 .net45 database nosql mono</tags>
   </metadata>
