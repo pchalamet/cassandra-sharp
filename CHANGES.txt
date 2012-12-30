@@ -1,8 +1,9 @@
 version 2.0.6.0 (beta)
-- cqlsh changes:
-  changed cqlsh help system
+- renamed cqlsh to cqlplus to avoid confusion
+- cqlplus changes:
+  changed cqlplus help system
   added source & exec
-  support for enum for cqlsh command args
+  support for enum for cqlplus command args
   fix source when error encountered
 
 version 2.0.5.0 (beta)

@@ -5,7 +5,7 @@ cassandra-sharp is a .NET client for Apache Cassandra.  The philosophy of cassan
 Starting from version 2, only CQL binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Version 2 is also only .NET 4.0+ compatible.
 cassandra-sharp support async operations exposed as TPL tasks and efficient memory usage (streaming as much as it can using a pull model). Futures are also supported as well. Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety.
 
-A command line tool is also available (cqlsh) to access a Cassandra cluster. It's also a great tool to understand what's happening under the cover.
+A command line tool is also available (cqlplus) to access a Cassandra cluster. It's also a great tool to understand what's happening under the cover.
 
 Features
 ========
@@ -15,7 +15,7 @@ Features
 * extensible rowset mapping (poco and map provided out of the box)
 * robust connection handling (connection can then be recovered)
 * multiple extension points
-* command line tool (cqlsh)
+* command line tool (cqlplus)
 
 If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.
 

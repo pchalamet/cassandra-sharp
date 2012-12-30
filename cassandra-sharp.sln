@@ -5,8 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp", "Cassandra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{220BEE49-7E3C-40D9-B58C-A5299F55419E}"
 	ProjectSection(SolutionItems) = preProject
-		CassandraSharp.nuspec = CassandraSharp.nuspec
-		CassandraSharp.targets = CassandraSharp.targets
+		cassandra-sharp.nuspec = cassandra-sharp.nuspec
+		cassandra-sharp.targets = cassandra-sharp.targets
 		CHANGES.txt = CHANGES.txt
 		LICENSE-2.0.txt = LICENSE-2.0.txt
 		README.md = README.md
@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharpUnitTests", "CassandraSharpUnitTests\CassandraSharpUnitTests.csproj", "{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlsh", "cqlsh\cqlsh.csproj", "{0A06398E-69BE-487B-A011-4C0BE6619B59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus", "cqlplus\cqlplus.csproj", "{0A06398E-69BE-487B-A011-4C0BE6619B59}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples", "Samples\Samples.csproj", "{8B2359B2-4A73-4A49-8E1E-646014A768A4}"
 EndProject
