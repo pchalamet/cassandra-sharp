@@ -45,7 +45,7 @@ namespace cqlplus
             try
             {
                 var statementReader = new StatementSplitter(statementInput);
-                Run(hostname, statementReader);
+                Run(statementReader);
             }
             catch (Exception ex)
             {
@@ -56,7 +56,7 @@ namespace cqlplus
             return 0;
         }
 
-        private static void Run(string hostname, IStatementReader statementReader)
+        private static void Run(IStatementReader statementReader)
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
             cassandraSharpConfig.Logger = typeof(ConsoleDebugLogger).AssemblyQualifiedName;
@@ -71,7 +71,7 @@ namespace cqlplus
                             },
                         Endpoints = new EndpointsConfig
                             {
-                                    Servers = new[] {hostname},
+                                    Servers = new[] {_cliArgs.Hostname},
                             }
                 };
 
@@ -81,7 +81,7 @@ namespace cqlplus
 
                 if (_cliArgs.CheckConnection)
                 {
-                    Console.WriteLine("Connecting to {0}:", hostname);
+                    Console.WriteLine("Connecting to {0}:{1}...", _cliArgs.Hostname, _cliArgs.Port);
                     const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
                     new Exec {Statement = checkStatement}.Execute();
                     if (CommandContext.LastCommandFailed)

@@ -26,11 +26,14 @@ namespace cqlplus
         [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
         public string File = null;
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h", DefaultValue = "localhost")]
-        public string Hostname = null;
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h")]
+        public string Hostname = "localhost";
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Password", ShortName = "p")]
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Password", ShortName = "x")]
         public string Password = null;
+
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Port", ShortName = "p")]
+        public int Port = 9042;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
         public string User = null;

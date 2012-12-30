@@ -8,8 +8,8 @@
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/pchalamet/cassandra-sharp</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <summary>cassandra-sharp is a .NET 4.0+ client for Apache Cassandra 1.2+, fully supporting asynchronous operations (using TPL) and CQL 3.</summary>
-    <description>cassandra-sharp is a .NET client for Apache Cassandra.
+    <summary>cassandra-sharp is a CQL Binary Protocol .NET 4.0+ client for Apache Cassandra 1.2+, fully supporting asynchronous operations (using TPL) and CQL 3.</summary>
+    <description>cassandra-sharp is a CQL Binary Protocol .NET client for Apache Cassandra.
 
 Major features:
 * async operations
@@ -23,7 +23,8 @@ cassandra-sharp does only support:
 * .NET 4.0+
 * CQL 3.0 (Binary Protocol)
 * Apache Cassandra 1.2+
+* Microsoft .NET or Mono
 </description>
-    <tags>apache cassandra .net40 .net45 database nosql</tags>
+    <tags>apache cassandra .net40 .net45 database nosql mono</tags>
   </metadata>
 </package>
