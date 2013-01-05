@@ -29,7 +29,7 @@ namespace CassandraSharp.EndpointStrategy
 
         private readonly Random _rnd;
 
-        public RandomEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
+        public RandomEndpointStrategy(IEnumerable<IPAddress> endpoints)
         {
             _healthyEndpoints = new List<IPAddress>(endpoints);
             _bannedEndpoints = new List<IPAddress>();

@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,41 @@ namespace cqlplus.ResultWriter
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Text;
 
     internal class CSV : IResultWriter
     {
-        public void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet)
         {
+            bool first = true;
+            foreach (var row in rowSet)
+            {
+                string sep;
+                if (first)
+                {
+                    StringBuilder sbHeader = new StringBuilder();
+                    sep = string.Empty;
+                    foreach (var kvp in row)
+                    {
+                        sbHeader.AppendFormat("{0}{1}", sep, kvp.Key);
+                        sep = ",";
+                    }
+
+                    string header = sbHeader.ToString();
+                    txtWriter.WriteLine(header);
+                    first = false;
+                }
+
+                StringBuilder sbValues = new StringBuilder();
+                sep = string.Empty;
+                foreach (var kvp in row)
+                {
+                    sbValues.AppendFormat("{0}{1}", sep, ValueFormatter.Format(kvp.Value));
+                    sep = ",";
+                }
+                string values = sbValues.ToString();
+                txtWriter.WriteLine(values);
+            }
         }
     }
 }

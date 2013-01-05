@@ -71,11 +71,14 @@ namespace cqlplus.Commands
         {
             switch (CommandContext.Formatter)
             {
-                case CommandContext.OutputFormatter.Tabular:
+                case CommandContext.OutputFormatter.Tab:
                     return new Tabular(CommandContext.ColumnWidth);
 
-                case CommandContext.OutputFormatter.RowKey:
+                case CommandContext.OutputFormatter.KV:
                     return new RowKeyValue();
+
+                case CommandContext.OutputFormatter.CSV:
+                    return new CSV();
 
                 default:
                     throw new ArgumentException("Unknown formatter");

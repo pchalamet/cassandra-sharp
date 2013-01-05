@@ -20,10 +20,10 @@ namespace cqlplus.Commands
     [Description("set environment variable")]
     internal class Set : CommandBase
     {
-        [Description("set tabular result column width")]
-        public int? ColWidth { get; set; }
+        [Description("set max result column width")]
+        public int? MaxWidth { get; set; }
 
-        [Description("enable tabular result mode")]
+        [Description("select output formatter")]
         public CommandContext.OutputFormatter? Output { get; set; }
 
         [Description("enable debug log to console")]
@@ -31,7 +31,7 @@ namespace cqlplus.Commands
 
         public override void Validate()
         {
-            if (ColWidth.HasValue && 3 > ColWidth.Value)
+            if (MaxWidth.HasValue && 3 > MaxWidth.Value)
             {
                 throw new ArgumentException("ColWidth must be greater than 3");
             }
@@ -44,9 +44,9 @@ namespace cqlplus.Commands
 
         public override void Execute()
         {
-            if (ColWidth.HasValue)
+            if (MaxWidth.HasValue)
             {
-                CommandContext.ColumnWidth = ColWidth.Value;
+                CommandContext.ColumnWidth = MaxWidth.Value;
             }
 
             if (Output.HasValue)

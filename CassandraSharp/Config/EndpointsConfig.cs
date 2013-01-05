@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace CassandraSharp.Config
         {
             Snitch = "RackInferring";
             Strategy = "Nearest";
+            Discovery = "Simple";
         }
 
         [XmlElement("Server")]
@@ -33,5 +34,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("strategy")]
         public string Strategy { get; set; }
+
+        [XmlAttribute("discovery")]
+        public string Discovery { get; set; }
     }
 }

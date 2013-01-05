@@ -20,6 +20,6 @@ namespace cqlplus
 
     internal interface IResultWriter
     {
-        void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet);
+        void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet);
     }
 }

@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,6 +64,11 @@ namespace CassandraSharp
 
             // create the cluster now
             ICluster cluster = Cluster.Factory.Create("Default", endpointsManager, _logger, connectionFactory, recoveryService);
+
+            IDiscoveryService discoveryService = Discovery.Factory.Create(clusterConfig.Endpoints.Discovery, _logger);
+            var newPeers = discoveryService.DiscoverPeers(cluster);
+            endpointsManager.Update(newPeers);
+
             return cluster;
         }
 

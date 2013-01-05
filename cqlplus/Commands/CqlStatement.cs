@@ -16,6 +16,7 @@
 namespace cqlplus.Commands
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPropertyBag;
@@ -31,8 +32,13 @@ namespace cqlplus.Commands
 
         public override void Execute()
         {
-            Task<IEnumerable<Dictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
-            CommandContext.ResultWriter.Write(CommandContext.TextWriter, res.Result);
+            Task<IEnumerable<IDictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
+            
+            // ensure values are sorted accordingly to column name
+            var sortedRes = from row in res.Result
+                            select new SortedDictionary<string, object>(row);
+
+            CommandContext.ResultWriter.Write(CommandContext.TextWriter, sortedRes);
         }
     }
 }

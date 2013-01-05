@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,19 @@ namespace cqlplus.ResultWriter
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
 
     public static class ValueFormatter
     {
         private static bool IsGenericCollection(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>);
+            Type collType = type.GetInterfaces()
+                                .Where(face => face.IsGenericType &&
+                                               face.GetGenericTypeDefinition() == typeof(ICollection<>))
+                                .Select(face => face.GetGenericArguments()[0])
+                                .FirstOrDefault();
+            return null != collType;
         }
 
         public static string Format(object value)

@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 namespace cqlplus.ResultWriter
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
@@ -23,72 +24,87 @@ namespace cqlplus.ResultWriter
     {
         private readonly int _maxWidth;
 
-        public Tabular()
-                : this(20)
-        {
-        }
-
         public Tabular(int maxWidth)
         {
             _maxWidth = maxWidth;
         }
 
-        public void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet)
         {
-            string colFormat = string.Format("{{0,-{0}}}", _maxWidth);
             string rowSeparator = null;
-            foreach (Dictionary<string, object> row in rowSet)
+
+            Dictionary<string, int> colWidths = null;
+            foreach (var row in rowSet)
             {
-                if (null == row)
+                if (null == colWidths)
                 {
-                    continue;
-                }
+                    colWidths = DetermineColumnWidth(row, _maxWidth);
 
-                if (null == rowSeparator)
-                {
-                    StringBuilder sbHeader = new StringBuilder();
-                    StringBuilder sbRowSeparator = new StringBuilder();
-                    foreach (KeyValuePair<string, object> value in row)
-                    {
-                        string colHeader = string.Format(colFormat, value.Key);
-                        if (_maxWidth < colHeader.Length)
-                        {
-                            colHeader = colHeader.Substring(0, _maxWidth - 1);
-                            colHeader += "~";
-                        }
-                        sbHeader.Append("| ").Append(colHeader).Append(" ");
-                        sbRowSeparator.Append("+-").Append(new string('-', colHeader.Length)).Append('-');
-                    }
-                    sbHeader.Append(" |");
-                    sbRowSeparator.Append("-+");
-
-                    string header = sbHeader.ToString();
-                    rowSeparator = sbRowSeparator.ToString();
+                    rowSeparator = BuildRowSeparator(colWidths);
                     string headerSeparator = rowSeparator.Replace('-', '=');
+                    string header = BuildRowValues(row, colWidths, kvp => kvp.Key);
 
                     txtWriter.WriteLine(rowSeparator);
                     txtWriter.WriteLine(header);
                     txtWriter.WriteLine(headerSeparator);
                 }
 
-                StringBuilder sbValues = new StringBuilder();
-                foreach (KeyValuePair<string, object> value in row)
-                {
-                    string sValue = ValueFormatter.Format(value.Value);
-                    string colValue = string.Format(colFormat, sValue);
-                    if (_maxWidth < colValue.Length)
-                    {
-                        colValue = colValue.Substring(0, _maxWidth - 1);
-                        colValue += "~";
-                    }
-                    sbValues.Append("| ").Append(colValue).Append(" ");
-                }
-                sbValues.Append(" |");
-                string rowValues = sbValues.ToString();
-
+                string rowValues = BuildRowValues(row, colWidths, kvp => ValueFormatter.Format(kvp.Value));
                 txtWriter.WriteLine(rowValues);
                 txtWriter.WriteLine(rowSeparator);
             }
+        }
+
+        private static Dictionary<string, int> DetermineColumnWidth(IEnumerable<KeyValuePair<string, object>> row, int maxWidth)
+        {
+            Dictionary<string, int> colWidths = new Dictionary<string, int>();
+            foreach (var value in row)
+            {
+                string sValue = ValueFormatter.Format(value.Value);
+                int keyWidth = value.Key.Length;
+                int valWidth = sValue.Length;
+                int colWidth = 4 + Math.Max(keyWidth, valWidth);
+                colWidth = Math.Min(colWidth, maxWidth);
+                colWidths.Add(value.Key, colWidth);
+            }
+            return colWidths;
+        }
+
+        private static string BuildRowSeparator(Dictionary<string, int> colWidths)
+        {
+            StringBuilder sbRowSeparator = new StringBuilder();
+            foreach (var kvp in colWidths)
+            {
+                int colWidth = colWidths[kvp.Key];
+                sbRowSeparator.Append("+-").Append(new string('-', colWidth)).Append('-');
+            }
+            sbRowSeparator.Append("-+");
+
+            string rowSeparator = sbRowSeparator.ToString();
+            return rowSeparator;
+        }
+
+        private static string BuildRowValues(IEnumerable<KeyValuePair<string, object>> row, IDictionary<string, int> colWidths,
+                                             Func<KeyValuePair<string, object>, string> formatter)
+        {
+            StringBuilder sbValues = new StringBuilder();
+            foreach (var value in row)
+            {
+                string sValue = formatter(value);
+                int colWidth = colWidths[value.Key];
+                string colFormat = string.Format("{{0,-{0}}}", colWidth);
+
+                string colValue = string.Format(colFormat, sValue);
+                if (colWidth < colValue.Length)
+                {
+                    colValue = colValue.Substring(0, colWidth - 1);
+                    colValue += "~";
+                }
+                sbValues.Append("| ").Append(colValue).Append(" ");
+            }
+            sbValues.Append(" |");
+            string rowValues = sbValues.ToString();
+            return rowValues;
         }
     }
 }

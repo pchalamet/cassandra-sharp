@@ -1,5 +1,8 @@
-version 2.0.7.0
+version 2.1.0.0
+- node discovery implementation
+- fixed guid serialization
 - dynamic column width
+- fixed eventually incorrect order of column in cqlplus
 
 version 2.0.7.0
 - mono compatibility (for cqlplus)

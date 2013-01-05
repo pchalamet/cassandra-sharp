@@ -1,5 +1,5 @@
 // cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,36 +26,30 @@ namespace CassandraSharp.Transport
     using System.Threading.Tasks;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Config;
-    using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
     internal class Connection : IConnection
     {
-// ReSharper disable InconsistentNaming
-        private const byte STREAMID_MAX = 0x80;
+        private const byte MAX_STREAMID = 0x80;
 
-// ReSharper restore InconsistentNaming
+        private readonly Stack<byte> _availableStreamIds = new Stack<byte>(MAX_STREAMID);
 
-        private readonly Stack<byte> _availableStreamIds = new Stack<byte>(STREAMID_MAX);
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private readonly TransportConfig _config;
-
-        private readonly ILogger _logger;
 
         private readonly object _globalLock = new object();
 
         private readonly Stream _inputStream;
 
+        private readonly ILogger _logger;
+
         private readonly Stream _outputStream;
 
-        private readonly RequestState[] _requestStates = new RequestState[STREAMID_MAX];
+        private readonly Task<IEnumerable<object>>[] _readers = new Task<IEnumerable<object>>[MAX_STREAMID];
 
         private readonly TcpClient _tcpClient;
-
-        private Task _currReadTask;
-
-        private bool _failed;
 
         public Connection(IPAddress address, TransportConfig config, ILogger logger)
         {
@@ -73,30 +67,46 @@ namespace CassandraSharp.Transport
             _outputStream = stream;
             _inputStream = stream;
 
-            for (byte idx = 0; idx < STREAMID_MAX; ++idx)
+            for (byte idx = 0; idx < MAX_STREAMID; ++idx)
             {
                 _availableStreamIds.Push(idx);
-                _requestStates[idx].Lock = new object();
             }
 
-            _logger.Debug("Ready'ing connection for {0}", Endpoint);
+            // start a new read task
+            Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+
+            // readify the connection
+            _logger.Debug("Readyfying connection for {0}", Endpoint);
             GetOptions();
             ReadifyConnection();
             _logger.Debug("Connection to {0} is ready", Endpoint);
         }
 
-        public void Dispose()
-        {
-            _logger.Debug("Connection to {0} is being disposed", Endpoint);
-            lock (_globalLock)
-            {
-                _tcpClient.SafeDispose();
-            }
-        }
-
         public IPAddress Endpoint { get; private set; }
 
         public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader)
+        {
+            byte streamId = ReserveStreamId();
+
+            // write the request asynchronously
+            StartWriteNextFrame(writer, streamId);
+
+            // return a promise to stream results
+            var taskRead = CreateReadNextFrame(reader, streamId);
+            _readers[streamId] = taskRead;
+            return taskRead;
+        }
+
+        public event EventHandler<FailureEventArgs> OnFailure;
+
+        public void Dispose()
+        {
+            _logger.Debug("Connection to {0} is being disposed", Endpoint);
+            _tcpClient.SafeDispose();
+            _cancellation.SafeDispose();
+        }
+
+        private byte ReserveStreamId()
         {
             byte streamId;
             lock (_globalLock)
@@ -104,100 +114,69 @@ namespace CassandraSharp.Transport
                 while (0 == _availableStreamIds.Count)
                 {
                     _logger.Debug("Waiting for available stream id for {0}", Endpoint);
-                    ThrowClientRequestAbortedIfConnectionFailed();
+                    _cancellation.Token.ThrowIfCancellationRequested();
                     Monitor.Wait(_globalLock);
                 }
-                ThrowClientRequestAbortedIfConnectionFailed();
+                _cancellation.Token.ThrowIfCancellationRequested();
 
                 // get the stream id and initialize async reader context
                 streamId = _availableStreamIds.Pop();
-                _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
-
-                // startup a new read task
-                _currReadTask = null != _currReadTask
-                                        ? _currReadTask.ContinueWith(_ => ReadNextFrameHeader())
-                                        : Task.Factory.StartNew(ReadNextFrameHeader);
             }
 
-            // start the async request
-            var taskWrite = Task.Factory.StartNew(() => WriteNextFrame(writer, reader, streamId));
-            return taskWrite;
+            _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
+            return streamId;
         }
 
-        public event EventHandler<FailureEventArgs> OnFailure;
-
-        private IEnumerable<object> WriteNextFrame(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, byte streamId)
+        private Task<IEnumerable<object>> CreateReadNextFrame(Func<IFrameReader, IEnumerable<object>> reader, byte streamId)
         {
-            // acquire the global lock to write the request
-            lock (_globalLock)
-            {
-                ThrowClientRequestAbortedIfConnectionFailed();
-
-                _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
-
-                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId))
-                    writer(frameWriter);
-
-                _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-            }
-
-            // return a promise to stream results
-            return StreamResultsThenReleaseStreamId(reader, streamId);
-        }
-
-        // *must* be called under _globalLock
-        private void ThrowClientRequestAbortedIfConnectionFailed()
-        {
-            if (_failed)
-            {
-                throw new ClientRequestAbortedException();
-            }
+            return new Task<IEnumerable<object>>(() => StreamResultsThenReleaseStreamId(reader, streamId));
         }
 
         private IEnumerable<object> StreamResultsThenReleaseStreamId(Func<FrameReader, IEnumerable<object>> reader, byte streamId)
         {
-            // we are completely client side there (ie: running on the thread of the client)
-            // we have first to grab the request lock to avoid a race with async reader
-            // and find if the async reader has started to read the frame
-            lock (_requestStates[streamId].Lock)
+            try
             {
-                try
+                _logger.Debug("Starting reading stream {0}@{1}", streamId, Endpoint);
+                lock (_globalLock)
                 {
-                    // if the reader has not read this stream id then just wait for a notification
-                    if (!_requestStates[streamId].ReadBegan)
-                    {
-                        Monitor.Wait(_requestStates[streamId].Lock);
-                    }
-
-                    _logger.Debug("Starting reading stream {0}@{1}", streamId, Endpoint);
-
-                    lock (_globalLock)
-                    {
-                        // release stream id (since result streaming has started)
-                        _availableStreamIds.Push(streamId);
-                        Monitor.Pulse(_globalLock);
-
-                        ThrowClientRequestAbortedIfConnectionFailed();
-                    }
-
-                    // yield all rows - no lock required on input stream since we are the only one allowed to read
-                    using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _config.Streaming))
-                    {
-                        foreach (object row in EnumerableOrEmptyEnumerable(reader(frameReader)))
-                        {
-                            yield return row;
-                        }                            
-                    }
-
-                    _logger.Debug("Done reading stream {0}@{1}", streamId, Endpoint);
+                    // release stream id (since result streaming has started)
+                    _availableStreamIds.Push(streamId);
+                    Monitor.Pulse(_globalLock);
                 }
-                finally
+
+                // yield all rows - no lock required on input stream since we are the only one allowed to read
+                using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _config.Streaming))
                 {
-                    // wake up the async reader
-                    _requestStates[streamId].ReadBegan = false;
-                    Monitor.Pulse(_requestStates[streamId].Lock);
+                    foreach (object row in EnumerableOrEmptyEnumerable(reader(frameReader)))
+                    {
+                        yield return row;
+                    }
                 }
+
+                _logger.Debug("Done reading stream {0}@{1}", streamId, Endpoint);
             }
+            finally
+            {
+                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+            }
+        }
+
+        private void StartWriteNextFrame(Action<IFrameWriter> writer, byte streamId)
+        {
+            Task.Factory.StartNew(() => WriteNextFrame(writer, streamId), _cancellation.Token);
+        }
+
+        private void WriteNextFrame(Action<IFrameWriter> writer, byte streamId)
+        {
+            // acquire the global lock to write the request
+            _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
+            lock (_globalLock)
+            {
+                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId))
+                    writer(frameWriter);
+            }
+
+            _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
         }
 
         private static IEnumerable<object> EnumerableOrEmptyEnumerable(IEnumerable<object> enumerable)
@@ -211,23 +190,7 @@ namespace CassandraSharp.Transport
             {
                 // read stream id - we are the only one reading so no lock required
                 byte streamId = FrameReader.ReadStreamId(_inputStream);
-
-                _logger.Debug("Stream {0}@{1} is available", streamId, Endpoint);
-
-                // acquire request lock
-                lock (_requestStates[streamId].Lock)
-                {
-                    // flip the status flag (write barrier in Pulse below)
-                    _requestStates[streamId].ReadBegan = true;
-
-                    // hand off the reading of the body to the request handler
-                    Monitor.Pulse(_requestStates[streamId].Lock);
-
-                    // wait for request handler to complete
-                    Monitor.Wait(_requestStates[streamId].Lock);
-                }
-
-                _logger.Debug("Stream {0}@{1} is completed", streamId, Endpoint);
+                _readers[streamId].RunSynchronously();
             }
             catch (Exception ex)
             {
@@ -239,26 +202,14 @@ namespace CassandraSharp.Transport
         {
             lock (_globalLock)
             {
-                if (_failed)
-                {
-                    return;
-                }
-
                 _logger.Error("Connection to {0} is broken", Endpoint);
 
-                _failed = true;
+                _cancellation.Cancel();
 
                 // currently running request/response will be abruptly terminated
                 Dispose();
 
-                // release all pending client waiting for a response
-                foreach (RequestState requestState in _requestStates)
-                {
-                    lock (requestState.Lock)
-                    {
-                        Monitor.Pulse(requestState.Lock);
-                    }
-                }
+                // wake up eventually client waiting for a stream id
                 Monitor.Pulse(_globalLock);
 
                 if (null != OnFailure)
@@ -311,13 +262,6 @@ namespace CassandraSharp.Transport
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
             Execute(writer, reader).Result.Count();
 // ReSharper restore ReturnValueOfPureMethodIsNotUsed
-        }
-
-        private struct RequestState
-        {
-            public object Lock;
-
-            public bool ReadBegan;
         }
     }
 }

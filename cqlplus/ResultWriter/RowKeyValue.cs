@@ -20,7 +20,7 @@ namespace cqlplus.ResultWriter
 
     public class RowKeyValue : IResultWriter
     {
-        public void Write(TextWriter txtWriter, IEnumerable<Dictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet)
         {
             int rowNum = 0;
             foreach (var row in rowSet)

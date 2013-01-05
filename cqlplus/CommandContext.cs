@@ -22,9 +22,11 @@ namespace cqlplus
     {
         public enum OutputFormatter
         {
-            Tabular,
+            Tab,
 
-            RowKey,
+            KV,
+
+            CSV,
         }
 
         static CommandContext()
@@ -52,8 +54,8 @@ namespace cqlplus
 
         public static void Reset()
         {
-            ColumnWidth = 15;
-            Formatter = OutputFormatter.Tabular;
+            ColumnWidth = 40;
+            Formatter = OutputFormatter.Tab;
             DebugLog = false;
         }
     }

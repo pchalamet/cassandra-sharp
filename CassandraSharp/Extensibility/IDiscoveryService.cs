@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
 
 namespace CassandraSharp.Extensibility
 {
-    using System;
+    using System.Collections.Generic;
+    using System.Net;
 
-    public interface IDiscoveryService : IDisposable
+    public interface IDiscoveryService
     {
+        IEnumerable<IPAddress> DiscoverPeers(ICluster cluster);
     }
 }
