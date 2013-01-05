@@ -26,5 +26,13 @@ namespace CassandraSharp.CQLBinaryProtocol
                 Array.Reverse(buffer);
             }
         }
+
+        public static void ReverseIfLittleEndian(this byte[] buffer, int index, int length)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(buffer, index, length);
+            }
+        }
     }
 }

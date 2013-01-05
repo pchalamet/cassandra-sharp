@@ -129,7 +129,10 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.Uuid:
                 case ColumnType.Timeuuid:
-                    rawData = ((Guid) data).ToByteArray();
+                    rawData = ((Guid)data).ToByteArray();
+                    rawData.ReverseIfLittleEndian(0, 4);
+                    rawData.ReverseIfLittleEndian(4, 2);
+                    rawData.ReverseIfLittleEndian(6, 2);
                     break;
 
                 case ColumnType.Inet:
@@ -238,7 +241,6 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
-                    rawData.ReverseIfLittleEndian();
                     data = BitConverter.ToInt64(rawData, 0);
                     break;
 
@@ -253,6 +255,9 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.Uuid:
                 case ColumnType.Timeuuid:
+                    rawData.ReverseIfLittleEndian(0, 4);
+                    rawData.ReverseIfLittleEndian(4, 2);
+                    rawData.ReverseIfLittleEndian(6, 2);
                     data = new Guid(rawData);
                     break;
 
