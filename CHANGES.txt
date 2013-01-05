@@ -1,4 +1,7 @@
 version 2.0.7.0
+- dynamic column width
+
+version 2.0.7.0
 - mono compatibility (for cqlplus)
 - support for port in cqlplus
 
