@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using System.Collections.Generic;
     using CassandraSharp.Extensibility;
 
     internal class DataMapperFactory : IDataMapperFactory
@@ -24,9 +25,9 @@ namespace CassandraSharp.CQLPropertyBag
         {
         }
 
-        public DataMapperFactory(object[] prms)
+        public DataMapperFactory(IDictionary<string, object> dataSource)
         {
-            DataSource = new DataSource(prms);
+            DataSource = new DataSource(dataSource);
         }
 
         public IDataSource DataSource { get; private set; }

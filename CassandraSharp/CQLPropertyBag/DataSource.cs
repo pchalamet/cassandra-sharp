@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,20 +15,21 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using System.Collections.Generic;
     using CassandraSharp.Extensibility;
 
     internal class DataSource : IDataSource
     {
-        private readonly object[] _dataSource;
+        private readonly IDictionary<string, object> _dataSource;
 
-        public DataSource(object[] dataSource)
+        public DataSource(IDictionary<string, object> dataSource)
         {
             _dataSource = dataSource;
         }
 
         public object Get(IColumnSpec columnSpec)
         {
-            return _dataSource[columnSpec.Index];
+            return _dataSource[columnSpec.Name];
         }
     }
 }

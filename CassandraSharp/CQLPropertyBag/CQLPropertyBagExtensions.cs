@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,10 +29,16 @@ namespace CassandraSharp.CQLPropertyBag
             return CQLCommandHelpers.Query<IDictionary<string, object>>(cluster, cql, cl, factory);
         }
 
-        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, ConsistencyLevel cl, params object[] prms)
+        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, ConsistencyLevel cl, IDictionary<string, object> dataSource)
         {
-            IDataMapperFactory factory = new DataMapperFactory(prms);
+            IDataMapperFactory factory = new DataMapperFactory(dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
+        }
+
+        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, ConsistencyLevel cl, IDictionary<string, object> dataSource)
+        {
+            IDataMapperFactory factory = new DataMapperFactory(dataSource);
+            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
         }
     }
 }

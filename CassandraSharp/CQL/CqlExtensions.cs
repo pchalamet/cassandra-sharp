@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,11 +42,5 @@ namespace CassandraSharp.CQL
 
             return connection.Execute(writer, reader).ContinueWith(res => (IPreparedQuery) res.Result.Single());
         }
-
-        //public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, ConsistencyLevel cl, params object[] prms)
-        //{
-        //    return preparedQuery.Execute(cl, null).ContinueWith(res => res.Result.Count());
-        //}
-
     }
 }

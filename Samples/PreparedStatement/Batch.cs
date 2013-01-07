@@ -23,13 +23,6 @@ namespace Samples.PreparedStatement
 
     public class Batch
     {
-        public class Foo
-        {
-            public int a;
-
-            public int b;
-        }
-
         public static void Run()
         {
             XmlConfigurator.Configure();
@@ -45,10 +38,9 @@ namespace Samples.PreparedStatement
                 Console.WriteLine();
                 Console.WriteLine();
 
-
                 const string createBar = "CREATE TABLE Foo.Bar (a int, " +
-                                                                "b int, " +
-                                                                "PRIMARY KEY (a, b))";
+                                         "b int, " +
+                                         "PRIMARY KEY (a, b))";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
@@ -78,6 +70,15 @@ namespace Samples.PreparedStatement
                 resCount = cluster.ExecuteNonQuery(dropFoo, ConsistencyLevel.ONE);
                 resCount.Wait();
             }
+
+            ClusterManager.Shutdown();
+        }
+
+        public class Foo
+        {
+            public int a;
+
+            public int b;
         }
     }
 }

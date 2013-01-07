@@ -25,10 +25,10 @@ namespace Samples
         private static void Main(string[] args)
         {
             PreparedStatement.Batch.Run();
-            //LinqSample.Run();
-            //FutureSample.Run();
-            //POCOSample.Run();
-            //AsyncSample.Run();
+            LinqSample.Run();
+            FutureSample.Run();
+            POCOSample.Run();
+            AsyncSample.Run();
         }
     }
 }
