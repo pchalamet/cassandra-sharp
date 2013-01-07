@@ -47,6 +47,7 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="Cluster\Factory.cs" />
+    <Compile Include="CQL\Unit.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
     <Compile Include="Utils\ICollectionInitializer.cs" />

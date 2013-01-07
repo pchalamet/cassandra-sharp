@@ -18,6 +18,7 @@ namespace CassandraSharp.CQLPoco
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
 
@@ -34,5 +35,12 @@ namespace CassandraSharp.CQLPoco
             IDataMapperFactory factory = new DataMapperFactory(typeof(T), dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
         }
+
+        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, ConsistencyLevel cl, object dataSource)
+        {
+            IDataMapperFactory factory = new DataMapperFactory(typeof(Unit), dataSource);
+            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
+        }
+
     }
 }

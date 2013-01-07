@@ -86,29 +86,7 @@ namespace CassandraSharp.Transport
 
         public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader)
         {
-            byte streamId = ReserveStreamId();
-
-            // write the request asynchronously
-            StartWriteNextFrame(writer, streamId);
-
-            // return a promise to stream results
-            var taskRead = CreateReadNextFrame(reader, streamId);
-            _readers[streamId] = taskRead;
-            return taskRead;
-        }
-
-        public event EventHandler<FailureEventArgs> OnFailure;
-
-        public void Dispose()
-        {
-            _logger.Debug("Connection to {0} is being disposed", Endpoint);
-            OnFailure = null;
-            _tcpClient.SafeDispose();
-            _cancellation.SafeDispose();
-        }
-
-        private byte ReserveStreamId()
-        {
+            Task<IEnumerable<object>> taskRead;
             byte streamId;
             lock (_globalLock)
             {
@@ -122,10 +100,27 @@ namespace CassandraSharp.Transport
 
                 // get the stream id and initialize async reader context
                 streamId = _availableStreamIds.Pop();
-            }
 
+                // promise to stream results
+                taskRead = CreateReadNextFrame(reader, streamId);
+                _readers[streamId] = taskRead;
+            }
             _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
-            return streamId;
+
+            // write the request asynchronously
+            StartWriteNextFrame(writer, streamId);
+
+            return taskRead;
+        }
+
+        public event EventHandler<FailureEventArgs> OnFailure;
+
+        public void Dispose()
+        {
+            _logger.Debug("Connection to {0} is being disposed", Endpoint);
+            OnFailure = null;
+            _tcpClient.SafeDispose();
+            _cancellation.SafeDispose();
         }
 
         private Task<IEnumerable<object>> CreateReadNextFrame(Func<IFrameReader, IEnumerable<object>> reader, byte streamId)

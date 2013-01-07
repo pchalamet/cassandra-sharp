@@ -46,6 +46,7 @@
     <Compile Include="Future\AsyncSample.cs" />
     <Compile Include="Linq\AsyncSample.cs" />
     <Compile Include="POCO\NerdMovies.cs" />
+    <Compile Include="PreparedStatement\Batch.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
