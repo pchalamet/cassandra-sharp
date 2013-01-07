@@ -118,16 +118,19 @@ namespace CassandraSharp.Cluster
                 IConnection connection = sender as IConnection;
                 if (null != connection && _ip2Connection.ContainsKey(connection.Endpoint))
                 {
-                    _logger.Error("connection {0} failed with error {1}", connection.Endpoint, e.Exception);
-                    _ip2Connection.Remove(connection.Endpoint);
-                    MarkEndpointForRecovery(connection.Endpoint);
+                    IPAddress endpoint = connection.Endpoint;
+                    _logger.Error("connection {0} failed with error {1}", endpoint, e.Exception);
+
+                    _ip2Connection.Remove(endpoint);
+                    _endpointStrategy.Ban(endpoint);
+
+                    MarkEndpointForRecovery(endpoint);
                 }
             }
         }
 
         private void MarkEndpointForRecovery(IPAddress endpoint)
         {
-            _endpointStrategy.Ban(endpoint);
 
             _logger.Info("marking {0} for recovery", endpoint);
             _recoveryService.Recover(endpoint, _connectionFactory, ClientRecoveredCallback);
@@ -139,8 +142,9 @@ namespace CassandraSharp.Cluster
             {
                 _logger.Info("Endpoint {0} is recovered", connection.Endpoint);
 
-                _ip2Connection.Add(connection.Endpoint, connection);
                 _endpointStrategy.Permit(connection.Endpoint);
+                _ip2Connection.Add(connection.Endpoint, connection);
+                connection.OnFailure += OnFailure;
             }
         }
     }

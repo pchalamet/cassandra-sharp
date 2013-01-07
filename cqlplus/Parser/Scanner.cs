@@ -34,10 +34,15 @@ namespace cqlplus.Parser
 
             SkipList = new List<TokenType>();
             SkipList.Add(TokenType.WHITESPACE);
+            SkipList.Add(TokenType.COMMENT2);
 
             regex = new Regex(@"\s+", RegexOptions.Compiled);
             Patterns.Add(TokenType.WHITESPACE, regex);
             Tokens.Add(TokenType.WHITESPACE);
+
+            regex = new Regex(@"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/", RegexOptions.Compiled);
+            Patterns.Add(TokenType.COMMENT2, regex);
+            Tokens.Add(TokenType.COMMENT2);
 
             regex = new Regex(@"^$", RegexOptions.Compiled);
             Patterns.Add(TokenType.EOF, regex);
@@ -214,16 +219,17 @@ namespace cqlplus.Parser
 
             //Terminal tokens:
             WHITESPACE= 10,
-            EOF     = 11,
-            STRING  = 12,
-            WORD    = 13,
-            INTEGER = 14,
-            IDENTIFIER= 15,
-            BANG    = 16,
-            EVERYTHING= 17,
-            EVERYTHING_BUT_START_WITH_BANG= 18,
-            MINUS   = 19,
-            EQUAL   = 20
+            COMMENT2= 11,
+            EOF     = 12,
+            STRING  = 13,
+            WORD    = 14,
+            INTEGER = 15,
+            IDENTIFIER= 16,
+            BANG    = 17,
+            EVERYTHING= 18,
+            EVERYTHING_BUT_START_WITH_BANG= 19,
+            MINUS   = 20,
+            EQUAL   = 21
     }
 
     public class Token

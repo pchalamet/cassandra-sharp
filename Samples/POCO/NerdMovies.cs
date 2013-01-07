@@ -83,8 +83,9 @@ namespace Samples.POCO
                 Console.WriteLine(selectAllFrom);
                 Console.WriteLine("============================================================");
                 var preparedAllFrom = cluster.Prepare(selectAllFrom);
+                var ds = new { Director = "Joss Whedon" };
                 var taskSelectWhere =
-                        preparedAllFrom.Result.Execute<NerdMovie>(ConsistencyLevel.QUORUM, "Joss Whedon").ContinueWith(res => DisplayMovies(res.Result));
+                        preparedAllFrom.Result.Execute<NerdMovie>(ConsistencyLevel.QUORUM, ds).ContinueWith(res => DisplayMovies(res.Result));
                 taskSelectWhere.Wait();
 
                 const string dropExcelsor = "drop keyspace videos";

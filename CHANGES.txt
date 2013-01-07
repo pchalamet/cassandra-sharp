@@ -3,6 +3,8 @@ version 2.1.0.0
 - fixed guid serialization
 - dynamic column width
 - fixed eventually incorrect order of column in cqlplus
+- fixed connection recovery (OnFailure event)
+- use object (supporting anonyous type) instead of object[] for prepared statement
 
 version 2.0.7.0
 - mono compatibility (for cqlplus)

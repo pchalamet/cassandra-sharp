@@ -42,6 +42,8 @@ namespace cqlplus
                 statementInput = new FileInput(_cliArgs.File);
             }
 
+            CommandContext.DebugLog = _cliArgs.DebugLog;
+
             try
             {
                 var statementReader = new StatementSplitter(statementInput);
@@ -72,6 +74,7 @@ namespace cqlplus
                         Endpoints = new EndpointsConfig
                             {
                                     Servers = new[] {_cliArgs.Hostname},
+                                    Discovery = "Null",
                             }
                 };
 

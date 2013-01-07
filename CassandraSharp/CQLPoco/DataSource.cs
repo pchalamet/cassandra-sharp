@@ -15,20 +15,39 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using System;
+    using System.Reflection;
     using CassandraSharp.Extensibility;
 
     internal class DataSource : IDataSource
     {
-        private readonly object[] _dataSource;
+        private readonly object _dataSource;
 
-        public DataSource(object[] dataSource)
+        public DataSource(object dataSource)
         {
             _dataSource = dataSource;
         }
 
         public object Get(IColumnSpec columnSpec)
         {
-            return _dataSource[columnSpec.Index];
+            const BindingFlags commonFlags = BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance;
+
+            Type type = _dataSource.GetType();
+            string name = columnSpec.Name;
+            FieldInfo fieldInfo = type.GetField(name, commonFlags | BindingFlags.GetField);
+            if (null != fieldInfo)
+            {
+                return fieldInfo.GetValue(_dataSource);
+            }
+
+            PropertyInfo propertyInfo = type.GetProperty(name, commonFlags | BindingFlags.SetProperty);
+            if (null != propertyInfo)
+            {
+                return propertyInfo.GetValue(_dataSource, null);
+            }
+
+            string msg = string.Format("Can't find field or property {0}", columnSpec.Name);
+            throw new ArgumentException(msg);
         }
     }
 }

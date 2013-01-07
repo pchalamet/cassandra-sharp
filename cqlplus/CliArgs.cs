@@ -37,5 +37,8 @@ namespace cqlplus
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
         public string User = null;
+
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable debug log", ShortName = "dbglog")]
+        public bool DebugLog = false;
     }
 }

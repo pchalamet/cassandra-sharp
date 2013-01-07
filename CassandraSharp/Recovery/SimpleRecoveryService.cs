@@ -38,6 +38,7 @@ namespace CassandraSharp.Recovery
             _toRecover = new List<RecoveryItem>();
             _timer = new Timer(60*1000);
             _timer.Elapsed += (s, e) => TryRecover();
+            _timer.AutoReset = false;
             _lock = new object();
         }
 
@@ -47,8 +48,7 @@ namespace CassandraSharp.Recovery
             {
                 RecoveryItem recoveryItem = new RecoveryItem(endpoint, connectionFactory, clientRecoveredCallback);
                 _toRecover.Add(recoveryItem);
-
-                _timer.Enabled = true;
+                _timer.Start();
             }
         }
 

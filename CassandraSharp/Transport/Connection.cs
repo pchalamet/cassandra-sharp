@@ -102,6 +102,7 @@ namespace CassandraSharp.Transport
         public void Dispose()
         {
             _logger.Debug("Connection to {0} is being disposed", Endpoint);
+            OnFailure = null;
             _tcpClient.SafeDispose();
             _cancellation.SafeDispose();
         }
@@ -206,9 +207,6 @@ namespace CassandraSharp.Transport
 
                 _cancellation.Cancel();
 
-                // currently running request/response will be abruptly terminated
-                Dispose();
-
                 // wake up eventually client waiting for a stream id
                 Monitor.Pulse(_globalLock);
 
@@ -217,6 +215,9 @@ namespace CassandraSharp.Transport
                     FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
                     OnFailure(this, failureEventArgs);
                 }
+
+                // currently running request/response will be abruptly terminated
+                Dispose();
             }
         }
 

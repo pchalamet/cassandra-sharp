@@ -29,9 +29,9 @@ namespace CassandraSharp.CQLPoco
             return CQLCommandHelpers.Query<T>(cluster, cql, cl, factory);
         }
 
-        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, ConsistencyLevel cl, params object[] prms)
+        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, ConsistencyLevel cl, object dataSource)
         {
-            IDataMapperFactory factory = new DataMapperFactory(typeof(T), prms);
+            IDataMapperFactory factory = new DataMapperFactory(typeof(T), dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
         }
     }

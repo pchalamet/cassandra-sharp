@@ -27,7 +27,7 @@ namespace CassandraSharp.CQLPoco
         {
         }
 
-        public DataMapperFactory(Type type, object[] dataSource)
+        public DataMapperFactory(Type type, object dataSource)
         {
             _type = type;
             DataSource = new DataSource(dataSource);

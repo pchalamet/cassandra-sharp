@@ -1,6 +1,7 @@
 <% @TinyPG Namespace="cqlplus.Parser" Language="c#"  %>
 
 [Skip] WHITESPACE 			-> @"\s+";
+[Skip] COMMENT2			-> @"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/";
 EOF               			-> @"^$";
 STRING             			-> @"@?\""(\""\""|[^\""])*\""";
 WORD                   		->  @"\b";
