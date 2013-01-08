@@ -16,6 +16,7 @@
 namespace Samples.PreparedStatement
 {
     using System;
+    using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
@@ -23,6 +24,8 @@ namespace Samples.PreparedStatement
 
     public class Batch
     {
+        private static long _running;
+
         public static void Run()
         {
             XmlConfigurator.Configure();
@@ -51,13 +54,20 @@ namespace Samples.PreparedStatement
 
                 const string insertBatch = "insert into Foo.Bar (a, b) values (?, ?)";
                 var prepared = cluster.Prepare(insertBatch).Result;
+
                 for (int aIdx = 0; aIdx < 100; ++aIdx)
                 {
-                    for (int bIdx = 0; bIdx < 100; ++bIdx)
+                    for (int bIdx = 0; bIdx < 1000; ++bIdx)
                     {
-                        resCount = prepared.ExecuteNonQuery(ConsistencyLevel.ONE, new {a = aIdx, b = bIdx});
-                        resCount.Wait();
+                        Interlocked.Increment(ref _running);
+                        prepared.ExecuteNonQuery(ConsistencyLevel.ONE, new {a = aIdx, b = bIdx})
+                                           .ContinueWith(_ => Interlocked.Decrement(ref _running));
                     }
+                }
+
+                while (0 < Thread.VolatileRead(ref _running))
+                {
+                    Thread.Sleep(1*1000);
                 }
 
                 const string select50 = "select * from Foo.Bar where a=50";
