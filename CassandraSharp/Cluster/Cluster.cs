@@ -122,8 +122,6 @@ namespace CassandraSharp.Cluster
                     _logger.Error("connection {0} failed with error {1}", endpoint, e.Exception);
 
                     _ip2Connection.Remove(endpoint);
-                    _endpointStrategy.Ban(endpoint);
-
                     MarkEndpointForRecovery(endpoint);
                 }
             }
@@ -131,8 +129,9 @@ namespace CassandraSharp.Cluster
 
         private void MarkEndpointForRecovery(IPAddress endpoint)
         {
-
             _logger.Info("marking {0} for recovery", endpoint);
+
+            _endpointStrategy.Ban(endpoint);
             _recoveryService.Recover(endpoint, _connectionFactory, ClientRecoveredCallback);
         }
 
