@@ -17,10 +17,10 @@ namespace cqlplus
 {
     internal class CliArgs
     {
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Display banner", ShortName = "b")]
-        public bool Banner = true;
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Display help on startup", ShortName = "nohelp")]
+        public bool NoHelp = false;
 
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "cn")]
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "chkcn")]
         public bool CheckConnection = true;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]

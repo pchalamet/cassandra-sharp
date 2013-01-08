@@ -93,7 +93,7 @@ namespace cqlplus
                     }
                 }
 
-                if (_cliArgs.Banner)
+                if (! _cliArgs.NoHelp)
                 {
                     new Exec {Statement = "!help"}.Execute();
                 }
