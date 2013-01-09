@@ -168,6 +168,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                             byte[] elemRawData = ms.ReadShortBytes();
                             object elem = Deserialize(columnSpec.CollectionValueType, elemRawData);
                             list.Add(elem);
+                            --nbElem;
                         }
                         data = list.Collection;
                     }
@@ -188,6 +189,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                             object key = Deserialize(columnSpec.CollectionValueType, elemRawKey);
                             object value = Deserialize(columnSpec.CollectionValueType, elemRawValue);
                             dic.Add(key, value);
+                            --nbElem;
                         }
                         data = dic.Collection;
                     }
@@ -200,11 +202,12 @@ namespace CassandraSharp.CQLBinaryProtocol
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
                         short nbElem = ms.ReadShort();
-                        while (0 < nbElem--)
+                        while (0 < nbElem)
                         {
                             byte[] elemRawData = ms.ReadShortBytes();
                             object elem = Deserialize(columnSpec.CollectionValueType, elemRawData);
                             set.Add(elem);
+                            --nbElem;
                         }
                         data = set.Collection;
                     }

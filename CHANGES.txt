@@ -1,3 +1,6 @@
+version 2.1.1
+- fixed issue 5 (https://github.com/pchalamet/cassandra-sharp/issues/5)
+
 version 2.1.0.0
 - node discovery implementation
 - fixed guid serialization
