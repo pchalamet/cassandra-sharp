@@ -43,8 +43,7 @@ namespace Samples.PreparedStatement
                 const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
                 var preparedInsert = cluster.Prepare(insertBatch).Result;
 
-                const int Times = 10000;
-                const int BlobSize = 25000;
+                const int Times = 1000;
 
                 var random = new Random();
 
@@ -54,7 +53,7 @@ namespace Samples.PreparedStatement
 
                     Console.WriteLine("Current {0} Running {1}", i, running);
 
-                    var data = (from idx in Enumerable.Range(0, BlobSize) select (byte)random.Next(byte.MaxValue)).ToArray();
+                    var data = new byte[100000];
                     // var data = (float)random.NextDouble();
                     preparedInsert.ExecuteNonQuery(ConsistencyLevel.ONE, new { id = i, Baz = data })
                         .ContinueWith(_ => Interlocked.Decrement(ref _running));
@@ -65,6 +64,14 @@ namespace Samples.PreparedStatement
                     Console.WriteLine("Running {0}", _running);
                     Thread.Sleep(1000);
                 }
+
+                var result = cluster.Execute<Foo>("select * from Foo.Bar where id = 50", ConsistencyLevel.QUORUM).Result;
+                foreach (var res in result)
+                {
+                    Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);
+                }
+
+                cluster.ExecuteNonQuery("drop keyspace Foo", ConsistencyLevel.QUORUM).Wait();
             }
             ClusterManager.Shutdown();
         }
