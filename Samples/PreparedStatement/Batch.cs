@@ -16,6 +16,7 @@
 namespace Samples.PreparedStatement
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQL;
@@ -29,66 +30,50 @@ namespace Samples.PreparedStatement
         public static void Run()
         {
             XmlConfigurator.Configure();
-            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
+            using (var cluster = ClusterManager.GetCluster("TestCassandra"))
             {
-                const string createFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createFoo);
-                Console.WriteLine("============================================================");
+                const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                cluster.ExecuteNonQuery(createKeyspaceFoo, ConsistencyLevel.QUORUM)
+                    .Wait();
 
-                var resCount = cluster.ExecuteNonQuery(createFoo, ConsistencyLevel.QUORUM);
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+                const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
+                cluster.ExecuteNonQuery(createBar, ConsistencyLevel.QUORUM)
+                    .Wait();
 
-                const string createBar = "CREATE TABLE Foo.Bar (a int, " +
-                                         "b int, " +
-                                         "PRIMARY KEY (a, b))";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createBar);
-                Console.WriteLine("============================================================");
-                resCount = cluster.ExecuteNonQuery(createBar, ConsistencyLevel.QUORUM);
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+                const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
+                var preparedInsert = cluster.Prepare(insertBatch).Result;
 
-                const string insertBatch = "insert into Foo.Bar (a, b) values (?, ?)";
-                var prepared = cluster.Prepare(insertBatch).Result;
+                const int Times = 10000;
+                const int BlobSize = 25000;
 
-                for (int aIdx = 0; aIdx < 100; ++aIdx)
+                var random = new Random();
+
+                for (int i = 0; i < Times; i++)
                 {
-                    for (int bIdx = 0; bIdx < 1000; ++bIdx)
-                    {
-                        Interlocked.Increment(ref _running);
-                        prepared.ExecuteNonQuery(ConsistencyLevel.ONE, new {a = aIdx, b = bIdx})
-                                           .ContinueWith(_ => Interlocked.Decrement(ref _running));
-                    }
+                    long running = Interlocked.Increment(ref _running);
+
+                    Console.WriteLine("Current {0} Running {1}", i, running);
+
+                    var data = (from idx in Enumerable.Range(0, BlobSize) select (byte)random.Next(byte.MaxValue)).ToArray();
+                    // var data = (float)random.NextDouble();
+                    preparedInsert.ExecuteNonQuery(ConsistencyLevel.ONE, new { id = i, Baz = data })
+                        .ContinueWith(_ => Interlocked.Decrement(ref _running));
                 }
 
-                while (0 < Thread.VolatileRead(ref _running))
+                while (Thread.VolatileRead(ref _running) > 0)
                 {
-                    Thread.Sleep(1*1000);
+                    Console.WriteLine("Running {0}", _running);
+                    Thread.Sleep(1000);
                 }
-
-                const string select50 = "select * from Foo.Bar where a=50";
-                foreach (Foo foo in cluster.Execute<Foo>(select50, ConsistencyLevel.ONE).Result)
-                {
-                    Console.WriteLine("a={0} b={1}", foo.a, foo.b);
-                }
-
-                const string dropFoo = "drop keyspace Foo";
-                resCount = cluster.ExecuteNonQuery(dropFoo, ConsistencyLevel.ONE);
-                resCount.Wait();
             }
-
             ClusterManager.Shutdown();
         }
 
         public class Foo
         {
-            public int a;
+            public int Id;
 
-            public int b;
+            public byte[] Baz;
         }
     }
 }
