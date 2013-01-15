@@ -19,6 +19,7 @@ namespace cqlplus.Commands
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using CassandraSharp;
 
     [Description("display help")]
     internal class Help : CommandBase
@@ -30,6 +31,10 @@ namespace cqlplus.Commands
             {
                 cmdMaxLen = Math.Max(cmdMaxLen, cmdType.Key.Length);
             }
+
+            string version = typeof(ClusterManager).Assembly.GetName().Version.ToString();
+            Console.WriteLine("Using cassandra-sharp v{0}", version);
+            Console.WriteLine();
 
             Console.WriteLine("Commands:");
             string format = string.Format("  !{{0,-{0}}} - ", cmdMaxLen);
