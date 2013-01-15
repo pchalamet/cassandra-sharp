@@ -1,6 +1,7 @@
 version 2.1.2
 - fixed issue 9 (https://github.com/pchalamet/cassandra-sharp/issues/9)
 - read again asap if buffering mode 
+- fixd invalid utf8 string len when using char >= 0x80
 
 version 2.1.1
 - fixed issue 5 (https://github.com/pchalamet/cassandra-sharp/issues/5

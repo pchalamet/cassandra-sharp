@@ -38,9 +38,10 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         public static void WriteString(this Stream stream, string data)
         {
-            stream.WriteShort((short) data.Length);
             byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            stream.Write(bufStr, 0, bufStr.Length);
+            short len = (short)bufStr.Length;
+            stream.WriteShort(len);
+            stream.Write(bufStr, 0, len);
         }
 
         public static void WriteStringList(this Stream stream, string[] data)
@@ -54,9 +55,10 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         public static void WriteLongString(this Stream stream, string data)
         {
-            stream.WriteInt(data.Length);
             byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            stream.Write(bufStr, 0, bufStr.Length);
+            int len = bufStr.Length;
+            stream.WriteInt(len);
+            stream.Write(bufStr, 0, len);
         }
 
         public static void WriteStringMap(this Stream stream, Dictionary<string, string> dic)
