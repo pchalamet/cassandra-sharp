@@ -106,8 +106,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 case ResultOpcode.Prepared:
                     byte[] queryId = frameReader.ReadShortBytes();
                     IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
-                    IPreparedQuery preparedQuery = new PreparedQuery(connection, queryId, columnSpecs);
-                    yield return preparedQuery;
+                    yield return Tuple.Create(queryId, columnSpecs);
                     break;
 
                 default:

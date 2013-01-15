@@ -52,7 +52,7 @@ namespace Samples.Future
                 var allResults = new List<Task<IList<SchemaKeyspaces>>>();
                 for (int i = 0; i < 100; ++i)
                 {
-                    var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces, ConsistencyLevel.QUORUM).AsFuture();
+                    var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
                     allResults.Add(futRes);
                 }
 

@@ -24,19 +24,19 @@ namespace CassandraSharp.CQLPoco
 
     public static class CQLPocoExtensions
     {
-        public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl)
+        public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
             IDataMapperFactory factory = new DataMapperFactory(typeof(T));
             return CQLCommandHelpers.Query<T>(cluster, cql, cl, factory);
         }
 
-        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, ConsistencyLevel cl, object dataSource)
+        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
             IDataMapperFactory factory = new DataMapperFactory(typeof(T), dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
         }
 
-        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, ConsistencyLevel cl, object dataSource)
+        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
             IDataMapperFactory factory = new DataMapperFactory(typeof(Unit), dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());

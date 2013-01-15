@@ -33,29 +33,29 @@ namespace Samples.PreparedStatement
             using (var cluster = ClusterManager.GetCluster("TestCassandra"))
             {
                 const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                cluster.ExecuteNonQuery(createKeyspaceFoo, ConsistencyLevel.QUORUM)
+                cluster.ExecuteNonQuery(createKeyspaceFoo)
                     .Wait();
 
                 const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
-                cluster.ExecuteNonQuery(createBar, ConsistencyLevel.QUORUM)
+                cluster.ExecuteNonQuery(createBar)
                     .Wait();
 
                 const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
-                var preparedInsert = cluster.Prepare(insertBatch).Result;
+                var preparedInsert = cluster.Prepare(insertBatch);
 
-                const int Times = 1000;
+                const int times = 10000;
 
                 var random = new Random();
 
-                for (int i = 0; i < Times; i++)
+                for (int i = 0; i < times; i++)
                 {
                     long running = Interlocked.Increment(ref _running);
 
                     Console.WriteLine("Current {0} Running {1}", i, running);
 
-                    var data = new byte[100000];
+                    var data = new byte[30000];
                     // var data = (float)random.NextDouble();
-                    preparedInsert.ExecuteNonQuery(ConsistencyLevel.ONE, new { id = i, Baz = data })
+                    preparedInsert.ExecuteNonQuery(new { id = i, Baz = data })
                         .ContinueWith(_ => Interlocked.Decrement(ref _running));
                 }
 
@@ -65,13 +65,13 @@ namespace Samples.PreparedStatement
                     Thread.Sleep(1000);
                 }
 
-                var result = cluster.Execute<Foo>("select * from Foo.Bar where id = 50", ConsistencyLevel.QUORUM).Result;
+                var result = cluster.Execute<Foo>("select * from Foo.Bar where id = 50").Result;
                 foreach (var res in result)
                 {
                     Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);
                 }
 
-                cluster.ExecuteNonQuery("drop keyspace Foo", ConsistencyLevel.QUORUM).Wait();
+                cluster.ExecuteNonQuery("drop keyspace Foo").Wait();
             }
             ClusterManager.Shutdown();
         }

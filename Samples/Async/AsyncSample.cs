@@ -51,7 +51,7 @@ namespace Samples.Async
                 var allTasks = new List<Task>();
                 for (int i = 0; i < 100; ++i)
                 {
-                    var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces, ConsistencyLevel.QUORUM).ContinueWith(t => DisplayKeyspace(t.Result));
+                    var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces).ContinueWith(t => DisplayKeyspace(t.Result));
                     allTasks.Add(futRes);
                 }
 

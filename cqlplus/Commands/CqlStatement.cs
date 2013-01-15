@@ -32,7 +32,7 @@ namespace cqlplus.Commands
 
         public override void Execute()
         {
-            Task<IEnumerable<IDictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, ConsistencyLevel.QUORUM);
+            Task<IEnumerable<IDictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement);
             
             // ensure values are sorted accordingly to column name
             var sortedRes = from row in res.Result

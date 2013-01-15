@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,30 +17,74 @@ namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
 
     internal class PreparedQuery : IPreparedQuery
     {
-        private readonly IColumnSpec[] _columnSpecs;
+        private readonly ICluster _cluster;
 
-        private readonly IConnection _connection;
+        private readonly string _cql;
 
-        private readonly byte[] _id;
+        private readonly object _lock = new object();
 
-        public PreparedQuery(IConnection connection, byte[] id, IColumnSpec[] columnSpecs)
+        private byte[] _id;
+
+        private IColumnSpec[] _columnSpecs;
+
+        private IConnection _connection;
+
+        public PreparedQuery(ICluster cluster, string cql)
         {
-            _connection = connection;
-            _id = id;
-            _columnSpecs = columnSpecs;
+            _cluster = cluster;
+            _cql = cql;
         }
 
         public Task<IEnumerable<object>> Execute(ConsistencyLevel cl, IDataMapperFactory factory)
         {
-            Action<IFrameWriter> writer = fw => WriteExecuteRequest(fw, cl, factory);
-            Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
+            IConnection connection;
+            if (null == (connection = _connection))
+            {
+                lock (_lock)
+                {
+                    if (null == (connection = _connection))
+                    {
+                        connection = _cluster.GetConnection(null);
+                        connection.OnFailure += ConnectionOnOnFailure;
 
-            return _connection.Execute(writer, reader);
+                        Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, _cql);
+                        Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
+
+                        connection.Execute(writer, reader).ContinueWith(ReadPreparedQueryInfo).Wait();
+
+                        Thread.MemoryBarrier();
+
+                        _connection = connection;
+                    }
+                }
+            }
+
+            Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
+            Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
+
+            return connection.Execute(execWriter, execReader);
+        }
+
+        private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
+        {
+            lock (_lock)
+            {
+                _connection = null; 
+            }
+        }
+
+        private void ReadPreparedQueryInfo(Task<IEnumerable<object>> results)
+        {
+            Tuple<byte[], IColumnSpec[]> preparedInfo = (Tuple<byte[], IColumnSpec[]>) results.Result.Single();
+            _id = preparedInfo.Item1;
+            _columnSpecs = preparedInfo.Item2;
         }
 
         private void WriteExecuteRequest(IFrameWriter frameWriter, ConsistencyLevel cl, IDataMapperFactory factory)

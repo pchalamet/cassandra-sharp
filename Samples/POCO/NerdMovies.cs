@@ -45,7 +45,7 @@ namespace Samples.POCO
                 Console.WriteLine(createKeyspace);
                 Console.WriteLine("============================================================");
 
-                var resCount = cluster.ExecuteNonQuery(createKeyspace, ConsistencyLevel.QUORUM);
+                var resCount = cluster.ExecuteNonQuery(createKeyspace);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -58,7 +58,7 @@ namespace Samples.POCO
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createNerdMovies);
                 Console.WriteLine("============================================================");
-                resCount = cluster.ExecuteNonQuery(createNerdMovies, ConsistencyLevel.QUORUM);
+                resCount = cluster.ExecuteNonQuery(createNerdMovies);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -66,7 +66,7 @@ namespace Samples.POCO
                 const string insertNerdMovie = "INSERT INTO videos.NerdMovies (movie, director, main_actor, year)" +
                                                "VALUES ('Serenity', 'Joss Whedon', 'Nathan Fillion', 2005) " +
                                                "USING TTL 86400";
-                resCount = cluster.ExecuteNonQuery(insertNerdMovie, ConsistencyLevel.QUORUM);
+                resCount = cluster.ExecuteNonQuery(insertNerdMovie);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -75,7 +75,7 @@ namespace Samples.POCO
                 Console.WriteLine("============================================================");
                 Console.WriteLine(selectNerdMovies);
                 Console.WriteLine("============================================================");
-                var taskSelectStartMovies = cluster.Execute<NerdMovie>(selectNerdMovies, ConsistencyLevel.QUORUM).ContinueWith(res => DisplayMovies(res.Result));
+                var taskSelectStartMovies = cluster.Execute<NerdMovie>(selectNerdMovies).ContinueWith(res => DisplayMovies(res.Result));
                 taskSelectStartMovies.Wait();
 
                 const string selectAllFrom = "select * from videos.NerdMovies where director=? ALLOW FILTERING";
@@ -85,14 +85,14 @@ namespace Samples.POCO
                 var preparedAllFrom = cluster.Prepare(selectAllFrom);
                 var ds = new { Director = "Joss Whedon" };
                 var taskSelectWhere =
-                        preparedAllFrom.Result.Execute<NerdMovie>(ConsistencyLevel.QUORUM, ds).ContinueWith(res => DisplayMovies(res.Result));
+                        preparedAllFrom.Execute<NerdMovie>(ds).ContinueWith(res => DisplayMovies(res.Result));
                 taskSelectWhere.Wait();
 
                 const string dropExcelsor = "drop keyspace videos";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(dropExcelsor);
                 Console.WriteLine("============================================================");
-                var taskDrop = cluster.ExecuteNonQuery(dropExcelsor, ConsistencyLevel.QUORUM);
+                var taskDrop = cluster.ExecuteNonQuery(dropExcelsor);
                 taskDrop.Wait();
                 Console.WriteLine();
                 Console.WriteLine();

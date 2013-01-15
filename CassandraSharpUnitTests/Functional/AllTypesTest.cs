@@ -84,7 +84,7 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine(createFoo);
                 Console.WriteLine("============================================================");
 
-                var resCount = cluster.ExecuteNonQuery(createFoo, ConsistencyLevel.QUORUM);
+                var resCount = cluster.ExecuteNonQuery(createFoo);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -109,7 +109,7 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
-                resCount = cluster.ExecuteNonQuery(createBar, ConsistencyLevel.QUORUM);
+                resCount = cluster.ExecuteNonQuery(createBar);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -117,7 +117,7 @@ namespace CassandraSharpUnitTests.Functional
                 const string insertBatch = @"insert into Tests.AllTypes (cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat,
                                                                          cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar)
                                              values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                var prepared = cluster.Prepare(insertBatch).Result;
+                var prepared = cluster.Prepare(insertBatch);
 
                 var allTypesInsert = new AllTypes
                     {
@@ -136,13 +136,13 @@ namespace CassandraSharpUnitTests.Functional
                             CVarchar = "varchar"
                     };
 
-                prepared.ExecuteNonQuery(ConsistencyLevel.QUORUM, allTypesInsert).Wait();
+                prepared.ExecuteNonQuery(allTypesInsert).Wait();
 
                 const string selectAll = "select * from Tests.AllTypes";
-                AllTypes allTypesSelect = cluster.Execute<AllTypes>(selectAll, ConsistencyLevel.QUORUM).Result.Single();
+                AllTypes allTypesSelect = cluster.Execute<AllTypes>(selectAll).Result.Single();
 
                 const string dropFoo = "drop keyspace Tests";
-                resCount = cluster.ExecuteNonQuery(dropFoo, ConsistencyLevel.ONE);
+                resCount = cluster.ExecuteNonQuery(dropFoo);
                 resCount.Wait();
 
                 Assert.AreEqual(allTypesInsert.CAscii, allTypesSelect.CAscii);

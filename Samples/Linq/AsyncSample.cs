@@ -44,7 +44,7 @@ namespace Samples.Linq
             {
                 const string cqlKeyspaces = "SELECT * from system.schema_columns";
 
-                var req = from t in cluster.Execute<SchemaColumns>(cqlKeyspaces, ConsistencyLevel.QUORUM).Result
+                var req = from t in cluster.Execute<SchemaColumns>(cqlKeyspaces).Result
                           where t.KeyspaceName == "system"
                           select t;
                 DisplayResult(req);

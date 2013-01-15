@@ -15,12 +15,10 @@
 
 namespace CassandraSharp.CQL
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
 
     public static class CQLExtensions
     {
@@ -29,18 +27,14 @@ namespace CassandraSharp.CQL
             return @this.ContinueWith(a => (IList<T>) a.Result.ToList());
         }
 
-        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl)
+        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
             return CQLCommandHelpers.Query<Unit>(cluster, cql, cl, null).ContinueWith(res => res.Result.Count());
         }
 
-        public static Task<IPreparedQuery> Prepare(this ICluster cluster, string cql)
+        public static IPreparedQuery Prepare(this ICluster cluster, string cql)
         {
-            IConnection connection = cluster.GetConnection(null);
-            Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, cql);
-            Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
-
-            return connection.Execute(writer, reader).ContinueWith(res => (IPreparedQuery) res.Result.Single());
+            return new PreparedQuery(cluster, cql);
         }
     }
 }

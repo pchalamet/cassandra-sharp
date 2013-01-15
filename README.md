@@ -93,10 +93,10 @@ Sample client
 				const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
 				// async operation
-				var taskKeyspaces = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces, ConsistencyLevel.QUORUM);
+				var taskKeyspaces = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces);
 
 				// future operation meanwhile
-				var futKeyspaces = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces, ConsistencyLevel.QUORUM)
+				var futKeyspaces = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces)
 										  .AsFuture();
 
 				// display the result of the async operation
