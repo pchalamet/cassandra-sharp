@@ -51,6 +51,8 @@ namespace CassandraSharp.Transport
 
         private readonly TcpClient _tcpClient;
 
+        private readonly bool _streaming;
+
         public Connection(IPAddress address, TransportConfig config, ILogger logger)
         {
             Endpoint = address;
@@ -58,6 +60,7 @@ namespace CassandraSharp.Transport
             _logger = logger;
             _tcpClient = new TcpClient();
             _tcpClient.Connect(address, _config.Port);
+            _streaming = config.Streaming;
 
             Stream stream = _tcpClient.GetStream();
 #if DEBUG_STREAM
@@ -141,8 +144,15 @@ namespace CassandraSharp.Transport
                 }
 
                 // yield all rows - no lock required on input stream since we are the only one allowed to read
-                using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _config.Streaming))
+                using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming))
                 {
+                    // if no streaming we have read everything in memory
+                    // we can run a new reader immediately
+                    if (!_streaming)
+                    {
+                        Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                    }
+
                     foreach (object row in EnumerableOrEmptyEnumerable(reader(frameReader)))
                     {
                         yield return row;
@@ -153,7 +163,11 @@ namespace CassandraSharp.Transport
             }
             finally
             {
-                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                // run a new reader after streaming data
+                if (_streaming)
+                {
+                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                }
             }
         }
 

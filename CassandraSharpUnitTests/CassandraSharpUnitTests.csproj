@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EndpointStrategy\TimedUuid.cs" />
+    <Compile Include="Functional\AllTypesTest.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
     <Compile Include="ClusterTest.cs" />
     <Compile Include="SectionHandlerTest.cs" />
