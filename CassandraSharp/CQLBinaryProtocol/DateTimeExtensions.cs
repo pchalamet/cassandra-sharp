@@ -24,13 +24,13 @@ namespace CassandraSharp.CQLBinaryProtocol
         public static long ToTimestamp(this DateTime dt)
         {
             TimeSpan t = (dt - _epoch);
-            long timestamp = (long) t.TotalSeconds;
+            long timestamp = (long) t.TotalMilliseconds;
             return timestamp;
         }
 
         public static DateTime FromTimestamp(this long ts)
         {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(ts);
+            TimeSpan timeSpan = TimeSpan.FromMilliseconds(ts);
             DateTime date = _epoch + timeSpan;
             return date;
         }
