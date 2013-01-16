@@ -13,22 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
+namespace CassandraSharpUnitTests.CQLBinaryProtocol
 {
     using System;
+    using CassandraSharp.CQLBinaryProtocol;
+    using NUnit.Framework;
 
-    internal static class DateTimeExtensions
+    [TestFixture]
+    public class DateTimeExtensionsTest
     {
-        public static readonly DateTime _epoch = new DateTime(1970, 1, 1);
-
-        public static long ToTimestamp(this DateTime dt)
+        [Test]
+        public void TestConversion()
         {
-            return (long)dt.Subtract(_epoch).TotalMilliseconds;
-        }
+            DateTime dt = new DateTime(2013, 1, 16, 14, 20, 0);
+            long ts = dt.ToTimestamp();
 
-        public static DateTime ToDateTime(this long ts)
-        {
-            return _epoch.AddMilliseconds(ts);
+            Assert.AreEqual(ts, 1358346000000);
+
+            DateTime cdt = ts.ToDateTime();
+            Assert.AreEqual(cdt, dt);
         }
     }
 }
