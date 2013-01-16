@@ -5,6 +5,7 @@ version 2.1.2
 - prepared statements can recover from connection failure
 - fixed issue 8 (https://github.com/pchalamet/cassandra-sharp/issues/8)
 - fixed issue 10 (https://github.com/pchalamet/cassandra-sharp/issues/10)
+- fixed issue 11 (https://github.com/pchalamet/cassandra-sharp/issues/11)
 
 version 2.1.1
 - fixed issue 5 (https://github.com/pchalamet/cassandra-sharp/issues/5
