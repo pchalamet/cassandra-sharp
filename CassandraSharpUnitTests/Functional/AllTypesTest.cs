@@ -52,7 +52,7 @@ namespace CassandraSharpUnitTests.Functional
 
             public string CText;
 
-            public long CTimestamp;
+            public DateTime CTimestamp;
 
             public Guid CTimeuuid;
 
@@ -130,7 +130,7 @@ namespace CassandraSharpUnitTests.Functional
                             CInet = new IPAddress(new byte[] {0x01, 0x02, 0x03, 0x04}),
                             CInt = 42,
                             CText = "text",
-                            CTimestamp = 0x08070605040301,
+                            CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
                             CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
                             CUuid = Guid.NewGuid(),
                             CVarchar = "varchar"

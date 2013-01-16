@@ -113,6 +113,10 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 case ColumnType.Timestamp:
+                    rawData = BitConverter.GetBytes(((DateTime) data).ToTimestamp());
+                    rawData.ReverseIfLittleEndian();
+                    break;
+
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
                     rawData = BitConverter.GetBytes((long) data);
@@ -244,6 +248,10 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 case ColumnType.Timestamp:
+                    rawData.ReverseIfLittleEndian();
+                    data = BitConverter.ToInt64(rawData, 0).FromTimestamp();
+                    break;
+
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
                     rawData.ReverseIfLittleEndian();

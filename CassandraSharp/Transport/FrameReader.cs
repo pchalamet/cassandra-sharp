@@ -30,27 +30,35 @@ namespace CassandraSharp.Transport
 
         private FrameReader(Stream stream, bool streaming)
         {
-            MessageOpcode = (MessageOpcodes) stream.ReadByte();
-            int bodyLen = stream.ReadInt();
-            if (streaming)
+            try
             {
-                _ms = new WindowedReadStream(stream, bodyLen);
-            }
-            else
-            {
-                byte[] buffer = new byte[bodyLen];
-                if (0 < bodyLen)
+                MessageOpcode = (MessageOpcodes)stream.ReadByte();
+                int bodyLen = stream.ReadInt();
+                if (streaming)
                 {
-                    stream.Read(buffer, 0, bodyLen);
-                    _ms = new MemoryStream(buffer);
+                    _ms = new WindowedReadStream(stream, bodyLen);
+                }
+                else
+                {
+                    byte[] buffer = new byte[bodyLen];
+                    if (0 < bodyLen)
+                    {
+                        stream.Read(buffer, 0, bodyLen);
+                        _ms = new MemoryStream(buffer);
+                    }
+                }
+
+                if (MessageOpcodes.Error == MessageOpcode)
+                {
+                    ThrowError();
                 }
             }
-
-            if (MessageOpcodes.Error == MessageOpcode)
+            catch
             {
-                using (this)
-                    ThrowError();
+                Dispose();
+                throw;
             }
+            
         }
 
         public void Dispose()
