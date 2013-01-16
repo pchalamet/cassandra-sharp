@@ -16,7 +16,6 @@
 namespace Samples.PreparedStatement
 {
     using System;
-    using System.Linq;
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQL;
@@ -33,12 +32,10 @@ namespace Samples.PreparedStatement
             using (var cluster = ClusterManager.GetCluster("TestCassandra"))
             {
                 const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                cluster.ExecuteNonQuery(createKeyspaceFoo)
-                    .Wait();
+                cluster.ExecuteNonQuery(createKeyspaceFoo).Wait();
 
                 const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
-                cluster.ExecuteNonQuery(createBar)
-                    .Wait();
+                cluster.ExecuteNonQuery(createBar).Wait();
 
                 const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
                 var preparedInsert = cluster.Prepare(insertBatch);
@@ -55,8 +52,8 @@ namespace Samples.PreparedStatement
 
                     var data = new byte[30000];
                     // var data = (float)random.NextDouble();
-                    preparedInsert.ExecuteNonQuery(new { id = i, Baz = data })
-                        .ContinueWith(_ => Interlocked.Decrement(ref _running));
+                    preparedInsert.ExecuteNonQuery(new {id = i, Baz = data}, ConsistencyLevel.ONE)
+                                  .ContinueWith(_ => Interlocked.Decrement(ref _running));
                 }
 
                 while (Thread.VolatileRead(ref _running) > 0)
@@ -78,9 +75,9 @@ namespace Samples.PreparedStatement
 
         public class Foo
         {
-            public int Id;
-
             public byte[] Baz;
+
+            public int Id;
         }
     }
 }

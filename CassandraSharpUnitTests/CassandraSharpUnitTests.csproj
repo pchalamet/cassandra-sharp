@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CQLBinaryProtocol\DateTimeExtensionsTest.cs" />
     <Compile Include="EndpointStrategy\TimedUuid.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />

@@ -249,7 +249,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.Timestamp:
                     rawData.ReverseIfLittleEndian();
-                    data = BitConverter.ToInt64(rawData, 0).FromTimestamp();
+                    data = BitConverter.ToInt64(rawData, 0).ToDateTime();
                     break;
 
                 case ColumnType.Bigint:
