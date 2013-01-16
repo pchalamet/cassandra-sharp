@@ -20,13 +20,13 @@ namespace CassandraSharp.Transport
 
     internal class WindowedReadStream : Stream
     {
-        private readonly Stream _baseStream;
+        private readonly Stream _stream;
 
         private int _len;
 
         public WindowedReadStream(Stream baseStream, int len)
         {
-            _baseStream = baseStream;
+            _stream = baseStream;
             _len = len;
         }
 
@@ -38,7 +38,7 @@ namespace CassandraSharp.Transport
                 while (0 < _len)
                 {
                     --_len;
-                    _baseStream.ReadByte();
+                    _stream.ReadByte();
                 }
             }
         }
@@ -92,10 +92,10 @@ namespace CassandraSharp.Transport
                 throw new IOException("Reading past out of window");
             }
 
-            int read = _baseStream.Read(buffer, offset, count);
-            if(count != read)
+            int read = _stream.Read(buffer, offset, count);
+            while (read != count)
             {
-                throw new IOException("Unexpected read count");
+                read += _stream.Read(buffer, offset+read, count-read);
             }
 
             return read;
