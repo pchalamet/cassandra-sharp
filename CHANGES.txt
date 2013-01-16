@@ -4,6 +4,7 @@ version 2.1.2
 - fixd invalid utf8 string len when using char >= 0x80
 - prepared statements can recover from connection failure
 - fixed issue 8 (https://github.com/pchalamet/cassandra-sharp/issues/8)
+- fixed issue 10 (https://github.com/pchalamet/cassandra-sharp/issues/10)
 
 version 2.1.1
 - fixed issue 5 (https://github.com/pchalamet/cassandra-sharp/issues/5
