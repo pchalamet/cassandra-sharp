@@ -31,11 +31,25 @@ namespace Samples.PreparedStatement
             XmlConfigurator.Configure();
             using (var cluster = ClusterManager.GetCluster("TestCassandra"))
             {
-                const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                cluster.ExecuteNonQuery(createKeyspaceFoo).Wait();
+                try
+                {
+                    const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                    cluster.ExecuteNonQuery(createKeyspaceFoo).Wait();
+                }
+                catch
+                {
+                    Console.WriteLine("Keyspace Foo already exists");
+                }
 
-                const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
-                cluster.ExecuteNonQuery(createBar).Wait();
+                try
+                {
+                    const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
+                    cluster.ExecuteNonQuery(createBar).Wait();
+                }
+                catch
+                {
+                    Console.WriteLine("CF Foo.Bar already exists");
+                }
 
                 const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
                 var preparedInsert = cluster.Prepare(insertBatch);

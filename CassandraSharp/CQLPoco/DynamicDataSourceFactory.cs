@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp.CQLPoco
 {
-    public interface IInstanceBuilder
-    {
-        // data type can be:
-        //   * string
-        //   * byte[]
-        //   * double
-        //   * float
-        //   * long
-        //   * int
-        //   * DateTime
-        //   * Guid
-        //   * IPAddress
-        //   * IList<V> with V same as data type
-        //   * ISet<V> with V same as data type
-        //   * IDictionary<K, V> with K, V same as data type
-        void Set(IColumnSpec columnSpec, object data);
+    using System;
+    using CassandraSharp.Extensibility;
 
-        object Build();
+    internal class DynamicDataSourceFactory
+    {
+        public static IDataSource Create(object dataSource)
+        {
+            Type genDataSource = typeof(DynamicDataSource<>);
+            Type[] genParams = new[] {dataSource.GetType()};
+            Type typedDataSource = genDataSource.MakeGenericType(genParams);
+            IDataSource dynDataSource = (IDataSource) Activator.CreateInstance(typedDataSource, dataSource);
+            return dynDataSource;
+        }
     }
 }

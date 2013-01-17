@@ -1,5 +1,5 @@
 // cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,24 +30,45 @@ namespace CassandraSharp.CQLPoco
 
         public object Get(IColumnSpec columnSpec)
         {
+            object res;
+            string name = columnSpec.Name;
+            if (! TryGet(name, out res))
+            {
+                if (name.Contains("_"))
+                {
+                    name = name.Replace("_", "");
+                    if (! TryGet(name, out res))
+                    {
+                        string msg = string.Format("Can't find field or property {0}", columnSpec.Name);
+                        throw new ArgumentException(msg);
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        private bool TryGet(string name, out object res)
+        {
             const BindingFlags commonFlags = BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance;
 
             Type type = _dataSource.GetType();
-            string name = columnSpec.Name;
             FieldInfo fieldInfo = type.GetField(name, commonFlags | BindingFlags.GetField);
             if (null != fieldInfo)
             {
-                return fieldInfo.GetValue(_dataSource);
+                res = fieldInfo.GetValue(_dataSource);
+                return true;
             }
 
             PropertyInfo propertyInfo = type.GetProperty(name, commonFlags | BindingFlags.SetProperty);
             if (null != propertyInfo)
             {
-                return propertyInfo.GetValue(_dataSource, null);
+                res = propertyInfo.GetValue(_dataSource, null);
+                return true;
             }
 
-            string msg = string.Format("Can't find field or property {0}", columnSpec.Name);
-            throw new ArgumentException(msg);
+            res = null;
+            return false;
         }
     }
 }

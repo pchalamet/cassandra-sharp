@@ -48,6 +48,23 @@
     </Compile>
     <Compile Include="Cluster\Factory.cs" />
     <Compile Include="CQLBinaryProtocol\DateTimeExtensions.cs" />
+    <Compile Include="CQLPoco\DataMapperFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CQLPoco\DataSource.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CQLPoco\DynamicAccessor.cs" />
+    <Compile Include="CQLPoco\DynamicDataMapperFactory.cs" />
+    <Compile Include="CQLPoco\DynamicDataSource.cs" />
+    <Compile Include="CQLPoco\DynamicDataSourceFactory.cs" />
+    <Compile Include="CQLPoco\DynamicInstanceBuilder.cs" />
+    <Compile Include="CQLPoco\DynamicInstanceBuilderFactory.cs" />
+    <Compile Include="CQLPoco\DynamicReadAccessor.cs" />
+    <Compile Include="CQLPoco\DynamicWriteAccessor.cs" />
+    <Compile Include="CQLPoco\InstanceBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="CQL\Unit.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
@@ -69,9 +86,6 @@
     <Compile Include="CQLBinaryProtocol\FrameHeaderFlags.cs" />
     <Compile Include="CQLBinaryProtocol\FrameType.cs" />
     <Compile Include="CQLPoco\CQLPocoExtensions.cs" />
-    <Compile Include="CQLPoco\DataMapperFactory.cs" />
-    <Compile Include="CQLPoco\DataSource.cs" />
-    <Compile Include="CQLPoco\InstanceBuilder.cs" />
     <Compile Include="CQLPropertyBag\CQLPropertyBagExtensions.cs" />
     <Compile Include="CQLPropertyBag\DataMapperFactory.cs" />
     <Compile Include="CQLPropertyBag\DataSource.cs" />

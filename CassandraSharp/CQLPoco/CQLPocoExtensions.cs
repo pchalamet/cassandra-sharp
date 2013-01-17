@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -24,21 +25,28 @@ namespace CassandraSharp.CQLPoco
 
     public static class CQLPocoExtensions
     {
+        private static IDataMapperFactory GetFactory(Type type, object dataSource)
+        {
+            //IDataMapperFactory factory = new DataMapperFactory(type, dataSource);
+            IDataMapperFactory factory = new DynamicDataMapperFactory(type, dataSource);
+            return factory;
+        }
+
         public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
-            IDataMapperFactory factory = new DataMapperFactory(typeof(T));
+            IDataMapperFactory factory = GetFactory(typeof(T), null);
             return CQLCommandHelpers.Query<T>(cluster, cql, cl, factory);
         }
 
         public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
-            IDataMapperFactory factory = new DataMapperFactory(typeof(T), dataSource);
+            IDataMapperFactory factory = GetFactory(typeof(T), dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
         }
 
         public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
-            IDataMapperFactory factory = new DataMapperFactory(typeof(Unit), dataSource);
+            IDataMapperFactory factory = GetFactory(typeof(Unit), dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
         }
     }

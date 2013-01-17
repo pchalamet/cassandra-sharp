@@ -1,5 +1,5 @@
 // cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ namespace CassandraSharp.CQLPoco
     using System;
     using CassandraSharp.Extensibility;
 
-    internal class DataMapperFactory : IDataMapperFactory
+    internal class DynamicDataMapperFactory : IDataMapperFactory
     {
         private readonly Type _type;
 
-        public DataMapperFactory(Type type, object dataSource)
+        public DynamicDataMapperFactory(Type type, object dataSource)
         {
             _type = type;
             if (null != dataSource)
             {
-                DataSource = new DataSource(dataSource);
+                DataSource = DynamicDataSourceFactory.Create(dataSource);
             }
         }
 
@@ -35,7 +35,7 @@ namespace CassandraSharp.CQLPoco
 
         public IInstanceBuilder CreateBuilder()
         {
-            return new InstanceBuilder(_type);
+            return DynamicInstanceBuilderFactory.Create(_type);
         }
     }
 }

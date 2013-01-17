@@ -58,7 +58,6 @@ namespace CassandraSharp.Transport
                 Dispose();
                 throw;
             }
-            
         }
 
         public void Dispose()
