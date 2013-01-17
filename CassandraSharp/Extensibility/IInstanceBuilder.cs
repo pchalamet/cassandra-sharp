@@ -30,7 +30,7 @@ namespace CassandraSharp.Extensibility
         //   * IList<V> with V same as data type
         //   * ISet<V> with V same as data type
         //   * IDictionary<K, V> with K, V same as data type
-        void Set(IColumnSpec columnSpec, object data);
+        bool Set(IColumnSpec columnSpec, object data);
 
         object Build();
     }

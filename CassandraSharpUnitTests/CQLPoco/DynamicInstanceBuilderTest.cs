@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,24 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
+namespace CassandraSharpUnitTests.CQLPoco
 {
-    using System.Collections.Generic;
+    using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
+    using NUnit.Framework;
 
-    internal class InstanceBuilder : IInstanceBuilder
+    [TestFixture]
+    public class DynamicInstanceBuilderTest : CommonInstanceBuilderTest
     {
-        private readonly Dictionary<string, object> _data = new Dictionary<string, object>();
-
-        public bool Set(IColumnSpec columnSpec, object data)
+        protected override IInstanceBuilder GetInstanceBuilder<T>() 
         {
-            _data[columnSpec.Name] = data;
-            return true;
-        }
-
-        public object Build()
-        {
-            return _data;
+            return new DynamicInstanceBuilder<T>();
         }
     }
 }

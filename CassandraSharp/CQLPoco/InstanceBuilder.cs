@@ -1,5 +1,5 @@
 // cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,19 +31,20 @@ namespace CassandraSharp.CQLPoco
             _instance = Activator.CreateInstance(_type);
         }
 
-        public void Set(IColumnSpec columnSpec, object data)
+        public bool Set(IColumnSpec columnSpec, object data)
         {
-            if (null == data)
-                return;
-
-            if (! TrySet(columnSpec.Name, data))
+            if (TrySet(columnSpec.Name, data))
             {
-                if (columnSpec.Name.Contains("_"))
-                {
-                    string newName = columnSpec.Name.Replace("_", "");
-                    TrySet(newName, data);
-                }
+                return true;
             }
+
+            if (columnSpec.Name.Contains("_"))
+            {
+                string newName = columnSpec.Name.Replace("_", "");
+                return TrySet(newName, data);
+            }
+
+            return false;
         }
 
         public object Build()

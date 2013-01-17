@@ -32,20 +32,21 @@ namespace CassandraSharp.CQLPoco
         {
             object res;
             string name = columnSpec.Name;
-            if (! TryGet(name, out res))
+            if (TryGet(name, out res))
             {
-                if (name.Contains("_"))
+                return res;
+            }
+
+            if (name.Contains("_"))
+            {
+                name = name.Replace("_", "");
+                if (TryGet(name, out res))
                 {
-                    name = name.Replace("_", "");
-                    if (! TryGet(name, out res))
-                    {
-                        string msg = string.Format("Can't find field or property {0}", columnSpec.Name);
-                        throw new ArgumentException(msg);
-                    }
+                    return res;
                 }
             }
 
-            return res;
+            throw new ArgumentException("Can't find requested member", columnSpec.Name);
         }
 
         private bool TryGet(string name, out object res)

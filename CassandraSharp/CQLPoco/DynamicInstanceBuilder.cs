@@ -29,21 +29,21 @@ namespace CassandraSharp.CQLPoco
             _instance = new T();
         }
 
-        public void Set(IColumnSpec columnSpec, object data)
+        public bool Set(IColumnSpec columnSpec, object data)
         {
             string colName = columnSpec.Name;
-            try
+            if (_accessor.Set(ref _instance, colName, data))
             {
-                _accessor.Set(ref _instance, colName, data);
+                return true;
             }
-            catch (Exception)
+
+            if (colName.Contains("_"))
             {
-                if (colName.Contains("_"))
-                {
-                    colName = colName.Replace("_", "");
-                }
-                _accessor.Set(ref _instance, colName, data);
+                colName = colName.Replace("_", "");
+                return _accessor.Set(ref _instance, colName, data);
             }
+
+            return false;
         }
 
         public object Build()

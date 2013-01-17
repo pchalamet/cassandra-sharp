@@ -51,6 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CQLBinaryProtocol\DateTimeExtensionsTest.cs" />
+    <Compile Include="CQLPoco\CommonDataSourceTest.cs" />
+    <Compile Include="CQLPoco\CommonInstanceBuilderTest.cs" />
+    <Compile Include="CQLPoco\DataSourceTest.cs" />
+    <Compile Include="CQLPoco\DynamicDataSourceTest.cs" />
+    <Compile Include="CQLPoco\DynamicInstanceBuilderTest.cs" />
+    <Compile Include="CQLPoco\InstanceBuilderTest.cs" />
     <Compile Include="EndpointStrategy\TimedUuid.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
     <Compile Include="Properties\cassandra-sharp-version.cs" />
@@ -74,6 +80,7 @@
     <None Include="App.config" />
     <None Include="..\..\cassandra-sharp.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -28,9 +28,9 @@ namespace CassandraSharp.CQLPoco
             _writeValue = Generate();
         }
 
-        public void Set(ref T target, string name, object value)
+        public bool Set(ref T target, string name, object value)
         {
-            _writeValue(ref target, name, value);
+            return _writeValue(ref target, name, value);
         }
 
         private WriteValue Generate()
@@ -38,7 +38,7 @@ namespace CassandraSharp.CQLPoco
             Type type = typeof(T);
             string methodName = "WriteToObject" + Guid.NewGuid();
             var dm = new DynamicMethod(methodName,
-                                       typeof(void),
+                                       typeof(bool),
                                        new[] {type.MakeByRefType(), typeof(string), typeof(object)},
                                        type.Module,
                                        true);
@@ -84,14 +84,16 @@ namespace CassandraSharp.CQLPoco
                 gen.Emit(OpCodes.Stfld, fieldInfo);
             }
 
+            gen.Emit(OpCodes.Ldc_I4_1);
             gen.Emit(OpCodes.Ret);
         }
 
         protected override void GenerateNotFound(ILGenerator gen)
         {
+            gen.Emit(OpCodes.Ldc_I4_0);
             gen.Emit(OpCodes.Ret);
         }
 
-        private delegate void WriteValue(ref T dataSource, string name, object value);
+        private delegate bool WriteValue(ref T dataSource, string name, object value);
     }
 }
