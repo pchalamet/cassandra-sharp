@@ -54,7 +54,7 @@ namespace Samples.PreparedStatement
                 const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
                 var preparedInsert = cluster.Prepare(insertBatch);
 
-                const int times = 10000;
+                const int times = 10;
 
                 var random = new Random();
 

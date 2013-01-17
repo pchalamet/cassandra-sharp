@@ -167,12 +167,11 @@ namespace CassandraSharp.CQLBinaryProtocol
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
                     byte[] rawData = frameReader.ReadBytes();
-                    object data = null;
                     if (null != rawData)
                     {
-                        data = colSpec.Deserialize(rawData);
+                        object data = colSpec.Deserialize(rawData);
+                        instanceBuilder.Set(colSpec, data);
                     }
-                    instanceBuilder.Set(colSpec, data);
                 }
 
                 yield return instanceBuilder.Build();
