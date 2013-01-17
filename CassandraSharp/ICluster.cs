@@ -16,6 +16,7 @@
 namespace CassandraSharp
 {
     using System;
+    using CassandraSharp.Extensibility;
 
     /// <summary>
     ///     Primary interface to execute commands against a Cassandra cluster Implementation of this interface must be thread safe
@@ -23,5 +24,7 @@ namespace CassandraSharp
     public interface ICluster : IDisposable
     {
         IConnection GetConnection(Token token);
+
+        IInstrumentation Instrumentation { get; }
     }
 }

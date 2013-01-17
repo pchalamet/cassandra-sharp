@@ -34,7 +34,7 @@ namespace CassandraSharp.CQL
 
         public static IPreparedQuery Prepare(this ICluster cluster, string cql)
         {
-            return new PreparedQuery(cluster, cql);
+            return new PreparedQuery(cluster, cql, cluster.Instrumentation);
         }
     }
 }

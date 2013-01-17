@@ -20,6 +20,7 @@ namespace CassandraSharp.Cluster
     using System.Net;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
+    using CassandraSharp.Instrumentation;
 
     internal class Cluster : ICluster
     {
@@ -35,18 +36,32 @@ namespace CassandraSharp.Cluster
 
         private readonly IRecoveryService _recoveryService;
 
+        private readonly IInstrumentation _instrumentation;
+
+        public IInstrumentation Instrumentation
+        {
+            get
+            {
+                return _instrumentation;
+            }
+        }
+
         public Cluster(IEndpointStrategy endpointStrategy, ILogger logger,
-                       IConnectionFactory connectionFactory, IRecoveryService recoveryService)
+                       IConnectionFactory connectionFactory, IRecoveryService recoveryService, IInstrumentation instrumentation)
         {
             _ip2Connection = new Dictionary<IPAddress, IConnection>();
             _endpointStrategy = endpointStrategy;
             _logger = logger;
             _connectionFactory = connectionFactory;
             _recoveryService = recoveryService;
+            _instrumentation = instrumentation;
         }
 
         public IConnection GetConnection(Token token)
         {
+            ITimer timer = _instrumentation.CreateTimer(null);
+            timer.Start();
+
             lock (_globalLock)
             {
                 IConnection connection = null;
@@ -71,7 +86,7 @@ namespace CassandraSharp.Cluster
                             }
                         }
                     }
-
+                    Instrumentation.GetConnection(timer);
                     return connection;
                 }
                 catch

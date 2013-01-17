@@ -32,10 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>cassandra-sharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,6 +49,12 @@
     <Compile Include="Cluster\Factory.cs" />
     <Compile Include="CQLBinaryProtocol\DateTimeExtensions.cs" />
     <Compile Include="CQL\Unit.cs" />
+    <Compile Include="Extensibility\IInstrumentation.cs" />
+    <Compile Include="Instrumentation\AbstractInstrumentation.cs" />
+    <Compile Include="Instrumentation\Barry.cs" />
+    <Compile Include="Instrumentation\Factory.cs" />
+    <Compile Include="Instrumentation\ITimer.cs" />
+    <Compile Include="Instrumentation\NullInstrumentation.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
     <Compile Include="Utils\ICollectionInitializer.cs" />
@@ -144,8 +150,9 @@
     <Compile Include="Extensibility\IConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\cassandra-sharp.snk" />
+    <None Include="cassandra-sharp.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

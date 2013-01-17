@@ -21,6 +21,8 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Threading;
     using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
+    using System.Diagnostics;
+    using CassandraSharp.Instrumentation;
 
     internal class PreparedQuery : IPreparedQuery
     {
@@ -36,10 +38,13 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private IConnection _connection;
 
-        public PreparedQuery(ICluster cluster, string cql)
+        private IInstrumentation _instrumentation;
+
+        public PreparedQuery(ICluster cluster, string cql, IInstrumentation instrumentation)
         {
             _cluster = cluster;
             _cql = cql;
+            _instrumentation = instrumentation;
         }
 
         public Task<IEnumerable<object>> Execute(ConsistencyLevel cl, IDataMapperFactory factory)
@@ -47,6 +52,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             IConnection connection;
             if (null == (connection = _connection))
             {
+                ITimer timer = _instrumentation.CreateTimer(null);
+                timer.Start();
                 lock (_lock)
                 {
                     if (null == (connection = _connection))
@@ -57,19 +64,28 @@ namespace CassandraSharp.CQLBinaryProtocol
                         Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, _cql);
                         Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
 
+                        
                         connection.Execute(writer, reader).ContinueWith(ReadPreparedQueryInfo).Wait();
+                        timer.Stop();
 
                         Thread.MemoryBarrier();
 
                         _connection = connection;
                     }
                 }
+                _instrumentation.PrepareQuery(_cql, timer);
             }
 
-            Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
-            Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
+            ITimer queryTimer = _instrumentation.CreateTimer(_cql);
+            queryTimer.Start();
 
-            return connection.Execute(execWriter, execReader);
+            Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
+            Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory, queryTimer);
+
+            var executionTask = connection.Execute(execWriter, execReader);
+            queryTimer.AddTask(executionTask);
+
+            return executionTask;
         }
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)

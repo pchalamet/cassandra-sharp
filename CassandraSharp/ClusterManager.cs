@@ -33,6 +33,8 @@ namespace CassandraSharp
 
         private static ILogger _logger;
 
+        private static IInstrumentation _instrumentation;
+
         public static ICluster GetCluster(string name)
         {
             name.CheckArgumentNotNull("name");
@@ -63,7 +65,7 @@ namespace CassandraSharp
             IConnectionFactory connectionFactory = Transport.Factory.Create(transportConfig.Type, transportConfig, _logger);
 
             // create the cluster now
-            ICluster cluster = Cluster.Factory.Create("Default", endpointsManager, _logger, connectionFactory, recoveryService);
+            ICluster cluster = Cluster.Factory.Create("Default", endpointsManager, _logger, connectionFactory, recoveryService, _instrumentation);
 
             IDiscoveryService discoveryService = Discovery.Factory.Create(clusterConfig.Endpoints.Discovery, _logger);
             var newPeers = discoveryService.DiscoverPeers(cluster);
@@ -118,6 +120,7 @@ namespace CassandraSharp
 
             _logger = Logger.Factory.Create(config.Logger);
             _recoveryService = Recovery.Factory.Create(config.Recovery, _logger);
+            _instrumentation = Instrumentation.Factory.Create(config.Instrumentation, _logger);
             _config = config;
         }
     }

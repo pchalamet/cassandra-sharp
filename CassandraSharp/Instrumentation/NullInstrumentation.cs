@@ -13,30 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp.Instrumentation
 {
-    using System.Xml.Serialization;
+    using CassandraSharp.Extensibility;
+	using System.Threading.Tasks;
 
-    [XmlRoot("CassandraSharpConfig")]
-    public class CassandraSharpConfig
+	internal class NullInstrumentation : IInstrumentation
     {
-        public CassandraSharpConfig()
-        {
-            Recovery = "Simple";
-            Logger = "Null";
-            Instrumentation = "Null";
-        }
+		private static readonly ITimer dummy = new DummyTimer();
 
-        [XmlAttribute("recovery")]
-        public string Recovery { get; set; }
+		public ITimer CreateTimer(string cqlQuery)
+		{
+			return dummy;
+		}
 
-        [XmlAttribute("logger")]
-        public string Logger { get; set; }
+		public void GetConnection(ITimer timer) { }
 
-        [XmlAttribute("instrumentation")]
-        public string Instrumentation { get; set; }
+		public void PrepareQuery(string _cql, ITimer timer) { }
 
-        [XmlElement("Cluster")]
-        public ClusterConfig[] Clusters { get; set; }
-    }
+		private class DummyTimer : ITimer
+		{
+			public void Start() { }
+			public void Stop() { }
+			public void AddTask(Task task) { }
+
+			public long ElapsedMilliseconds
+			{
+				get { return 0; }
+			}
+		}
+	}
 }

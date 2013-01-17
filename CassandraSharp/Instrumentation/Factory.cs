@@ -13,30 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp.Instrumentation
 {
-    using System.Xml.Serialization;
+    using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
 
-    [XmlRoot("CassandraSharpConfig")]
-    public class CassandraSharpConfig
+    internal static class Factory
     {
-        public CassandraSharpConfig()
+        public static IInstrumentation Create(string customType, params object[] prms)
         {
-            Recovery = "Simple";
-            Logger = "Null";
-            Instrumentation = "Null";
+            if (customType == "Null")
+            {
+                customType = ServiceActivator.GetTypeName<NullInstrumentation>();                
+            }
+
+			return ServiceActivator.Create<IInstrumentation>(customType, prms);
         }
-
-        [XmlAttribute("recovery")]
-        public string Recovery { get; set; }
-
-        [XmlAttribute("logger")]
-        public string Logger { get; set; }
-
-        [XmlAttribute("instrumentation")]
-        public string Instrumentation { get; set; }
-
-        [XmlElement("Cluster")]
-        public ClusterConfig[] Clusters { get; set; }
     }
 }

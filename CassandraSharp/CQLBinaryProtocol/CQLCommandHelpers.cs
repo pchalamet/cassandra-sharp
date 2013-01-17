@@ -22,15 +22,26 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Threading.Tasks;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Instrumentation;
 
     internal static class CQLCommandHelpers
     {
         public static Task<IEnumerable<T>> Query<T>(ICluster cluster, string cql, ConsistencyLevel cl, IDataMapperFactory factory)
         {
-            Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query);
-            Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory);
+            ITimer queryTimer = cluster.Instrumentation.CreateTimer(cql);
+            queryTimer.Start();
 
-            return cluster.GetConnection(null).Execute(writer, reader).ContinueWith(res => res.Result.Cast<T>());
+            Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query, queryTimer);
+            Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory, queryTimer);
+
+            IConnection conn = cluster.GetConnection(null);
+            var executionTask = conn.Execute(writer, reader);
+            var castingTask = executionTask.ContinueWith(res => res.Result.Cast<T>());
+
+            queryTimer.AddTask(executionTask);
+            queryTimer.AddTask(castingTask);
+
+            return castingTask;
         }
 
         internal static void WriteReady(IFrameWriter frameWriter, string cqlVersion)
@@ -114,15 +125,17 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
         }
 
-        private static void WriteQueryRequest(IFrameWriter frameWriter, string cql, ConsistencyLevel cl, MessageOpcodes opcode)
+        private static void WriteQueryRequest(IFrameWriter frameWriter, string cql, ConsistencyLevel cl, MessageOpcodes opcode, ITimer timer)
         {
             frameWriter.WriteLongString(cql);
             frameWriter.WriteShort((short) cl);
             frameWriter.Send(opcode);
         }
 
-        internal static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapperFactory mapperFactory)
+        internal static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapperFactory mapperFactory, ITimer timer)
         {
+            timer.Start();
+
             if (MessageOpcodes.Result != frameReader.MessageOpcode)
             {
                 throw new ArgumentException("Unknown server response");
@@ -137,32 +150,39 @@ namespace CassandraSharp.CQLBinaryProtocol
             switch (resultOpcode)
             {
                 case ResultOpcode.Void:
+                    timer.Stop();
                     yield break;
 
                 case ResultOpcode.Rows:
                     IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
-                    foreach (object row in ReadRows(frameReader, columnSpecs, mapperFactory))
+                    foreach (object row in ReadRows(frameReader, columnSpecs, mapperFactory, timer))
                     {
                         yield return row;
                     }
                     break;
 
                 case ResultOpcode.SetKeyspace:
+                    timer.Stop();
                     yield break;
 
                 case ResultOpcode.SchemaChange:
+                    timer.Stop();
                     yield break;
 
                 default:
+                    timer.Stop();
                     throw new ArgumentException("Unexpected ResultOpcode");
             }
         }
 
-        private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapperFactory mapperFactory)
+        private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapperFactory mapperFactory, ITimer timer)
         {
+            timer.Start();
             int rowCount = frameReader.ReadInt();
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
+                timer.Start();
+
                 IInstanceBuilder instanceBuilder = mapperFactory.CreateBuilder();
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
@@ -175,7 +195,10 @@ namespace CassandraSharp.CQLBinaryProtocol
                     instanceBuilder.Set(colSpec, data);
                 }
 
-                yield return instanceBuilder.Build();
+                var retVal = instanceBuilder.Build();
+                timer.Stop();
+
+                yield return retVal;
             }
         }
 
