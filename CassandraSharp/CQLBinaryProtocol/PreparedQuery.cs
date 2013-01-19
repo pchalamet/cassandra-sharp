@@ -74,10 +74,8 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
         {
-            lock (_lock)
-            {
-                _connection = null; 
-            }
+            _connection = null; 
+            Thread.MemoryBarrier();
         }
 
         private void ReadPreparedQueryInfo(Task<IEnumerable<object>> results)

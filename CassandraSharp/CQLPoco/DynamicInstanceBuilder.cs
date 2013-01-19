@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.CQLPoco
 {
-    using System;
+    using System.Runtime.Serialization;
     using CassandraSharp.Extensibility;
 
     internal class DynamicInstanceBuilder<T> : IInstanceBuilder where T : new()
@@ -48,6 +48,12 @@ namespace CassandraSharp.CQLPoco
 
         public object Build()
         {
+            IDeserializationCallback cb = _instance as IDeserializationCallback;
+            if (null != cb)
+            {
+                cb.OnDeserialization(null);
+            }
+
             return _instance;
         }
     }

@@ -125,8 +125,19 @@ namespace CassandraSharp.Transport
             }
 
             FrameHeaderFlags flags = (FrameHeaderFlags) stream.ReadByte();
+            byte streamId = (byte)stream.ReadByte();
 
-            byte streamId = (byte) stream.ReadByte();
+            //if (0 != (flags & FrameHeaderFlags.Tracing))
+            //{
+            //    byte[] traceId = new byte[16];
+            //    int count = traceId.Length;
+            //    int read = stream.Read(traceId, 0, count);
+            //    while (read != count)
+            //    {
+            //        read += stream.Read(traceId, read, count - read);
+            //    }
+            //}
+
             return streamId;
         }
 

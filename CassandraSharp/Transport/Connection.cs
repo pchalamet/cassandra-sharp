@@ -29,7 +29,7 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class Connection : IConnection
+    internal partial class Connection : IConnection
     {
         private const byte MAX_STREAMID = 0x80;
 
@@ -49,9 +49,9 @@ namespace CassandraSharp.Transport
 
         private readonly Task<IEnumerable<object>>[] _readers = new Task<IEnumerable<object>>[MAX_STREAMID];
 
-        private readonly TcpClient _tcpClient;
-
         private readonly bool _streaming;
+
+        private readonly TcpClient _tcpClient;
 
         public Connection(IPAddress address, TransportConfig config, ILogger logger)
         {
@@ -80,7 +80,7 @@ namespace CassandraSharp.Transport
 
             // readify the connection
             _logger.Debug("Readyfying connection for {0}", Endpoint);
-            GetOptions();
+            //GetOptions();
             ReadifyConnection();
             _logger.Debug("Connection to {0} is ready", Endpoint);
         }
@@ -126,49 +126,41 @@ namespace CassandraSharp.Transport
             _cancellation.SafeDispose();
         }
 
-        private Task<IEnumerable<object>> CreateReadNextFrame(Func<IFrameReader, IEnumerable<object>> reader, byte streamId)
+        private FrameReader ReleaseStreamId(byte streamId)
         {
-            return new Task<IEnumerable<object>>(() => StreamResultsThenReleaseStreamId(reader, streamId));
+            lock (_globalLock)
+            {
+                // release stream id (since result streaming has started)
+                _availableStreamIds.Push(streamId);
+                Monitor.Pulse(_globalLock);
+            }
+
+            // yield all rows - no lock required on input stream since we are the only one allowed to read
+            FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming);
+
+            // if no streaming we have read everything in memory
+            // we can run a new reader immediately
+            if (!_streaming)
+            {
+                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+            }
+
+            return frameReader;
         }
 
-        private IEnumerable<object> StreamResultsThenReleaseStreamId(Func<FrameReader, IEnumerable<object>> reader, byte streamId)
+        private void CompleteStreamRead()
         {
-            try
+            // run a new reader after streaming data
+            if (_streaming)
             {
-                _logger.Debug("Starting reading stream {0}@{1}", streamId, Endpoint);
-                lock (_globalLock)
-                {
-                    // release stream id (since result streaming has started)
-                    _availableStreamIds.Push(streamId);
-                    Monitor.Pulse(_globalLock);
-                }
-
-                // yield all rows - no lock required on input stream since we are the only one allowed to read
-                using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming))
-                {
-                    // if no streaming we have read everything in memory
-                    // we can run a new reader immediately
-                    if (!_streaming)
-                    {
-                        Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-                    }
-
-                    foreach (object row in EnumerableOrEmptyEnumerable(reader(frameReader)))
-                    {
-                        yield return row;
-                    }
-                }
-
-                _logger.Debug("Done reading stream {0}@{1}", streamId, Endpoint);
+                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
             }
-            finally
-            {
-                // run a new reader after streaming data
-                if (_streaming)
-                {
-                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-                }
-            }
+        }
+
+        private Task<IEnumerable<object>> CreateReadNextFrame(Func<IFrameReader, IEnumerable<object>> reader, byte streamId)
+        {
+            //return new Task<IEnumerable<object>>(() => StreamResultsThenReleaseStreamId(reader, streamId));
+            return new Task<IEnumerable<object>>(() => new ResultStreamEnumerable(this, reader, streamId));
         }
 
         private void StartWriteNextFrame(Action<IFrameWriter> writer, byte streamId)
@@ -189,27 +181,34 @@ namespace CassandraSharp.Transport
             _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
         }
 
-        private static IEnumerable<object> EnumerableOrEmptyEnumerable(IEnumerable<object> enumerable)
-        {
-            return enumerable ?? Enumerable.Empty<object>();
-        }
-
         private void ReadNextFrameHeader()
         {
             try
             {
                 // read stream id - we are the only one reading so no lock required
                 byte streamId = FrameReader.ReadStreamId(_inputStream);
+
+                // NOTE: the task is running just to return an IEnumerable<object> to the client
+                //       so it's better to execute it on our context immediately
                 _readers[streamId].RunSynchronously();
             }
             catch (Exception ex)
             {
-                GeneralFailure(ex);
+                HandleFailure(ex);
             }
         }
 
-        private void GeneralFailure(Exception ex)
+        private void HandleFailure(Exception ex)
         {
+            _logger.Debug("HandleFailure notified with exception {0}", ex);
+            bool isFatal = ex is IOException
+                           || ex is SocketException;
+            if (! isFatal)
+            {
+                _logger.Debug("Exception is not fatal");
+                return;
+            }
+
             lock (_globalLock)
             {
                 _logger.Error("Connection to {0} is broken", Endpoint);
