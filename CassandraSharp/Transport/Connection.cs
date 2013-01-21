@@ -51,6 +51,10 @@ namespace CassandraSharp.Transport
 
         private readonly bool _streaming;
 
+        private readonly bool _tracing;
+
+        private volatile bool _frameTracing;
+
         private readonly TcpClient _tcpClient;
 
         public Connection(IPAddress address, TransportConfig config, ILogger logger)
@@ -61,6 +65,7 @@ namespace CassandraSharp.Transport
             _tcpClient = new TcpClient();
             _tcpClient.Connect(address, _config.Port);
             _streaming = config.Streaming;
+            _tracing = config.Tracing;
 
             Stream stream = _tcpClient.GetStream();
 #if DEBUG_STREAM
@@ -136,7 +141,7 @@ namespace CassandraSharp.Transport
             }
 
             // yield all rows - no lock required on input stream since we are the only one allowed to read
-            FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming);
+            FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming, _frameTracing);
 
             // if no streaming we have read everything in memory
             // we can run a new reader immediately
@@ -174,7 +179,7 @@ namespace CassandraSharp.Transport
             _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
             lock (_globalLock)
             {
-                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId))
+                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId, _tracing))
                     writer(frameWriter);
             }
 
@@ -186,7 +191,9 @@ namespace CassandraSharp.Transport
             try
             {
                 // read stream id - we are the only one reading so no lock required
-                byte streamId = FrameReader.ReadStreamId(_inputStream);
+                bool frameTracing;
+                byte streamId = FrameReader.ReadStreamId(_inputStream, out frameTracing);
+                _frameTracing = frameTracing;
 
                 // NOTE: the task is running just to return an IEnumerable<object> to the client
                 //       so it's better to execute it on our context immediately

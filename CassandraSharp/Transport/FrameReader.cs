@@ -28,7 +28,7 @@ namespace CassandraSharp.Transport
     {
         private readonly Stream _ms;
 
-        private FrameReader(Stream stream, bool streaming)
+        private FrameReader(Stream stream, bool streaming, bool tracing)
         {
             try
             {
@@ -43,9 +43,22 @@ namespace CassandraSharp.Transport
                     byte[] buffer = new byte[bodyLen];
                     if (0 < bodyLen)
                     {
-                        stream.Read(buffer, 0, bodyLen);
+                        // read whole frame in memory
+                        int read = stream.Read(buffer, 0, bodyLen);
+                        while (read != bodyLen)
+                        {
+                            read += stream.Read(buffer, read, bodyLen - read);
+                        }
                         _ms = new MemoryStream(buffer);
                     }
+                }
+
+                if (tracing)
+                {
+                    // skip traceId
+                    byte[] traceId = new byte[16];
+                    int count = traceId.Length;
+                    _ms.Read(traceId, 0, count);
                 }
 
                 if (MessageOpcodes.Error == MessageOpcode)
@@ -107,12 +120,12 @@ namespace CassandraSharp.Transport
             return _ms.ReadStringMultimap();
         }
 
-        public static FrameReader ReadBody(Stream stream, bool streaming)
+        public static FrameReader ReadBody(Stream stream, bool streaming, bool tracing)
         {
-            return new FrameReader(stream, streaming);
+            return new FrameReader(stream, streaming, tracing);
         }
 
-        public static byte ReadStreamId(Stream stream)
+        public static byte ReadStreamId(Stream stream, out bool frameTracing)
         {
             FrameType version = (FrameType) stream.ReadByte();
             if (0 == (version & FrameType.Response))
@@ -125,19 +138,9 @@ namespace CassandraSharp.Transport
             }
 
             FrameHeaderFlags flags = (FrameHeaderFlags) stream.ReadByte();
+            frameTracing = 0 != (flags & FrameHeaderFlags.Tracing); 
+
             byte streamId = (byte)stream.ReadByte();
-
-            //if (0 != (flags & FrameHeaderFlags.Tracing))
-            //{
-            //    byte[] traceId = new byte[16];
-            //    int count = traceId.Length;
-            //    int read = stream.Read(traceId, 0, count);
-            //    while (read != count)
-            //    {
-            //        read += stream.Read(traceId, read, count - read);
-            //    }
-            //}
-
             return streamId;
         }
 

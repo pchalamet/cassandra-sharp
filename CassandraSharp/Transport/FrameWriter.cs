@@ -28,12 +28,15 @@ namespace CassandraSharp.Transport
 
         private readonly byte _streamId;
 
+        private readonly bool _tracing;
+
         private readonly MemoryStream _ms;
 
-        internal FrameWriter(Stream stream, byte streamId)
+        internal FrameWriter(Stream stream, byte streamId, bool tracing)
         {
             _stream = stream;
             _streamId = streamId;
+            _tracing = tracing;
             _ms = new MemoryStream();
         }
 
@@ -48,12 +51,17 @@ namespace CassandraSharp.Transport
             const byte version = (byte) (FrameType.Request | FrameType.ProtocolVersion);
             _stream.WriteByte(version);
 
-            const byte flags = (byte) FrameHeaderFlags.None;
+            FrameHeaderFlags flags = FrameHeaderFlags.None;
+            if (_tracing)
+            {
+                flags |= FrameHeaderFlags.Tracing;
+            }
+
             //if (compress)
             //{
             //    flags |= 0x01;
             //}
-            _stream.WriteByte(flags);
+            _stream.WriteByte((byte)flags);
 
             // streamId
             _stream.WriteByte(_streamId);
