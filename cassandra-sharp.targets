@@ -21,6 +21,12 @@
 	</PropertyGroup>
 	
     <PropertyGroup>
+        <Thrift>ThirdParties\Thrift\thrift-0.9.0.exe</Thrift>
+        <ThriftInput>Apache.Cassandra\cassandra.thrift</ThriftInput>
+        <ThriftOutput>Apache.Cassandra</ThriftOutput>
+    </PropertyGroup>
+
+    <PropertyGroup>
 		<CassandraSharpProjectName>cassandra-sharp</CassandraSharpProjectName>
         <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp</CassandraSharpAssembly>
         <CQLPlusAssembly>cqlplus\bin\$(Configuration)\cqlplus</CQLPlusAssembly>
@@ -39,7 +45,11 @@
         <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)$(VersionStatus)" OutputFile="$(CassandraSharpProjectName)-version.cs" />
     </Target>
 
-    <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo">
+    <Target Name="GenerateThrift">
+        <Exec Command="$(Thrift) -o $(ThriftOutput) --gen csharp $(ThriftInput)" />
+    </Target>
+
+    <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo;GenerateThrift">
         <MSBuild Projects="$(CassandraSharpProjectName).sln" />
     </Target>
 

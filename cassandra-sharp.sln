@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus", "cqlplus\cqlplus.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples", "Samples\Samples.csproj", "{8B2359B2-4A73-4A49-8E1E-646014A768A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thrift", "Thrift\Thrift.csproj", "{499EB63C-D74C-47E8-AE48-A2FC94538E9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apache.Cassandra", "Apache.Cassandra\Apache.Cassandra.csproj", "{984A4B04-C71A-4550-9193-817CFACBA30A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,14 @@ Global
 		{8B2359B2-4A73-4A49-8E1E-646014A768A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B2359B2-4A73-4A49-8E1E-646014A768A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B2359B2-4A73-4A49-8E1E-646014A768A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{984A4B04-C71A-4550-9193-817CFACBA30A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{984A4B04-C71A-4550-9193-817CFACBA30A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{984A4B04-C71A-4550-9193-817CFACBA30A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{984A4B04-C71A-4550-9193-817CFACBA30A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

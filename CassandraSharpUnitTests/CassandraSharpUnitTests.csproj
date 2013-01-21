@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\cassandra-sharp-version.cs">
+      <Link>Properties\cassandra-sharp-version.cs</Link>
+    </Compile>
     <Compile Include="CQLBinaryProtocol\DateTimeExtensionsTest.cs" />
     <Compile Include="CQLPoco\CommonDataSourceTest.cs" />
     <Compile Include="CQLPoco\CommonInstanceBuilderTest.cs" />
@@ -59,8 +62,8 @@
     <Compile Include="CQLPoco\InstanceBuilderTest.cs" />
     <Compile Include="EndpointStrategy\TimedUuid.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
-    <Compile Include="Properties\cassandra-sharp-version.cs" />
     <Compile Include="ClusterTest.cs" />
+    <Compile Include="Performance\WritePerformanceTest.cs" />
     <Compile Include="SectionHandlerTest.cs" />
     <Compile Include="Utils\DisposableExtensionsTest.cs" />
     <Compile Include="EndpointStrategy\FactoryTest.cs" />
@@ -71,9 +74,17 @@
     <Compile Include="Utils\ServiceActivatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
+      <Project>{984a4b04-c71a-4550-9193-817cfacba30a}</Project>
+      <Name>Apache.Cassandra</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj">
       <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
       <Name>CassandraSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Thrift\Thrift.csproj">
+      <Project>{499eb63c-d74c-47e8-ae48-a2fc94538e9d}</Project>
+      <Name>Thrift</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
