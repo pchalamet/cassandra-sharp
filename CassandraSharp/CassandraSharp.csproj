@@ -32,10 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>cassandra-sharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -159,7 +159,7 @@
     <Compile Include="Extensibility\IConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\cassandra-sharp.snk" />
+    <None Include="cassandra-sharp.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

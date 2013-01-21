@@ -32,10 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Moq">
@@ -48,8 +51,52 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
+    <Reference Include="Thrift">
+      <HintPath>..\ThirdParties\Thrift\Thrift.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="gen-csharp\Apache\Cassandra\AuthenticationRequest.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\AuthorizationException.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\Cassandra.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CfDef.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CfSplit.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\Column.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\ColumnDef.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\ColumnOrSuperColumn.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\ColumnParent.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\ColumnPath.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\Compression.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\ConsistencyLevel.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\Constants.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CounterColumn.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CounterSuperColumn.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CqlMetadata.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CqlPreparedResult.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CqlResult.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CqlResultType.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\CqlRow.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\Deletion.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\EndpointDetails.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\IndexClause.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\IndexExpression.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\IndexOperator.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\IndexType.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\InvalidRequestException.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\KeyCount.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\KeyRange.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\KeySlice.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\KsDef.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\Mutation.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\NotFoundException.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\SchemaDisagreementException.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\SlicePredicate.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\SliceRange.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\SuperColumn.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\TimedOutException.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\TokenRange.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\UnavailableException.cs" />
+    <Compile Include="Performance\WritePerformanceTest.cs" />
     <Compile Include="CQLBinaryProtocol\DateTimeExtensionsTest.cs" />
     <Compile Include="CQLPoco\CommonDataSourceTest.cs" />
     <Compile Include="CQLPoco\CommonInstanceBuilderTest.cs" />
@@ -59,8 +106,8 @@
     <Compile Include="CQLPoco\InstanceBuilderTest.cs" />
     <Compile Include="EndpointStrategy\TimedUuid.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
-    <Compile Include="Properties\cassandra-sharp-version.cs" />
     <Compile Include="ClusterTest.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="SectionHandlerTest.cs" />
     <Compile Include="Utils\DisposableExtensionsTest.cs" />
     <Compile Include="EndpointStrategy\FactoryTest.cs" />
@@ -69,6 +116,7 @@
     <Compile Include="Snitch\RackInferringSnitchTest.cs" />
     <Compile Include="Utils\MiniXmlSerializerTest.cs" />
     <Compile Include="Utils\ServiceActivatorTest.cs" />
+    <Compile Include="gen-csharp\Apache\Cassandra\AuthenticationException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj">
@@ -78,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="..\..\cassandra-sharp.snk" />
+    <None Include="cassandra-sharp.snk" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
