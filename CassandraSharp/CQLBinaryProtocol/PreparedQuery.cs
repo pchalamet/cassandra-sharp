@@ -34,7 +34,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private IColumnSpec[] _columnSpecs;
 
-        private IConnection _connection;
+        private volatile IConnection _connection;
 
         public PreparedQuery(ICluster cluster, string cql)
         {
@@ -58,9 +58,6 @@ namespace CassandraSharp.CQLBinaryProtocol
                         Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
 
                         connection.Execute(writer, reader).ContinueWith(ReadPreparedQueryInfo).Wait();
-
-                        Thread.MemoryBarrier();
-
                         _connection = connection;
                     }
                 }
@@ -75,7 +72,6 @@ namespace CassandraSharp.CQLBinaryProtocol
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
         {
             _connection = null; 
-            Thread.MemoryBarrier();
         }
 
         private void ReadPreparedQueryInfo(Task<IEnumerable<object>> results)
