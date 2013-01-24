@@ -50,7 +50,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 case MessageOpcodes.Ready:
                     return false;
 
-                case MessageOpcodes.Credentials:
+                case MessageOpcodes.Authenticate:
                     return true;
 
                 default:

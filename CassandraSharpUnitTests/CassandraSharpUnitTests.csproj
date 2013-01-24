@@ -60,6 +60,7 @@
     <Compile Include="CQLPoco\DynamicDataSourceTest.cs" />
     <Compile Include="CQLPoco\DynamicInstanceBuilderTest.cs" />
     <Compile Include="CQLPoco\InstanceBuilderTest.cs" />
+    <Compile Include="EndpointStrategy\RandomEndpointStrategyTest.cs" />
     <Compile Include="EndpointStrategy\TimedUuid.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
     <Compile Include="ClusterTest.cs" />
