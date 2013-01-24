@@ -73,8 +73,12 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         internal static void WriteAuthenticate(IFrameWriter frameWriter, string user, string password)
         {
-            string[] authParams = new[] { user, password };
-            frameWriter.WriteStringList(authParams);
+            Dictionary<string, string> authParams = new Dictionary<string, string>
+                {
+                        {"username", user},
+                        {"password", password}
+                };
+            frameWriter.WriteStringMap(authParams);
 
             frameWriter.Send(MessageOpcodes.Credentials);            
         }

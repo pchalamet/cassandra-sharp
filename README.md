@@ -9,11 +9,12 @@ A command line tool is also available (cqlplus) to access a Cassandra cluster. I
 
 Features
 ========
-* async operations
+* async operations (TPL tasks)
 * TPL integration (compatible with C# 5 async)
 * streaming support with IEnumerable (compatible with Linq)
 * extensible rowset mapping (poco and map provided out of the box)
-* robust connection handling (connection can then be recovered)
+* blazing fast object serializer/deserializer (dynamic gen code)
+* robust connection handling (connection recovery supported)
 * multiple extension points
 * command line tool (cqlplus)
 * .NET 4+ compatible (Microsoft .NET or Mono)

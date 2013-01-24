@@ -1,8 +1,9 @@
 version 2.2.0
 - POCO is now using DynamicMethod instead of Reflection
 - support for IDeserializationCallback
-- fix failure on connection on IO errors
+- fix failure on connection when IO errors
 - merge "Cassandra-Sharp write performance Vs Thrift Client" from hjarraya
+- fix authentication issues (https://github.com/pchalamet/cassandra-sharp/issues/25)
 
 version 2.1.2
 - fixed issue 9 (https://github.com/pchalamet/cassandra-sharp/issues/9)
