@@ -31,7 +31,7 @@
         <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp</CassandraSharpAssembly>
         <CQLPlusAssembly>cqlplus\bin\$(Configuration)\cqlplus</CQLPlusAssembly>
         <Log4NetAssembly>ThirdParties\log4net\log4net.dll</Log4NetAssembly>
-        <KeyFile>CassandraSharp.snk</KeyFile>
+        <ChangesFile>CHANGES.txt</ChangesFile>
     </PropertyGroup>
 
 	<Target Name="Clean">
@@ -59,6 +59,7 @@
             <ZipFilesCopy Include="$(CassandraSharpAssembly).pdb" />
             <ZipFilesCopy Include="$(CQLPlusAssembly).exe" />
             <ZipFilesCopy Include="$(CQLPlusAssembly).pdb" />
+            <ZipFilesCopy Include="$(ChangesFile)" />
         </ItemGroup>
 		
 		<Copy SourceFiles="@(ZipFilesCopy)" DestinationFolder="$(ZipDir)" />
@@ -73,9 +74,10 @@
 	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile">
 		<Copy SourceFiles="$(CassandraSharpAssembly).dll" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
 		<Copy SourceFiles="$(CassandraSharpAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
-		<Copy SourceFiles="$(CQLPlusAssembly).exe" DestinationFolder="$(NuGetPackageDir)\bin" />
-		<Copy SourceFiles="$(CQLPlusAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\bin" />
+		<Copy SourceFiles="$(CQLPlusAssembly).exe" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="$(CQLPlusAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
 		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
+		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(NuGetPackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)$(VersionStatus)" />
 		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory $(OutDir)" />
 	</Target>

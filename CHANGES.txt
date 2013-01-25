@@ -1,3 +1,7 @@
+version 2.2.1
+- added version in Zip & NuGet
+- cqlplus is in NuGet lib folder, only CassandraSharp.dll is then referenced
+
 version 2.2.0
 - POCO is now using DynamicMethod instead of Reflection
 - support for IDeserializationCallback

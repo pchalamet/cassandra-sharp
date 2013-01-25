@@ -25,5 +25,8 @@ cassandra-sharp does only support:
 * Apache Cassandra 1.2+
 </description>
     <tags>apache cassandra .net40 .net45 database nosql mono</tags>
+    <references>
+        <reference file="CassandraSharp.dll" />
+    </references>
   </metadata>
 </package>
