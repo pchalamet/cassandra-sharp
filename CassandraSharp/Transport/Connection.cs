@@ -29,7 +29,7 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal partial class Connection : IConnection
+    internal partial class Connection : IConnection, IDisposable
     {
         private const byte MAX_STREAMID = 0x80;
 
