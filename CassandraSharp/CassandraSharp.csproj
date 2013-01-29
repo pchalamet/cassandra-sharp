@@ -59,7 +59,6 @@
     <Compile Include="CQLPoco\DynamicDataSource.cs" />
     <Compile Include="CQLPoco\DynamicDataSourceFactory.cs" />
     <Compile Include="CQLPoco\DynamicInstanceBuilder.cs" />
-    <Compile Include="CQLPoco\DynamicInstanceBuilderFactory.cs" />
     <Compile Include="CQLPoco\DynamicReadAccessor.cs" />
     <Compile Include="CQLPoco\DynamicWriteAccessor.cs" />
     <Compile Include="CQLPoco\InstanceBuilder.cs">
