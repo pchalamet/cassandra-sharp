@@ -24,6 +24,16 @@ namespace CassandraSharp.CQLPoco
 
         private T _dataSource;
 
+        internal T Datasource
+        {
+            get { return _dataSource; }
+            set { _dataSource = value; }
+        }
+
+        internal DynamicDataSource()
+        { 
+        }
+
         public DynamicDataSource(T dataSource)
         {
             _dataSource = dataSource;
