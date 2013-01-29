@@ -32,21 +32,34 @@ namespace CassandraSharp.CQLPoco
             return factory;
         }
 
+        private static IDataMapperFactory GetFactory<T>(T dataSource)
+        {
+            //IDataMapperFactory factory = new DataMapperFactory(type, dataSource);
+            IDataMapperFactory factory = new DynamicDataMapperFactory<T>(dataSource);
+            return factory;
+        }
+
         public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
-            IDataMapperFactory factory = GetFactory(typeof(T), null);
+            IDataMapperFactory factory = GetFactory<T>(default(T));
             return CQLCommandHelpers.Query<T>(cluster, cql, cl, factory);
         }
 
-        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, T dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
-            IDataMapperFactory factory = GetFactory(typeof(T), dataSource);
+            IDataMapperFactory factory = GetFactory<T>(dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
         }
 
         public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
             IDataMapperFactory factory = GetFactory(typeof(Unit), dataSource);
+            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
+        }
+        
+        public static Task<int> ExecuteNonQuery<T>(this IPreparedQuery preparedQuery, T dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        {
+            IDataMapperFactory factory = GetFactory<T>(dataSource);
             return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
         }
     }
