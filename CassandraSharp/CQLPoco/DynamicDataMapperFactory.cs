@@ -20,7 +20,7 @@ namespace CassandraSharp.CQLPoco
 
     internal class DynamicDataMapperFactory : IDataMapperFactory
     {
-        private readonly Type _type;
+        private Type _type;
 
         public DynamicDataMapperFactory(Type type, object dataSource)
         {
@@ -28,6 +28,26 @@ namespace CassandraSharp.CQLPoco
             if (null != dataSource)
             {
                 DataSource = DynamicDataSourceFactory.Create(dataSource);
+            }
+        }
+
+        public IDataSource DataSource { get; private set; }
+
+        public IInstanceBuilder CreateBuilder()
+        {
+            return DynamicInstanceBuilderFactory.Create(_type);
+        }
+    }
+
+    internal class DynamicDataMapperFactory<T> : IDataMapperFactory
+    {
+        private static readonly Type _type = typeof(T);
+
+        public DynamicDataMapperFactory(T dataSource)
+        {
+            if (null != dataSource)
+            {
+                DataSource = new DynamicDataSource<T> { Datasource = dataSource };
             }
         }
 
