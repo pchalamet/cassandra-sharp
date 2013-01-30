@@ -20,6 +20,9 @@ namespace cqlplus
         [Argument(ArgumentType.AtMostOnce, HelpText = "Display help on startup", ShortName = "nohelp")]
         public bool NoHelp = false;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable command tracing", ShortName = "trace")]
+        public bool Tracing = false;
+
         [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "chkcn")]
         public bool CheckConnection = true;
 

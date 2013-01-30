@@ -16,6 +16,7 @@
 namespace cqlplus.Commands
 {
     using System;
+    using CassandraSharp;
 
     [Description("set environment variable")]
     internal class Set : CommandBase
@@ -28,6 +29,12 @@ namespace cqlplus.Commands
 
         [Description("enable debug log to console")]
         public bool? Log { get; set; }
+
+        [Description("enable query tracing")]
+        public bool? Tracing { get; set; }
+
+        [Description("consistency level")]
+        public ConsistencyLevel? CL { get; set; }
 
         public override void Validate()
         {
@@ -57,6 +64,16 @@ namespace cqlplus.Commands
             if (Log.HasValue)
             {
                 CommandContext.DebugLog = Log.Value;
+            }
+
+            if (Tracing.HasValue)
+            {
+                CommandContext.Tracing = Tracing.Value;
+            }
+
+            if (CL.HasValue)
+            {
+                CommandContext.CL = CL.Value;
             }
         }
     }

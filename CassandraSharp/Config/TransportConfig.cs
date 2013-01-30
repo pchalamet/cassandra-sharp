@@ -48,8 +48,5 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("streaming")]
         public bool Streaming { get; set; }
-
-        [XmlAttribute("tracing")]
-        public bool Tracing { get; set; }
     }
 }

@@ -25,12 +25,12 @@ namespace CassandraSharp.CQLBinaryProtocol
 
     internal static class CQLCommandHelpers
     {
-        public static Task<IEnumerable<T>> Query<T>(ICluster cluster, string cql, ConsistencyLevel cl, IDataMapperFactory factory)
+        public static Task<IEnumerable<T>> Query<T>(ICluster cluster, string cql, ConsistencyLevel cl, IDataMapperFactory factory, ExecutionFlags executionFlags)
         {
             Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query);
             Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory);
 
-            return cluster.GetConnection(null).Execute(writer, reader).ContinueWith(res => res.Result.Cast<T>());
+            return cluster.GetConnection(null).Execute(writer, reader, executionFlags).ContinueWith(res => res.Result.Cast<T>());
         }
 
         internal static void WriteReady(IFrameWriter frameWriter, string cqlVersion)

@@ -18,7 +18,6 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
 
@@ -28,6 +27,8 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private readonly string _cql;
 
+        private readonly ExecutionFlags _executionFlags;
+
         private readonly object _lock = new object();
 
         private byte[] _id;
@@ -36,10 +37,11 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private volatile IConnection _connection;
 
-        public PreparedQuery(ICluster cluster, string cql)
+        public PreparedQuery(ICluster cluster, string cql, ExecutionFlags executionFlags)
         {
             _cluster = cluster;
             _cql = cql;
+            _executionFlags = executionFlags;
         }
 
         public Task<IEnumerable<object>> Execute(ConsistencyLevel cl, IDataMapperFactory factory)
@@ -57,7 +59,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, _cql);
                         Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
 
-                        connection.Execute(writer, reader).ContinueWith(ReadPreparedQueryInfo).Wait();
+                        connection.Execute(writer, reader, _executionFlags).ContinueWith(ReadPreparedQueryInfo).Wait();
                         _connection = connection;
                     }
                 }
@@ -66,7 +68,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
             Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
 
-            return connection.Execute(execWriter, execReader);
+            return connection.Execute(execWriter, execReader, _executionFlags);
         }
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)

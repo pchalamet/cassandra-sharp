@@ -23,10 +23,10 @@ namespace CassandraSharp.CQLPropertyBag
 
     public static class CQLPropertyBagExtensions
     {
-        public static Task<IEnumerable<IDictionary<string, object>>> Execute(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        public static Task<IEnumerable<IDictionary<string, object>>> Execute(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
             IDataMapperFactory factory = new DataMapperFactory();
-            return CQLCommandHelpers.Query<IDictionary<string, object>>(cluster, cql, cl, factory);
+            return CQLCommandHelpers.Query<IDictionary<string, object>>(cluster, cql, cl, factory, executionFlags);
         }
 
         public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, IDictionary<string, object> dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)

@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,11 @@
 namespace CassandraSharp
 {
     using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
-    using CassandraSharp.Extensibility;
 
-    /// <summary>
-    ///     Internal interface to keep track of Cassandra connections
-    /// </summary>
-    public interface IConnection
+    [Flags]
+    public enum ExecutionFlags
     {
-        IPAddress Endpoint { get; }
-
-        Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags);
-        event EventHandler<FailureEventArgs> OnFailure;
+        None,
+        Tracing
     }
 }

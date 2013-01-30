@@ -51,9 +51,7 @@ namespace CassandraSharp.Transport
 
         private readonly bool _streaming;
 
-        private readonly bool _tracing;
-
-        private volatile bool _frameTracing;
+        private volatile bool _tracing;
 
         private readonly TcpClient _tcpClient;
 
@@ -65,7 +63,6 @@ namespace CassandraSharp.Transport
             _tcpClient = new TcpClient();
             _tcpClient.Connect(address, _config.Port);
             _streaming = config.Streaming;
-            _tracing = config.Tracing;
 
             Stream stream = _tcpClient.GetStream();
 #if DEBUG_STREAM
@@ -92,7 +89,7 @@ namespace CassandraSharp.Transport
 
         public IPAddress Endpoint { get; private set; }
 
-        public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader)
+        public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags)
         {
             Task<IEnumerable<object>> taskRead;
             byte streamId;
@@ -116,7 +113,7 @@ namespace CassandraSharp.Transport
             _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
 
             // write the request asynchronously
-            StartWriteNextFrame(writer, streamId);
+            StartWriteNextFrame(writer, streamId, executionFlags);
 
             return taskRead;
         }
@@ -141,7 +138,7 @@ namespace CassandraSharp.Transport
             }
 
             // yield all rows - no lock required on input stream since we are the only one allowed to read
-            FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming, _frameTracing);
+            FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming, _tracing);
 
             // if no streaming we have read everything in memory
             // we can run a new reader immediately
@@ -168,18 +165,20 @@ namespace CassandraSharp.Transport
             return new Task<IEnumerable<object>>(() => new ResultStreamEnumerable(this, reader, streamId));
         }
 
-        private void StartWriteNextFrame(Action<IFrameWriter> writer, byte streamId)
+        private void StartWriteNextFrame(Action<IFrameWriter> writer, byte streamId, ExecutionFlags executionFlags)
         {
-            Task.Factory.StartNew(() => WriteNextFrame(writer, streamId), _cancellation.Token);
+            Task.Factory.StartNew(() => WriteNextFrame(writer, streamId, executionFlags), _cancellation.Token);
         }
 
-        private void WriteNextFrame(Action<IFrameWriter> writer, byte streamId)
+        private void WriteNextFrame(Action<IFrameWriter> writer, byte streamId, ExecutionFlags executionFlags)
         {
+            bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
+
             // acquire the global lock to write the request
             _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
             lock (_globalLock)
             {
-                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId, _tracing))
+                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId, tracing))
                     writer(frameWriter);
             }
 
@@ -191,9 +190,9 @@ namespace CassandraSharp.Transport
             try
             {
                 // read stream id - we are the only one reading so no lock required
-                bool frameTracing;
-                byte streamId = FrameReader.ReadStreamId(_inputStream, out frameTracing);
-                _frameTracing = frameTracing;
+                bool tracing;
+                byte streamId = FrameReader.ReadStreamId(_inputStream, out tracing);
+                _tracing = tracing;
 
                 // NOTE: the task is running just to return an IEnumerable<object> to the client
                 //       so it's better to execute it on our context immediately
@@ -246,7 +245,7 @@ namespace CassandraSharp.Transport
                 };
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Execute(writer, reader).Result.Count();
+            Execute(writer, reader, ExecutionFlags.None).Result.Count();
 // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
@@ -254,7 +253,7 @@ namespace CassandraSharp.Transport
         {
             Action<IFrameWriter> writer = fw => CQLCommandHelpers.WriteReady(fw, _config.CqlVersion);
             Func<IFrameReader, IEnumerable<object>> reader = fr => new object[] {CQLCommandHelpers.ReadReady(fr)};
-            bool authenticate = Execute(writer, reader).Result.Cast<bool>().Single();
+            bool authenticate = Execute(writer, reader, ExecutionFlags.None).Result.Cast<bool>().Single();
             if (authenticate)
             {
                 Authenticate();
@@ -276,7 +275,7 @@ namespace CassandraSharp.Transport
                 };
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Execute(writer, reader).Result.Count();
+            Execute(writer, reader, ExecutionFlags.None).Result.Count();
 // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
     }

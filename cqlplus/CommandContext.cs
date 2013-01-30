@@ -52,11 +52,17 @@ namespace cqlplus
 
         public static string OutputFile { get; set; }
 
+        public static bool Tracing { get; set; }
+
+        public static ConsistencyLevel CL { get; set; }
+
         public static void Reset()
         {
             ColumnWidth = 40;
             Formatter = OutputFormatter.Tab;
             DebugLog = false;
+            Tracing = false;
+            CL = ConsistencyLevel.QUORUM;
         }
     }
 }

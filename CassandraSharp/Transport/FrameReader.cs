@@ -125,7 +125,7 @@ namespace CassandraSharp.Transport
             return new FrameReader(stream, streaming, tracing);
         }
 
-        public static byte ReadStreamId(Stream stream, out bool frameTracing)
+        public static byte ReadStreamId(Stream stream, out bool tracing)
         {
             FrameType version = (FrameType) stream.ReadByte();
             if (0 == (version & FrameType.Response))
@@ -138,7 +138,7 @@ namespace CassandraSharp.Transport
             }
 
             FrameHeaderFlags flags = (FrameHeaderFlags) stream.ReadByte();
-            frameTracing = 0 != (flags & FrameHeaderFlags.Tracing); 
+            tracing = 0 != (flags & FrameHeaderFlags.Tracing); 
 
             byte streamId = (byte)stream.ReadByte();
             return streamId;

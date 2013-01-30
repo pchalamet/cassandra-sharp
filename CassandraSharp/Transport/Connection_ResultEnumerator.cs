@@ -23,51 +23,6 @@ namespace CassandraSharp.Transport
 
     internal partial class Connection
     {
-        //private IEnumerable<object> StreamResultsThenReleaseStreamId(Func<FrameReader, IEnumerable<object>> reader, byte streamId)
-        //{
-        //    // NOTE: this method runs inside a Task<IEnumerable<object>> but is an enumerator by itself
-        //    //       this means that as soon as the task is running it will yield immediately
-        //    //       rendering the task nearly immediately done.
-        //    //       So this method should *not* be considered as running inside a task context
-        //    try
-        //    {
-        //        _logger.Debug("Starting reading stream {0}@{1}", streamId, Endpoint);
-        //        lock (_globalLock)
-        //        {
-        //            // release stream id (since result streaming has started)
-        //            _availableStreamIds.Push(streamId);
-        //            Monitor.Pulse(_globalLock);
-        //        }
-
-        //        // yield all rows - no lock required on input stream since we are the only one allowed to read
-        //        using (FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming))
-        //        {
-        //            // if no streaming we have read everything in memory
-        //            // we can run a new reader immediately
-        //            if (!_streaming)
-        //            {
-        //                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-        //            }
-
-        //            foreach (object row in EnumerableOrEmptyEnumerable(reader(frameReader)))
-        //            {
-        //                yield return row;
-        //            }
-        //        }
-
-        //        _logger.Debug("Done reading stream {0}@{1}", streamId, Endpoint);
-        //        yield break;
-        //    }
-        //    finally
-        //    {
-        //        // run a new reader after streaming data
-        //        if (_streaming)
-        //        {
-        //            Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-        //        }
-        //    }
-        //}
-
         internal class ResultStreamEnumerable : IEnumerable<object>
         {
             private readonly Connection _connection;

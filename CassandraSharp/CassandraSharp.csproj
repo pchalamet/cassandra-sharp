@@ -65,6 +65,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CQL\Unit.cs" />
+    <Compile Include="ExecutionFlags.cs" />
     <Compile Include="Transport\Connection_ResultEnumerator.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />

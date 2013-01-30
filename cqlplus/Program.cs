@@ -69,7 +69,7 @@ namespace cqlplus
                         Transport = new TransportConfig
                             {
                                     User = _cliArgs.User,
-                                    Password = _cliArgs.Password,
+                                    Password = _cliArgs.Password
                             },
                         Endpoints = new EndpointsConfig
                             {

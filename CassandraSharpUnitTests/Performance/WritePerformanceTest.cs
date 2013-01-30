@@ -34,10 +34,6 @@
                             {
                                     Servers = new[] {"localhost"}
                             },
-                        Transport = new TransportConfig
-                            {
-                                    Tracing = true,
-                            }
                 };
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))

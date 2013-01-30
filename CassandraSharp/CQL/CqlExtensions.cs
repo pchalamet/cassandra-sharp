@@ -27,14 +27,14 @@ namespace CassandraSharp.CQL
             return @this.ContinueWith(a => (IList<T>) a.Result.ToList());
         }
 
-        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            return CQLCommandHelpers.Query<Unit>(cluster, cql, cl, null).ContinueWith(res => res.Result.Count());
+            return CQLCommandHelpers.Query<Unit>(cluster, cql, cl, null, executionFlags).ContinueWith(res => res.Result.Count());
         }
 
-        public static IPreparedQuery Prepare(this ICluster cluster, string cql)
+        public static IPreparedQuery Prepare(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            return new PreparedQuery(cluster, cql);
+            return new PreparedQuery(cluster, cql, executionFlags);
         }
     }
 }
