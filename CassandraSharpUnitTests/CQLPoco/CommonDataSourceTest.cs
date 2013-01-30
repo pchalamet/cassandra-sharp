@@ -16,6 +16,7 @@
 namespace CassandraSharpUnitTests.CQLPoco
 {
     using System;
+    using CassandraSharp;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;

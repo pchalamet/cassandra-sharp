@@ -53,7 +53,7 @@ namespace cqlplus
             {
                 if (CommandContext.DebugLog)
                 {
-                    Console.Write("{0} [{1}] - ", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId);
+                    Console.Write("LOG   {0} [{1}] - ", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId);
                     Console.WriteLine(format, prms);
                 }
             }

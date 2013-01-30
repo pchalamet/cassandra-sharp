@@ -63,6 +63,7 @@
     <Compile Include="Commands\Reset.cs" />
     <Compile Include="Commands\Source.cs" />
     <Compile Include="ConsoleDebugLogger.cs" />
+    <Compile Include="ConsoleInstrumentation.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="Parser\Parser.cs" />
     <Compile Include="Parser\ParseTree.cs" />

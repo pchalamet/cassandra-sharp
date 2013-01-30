@@ -25,17 +25,20 @@ namespace CassandraSharp.Transport
 
         private readonly ILogger _logger;
 
-        public ConnectionFactory(TransportConfig config, ILogger logger)
+        private readonly IInstrumentation _instrumentation;
+
+        public ConnectionFactory(TransportConfig config, ILogger logger, IInstrumentation instrumentation)
         {
             _config = config;
             _logger = logger;
+            _instrumentation = instrumentation;
         }
 
         public IConnection Create(IPAddress address)
         {
             _logger.Debug("Creating connection to {0}", address);
 
-            Connection connection = new Connection(address, _config, _logger);
+            Connection connection = new Connection(address, _config, _logger, _instrumentation);
             return connection;
         }
     }

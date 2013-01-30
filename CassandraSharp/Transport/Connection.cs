@@ -45,6 +45,8 @@ namespace CassandraSharp.Transport
 
         private readonly ILogger _logger;
 
+        private readonly IInstrumentation _instrumentation;
+
         private readonly Stream _outputStream;
 
         private readonly Task<IEnumerable<object>>[] _readers = new Task<IEnumerable<object>>[MAX_STREAMID];
@@ -53,13 +55,16 @@ namespace CassandraSharp.Transport
 
         private volatile bool _tracing;
 
+        private volatile byte _streamId;
+
         private readonly TcpClient _tcpClient;
 
-        public Connection(IPAddress address, TransportConfig config, ILogger logger)
+        public Connection(IPAddress address, TransportConfig config, ILogger logger, IInstrumentation instrumentation)
         {
             Endpoint = address;
             _config = config;
             _logger = logger;
+            _instrumentation = instrumentation;
             _tcpClient = new TcpClient();
             _tcpClient.Connect(address, _config.Port);
             _streaming = config.Streaming;
@@ -105,6 +110,8 @@ namespace CassandraSharp.Transport
 
                 // get the stream id and initialize async reader context
                 streamId = _availableStreamIds.Pop();
+
+                _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.Start);
 
                 // promise to stream results
                 taskRead = CreateReadNextFrame(reader, streamId);
@@ -157,6 +164,8 @@ namespace CassandraSharp.Transport
             {
                 Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
             }
+
+            _instrumentation.ClientTrace(Endpoint, _streamId, CheckpointType.EndRead);
         }
 
         private Task<IEnumerable<object>> CreateReadNextFrame(Func<IFrameReader, IEnumerable<object>> reader, byte streamId)
@@ -172,6 +181,8 @@ namespace CassandraSharp.Transport
 
         private void WriteNextFrame(Action<IFrameWriter> writer, byte streamId, ExecutionFlags executionFlags)
         {
+            _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.BeginWrite);
+
             bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
 
             // acquire the global lock to write the request
@@ -183,6 +194,7 @@ namespace CassandraSharp.Transport
             }
 
             _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
+            _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.EndWrite);
         }
 
         private void ReadNextFrameHeader()
@@ -192,7 +204,10 @@ namespace CassandraSharp.Transport
                 // read stream id - we are the only one reading so no lock required
                 bool tracing;
                 byte streamId = FrameReader.ReadStreamId(_inputStream, out tracing);
+                _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.BeginRead);
+                
                 _tracing = tracing;
+                _streamId = streamId;
 
                 // NOTE: the task is running just to return an IEnumerable<object> to the client
                 //       so it's better to execute it on our context immediately
@@ -235,19 +250,19 @@ namespace CassandraSharp.Transport
             }
         }
 
-        private void GetOptions()
-        {
-            Action<IFrameWriter> writer = CQLCommandHelpers.WriteOptions;
-            Func<IFrameReader, IEnumerable<object>> reader = fr =>
-                {
-                    CQLCommandHelpers.ReadOptions(fr);
-                    return null;
-                };
+//        private void GetOptions()
+//        {
+//            Action<IFrameWriter> writer = CQLCommandHelpers.WriteOptions;
+//            Func<IFrameReader, IEnumerable<object>> reader = fr =>
+//                {
+//                    CQLCommandHelpers.ReadOptions(fr);
+//                    return null;
+//                };
 
-// ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Execute(writer, reader, ExecutionFlags.None).Result.Count();
-// ReSharper restore ReturnValueOfPureMethodIsNotUsed
-        }
+//// ReSharper disable ReturnValueOfPureMethodIsNotUsed
+//            Execute(writer, reader, ExecutionFlags.None).Result.Count();
+//// ReSharper restore ReturnValueOfPureMethodIsNotUsed
+//        }
 
         private void ReadifyConnection()
         {

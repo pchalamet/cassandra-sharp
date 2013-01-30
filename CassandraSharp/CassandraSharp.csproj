@@ -66,6 +66,12 @@
     </Compile>
     <Compile Include="CQL\Unit.cs" />
     <Compile Include="ExecutionFlags.cs" />
+    <Compile Include="CheckpointType.cs" />
+    <Compile Include="Extensibility\IInstrumentation.cs" />
+    <Compile Include="Instrumentation\Factory.cs" />
+    <Compile Include="TracingEvent.cs" />
+    <Compile Include="TracingSession.cs" />
+    <Compile Include="Instrumentation\NullInstrumentation.cs" />
     <Compile Include="Transport\Connection_ResultEnumerator.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
@@ -96,7 +102,7 @@
     <Compile Include="CQLBinaryProtocol\ColumnSpec.cs" />
     <Compile Include="Extensibility\IColumnSpec.cs" />
     <Compile Include="CQLBinaryProtocol\ValueSerialization.cs" />
-    <Compile Include="Extensibility\ColumnType.cs" />
+    <Compile Include="ColumnType.cs" />
     <Compile Include="CQLBinaryProtocol\BigEndianStreamExtensions.cs" />
     <Compile Include="CQLPropertyBag\InstanceBuilder.cs" />
     <Compile Include="Extensibility\IFrameReader.cs" />
@@ -135,7 +141,6 @@
     <Compile Include="Extensibility\IBehaviorConfig.cs" />
     <Compile Include="Extensibility\IRecoveryService.cs" />
     <Compile Include="ClusterManager.cs" />
-    <Compile Include="Config\BehaviorConfig.cs" />
     <Compile Include="Config\CassandraSharpConfig.cs" />
     <Compile Include="Config\ClusterConfig.cs" />
     <Compile Include="Config\EndpointsConfig.cs" />

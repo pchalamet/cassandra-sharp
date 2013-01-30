@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp.Instrumentation
 {
-    using System.Xml.Serialization;
+    using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
 
-    public class ClusterConfig
+    internal static class Factory
     {
-        [XmlElement("Endpoints")]
-        public EndpointsConfig Endpoints { get; set; }
+        public static IInstrumentation Create(string customType, params object[] prms)
+        {
+            if (customType == "Null")
+            {
+                customType = ServiceActivator.GetTypeName<NullInstrumentation>();
+            }
 
-        [XmlAttribute("name")]
-        public string Name { get; set; }
-
-        [XmlElement("Transport")]
-        public TransportConfig Transport { get; set; }
+            return ServiceActivator.Create<IInstrumentation>(customType, prms);
+        }
     }
 }

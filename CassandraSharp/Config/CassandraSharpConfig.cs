@@ -22,8 +22,9 @@ namespace CassandraSharp.Config
     {
         public CassandraSharpConfig()
         {
-            Recovery = "Simple";
+            Recovery = "Null";
             Logger = "Null";
+            Instrumentation = "Null";
         }
 
         [XmlAttribute("recovery")]
@@ -31,6 +32,9 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("logger")]
         public string Logger { get; set; }
+
+        [XmlAttribute("Instrumentation")]
+        public string Instrumentation { get; set; }
 
         [XmlElement("Cluster")]
         public ClusterConfig[] Clusters { get; set; }

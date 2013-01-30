@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp
 {
-    using System.Xml.Serialization;
+    using System;
 
-    public class ClusterConfig
+    public class TracingEvent
     {
-        [XmlElement("Endpoints")]
-        public EndpointsConfig Endpoints { get; set; }
+        public TracingEvent(string activity, Guid eventId, long sourceElapsed, string thread)
+        {
+            Activity = activity;
+            EventId = eventId;
+            SourceElapsed = sourceElapsed;
+            Thread = thread;
+        }
 
-        [XmlAttribute("name")]
-        public string Name { get; set; }
+        public string Activity { get; private set; }
 
-        [XmlElement("Transport")]
-        public TransportConfig Transport { get; set; }
+        public Guid EventId { get; private set; }
+
+        public long SourceElapsed { get; private set; }
+
+        public string Thread { get; private set; }
     }
 }

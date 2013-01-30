@@ -62,6 +62,7 @@ namespace cqlplus
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
             cassandraSharpConfig.Logger = typeof(ConsoleDebugLogger).AssemblyQualifiedName;
+            cassandraSharpConfig.Instrumentation = typeof(ConsoleInstrumentation).AssemblyQualifiedName;
             ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
