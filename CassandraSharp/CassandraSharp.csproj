@@ -47,7 +47,7 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="Cluster\Factory.cs" />
-    <Compile Include="CQLBinaryProtocol\DateTimeExtensions.cs" />
+    <Compile Include="Transport\DateTimeExtensions.cs" />
     <Compile Include="CQLPoco\DataMapperFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -73,7 +73,7 @@
     <Compile Include="TracingSession.cs" />
     <Compile Include="Instrumentation\NullInstrumentation.cs" />
     <Compile Include="Transport\BufferingFrameReader.cs" />
-    <Compile Include="Transport\PrimitiveExtensions.cs" />
+    <Compile Include="Transport\PrimitiveOnWireExtensions.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
     <Compile Include="Utils\EnumeratorExtensions.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
@@ -89,7 +89,7 @@
     <Compile Include="Exceptions\UnknownResponseException.cs" />
     <Compile Include="Exceptions\UnpreparedException.cs" />
     <Compile Include="Exceptions\WriteTimeOutException.cs" />
-    <Compile Include="CQLBinaryProtocol\ArrayExtensions.cs" />
+    <Compile Include="Transport\ArrayExtensions.cs" />
     <Compile Include="ErrorCodes.cs" />
     <Compile Include="CQLBinaryProtocol\FrameHeaderFlags.cs" />
     <Compile Include="CQLBinaryProtocol\FrameType.cs" />

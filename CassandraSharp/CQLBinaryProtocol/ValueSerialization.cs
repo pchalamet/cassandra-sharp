@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Net;
     using System.Text;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Transport;
     using CassandraSharp.Utils;
 
     internal static class ValueSerialization
@@ -95,7 +96,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 case ColumnType.Ascii:
                 case ColumnType.Text:
                 case ColumnType.Varchar:
-                    rawData = Encoding.ASCII.GetBytes((string) data);
+                    rawData = ((string) data).GetBytes();
                     break;
 
                 case ColumnType.Blob:
@@ -103,45 +104,37 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 case ColumnType.Double:
-                    rawData = BitConverter.GetBytes((double) data);
-                    rawData.ReverseIfLittleEndian();
+                    rawData = ((double) data).GetBytes();
                     break;
 
                 case ColumnType.Float:
-                    rawData = BitConverter.GetBytes((float) data);
-                    rawData.ReverseIfLittleEndian();
+                    rawData = ((float) data).GetBytes();
                     break;
 
                 case ColumnType.Timestamp:
-                    rawData = BitConverter.GetBytes(((DateTime) data).ToTimestamp());
-                    rawData.ReverseIfLittleEndian();
+                    rawData = ((DateTime) data).GetBytes();
                     break;
 
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
-                    rawData = BitConverter.GetBytes((long) data);
-                    rawData.ReverseIfLittleEndian();
+                    rawData = ((long) data).GetBytes();
                     break;
 
                 case ColumnType.Int:
-                    rawData = BitConverter.GetBytes((int) data);
-                    rawData.ReverseIfLittleEndian();
+                    rawData = ((int) data).GetBytes();
                     break;
 
                 case ColumnType.Boolean:
-                    rawData = BitConverter.GetBytes((bool) data);
+                    rawData = ((bool) data).GetBytes();
                     break;
 
                 case ColumnType.Uuid:
                 case ColumnType.Timeuuid:
-                    rawData = ((Guid)data).ToByteArray();
-                    rawData.ReverseIfLittleEndian(0, 4);
-                    rawData.ReverseIfLittleEndian(4, 2);
-                    rawData.ReverseIfLittleEndian(6, 2);
+                    rawData = ((Guid) data).GetBytes();
                     break;
 
                 case ColumnType.Inet:
-                    rawData = ((IPAddress) data).GetAddressBytes();
+                    rawData = ((IPAddress) data).GetBytes();
                     break;
 
                 default:
@@ -238,45 +231,37 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 case ColumnType.Double:
-                    rawData.ReverseIfLittleEndian();
-                    data = BitConverter.ToDouble(rawData, 0);
+                    data = rawData.ToDouble();
                     break;
 
                 case ColumnType.Float:
-                    rawData.ReverseIfLittleEndian();
-                    data = BitConverter.ToSingle(rawData, 0);
+                    data = rawData.ToFloat();
                     break;
 
                 case ColumnType.Timestamp:
-                    rawData.ReverseIfLittleEndian();
-                    data = BitConverter.ToInt64(rawData, 0).ToDateTime();
+                    data = rawData.ToDateTime();
                     break;
 
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
-                    rawData.ReverseIfLittleEndian();
-                    data = BitConverter.ToInt64(rawData, 0);
+                    data = rawData.ToLong(0);
                     break;
 
                 case ColumnType.Int:
-                    rawData.ReverseIfLittleEndian();
-                    data = BitConverter.ToInt32(rawData, 0);
+                    data = rawData.ToInt(0);
                     break;
 
                 case ColumnType.Boolean:
-                    data = BitConverter.ToBoolean(rawData, 0);
+                    data = rawData.ToBoolean();
                     break;
 
                 case ColumnType.Uuid:
                 case ColumnType.Timeuuid:
-                    rawData.ReverseIfLittleEndian(0, 4);
-                    rawData.ReverseIfLittleEndian(4, 2);
-                    rawData.ReverseIfLittleEndian(6, 2);
-                    data = new Guid(rawData);
+                    data = rawData.ToGuid();
                     break;
 
                 case ColumnType.Inet:
-                    data = new IPAddress(rawData);
+                    data = rawData.ToIPAddress();
                     break;
 
                 default:

@@ -16,7 +16,7 @@
 namespace CassandraSharpUnitTests.CQLBinaryProtocol
 {
     using System;
-    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.Transport;
     using NUnit.Framework;
 
     [TestFixture]

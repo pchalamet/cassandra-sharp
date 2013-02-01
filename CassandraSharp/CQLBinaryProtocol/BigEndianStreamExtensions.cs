@@ -19,6 +19,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using CassandraSharp.Transport;
 
     internal static class BigEndianStreamExtensions
     {
