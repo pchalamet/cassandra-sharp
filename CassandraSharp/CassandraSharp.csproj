@@ -66,19 +66,20 @@
     </Compile>
     <Compile Include="CQL\Unit.cs" />
     <Compile Include="ExecutionFlags.cs" />
-    <Compile Include="CheckpointType.cs" />
+    <Compile Include="EventType.cs" />
     <Compile Include="Extensibility\IInstrumentation.cs" />
     <Compile Include="Instrumentation\Factory.cs" />
     <Compile Include="TracingEvent.cs" />
     <Compile Include="TracingSession.cs" />
     <Compile Include="Instrumentation\NullInstrumentation.cs" />
-    <Compile Include="Transport\Connection_ResultEnumerator.cs" />
+    <Compile Include="Transport\BufferingFrameReader.cs" />
+    <Compile Include="Transport\PrimitiveExtensions.cs" />
     <Compile Include="Utils\DictionaryInitializer.cs" />
+    <Compile Include="Utils\EnumeratorExtensions.cs" />
     <Compile Include="Utils\HashSetInitializer.cs" />
     <Compile Include="Utils\ICollectionInitializer.cs" />
     <Compile Include="Utils\IDictionaryInitializer.cs" />
     <Compile Include="Utils\ListInitializer.cs" />
-    <Compile Include="Transport\WindowedReadStream.cs" />
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Exceptions\CassandraException.cs" />
     <Compile Include="Exceptions\InvalidException.cs" />
@@ -107,8 +108,8 @@
     <Compile Include="CQLPropertyBag\InstanceBuilder.cs" />
     <Compile Include="Extensibility\IFrameReader.cs" />
     <Compile Include="Extensibility\IFrameWriter.cs" />
-    <Compile Include="Transport\FrameReader.cs" />
-    <Compile Include="Transport\FrameWriter.cs" />
+    <Compile Include="Transport\StreamingFrameReader.cs" />
+    <Compile Include="Transport\BufferingFrameWriter.cs" />
     <Compile Include="Extensibility\IInstanceBuilder.cs" />
     <Compile Include="MessageOpcodes.cs" />
     <Compile Include="CQLBinaryProtocol\CQLCommandHelpers.cs" />

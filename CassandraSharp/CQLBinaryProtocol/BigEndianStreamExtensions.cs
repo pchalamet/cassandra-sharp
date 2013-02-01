@@ -85,10 +85,20 @@ namespace CassandraSharp.CQLBinaryProtocol
             stream.Write(data, 0, len);
         }
 
+        private static void ReadBuffer(this Stream stream, byte[] buffer)
+        {
+            int read = 0;
+            int len = buffer.Length;
+            while (read != len)
+            {
+                read += stream.Read(buffer, read, len - read);
+            }
+        }
+
         public static short ReadShort(this Stream stream)
         {
             byte[] buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
+            stream.ReadBuffer(buffer);
             buffer.ReverseIfLittleEndian();
 
             short data = BitConverter.ToInt16(buffer, 0);
@@ -98,7 +108,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         public static int ReadInt(this Stream stream)
         {
             byte[] buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
+            stream.ReadBuffer(buffer);
             buffer.ReverseIfLittleEndian();
 
             int data = BitConverter.ToInt32(buffer, 0);
@@ -114,7 +124,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             byte[] bufStr = new byte[len];
-            stream.Read(bufStr, 0, len);
+            stream.ReadBuffer(bufStr);
             string data = Encoding.UTF8.GetString(bufStr);
             return data;
         }
@@ -128,11 +138,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             byte[] data = new byte[len];
-            if (0 < len)
-            {
-                stream.Read(data, 0, len);
-            }
-
+            stream.ReadBuffer(data);
             return data;
         }
 
@@ -140,11 +146,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             short len = stream.ReadShort();
             byte[] data = new byte[len];
-            if (0 < len)
-            {
-                stream.Read(data, 0, len);
-            }
-
+            stream.ReadBuffer(data);
             return data;
         }
 

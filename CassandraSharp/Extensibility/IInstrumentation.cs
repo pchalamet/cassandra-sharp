@@ -15,12 +15,17 @@
 
 namespace CassandraSharp.Extensibility
 {
+    using System;
     using System.Net;
 
     public interface IInstrumentation
     {
-        void ClientTrace(IPAddress coordinator, byte streamId, CheckpointType type);
+        void ClientQuery(Guid queryId);
 
-        void ServerTrace(IPAddress coordinator, byte streamId, TracingSession session);
+        void ClientConnectionInfo(Guid queryId, IPAddress coordinator, byte streamId);
+
+        void ClientTrace(Guid queryId, EventType eventType);
+
+        void ServerTrace(Guid queryId, TracingSession session);
     }
 }

@@ -62,6 +62,7 @@
     <Compile Include="CQLPoco\InstanceBuilderTest.cs" />
     <Compile Include="EndpointStrategy\RandomEndpointStrategyTest.cs" />
     <Compile Include="EndpointStrategy\TimedUuid.cs" />
+    <Compile Include="Endurance\EnduranceTest.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
     <Compile Include="ClusterTest.cs" />
     <Compile Include="Performance\WritePerformanceTest.cs" />

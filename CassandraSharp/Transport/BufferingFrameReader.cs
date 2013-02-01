@@ -13,28 +13,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Instrumentation
+namespace CassandraSharp.Transport
 {
-    using System;
-    using System.Net;
-    using CassandraSharp.Extensibility;
+    using System.IO;
+    using System.Net.Sockets;
+    using CassandraSharp.Utils;
 
-    public class NullInstrumentation : IInstrumentation
+    internal class BufferingFrameReader : StreamingFrameReader
     {
-        public void ClientQuery(Guid queryId)
+        private readonly byte[] _buffer;
+
+        private readonly Stream _ms;
+
+        public BufferingFrameReader(Socket socket)
+                : base(socket)
         {
+            _buffer = new byte[FrameBytesLeft];
+            base.ReceiveBuffer(_buffer, 0, _buffer.Length);
+            _ms = new MemoryStream(_buffer);
         }
 
-        public void ClientConnectionInfo(Guid queryId, IPAddress coordinator, byte streamId)
+        public override void Dispose()
         {
+            _ms.SafeDispose();
+            base.Dispose();
         }
 
-        public void ClientTrace(Guid queryId, EventType eventType)
+        protected override void ReceiveBuffer(byte[] buffer, int offset, int len)
         {
-        }
-
-        public void ServerTrace(Guid queryId, TracingSession session)
-        {
+            _ms.Read(buffer, offset, len);
         }
     }
 }

@@ -23,21 +23,40 @@ namespace cqlplus
 
     public class ConsoleInstrumentation : IInstrumentation
     {
-        private readonly object _lock = new object();
-
-        public void ClientTrace(IPAddress coordinator, byte streamId, CheckpointType type)
+        public void ClientQuery(Guid queryId)
         {
-            lock (_lock)
+            if (CommandContext.DebugLog)
             {
-                if (CommandContext.DebugLog)
-                {
-                    Console.Write("INSTR {0} [{1}] - ", DateTime.Now, Thread.CurrentThread.ManagedThreadId);
-                    Console.WriteLine("coordinator:{0} streamId:{1} type:{2}", coordinator, streamId, type);
-                }
+                string buffer = string.Format("INSTR {0} [{1}] - queryId:{2}",
+                                              DateTime.Now, Thread.CurrentThread.ManagedThreadId,
+                                              queryId);
+                Console.WriteLine(buffer);
             }
         }
 
-        public void ServerTrace(IPAddress coordinator, byte streamId, TracingSession session)
+        public void ClientConnectionInfo(Guid queryId, IPAddress coordinator, byte streamId)
+        {
+            if (CommandContext.DebugLog)
+            {
+                string buffer = string.Format("INSTR {0} [{1}] - queryId:{2} coordinator:{3} streamId:{4}",
+                                              DateTime.Now, Thread.CurrentThread.ManagedThreadId,
+                                              queryId, coordinator, streamId);
+                Console.WriteLine(buffer);
+            }
+        }
+
+        public void ClientTrace(Guid queryId, EventType eventType)
+        {
+            if (CommandContext.DebugLog)
+            {
+                string buffer = string.Format("INSTR {0} [{1}] - queryId:{2} type:{3}",
+                                              DateTime.Now, Thread.CurrentThread.ManagedThreadId,
+                                              queryId, eventType);
+                Console.WriteLine(buffer);
+            }
+        }
+
+        public void ServerTrace(Guid queryId, TracingSession session)
         {
         }
     }

@@ -36,5 +36,7 @@ namespace CassandraSharp.Extensibility
         byte[] ReadShortBytes();
 
         Dictionary<string, string[]> ReadStringMultimap();
+
+        void ThrowExceptionIfError();
     }
 }

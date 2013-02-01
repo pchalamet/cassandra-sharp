@@ -38,6 +38,15 @@
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
+                const string dropFoo = "drop keyspace Tests";
+                try
+                {
+                    cluster.ExecuteNonQuery(dropFoo).Wait();
+                }
+                catch
+                {
+                }
+
                 const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createFoo);
@@ -61,7 +70,7 @@
                 Console.WriteLine("============================================================");
                 Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
                 Console.WriteLine("============================================================");
-                var prepared = cluster.Prepare(insertPerf);
+                var prepared = cluster.Prepare(insertPerf, ExecutionFlags.Tracing);
                 int n = 0;
                 while (n < NUM_ROUND)
                 {
@@ -79,7 +88,6 @@
                     n++;
                 }
 
-                const string dropFoo = "drop keyspace Tests";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(dropFoo);
                 Console.WriteLine("============================================================");
@@ -101,6 +109,15 @@
             Cassandra.Client client = new Cassandra.Client(protocol);
 
             transport.Open();
+
+            const string dropFoo = "drop keyspace Tests";
+            try
+            {
+                client.execute_cql3_query(Encoding.UTF8.GetBytes(dropFoo), Compression.NONE, Apache.Cassandra.ConsistencyLevel.QUORUM);
+            }
+            catch
+            {
+            }
 
             const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
             Console.WriteLine("============================================================");
@@ -145,11 +162,10 @@
                 n++;
             }
 
-            const string dropFoo = "drop keyspace Tests";
             Console.WriteLine("============================================================");
             Console.WriteLine(dropFoo);
             Console.WriteLine("============================================================");
-            client.execute_cql3_query(Encoding.UTF8.GetBytes("drop keyspace Tests"), Compression.NONE, Apache.Cassandra.ConsistencyLevel.QUORUM);
+            client.execute_cql3_query(Encoding.UTF8.GetBytes(dropFoo), Compression.NONE, Apache.Cassandra.ConsistencyLevel.QUORUM);
         }
     }
 }

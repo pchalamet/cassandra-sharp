@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 namespace cqlplus
 {
     using System;
+    using System.Text;
+    using System.Threading;
     using CassandraSharp.Extensibility;
 
     internal class ConsoleDebugLogger : ILogger
     {
-        private static readonly object _lock = new object();
-
         public void Debug(string format, params object[] prms)
         {
             Log(format, prms);
@@ -49,13 +49,12 @@ namespace cqlplus
 
         private static void Log(string format, object[] prms)
         {
-            lock (_lock)
+            if (CommandContext.DebugLog)
             {
-                if (CommandContext.DebugLog)
-                {
-                    Console.Write("LOG   {0} [{1}] - ", DateTime.Now, System.Threading.Thread.CurrentThread.ManagedThreadId);
-                    Console.WriteLine(format, prms);
-                }
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("LOG   {0} [{1}] - ", DateTime.Now, Thread.CurrentThread.ManagedThreadId);
+                sb.AppendFormat(format, prms);
+                Console.WriteLine(sb);
             }
         }
     }

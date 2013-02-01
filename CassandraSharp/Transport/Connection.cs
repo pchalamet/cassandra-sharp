@@ -29,7 +29,8 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal partial class Connection : IConnection, IDisposable
+    internal class Connection : IConnection,
+                                IDisposable
     {
         private const byte MAX_STREAMID = 0x80;
 
@@ -41,21 +42,15 @@ namespace CassandraSharp.Transport
 
         private readonly object _globalLock = new object();
 
-        private readonly Stream _inputStream;
+        private readonly IInstrumentation _instrumentation;
 
         private readonly ILogger _logger;
 
-        private readonly IInstrumentation _instrumentation;
+        private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
 
-        private readonly Stream _outputStream;
-
-        private readonly Task<IEnumerable<object>>[] _readers = new Task<IEnumerable<object>>[MAX_STREAMID];
+        private readonly Socket _socket;
 
         private readonly bool _streaming;
-
-        private volatile bool _tracing;
-
-        private volatile byte _streamId;
 
         private readonly TcpClient _tcpClient;
 
@@ -69,18 +64,12 @@ namespace CassandraSharp.Transport
             _tcpClient.Connect(address, _config.Port);
             _streaming = config.Streaming;
 
-            Stream stream = _tcpClient.GetStream();
-#if DEBUG_STREAM
-            stream = new DebugStream(stream);
-#endif
-
-            _outputStream = stream;
-            _inputStream = stream;
-
             for (byte idx = 0; idx < MAX_STREAMID; ++idx)
             {
                 _availableStreamIds.Push(idx);
             }
+
+            _socket = _tcpClient.Client;
 
             // start a new read task
             Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
@@ -96,6 +85,9 @@ namespace CassandraSharp.Transport
 
         public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags)
         {
+            Guid queryId = Guid.NewGuid();
+            _instrumentation.ClientQuery(queryId);
+
             Task<IEnumerable<object>> taskRead;
             byte streamId;
             lock (_globalLock)
@@ -111,11 +103,12 @@ namespace CassandraSharp.Transport
                 // get the stream id and initialize async reader context
                 streamId = _availableStreamIds.Pop();
 
-                _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.Start);
-
                 // promise to stream results
-                taskRead = CreateReadNextFrame(reader, streamId);
-                _readers[streamId] = taskRead;
+                taskRead = new Task<IEnumerable<object>>(() => ReadResultStream(streamId, reader));
+                _queryInfos[streamId].Id = queryId;
+                _queryInfos[streamId].ReadTask = taskRead;
+
+                _instrumentation.ClientConnectionInfo(queryId, Endpoint, streamId);
             }
             _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
 
@@ -135,43 +128,34 @@ namespace CassandraSharp.Transport
             _cancellation.SafeDispose();
         }
 
-        private FrameReader ReleaseStreamId(byte streamId)
+        private IEnumerable<object> ReadResultStream(byte streamId, Func<IFrameReader, IEnumerable<object>> reader)
         {
-            lock (_globalLock)
+            IFrameReader frameReader = null;
+            try
             {
-                // release stream id (since result streaming has started)
-                _availableStreamIds.Push(streamId);
-                Monitor.Pulse(_globalLock);
+                frameReader = _queryInfos[streamId].FrameReader;
+                frameReader.ThrowExceptionIfError();
+
+                IEnumerable<object> results = reader(frameReader);
+                results = results ?? Enumerable.Empty<object>();
+                foreach (object result in results)
+                {
+                    yield return result;
+                }
             }
-
-            // yield all rows - no lock required on input stream since we are the only one allowed to read
-            FrameReader frameReader = FrameReader.ReadBody(_inputStream, _streaming, _tracing);
-
-            // if no streaming we have read everything in memory
-            // we can run a new reader immediately
-            if (!_streaming)
+            finally
             {
-                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                frameReader.SafeDispose();
+
+                Guid queryId = _queryInfos[streamId].Id;
+                _instrumentation.ClientTrace(queryId, EventType.EndRead);
+
+                // run a new reader after streaming data if we were streaming
+                if (_streaming)
+                {
+                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                }
             }
-
-            return frameReader;
-        }
-
-        private void CompleteStreamRead()
-        {
-            // run a new reader after streaming data
-            if (_streaming)
-            {
-                Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-            }
-
-            _instrumentation.ClientTrace(Endpoint, _streamId, CheckpointType.EndRead);
-        }
-
-        private Task<IEnumerable<object>> CreateReadNextFrame(Func<IFrameReader, IEnumerable<object>> reader, byte streamId)
-        {
-            //return new Task<IEnumerable<object>>(() => StreamResultsThenReleaseStreamId(reader, streamId));
-            return new Task<IEnumerable<object>>(() => new ResultStreamEnumerable(this, reader, streamId));
         }
 
         private void StartWriteNextFrame(Action<IFrameWriter> writer, byte streamId, ExecutionFlags executionFlags)
@@ -181,7 +165,8 @@ namespace CassandraSharp.Transport
 
         private void WriteNextFrame(Action<IFrameWriter> writer, byte streamId, ExecutionFlags executionFlags)
         {
-            _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.BeginWrite);
+            Guid queryId = _queryInfos[streamId].Id;
+            _instrumentation.ClientTrace(queryId, EventType.BeginWrite);
 
             bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
 
@@ -189,29 +174,44 @@ namespace CassandraSharp.Transport
             _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
             lock (_globalLock)
             {
-                using (FrameWriter frameWriter = new FrameWriter(_outputStream, streamId, tracing))
-                    writer(frameWriter);
+                using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(_socket, streamId, tracing))
+                    writer(bufferingFrameWriter);
             }
 
             _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-            _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.EndWrite);
+            _instrumentation.ClientTrace(queryId, EventType.EndWrite);
         }
 
         private void ReadNextFrameHeader()
         {
             try
             {
-                // read stream id - we are the only one reading so no lock required
-                bool tracing;
-                byte streamId = FrameReader.ReadStreamId(_inputStream, out tracing);
-                _instrumentation.ClientTrace(Endpoint, streamId, CheckpointType.BeginRead);
-                
-                _tracing = tracing;
-                _streamId = streamId;
+                StreamingFrameReader frameReader = _streaming
+                                                           ? new StreamingFrameReader(_socket)
+                                                           : new BufferingFrameReader(_socket);
+                byte streamId = frameReader.StreamId;
+                _queryInfos[streamId].FrameReader = frameReader;
+
+                Guid queryId = _queryInfos[streamId].Id;
+                _instrumentation.ClientTrace(queryId, EventType.BeginRead);
 
                 // NOTE: the task is running just to return an IEnumerable<object> to the client
                 //       so it's better to execute it on our context immediately
-                _readers[streamId].RunSynchronously();
+                _queryInfos[streamId].ReadTask.RunSynchronously();
+
+                // release streamId now
+                lock (_globalLock)
+                {
+                    // release stream id (since result streaming has started)
+                    _availableStreamIds.Push(streamId);
+                    Monitor.Pulse(_globalLock);
+                }
+
+                // if we are not streaming we can wait for a new frame
+                if (! _streaming)
+                {
+                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                }
             }
             catch (Exception ex)
             {
@@ -268,7 +268,7 @@ namespace CassandraSharp.Transport
         {
             Action<IFrameWriter> writer = fw => CQLCommandHelpers.WriteReady(fw, _config.CqlVersion);
             Func<IFrameReader, IEnumerable<object>> reader = fr => new object[] {CQLCommandHelpers.ReadReady(fr)};
-            bool authenticate = Execute(writer, reader, ExecutionFlags.None).Result.Cast<bool>().Single();
+            bool authenticate = (bool) Execute(writer, reader, ExecutionFlags.None).Result.Single();
             if (authenticate)
             {
                 Authenticate();
@@ -292,6 +292,15 @@ namespace CassandraSharp.Transport
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
             Execute(writer, reader, ExecutionFlags.None).Result.Count();
 // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+        }
+
+        private struct QueryInfo
+        {
+            public Guid Id;
+
+            public Task<IEnumerable<object>> ReadTask;
+
+            public IFrameReader FrameReader;
         }
     }
 }

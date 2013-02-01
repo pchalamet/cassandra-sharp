@@ -24,6 +24,7 @@ namespace Samples
     {
         private static void Main(string[] args)
         {
+            TimeOut.TimeOutSample.Run();
             PreparedStatement.Batch.Run();
             LinqSample.Run();
             FutureSample.Run();

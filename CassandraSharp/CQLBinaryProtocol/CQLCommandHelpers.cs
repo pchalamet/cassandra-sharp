@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ namespace CassandraSharp.CQLBinaryProtocol
         internal static void WriteReady(IFrameWriter frameWriter, string cqlVersion)
         {
             Dictionary<string, string> options = new Dictionary<string, string>
-                    {
-                            {"CQL_VERSION", cqlVersion}
-                    };
+                {
+                        {"CQL_VERSION", cqlVersion}
+                };
             frameWriter.WriteStringMap(options);
             frameWriter.Send(MessageOpcodes.Startup);
         }
@@ -80,7 +80,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 };
             frameWriter.WriteStringMap(authParams);
 
-            frameWriter.Send(MessageOpcodes.Credentials);            
+            frameWriter.Send(MessageOpcodes.Credentials);
         }
 
         internal static void ReadAuthenticate(IFrameReader frameReader)
@@ -88,7 +88,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             if (frameReader.MessageOpcode != MessageOpcodes.Ready)
             {
                 throw new InvalidCredentialException();
-            }            
+            }
         }
 
         internal static void WritePrepareRequest(IFrameWriter frameWriter, string cql)
@@ -171,9 +171,13 @@ namespace CassandraSharp.CQLBinaryProtocol
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
                     byte[] rawData = frameReader.ReadBytes();
-                    if (null != rawData)
+                    object data = null != rawData
+                                          ? colSpec.Deserialize(rawData)
+                                          : null;
+
+                    // FIXME: require to support Nullable<T>
+                    if (null != data)
                     {
-                        object data = colSpec.Deserialize(rawData);
                         instanceBuilder.Set(colSpec, data);
                     }
                 }
@@ -220,12 +224,12 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                     case ColumnType.List:
                     case ColumnType.Set:
-                        colValueType = (ColumnType)frameReader.ReadShort();
+                        colValueType = (ColumnType) frameReader.ReadShort();
                         break;
 
                     case ColumnType.Map:
-                        colKeyType = (ColumnType)frameReader.ReadShort();
-                        colValueType = (ColumnType)frameReader.ReadShort();
+                        colKeyType = (ColumnType) frameReader.ReadShort();
+                        colValueType = (ColumnType) frameReader.ReadShort();
                         break;
                 }
 

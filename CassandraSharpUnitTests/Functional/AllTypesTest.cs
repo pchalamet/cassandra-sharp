@@ -18,6 +18,7 @@ namespace CassandraSharpUnitTests.Functional
     using System;
     using System.Linq;
     using System.Net;
+    using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
@@ -79,6 +80,16 @@ namespace CassandraSharpUnitTests.Functional
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
+                const string dropFoo = "drop keyspace Tests";
+
+                try
+                {
+                    cluster.ExecuteNonQuery(dropFoo).Wait();
+                }
+                catch
+                {
+                }
+
                 const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createFoo);
@@ -141,7 +152,6 @@ namespace CassandraSharpUnitTests.Functional
                 const string selectAll = "select * from Tests.AllTypes";
                 AllTypes allTypesSelect = cluster.Execute<AllTypes>(selectAll).Result.Single();
 
-                const string dropFoo = "drop keyspace Tests";
                 resCount = cluster.ExecuteNonQuery(dropFoo);
                 resCount.Wait();
 

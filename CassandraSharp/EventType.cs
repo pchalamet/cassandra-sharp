@@ -15,10 +15,8 @@
 
 namespace CassandraSharp
 {
-    public enum CheckpointType
+    public enum EventType
     {
-        Start,
-
         BeginWrite,
 
         EndWrite,
