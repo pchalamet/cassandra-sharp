@@ -47,6 +47,11 @@ namespace cqlplus
             Log(format, prms);
         }
 
+       public bool IsDebugEnabled()
+        {
+            return true;
+        }
+
         private static void Log(string format, object[] prms)
         {
             if (CommandContext.DebugLog)
