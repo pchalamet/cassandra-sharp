@@ -38,5 +38,10 @@ namespace CassandraSharp.Logger
         public void Fatal(string format, params object[] prms)
         {
         }
+
+        public bool IsDebugEnabled()
+        {
+            return false;
+        }
     }
 }
