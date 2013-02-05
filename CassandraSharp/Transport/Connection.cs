@@ -133,6 +133,10 @@ namespace CassandraSharp.Transport
             IFrameReader frameReader = null;
             try
             {
+                // we are running on a different thread (the client one)
+                // and the read in _queryInfos are not volatile (they should probably)
+                Thread.MemoryBarrier();
+
                 frameReader = _queryInfos[streamId].FrameReader;
                 frameReader.ThrowExceptionIfError();
 
@@ -149,6 +153,14 @@ namespace CassandraSharp.Transport
 
                 Guid queryId = _queryInfos[streamId].Id;
                 _instrumentation.ClientTrace(queryId, EventType.EndRead);
+
+                // release streamId now
+                lock (_globalLock)
+                {
+                    // release stream id (since result streaming has started)
+                    _availableStreamIds.Push(streamId);
+                    Monitor.Pulse(_globalLock);
+                }
 
                 // run a new reader after streaming data if we were streaming
                 if (_streaming)
@@ -192,20 +204,16 @@ namespace CassandraSharp.Transport
                 byte streamId = frameReader.StreamId;
                 _queryInfos[streamId].FrameReader = frameReader;
 
+                // we are running in another thread of the client
+                // reads in _queryInfos are not volatile (they should probably)
+                Thread.MemoryBarrier();
+
                 Guid queryId = _queryInfos[streamId].Id;
                 _instrumentation.ClientTrace(queryId, EventType.BeginRead);
 
                 // NOTE: the task is running just to return an IEnumerable<object> to the client
                 //       so it's better to execute it on our context immediately
                 _queryInfos[streamId].ReadTask.RunSynchronously();
-
-                // release streamId now
-                lock (_globalLock)
-                {
-                    // release stream id (since result streaming has started)
-                    _availableStreamIds.Push(streamId);
-                    Monitor.Pulse(_globalLock);
-                }
 
                 // if we are not streaming we can wait for a new frame
                 if (! _streaming)
