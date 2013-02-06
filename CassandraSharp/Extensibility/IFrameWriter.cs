@@ -35,6 +35,6 @@ namespace CassandraSharp.Extensibility
 
         void WriteByteArray(byte[] data);
 
-        void Send(MessageOpcodes msgOpcode);
+        void SetMessageType(MessageOpcodes msgOpcode);
     }
 }

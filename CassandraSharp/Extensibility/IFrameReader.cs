@@ -21,6 +21,8 @@ namespace CassandraSharp.Extensibility
     {
         MessageOpcodes MessageOpcode { get; }
 
+        byte StreamId { get; }
+
         byte ReadByte();
 
         short ReadShort();

@@ -47,6 +47,7 @@
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
     <Compile Include="Cluster\Factory.cs" />
+    <Compile Include="Transport\Connection_ResultEnumerator.cs" />
     <Compile Include="Transport\DateTimeExtensions.cs" />
     <Compile Include="CQLPoco\DataMapperFactory.cs">
       <SubType>Code</SubType>

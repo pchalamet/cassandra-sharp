@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,9 +35,14 @@ namespace Samples.Linq
         public string Validator { get; set; }
     }
 
-    public static class LinqSample
+    public class LinqSample : Sample
     {
-        public static void Run()
+        public LinqSample()
+                : base("LinqSample")
+        {
+        }
+
+        protected override void InternalRun()
         {
             XmlConfigurator.Configure();
             using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))

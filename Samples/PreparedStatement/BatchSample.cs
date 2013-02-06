@@ -22,11 +22,16 @@ namespace Samples.PreparedStatement
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
 
-    public class Batch
+    public class BatchSample : Sample
     {
-        private static long _running;
+        private long _running;
 
-        public static void Run()
+        public BatchSample()
+                : base("BatchSample")
+        {
+        }
+
+        protected override void InternalRun()
         {
             XmlConfigurator.Configure();
             using (var cluster = ClusterManager.GetCluster("TestCassandra"))

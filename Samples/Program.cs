@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@ namespace Samples
     using Samples.Future;
     using Samples.Linq;
     using Samples.POCO;
+    using Samples.PreparedStatement;
+    using Samples.TimeOut;
 
     internal class Program
     {
         private static void Main(string[] args)
         {
-            TimeOut.TimeOutSample.Run();
-            PreparedStatement.Batch.Run();
-            LinqSample.Run();
-            FutureSample.Run();
-            POCOSample.Run();
-            AsyncSample.Run();
+            new TimeOutSample().Run();
+            new BatchSample().Run();
+            new LinqSample().Run();
+            new FutureSample().Run();
+            new POCOSample().Run();
+            new AsyncSample().Run();
         }
     }
 }

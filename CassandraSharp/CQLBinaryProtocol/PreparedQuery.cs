@@ -97,7 +97,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             frameWriter.WriteShort((short) cl);
-            frameWriter.Send(MessageOpcodes.Execute);
+            frameWriter.SetMessageType(MessageOpcodes.Execute);
         }
     }
 }

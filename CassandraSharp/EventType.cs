@@ -24,5 +24,7 @@ namespace CassandraSharp
         BeginRead,
 
         EndRead,
+
+        Cancellation
     }
 }

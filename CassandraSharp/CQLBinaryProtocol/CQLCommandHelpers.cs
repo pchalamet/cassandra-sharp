@@ -40,7 +40,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         {"CQL_VERSION", cqlVersion}
                 };
             frameWriter.WriteStringMap(options);
-            frameWriter.Send(MessageOpcodes.Startup);
+            frameWriter.SetMessageType(MessageOpcodes.Startup);
         }
 
         internal static bool ReadReady(IFrameReader frameReader)
@@ -60,7 +60,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         internal static void WriteOptions(IFrameWriter frameWriter)
         {
-            frameWriter.Send(MessageOpcodes.Options);
+            frameWriter.SetMessageType(MessageOpcodes.Options);
         }
 
         internal static void ReadOptions(IFrameReader frameReader)
@@ -80,7 +80,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 };
             frameWriter.WriteStringMap(authParams);
 
-            frameWriter.Send(MessageOpcodes.Credentials);
+            frameWriter.SetMessageType(MessageOpcodes.Credentials);
         }
 
         internal static void ReadAuthenticate(IFrameReader frameReader)
@@ -94,7 +94,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         internal static void WritePrepareRequest(IFrameWriter frameWriter, string cql)
         {
             frameWriter.WriteLongString(cql);
-            frameWriter.Send(MessageOpcodes.Prepare);
+            frameWriter.SetMessageType(MessageOpcodes.Prepare);
         }
 
         internal static IEnumerable<object> ReadPreparedQuery(IFrameReader frameReader, IConnection connection)
@@ -122,7 +122,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             frameWriter.WriteLongString(cql);
             frameWriter.WriteShort((short) cl);
-            frameWriter.Send(opcode);
+            frameWriter.SetMessageType(opcode);
         }
 
         internal static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapperFactory mapperFactory)

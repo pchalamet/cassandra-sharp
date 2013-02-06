@@ -47,6 +47,15 @@ namespace CassandraSharpUnitTests.Endurance
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
+                const string dropFoo = "drop keyspace Endurance";
+                try
+                {
+                    cluster.ExecuteNonQuery(dropFoo).Wait();
+                }
+                catch
+                {
+                }
+
                 const string createFoo = "CREATE KEYSPACE Endurance WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createFoo);
@@ -94,13 +103,11 @@ namespace CassandraSharpUnitTests.Endurance
                 timer.Stop();
                 Console.WriteLine("Endurance ran in {0} ms", timer.ElapsedMilliseconds);
 
-                const string dropFoo = "drop keyspace Endurance";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(dropFoo);
                 Console.WriteLine("============================================================");
 
-                resCount = cluster.ExecuteNonQuery(dropFoo);
-                resCount.Wait();
+                cluster.ExecuteNonQuery(dropFoo).Wait();
             }
 
             ClusterManager.Shutdown();

@@ -35,6 +35,8 @@ namespace CassandraSharp.Transport
 
         private readonly bool _tracing;
 
+        private MessageOpcodes _msgOpcode = MessageOpcodes.Error;
+
         internal BufferingFrameWriter(Socket socket, byte streamId, bool tracing)
         {
             _socket = socket;
@@ -48,9 +50,14 @@ namespace CassandraSharp.Transport
             _ms.SafeDispose();
         }
 
-        public void Send(MessageOpcodes msgOpcode)
+        public void SetMessageType(MessageOpcodes msgOpcode)
         {
-            const byte version = (byte) (FrameType.Request | FrameType.ProtocolVersion);
+            _msgOpcode = msgOpcode;
+        }
+
+        public void SendFrame()
+        {
+            const byte version = (byte)(FrameType.Request | FrameType.ProtocolVersion);
             FrameHeaderFlags flags = FrameHeaderFlags.None;
             if (_tracing)
             {
@@ -59,13 +66,13 @@ namespace CassandraSharp.Transport
 
             byte[] header = new byte[4];
             header[0] = version;
-            header[1] = (byte) flags;
+            header[1] = (byte)flags;
             header[2] = _streamId;
-            header[3] = (byte) msgOpcode;
+            header[3] = (byte)_msgOpcode;
             SendBuffer(header);
 
             // len of body
-            int len = (int) _ms.Length;
+            int len = (int)_ms.Length;
             byte[] bodyLen = len.GetBytes();
             SendBuffer(bodyLen);
 

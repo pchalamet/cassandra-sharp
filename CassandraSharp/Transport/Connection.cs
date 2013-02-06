@@ -29,8 +29,8 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class Connection : IConnection,
-                                IDisposable
+    internal partial class Connection : IConnection,
+                                        IDisposable
     {
         private const byte MAX_STREAMID = 0x80;
 
@@ -122,51 +122,52 @@ namespace CassandraSharp.Transport
 
         public void Dispose()
         {
-            _logger.Debug("Connection to {0} is being disposed", Endpoint);
-            OnFailure = null;
-            _tcpClient.SafeDispose();
-            _cancellation.SafeDispose();
+            lock (_globalLock)
+            {
+                OnFailure = null;
+
+                // wake up clients waiting for a stream id (so they can cancel themselves)
+                _cancellation.Cancel();
+                Monitor.Pulse(_globalLock);
+
+                // cancel pending readers
+                Exception cancelException = new OperationCanceledException();
+                for (byte idx = 0; idx < MAX_STREAMID; ++idx)
+                {
+                    if (!_availableStreamIds.Contains(idx))
+                    {
+                        _instrumentation.ClientTrace(_queryInfos[idx].Id, EventType.Cancellation);
+
+                        _queryInfos[idx].Exception = cancelException;
+                        _queryInfos[idx].ReadTask.RunSynchronously();
+                    }
+                }
+
+                _logger.Debug("Connection to {0} is being disposed", Endpoint);
+                _tcpClient.SafeDispose();
+                _cancellation.SafeDispose();
+            }
         }
 
         private IEnumerable<object> ReadResultStream(byte streamId, Func<IFrameReader, IEnumerable<object>> reader)
         {
-            IFrameReader frameReader = null;
+            Exception exception = _queryInfos[streamId].Exception;
+            IFrameReader frameReader = _queryInfos[streamId].FrameReader;
             try
             {
-                // we are running on a different thread (the client one)
-                // and the read in _queryInfos are not volatile (they should probably)
-                Thread.MemoryBarrier();
-
-                frameReader = _queryInfos[streamId].FrameReader;
+                // forward error if any
+                if (null != exception)
+                {
+                    throw exception;
+                }
                 frameReader.ThrowExceptionIfError();
 
-                IEnumerable<object> results = reader(frameReader);
-                results = results ?? Enumerable.Empty<object>();
-                foreach (object result in results)
-                {
-                    yield return result;
-                }
+                return new ResultStreamEnumerable(this, reader, frameReader, streamId);
             }
-            finally
+            catch (Exception ex)
             {
-                frameReader.SafeDispose();
-
-                Guid queryId = _queryInfos[streamId].Id;
-                _instrumentation.ClientTrace(queryId, EventType.EndRead);
-
-                // release streamId now
-                lock (_globalLock)
-                {
-                    // release stream id (since result streaming has started)
-                    _availableStreamIds.Push(streamId);
-                    Monitor.Pulse(_globalLock);
-                }
-
-                // run a new reader after streaming data if we were streaming
-                if (_streaming)
-                {
-                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-                }
+                HandleFrameTerminaison(ex, frameReader, streamId);
+                throw;
             }
         }
 
@@ -177,64 +178,98 @@ namespace CassandraSharp.Transport
 
         private void WriteNextFrame(Action<IFrameWriter> writer, byte streamId, ExecutionFlags executionFlags)
         {
-            Guid queryId = _queryInfos[streamId].Id;
-            _instrumentation.ClientTrace(queryId, EventType.BeginWrite);
-
-            bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
-
-            // acquire the global lock to write the request
-            _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
-            lock (_globalLock)
+            try
             {
-                using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(_socket, streamId, tracing))
-                    writer(bufferingFrameWriter);
-            }
+                Guid queryId = _queryInfos[streamId].Id;
+                _instrumentation.ClientTrace(queryId, EventType.BeginWrite);
 
-            _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-            _instrumentation.ClientTrace(queryId, EventType.EndWrite);
+                bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
+
+                // acquire the global lock to write the request
+                _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
+                lock (_globalLock)
+                {
+                    using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(_socket, streamId, tracing))
+                    {
+                        writer(bufferingFrameWriter);
+                        bufferingFrameWriter.SendFrame();
+                    }
+                }
+
+                _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
+                _instrumentation.ClientTrace(queryId, EventType.EndWrite);
+            }
+            catch (Exception ex)
+            {
+                _queryInfos[streamId].Exception = ex;
+                _queryInfos[streamId].ReadTask.RunSynchronously();
+            }
         }
 
         private void ReadNextFrameHeader()
         {
+            byte streamId = 0xFF;
             try
             {
-                StreamingFrameReader frameReader = _streaming
-                                                           ? new StreamingFrameReader(_socket)
-                                                           : new BufferingFrameReader(_socket);
-                byte streamId = frameReader.StreamId;
-                _queryInfos[streamId].FrameReader = frameReader;
-
-                // we are running in another thread of the client
-                // reads in _queryInfos are not volatile (they should probably)
-                Thread.MemoryBarrier();
-
-                Guid queryId = _queryInfos[streamId].Id;
-                _instrumentation.ClientTrace(queryId, EventType.BeginRead);
-
-                // NOTE: the task is running just to return an IEnumerable<object> to the client
-                //       so it's better to execute it on our context immediately
-                _queryInfos[streamId].ReadTask.RunSynchronously();
-
-                // if we are not streaming we can wait for a new frame
-                if (! _streaming)
+                do
                 {
-                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-                }
+                    IFrameReader frameReader = _streaming
+                                                       ? new StreamingFrameReader(_socket)
+                                                       : new BufferingFrameReader(_socket);
+                    streamId = frameReader.StreamId;
+                    _queryInfos[streamId].FrameReader = frameReader;
+
+                    Guid queryId = _queryInfos[streamId].Id;
+                    _instrumentation.ClientTrace(queryId, EventType.BeginRead);
+
+                    // NOTE: the task is running just to return an IEnumerable<object> to the client
+                    //       so it's better to execute it on our context immediately
+                    _queryInfos[streamId].ReadTask.RunSynchronously();
+
+                    // if we are not streaming we can wait for a new frame
+                } while (!_streaming);
             }
             catch (Exception ex)
             {
-                HandleFailure(ex);
+                _queryInfos[streamId].Exception = ex;
+                _queryInfos[streamId].ReadTask.RunSynchronously();
             }
         }
 
-        private void HandleFailure(Exception ex)
+        private void HandleFrameTerminaison(Exception ex, IFrameReader frameReader, byte streamId)
         {
-            _logger.Debug("HandleFailure notified with exception {0}", ex);
-            bool isFatal = ex is IOException
-                           || ex is SocketException;
+            if (null != ex)
+            {
+                _logger.Debug("HandleFrameTerminaison notified with exception {0}", ex);
+            }
+
+            bool isFatal = ex is IOException || ex is SocketException || ex is OperationCanceledException;
             if (! isFatal)
             {
-                _logger.Debug("Exception is not fatal");
+                frameReader.SafeDispose();
+
+                Guid queryId = _queryInfos[streamId].Id;
+                _instrumentation.ClientTrace(queryId, EventType.EndRead);
+
+                _queryInfos[streamId] = new QueryInfo();
+
+                // release streamId now
+                lock (_globalLock)
+                {
+                    if (_cancellation.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    // release stream id (since result streaming has started)
+                    _availableStreamIds.Push(streamId);
+                    Monitor.Pulse(_globalLock);
+
+                    if (_streaming && null != frameReader)
+                    {
+                        Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                    }
+                }
                 return;
             }
 
@@ -242,19 +277,11 @@ namespace CassandraSharp.Transport
             {
                 _logger.Error("Connection to {0} is broken", Endpoint);
 
-                _cancellation.Cancel();
-
-                // wake up eventually client waiting for a stream id
-                Monitor.Pulse(_globalLock);
-
                 if (null != OnFailure)
                 {
                     FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
                     OnFailure(this, failureEventArgs);
                 }
-
-                // currently running request/response will be abruptly terminated
-                Dispose();
             }
         }
 
@@ -304,11 +331,13 @@ namespace CassandraSharp.Transport
 
         private struct QueryInfo
         {
+            public Exception Exception;
+
+            public IFrameReader FrameReader;
+
             public Guid Id;
 
             public Task<IEnumerable<object>> ReadTask;
-
-            public IFrameReader FrameReader;
         }
     }
 }

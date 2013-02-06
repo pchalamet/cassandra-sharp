@@ -65,6 +65,7 @@
     <Compile Include="Endurance\EnduranceTest.cs" />
     <Compile Include="Functional\AllTypesTest.cs" />
     <Compile Include="ClusterTest.cs" />
+    <Compile Include="Functional\StreamStarvationTest.cs" />
     <Compile Include="Performance\WritePerformanceTest.cs" />
     <Compile Include="SectionHandlerTest.cs" />
     <Compile Include="Utils\DisposableExtensionsTest.cs" />

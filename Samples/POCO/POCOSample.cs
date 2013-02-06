@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,9 +33,14 @@ namespace Samples.POCO
         public int Year;
     }
 
-    public static class POCOSample
+    public class POCOSample : Sample
     {
-        public static void Run()
+        public POCOSample()
+                : base("POCOSample")
+        {
+        }
+
+        protected override void InternalRun()
         {
             XmlConfigurator.Configure();
             using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
@@ -83,7 +88,7 @@ namespace Samples.POCO
                 Console.WriteLine(selectAllFrom);
                 Console.WriteLine("============================================================");
                 var preparedAllFrom = cluster.Prepare(selectAllFrom);
-                var ds = new { Director = "Joss Whedon" };
+                var ds = new {Director = "Joss Whedon"};
                 var taskSelectWhere =
                         preparedAllFrom.Execute<NerdMovie>(ds).ContinueWith(res => DisplayMovies(res.Result));
                 taskSelectWhere.Wait();

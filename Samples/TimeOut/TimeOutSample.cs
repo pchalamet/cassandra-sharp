@@ -40,9 +40,14 @@ namespace Samples.TimeOut
         // ReSharper restore InconsistentNaming
     }
 
-    public static class TimeOutSample
+    public class TimeOutSample : Sample
     {
-        public static void Run()
+        public TimeOutSample()
+                : base("TimeOutSample")
+        {
+        }
+
+        protected override void InternalRun()
         {
             XmlConfigurator.Configure();
             using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
