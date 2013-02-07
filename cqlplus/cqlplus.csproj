@@ -49,37 +49,7 @@
     <Compile Include="..\cassandra-sharp-version.cs">
       <Link>Properties\cassandra-sharp-version.cs</Link>
     </Compile>
-    <Compile Include="CliArgs.cs" />
-    <Compile Include="Commands\CommandBase.cs" />
-    <Compile Include="Commands\DescriptionAttribute.cs" />
-    <Compile Include="Commands\Exec.cs" />
-    <Compile Include="Commands\Set.cs" />
-    <Compile Include="CommandContext.cs" />
-    <Compile Include="Commands\ClearScreen.cs" />
-    <Compile Include="Commands\CqlStatement.cs" />
-    <Compile Include="Commands\Exit.cs" />
-    <Compile Include="Commands\ShellCommand.cs" />
-    <Compile Include="Commands\Help.cs" />
-    <Compile Include="Commands\Reset.cs" />
-    <Compile Include="Commands\Source.cs" />
-    <Compile Include="ConsoleDebugLogger.cs" />
-    <Compile Include="ConsoleInstrumentation.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="Parser\Parser.cs" />
-    <Compile Include="Parser\ParseTree.cs" />
-    <Compile Include="Parser\Scanner.cs" />
-    <Compile Include="ResultWriter\CSV.cs" />
-    <Compile Include="StatementReader\StatementSplitter.cs" />
-    <Compile Include="StatementReader\ConsoleInput.cs" />
-    <Compile Include="StatementReader\FileInput.cs" />
-    <Compile Include="CommandLineArguments.cs" />
-    <Compile Include="IStatementReader.cs" />
-    <Compile Include="IResultWriter.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResultWriter\RowKeyValue.cs" />
-    <Compile Include="ResultWriter\Tabular.cs" />
-    <Compile Include="ResultWriter\ValueFormatter.cs" />
+    <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

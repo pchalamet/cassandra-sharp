@@ -40,7 +40,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="**/*.cs" />
+    <Compile Include="..\cassandra-sharp-version.cs">
+      <Link>Properties\cassandra-sharp-version.cs</Link>
+    </Compile>
+    <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cassandra.thrift" />
