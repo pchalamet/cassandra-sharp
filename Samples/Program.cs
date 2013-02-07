@@ -15,6 +15,7 @@
 
 namespace Samples
 {
+    using System;
     using Samples.Async;
     using Samples.Future;
     using Samples.Linq;
@@ -32,6 +33,11 @@ namespace Samples
             new FutureSample().Run();
             new POCOSample().Run();
             new AsyncSample().Run();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            Console.WriteLine("Press ENTER to exit");
+            Console.ReadLine();
         }
     }
 }
