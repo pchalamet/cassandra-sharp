@@ -176,6 +176,8 @@ namespace CassandraSharpUnitTests.Functional
             {
                 thread.Join();
             }
+
+            ClusterManager.Shutdown();
         }
     }
 }

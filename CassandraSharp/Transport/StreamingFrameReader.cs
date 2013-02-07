@@ -62,9 +62,12 @@ namespace CassandraSharp.Transport
 
                 TraceId = _tempBuffer.ToGuid();
             }
-        }
 
-        public byte StreamId { get; private set; }
+            if (MessageOpcodes.Error == MessageOpcode)
+            {
+                ResponseException = CreateExceptionFromError();
+            }
+        }
 
         public Guid? TraceId { get; private set; }
 
@@ -77,15 +80,11 @@ namespace CassandraSharp.Transport
             }
         }
 
+        public byte StreamId { get; private set; }
+
         public MessageOpcodes MessageOpcode { get; private set; }
 
-        public void ThrowExceptionIfError()
-        {
-            if (MessageOpcodes.Error == MessageOpcode)
-            {
-                ThrowError();
-            }
-        }
+        public Exception ResponseException { get; private set; }
 
         public byte ReadByte()
         {
@@ -192,7 +191,7 @@ namespace CassandraSharp.Transport
             return read;
         }
 
-        private void ThrowError()
+        private Exception CreateExceptionFromError()
         {
             ErrorCodes code = (ErrorCodes) ReadInt();
             string msg = ReadString();
@@ -204,7 +203,7 @@ namespace CassandraSharp.Transport
                         ConsistencyLevel cl = (ConsistencyLevel) ReadShort();
                         int required = ReadInt();
                         int alive = ReadInt();
-                        throw new UnavailableException(msg, cl, required, alive);
+                        return new UnavailableException(msg, cl, required, alive);
                     }
 
                 case ErrorCodes.WriteTimeout:
@@ -213,7 +212,7 @@ namespace CassandraSharp.Transport
                         int received = ReadInt();
                         int blockFor = ReadInt();
                         string writeType = ReadString();
-                        throw new WriteTimeOutException(msg, cl, received, blockFor, writeType);
+                        return new WriteTimeOutException(msg, cl, received, blockFor, writeType);
                     }
 
                 case ErrorCodes.ReadTimeout:
@@ -222,33 +221,33 @@ namespace CassandraSharp.Transport
                         int received = ReadInt();
                         int blockFor = ReadInt();
                         bool dataPresent = 0 != ReadByte();
-                        throw new ReadTimeOutException(msg, cl, received, blockFor, dataPresent);
+                        return new ReadTimeOutException(msg, cl, received, blockFor, dataPresent);
                     }
 
                 case ErrorCodes.Syntax:
-                    throw new SyntaxException(msg);
+                    return new SyntaxException(msg);
 
                 case ErrorCodes.Unauthorized:
-                    throw new UnauthorizedException(msg);
+                    return new UnauthorizedException(msg);
 
                 case ErrorCodes.Invalid:
-                    throw new InvalidException(msg);
+                    return new InvalidException(msg);
 
                 case ErrorCodes.AlreadyExists:
                     {
                         string keyspace = ReadString();
                         string table = ReadString();
-                        throw new AlreadyExistsException(msg, keyspace, table);
+                        return new AlreadyExistsException(msg, keyspace, table);
                     }
 
                 case ErrorCodes.Unprepared:
                     {
                         byte[] unknownId = ReadShortBytes();
-                        throw new UnpreparedException(msg, unknownId);
+                        return new UnpreparedException(msg, unknownId);
                     }
 
                 default:
-                    throw new CassandraException(code, msg);
+                    return new CassandraException(code, msg);
             }
         }
     }

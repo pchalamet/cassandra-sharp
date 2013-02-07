@@ -152,16 +152,15 @@ namespace CassandraSharp.Transport
 
         private IEnumerable<object> ReadResultStream(byte streamId, Func<IFrameReader, IEnumerable<object>> reader)
         {
-            Exception exception = _queryInfos[streamId].Exception;
             IFrameReader frameReader = _queryInfos[streamId].FrameReader;
             try
             {
                 // forward error if any
+                Exception exception = _queryInfos[streamId].Exception ?? frameReader.ResponseException;
                 if (null != exception)
                 {
                     throw exception;
                 }
-                frameReader.ThrowExceptionIfError();
 
                 return new ResultStreamEnumerable(this, reader, frameReader, streamId);
             }

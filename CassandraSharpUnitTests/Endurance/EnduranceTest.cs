@@ -88,7 +88,7 @@ namespace CassandraSharpUnitTests.Endurance
                 {
                     if (0 == i%1000)
                     {
-                        Console.WriteLine("Sent {0} requests so far - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
+                        Console.WriteLine("Sent {0} requests - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
                     }
 
                     Interlocked.Increment(ref running);
