@@ -20,6 +20,7 @@ namespace CassandraSharp
     using System.Net;
     using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Instrumentation;
 
     /// <summary>
     ///     Internal interface to keep track of Cassandra connections
@@ -28,7 +29,7 @@ namespace CassandraSharp
     {
         IPAddress Endpoint { get; }
 
-        Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags);
+        Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags, InstrumentationToken token);
         event EventHandler<FailureEventArgs> OnFailure;
     }
 }

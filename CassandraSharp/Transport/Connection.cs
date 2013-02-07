@@ -28,6 +28,7 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
+    using CassandraSharp.Instrumentation;
 
     internal partial class Connection : IConnection,
                                         IDisposable
@@ -83,10 +84,9 @@ namespace CassandraSharp.Transport
 
         public IPAddress Endpoint { get; private set; }
 
-        public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags)
+        public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags, InstrumentationToken instrumentationToken)
         {
-            Guid queryId = Guid.NewGuid();
-            _instrumentation.ClientQuery(queryId);
+            _instrumentation.ClientQuery(instrumentationToken);
 
             Task<IEnumerable<object>> taskRead;
             byte streamId;
@@ -105,10 +105,10 @@ namespace CassandraSharp.Transport
 
                 // promise to stream results
                 taskRead = new Task<IEnumerable<object>>(() => ReadResultStream(streamId, reader));
-                _queryInfos[streamId].Id = queryId;
+                _queryInfos[streamId].InstrumentationToken = instrumentationToken;
                 _queryInfos[streamId].ReadTask = taskRead;
 
-                _instrumentation.ClientConnectionInfo(queryId, Endpoint, streamId);
+                _instrumentation.ClientConnectionInfo(instrumentationToken, Endpoint, streamId);
             }
             _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
 
@@ -136,7 +136,7 @@ namespace CassandraSharp.Transport
                 {
                     if (!_availableStreamIds.Contains(idx))
                     {
-                        _instrumentation.ClientTrace(_queryInfos[idx].Id, EventType.Cancellation);
+                        _instrumentation.ClientTrace(_queryInfos[idx].InstrumentationToken, EventType.Cancellation);
 
                         _queryInfos[idx].Exception = cancelException;
                         _queryInfos[idx].ReadTask.RunSynchronously();
@@ -180,8 +180,8 @@ namespace CassandraSharp.Transport
         {
             try
             {
-                Guid queryId = _queryInfos[streamId].Id;
-                _instrumentation.ClientTrace(queryId, EventType.BeginWrite);
+                InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
+                _instrumentation.ClientTrace(token, EventType.BeginWrite);
 
                 bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
 
@@ -197,7 +197,7 @@ namespace CassandraSharp.Transport
                 }
 
                 _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-                _instrumentation.ClientTrace(queryId, EventType.EndWrite);
+                _instrumentation.ClientTrace(token, EventType.EndWrite);
             }
             catch (Exception ex)
             {
@@ -219,8 +219,8 @@ namespace CassandraSharp.Transport
                     streamId = frameReader.StreamId;
                     _queryInfos[streamId].FrameReader = frameReader;
 
-                    Guid queryId = _queryInfos[streamId].Id;
-                    _instrumentation.ClientTrace(queryId, EventType.BeginRead);
+                    InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
+                    _instrumentation.ClientTrace(token, EventType.BeginRead);
 
                     // NOTE: the task is running just to return an IEnumerable<object> to the client
                     //       so it's better to execute it on our context immediately
@@ -248,8 +248,8 @@ namespace CassandraSharp.Transport
             {
                 frameReader.SafeDispose();
 
-                Guid queryId = _queryInfos[streamId].Id;
-                _instrumentation.ClientTrace(queryId, EventType.EndRead);
+                InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
+                _instrumentation.ClientTrace(token, EventType.EndRead);
 
                 _queryInfos[streamId] = new QueryInfo();
 
@@ -303,7 +303,7 @@ namespace CassandraSharp.Transport
         {
             Action<IFrameWriter> writer = fw => CQLCommandHelpers.WriteReady(fw, _config.CqlVersion);
             Func<IFrameReader, IEnumerable<object>> reader = fr => new object[] {CQLCommandHelpers.ReadReady(fr)};
-            bool authenticate = (bool) Execute(writer, reader, ExecutionFlags.None).Result.Single();
+            bool authenticate = (bool) Execute(writer, reader, ExecutionFlags.None, InstrumentationToken.NewNonQueryToken(RequestType.Ready)).Result.Single();
             if (authenticate)
             {
                 Authenticate();
@@ -325,7 +325,7 @@ namespace CassandraSharp.Transport
                 };
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Execute(writer, reader, ExecutionFlags.None).Result.Count();
+            Execute(writer, reader, ExecutionFlags.None, InstrumentationToken.NewNonQueryToken(RequestType.Authenticate)).Result.Count();
 // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
@@ -335,7 +335,7 @@ namespace CassandraSharp.Transport
 
             public IFrameReader FrameReader;
 
-            public Guid Id;
+            public InstrumentationToken InstrumentationToken;
 
             public Task<IEnumerable<object>> ReadTask;
         }
