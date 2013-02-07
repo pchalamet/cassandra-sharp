@@ -27,8 +27,8 @@ namespace CassandraSharp.Transport
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
     using CassandraSharp.Instrumentation;
+    using CassandraSharp.Utils;
 
     internal partial class Connection : IConnection,
                                         IDisposable
@@ -84,7 +84,8 @@ namespace CassandraSharp.Transport
 
         public IPAddress Endpoint { get; private set; }
 
-        public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags, InstrumentationToken instrumentationToken)
+        public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags,
+                                                 InstrumentationToken instrumentationToken)
         {
             _instrumentation.ClientQuery(instrumentationToken);
 
@@ -303,7 +304,8 @@ namespace CassandraSharp.Transport
         {
             Action<IFrameWriter> writer = fw => CQLCommandHelpers.WriteReady(fw, _config.CqlVersion);
             Func<IFrameReader, IEnumerable<object>> reader = fr => new object[] {CQLCommandHelpers.ReadReady(fr)};
-            bool authenticate = (bool) Execute(writer, reader, ExecutionFlags.None, InstrumentationToken.NewNonQueryToken(RequestType.Ready)).Result.Single();
+            InstrumentationToken readyToken = InstrumentationToken.Create(RequestType.Ready);
+            bool authenticate = (bool) Execute(writer, reader, ExecutionFlags.None, readyToken).Result.Single();
             if (authenticate)
             {
                 Authenticate();
@@ -325,7 +327,8 @@ namespace CassandraSharp.Transport
                 };
 
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Execute(writer, reader, ExecutionFlags.None, InstrumentationToken.NewNonQueryToken(RequestType.Authenticate)).Result.Count();
+            InstrumentationToken authToken = InstrumentationToken.Create(RequestType.Authenticate);
+            Execute(writer, reader, ExecutionFlags.None, authToken).Result.Count();
 // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 

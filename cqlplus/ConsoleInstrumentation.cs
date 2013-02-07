@@ -28,7 +28,7 @@ namespace cqlplus
         {
             if (CommandContext.DebugLog)
             {
-                string buffer = string.Format("INSTR {0} [{1}] - queryId:{2}",
+                string buffer = string.Format("INSTR {0} [{1}] - id:{2}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
                                               token.Id);
                 Console.WriteLine(buffer);
@@ -39,9 +39,9 @@ namespace cqlplus
         {
             if (CommandContext.DebugLog)
             {
-                string buffer = string.Format("INSTR {0} [{1}] - queryId:{2} coordinator:{3} streamId:{4}",
+                string buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3} coordinator:{4} streamId:{5} cql:{6}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              token.Id, coordinator, streamId);
+                                              token.Id, token.Type, coordinator, streamId, token.Cql);
                 Console.WriteLine(buffer);
             }
         }
@@ -50,7 +50,7 @@ namespace cqlplus
         {
             if (CommandContext.DebugLog)
             {
-                string buffer = string.Format("INSTR {0} [{1}] - queryId:{2} type:{3}",
+                string buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
                                               token.Id, eventType);
                 Console.WriteLine(buffer);
