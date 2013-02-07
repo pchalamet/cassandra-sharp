@@ -1,3 +1,7 @@
+version 2.3.0 [UNRELEASED]
+- fixed stalled client 
+- instrumentation for performance tracing
+
 version 2.2.1
 - added version in Zip & NuGet
 - cqlplus is in NuGet lib folder, only CassandraSharp.dll is then referenced
