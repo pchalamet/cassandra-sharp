@@ -17,15 +17,16 @@ namespace CassandraSharp.Extensibility
 {
     using System;
     using System.Net;
+    using CassandraSharp.Instrumentation;
 
     public interface IInstrumentation
     {
-        void ClientQuery(Guid queryId);
+        void ClientQuery(InstrumentationToken token);
 
-        void ClientConnectionInfo(Guid queryId, IPAddress coordinator, byte streamId);
+        void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId);
 
-        void ClientTrace(Guid queryId, EventType eventType);
+        void ClientTrace(InstrumentationToken token, EventType eventType);
 
-        void ServerTrace(Guid queryId, TracingSession session);
+        void ServerTrace(InstrumentationToken token, TracingSession session);
     }
 }

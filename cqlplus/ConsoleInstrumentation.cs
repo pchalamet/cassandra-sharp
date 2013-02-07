@@ -20,43 +20,44 @@ namespace cqlplus
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Instrumentation;
 
     public class ConsoleInstrumentation : IInstrumentation
     {
-        public void ClientQuery(Guid queryId)
+        public void ClientQuery(InstrumentationToken token)
         {
             if (CommandContext.DebugLog)
             {
                 string buffer = string.Format("INSTR {0} [{1}] - queryId:{2}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              queryId);
+                                              token.Id);
                 Console.WriteLine(buffer);
             }
         }
 
-        public void ClientConnectionInfo(Guid queryId, IPAddress coordinator, byte streamId)
+        public void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId)
         {
             if (CommandContext.DebugLog)
             {
                 string buffer = string.Format("INSTR {0} [{1}] - queryId:{2} coordinator:{3} streamId:{4}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              queryId, coordinator, streamId);
+                                              token.Id, coordinator, streamId);
                 Console.WriteLine(buffer);
             }
         }
 
-        public void ClientTrace(Guid queryId, EventType eventType)
+        public void ClientTrace(InstrumentationToken token, EventType eventType)
         {
             if (CommandContext.DebugLog)
             {
                 string buffer = string.Format("INSTR {0} [{1}] - queryId:{2} type:{3}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              queryId, eventType);
+                                              token.Id, eventType);
                 Console.WriteLine(buffer);
             }
         }
 
-        public void ServerTrace(Guid queryId, TracingSession session)
+        public void ServerTrace(InstrumentationToken token, TracingSession session)
         {
         }
     }

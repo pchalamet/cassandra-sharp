@@ -22,6 +22,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Threading.Tasks;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Instrumentation;
 
     internal static class CQLCommandHelpers
     {
@@ -30,7 +31,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query);
             Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory);
 
-            return cluster.GetConnection(null).Execute(writer, reader, executionFlags).ContinueWith(res => res.Result.Cast<T>());
+            return cluster.GetConnection(null).Execute(writer, reader, executionFlags, InstrumentationToken.NewQueryToken(cql)).ContinueWith(res => res.Result.Cast<T>());
         }
 
         internal static void WriteReady(IFrameWriter frameWriter, string cqlVersion)

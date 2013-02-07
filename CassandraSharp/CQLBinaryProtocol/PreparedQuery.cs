@@ -20,6 +20,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Linq;
     using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Instrumentation;
 
     internal class PreparedQuery : IPreparedQuery
     {
@@ -59,7 +60,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, _cql);
                         Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
 
-                        connection.Execute(writer, reader, _executionFlags).ContinueWith(ReadPreparedQueryInfo).Wait();
+                        connection.Execute(writer, reader, _executionFlags, InstrumentationToken.NewNonQueryToken(RequestType.Prepare)).ContinueWith(ReadPreparedQueryInfo).Wait();
                         _connection = connection;
                     }
                 }
@@ -68,7 +69,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
             Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
 
-            return connection.Execute(execWriter, execReader, _executionFlags);
+            return connection.Execute(execWriter, execReader, _executionFlags, InstrumentationToken.NewQueryToken(_cql));
         }
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)

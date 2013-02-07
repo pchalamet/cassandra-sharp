@@ -21,19 +21,19 @@ namespace CassandraSharp.Instrumentation
 
     public class NullInstrumentation : IInstrumentation
     {
-        public void ClientQuery(Guid queryId)
+        public void ClientQuery(InstrumentationToken token)
         {
         }
 
-        public void ClientConnectionInfo(Guid queryId, IPAddress coordinator, byte streamId)
+        public void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId)
         {
         }
 
-        public void ClientTrace(Guid queryId, EventType eventType)
+        public void ClientTrace(InstrumentationToken token, EventType eventType)
         {
         }
 
-        public void ServerTrace(Guid queryId, TracingSession session)
+        public void ServerTrace(InstrumentationToken token, TracingSession session)
         {
         }
     }
