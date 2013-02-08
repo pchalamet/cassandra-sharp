@@ -23,7 +23,7 @@ namespace CassandraSharp.Cluster
         {
             if (customType == "Default")
             {
-                customType = ServiceActivator.GetTypeName<Cluster>();
+                customType = ServiceActivator.GetTypeName<DefaultCluster>();
             }
 
             return ServiceActivator.Create<ICluster>(customType, prms);

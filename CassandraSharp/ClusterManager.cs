@@ -65,7 +65,7 @@ namespace CassandraSharp
             IConnectionFactory connectionFactory = Transport.Factory.Create(transportConfig.Type, transportConfig, _logger, _instrumentation);
 
             // create the cluster now
-            ICluster cluster = Cluster.Factory.Create("Default", endpointsManager, _logger, connectionFactory, recoveryService);
+            ICluster cluster = Cluster.Factory.Create(clusterConfig.Type, endpointsManager, _logger, connectionFactory, recoveryService);
 
             IDiscoveryService discoveryService = Discovery.Factory.Create(clusterConfig.Endpoints.Discovery, _logger);
             var newPeers = discoveryService.DiscoverPeers(cluster);

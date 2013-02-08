@@ -19,11 +19,19 @@ namespace CassandraSharp.Config
 
     public class ClusterConfig
     {
+        public ClusterConfig()
+        {
+            Type = "Default";
+        }
+
         [XmlElement("Endpoints")]
         public EndpointsConfig Endpoints { get; set; }
 
         [XmlAttribute("name")]
         public string Name { get; set; }
+
+        [XmlAttribute("type")]
+        public string Type { get; set; }
 
         [XmlElement("Transport")]
         public TransportConfig Transport { get; set; }

@@ -1,5 +1,5 @@
 // cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace CassandraSharp.Cluster
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class Cluster : ICluster
+    internal class DefaultCluster : ICluster
     {
         private readonly IConnectionFactory _connectionFactory;
 
@@ -35,8 +35,8 @@ namespace CassandraSharp.Cluster
 
         private readonly IRecoveryService _recoveryService;
 
-        public Cluster(IEndpointStrategy endpointStrategy, ILogger logger,
-                       IConnectionFactory connectionFactory, IRecoveryService recoveryService)
+        public DefaultCluster(IEndpointStrategy endpointStrategy, ILogger logger,
+                              IConnectionFactory connectionFactory, IRecoveryService recoveryService)
         {
             _ip2Connection = new Dictionary<IPAddress, IConnection>();
             _endpointStrategy = endpointStrategy;
