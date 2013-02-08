@@ -18,7 +18,7 @@ namespace CassandraSharp.Utils
     using System;
     using System.Reflection;
 
-    public static class ExceptionExtensions
+    internal static class ExceptionExtensions
     {
         private static readonly Action<Exception> _preserveInternalException;
 
