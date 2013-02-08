@@ -31,11 +31,16 @@ How to build
 ============
 To build cassandra-sharp, run this command: 
 
+	GenerateVersion.cmd
+
+If you want to build a specific version or specific flavor, use:
+
 	GenerateVersion.cmd <flavor> <VersionNumber> <VersionStatus>
 	
 NOTE: type "GenerateVersion.cmd /?" for more info.
   
 You will find a package named in the OutDir folder:
+
 	cassandra-sharp-bin-<VersionNumber>-<VersionStatus>.zip
 
 Sample configuration
