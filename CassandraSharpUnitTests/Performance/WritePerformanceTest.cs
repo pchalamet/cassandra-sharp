@@ -70,7 +70,7 @@
                 Console.WriteLine("============================================================");
                 Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
                 Console.WriteLine("============================================================");
-                var prepared = cluster.Prepare(insertPerf, ExecutionFlags.Tracing);
+                var prepared = cluster.Prepare(insertPerf);
                 int n = 0;
                 while (n < NUM_ROUND)
                 {
@@ -150,7 +150,6 @@
 
                 for (int i = 0; i < NUM_WRITES_PER_ROUND; i++)
                 {
-                    client.trace_next_query();
                     client.execute_prepared_cql3_query(query.ItemId,
                                                       new List<byte[]> {BitConverter.GetBytes(i).Reverse().ToArray(), Encoding.ASCII.GetBytes(i.ToString("X"))}, 
                                                       Apache.Cassandra.ConsistencyLevel.QUORUM);

@@ -146,7 +146,7 @@ namespace CassandraSharp.Transport
 
                 _logger.Debug("Connection to {0} is being disposed", Endpoint);
                 _tcpClient.SafeDispose();
-                _cancellation.SafeDispose();
+                //_cancellation.SafeDispose();
             }
         }
 
@@ -159,7 +159,7 @@ namespace CassandraSharp.Transport
                 Exception exception = _queryInfos[streamId].Exception ?? frameReader.ResponseException;
                 if (null != exception)
                 {
-                    throw exception;
+                    exception.RethrowPreserveStackTrace();
                 }
 
                 return new ResultStreamEnumerable(this, reader, frameReader, streamId);
@@ -187,12 +187,13 @@ namespace CassandraSharp.Transport
 
                 // acquire the global lock to write the request
                 _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
-                lock (_globalLock)
+                using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(streamId, tracing))
                 {
-                    using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(_socket, streamId, tracing))
+                    writer(bufferingFrameWriter);
+
+                    lock (_globalLock)
                     {
-                        writer(bufferingFrameWriter);
-                        bufferingFrameWriter.SendFrame();
+                        bufferingFrameWriter.SendFrame(_socket);
                     }
                 }
 
@@ -256,19 +257,14 @@ namespace CassandraSharp.Transport
                 // release streamId now
                 lock (_globalLock)
                 {
-                    if (_cancellation.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
                     // release stream id (since result streaming has started)
                     _availableStreamIds.Push(streamId);
                     Monitor.Pulse(_globalLock);
+                }
 
-                    if (_streaming && null != frameReader)
-                    {
-                        Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-                    }
+                if (_streaming && null != frameReader)
+                {
+                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
                 }
                 return;
             }

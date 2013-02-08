@@ -13,18 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.CQLPoco
+namespace CassandraSharp.Utils
 {
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
+    using System;
+    using System.Reflection;
 
-    [TestFixture]
-    public class InstanceBuilderTest : CommonInstanceBuilderTest
+    public static class ExceptionExtensions
     {
-        protected override IInstanceBuilder GetInstanceBuilder<T>()
+        private static readonly Action<Exception> _preserveInternalException;
+
+        static ExceptionExtensions()
         {
-            return new InstanceBuilder(typeof(T));
+            MethodInfo preserveStackTrace = typeof(Exception).GetMethod("InternalPreserveStackTrace", BindingFlags.Instance | BindingFlags.NonPublic);
+            _preserveInternalException = (Action<Exception>) Delegate.CreateDelegate(typeof(Action<Exception>), preserveStackTrace);
+        }
+
+        public static void RethrowPreserveStackTrace(this Exception @this)
+        {
+            _preserveInternalException(@this);
+            throw @this;
         }
     }
 }

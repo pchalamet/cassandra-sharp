@@ -29,17 +29,14 @@ namespace CassandraSharp.Transport
     {
         private readonly MemoryStream _ms;
 
-        private readonly Socket _socket;
-
         private readonly byte _streamId;
 
         private readonly bool _tracing;
 
         private MessageOpcodes _msgOpcode = MessageOpcodes.Error;
 
-        internal BufferingFrameWriter(Socket socket, byte streamId, bool tracing)
+        internal BufferingFrameWriter(byte streamId, bool tracing)
         {
-            _socket = socket;
             _streamId = streamId;
             _tracing = tracing;
             _ms = new MemoryStream();
@@ -55,7 +52,7 @@ namespace CassandraSharp.Transport
             _msgOpcode = msgOpcode;
         }
 
-        public void SendFrame()
+        public void SendFrame(Socket socket)
         {
             const byte version = (byte)(FrameType.Request | FrameType.ProtocolVersion);
             FrameHeaderFlags flags = FrameHeaderFlags.None;
@@ -69,15 +66,15 @@ namespace CassandraSharp.Transport
             header[1] = (byte)flags;
             header[2] = _streamId;
             header[3] = (byte)_msgOpcode;
-            SendBuffer(header);
+            SendBuffer(socket, header);
 
             // len of body
             int len = (int)_ms.Length;
             byte[] bodyLen = len.GetBytes();
-            SendBuffer(bodyLen);
+            SendBuffer(socket, bodyLen);
 
             // body
-            SendBuffer(_ms.GetBuffer(), 0, len);
+            SendBuffer(socket, _ms.GetBuffer(), 0, len);
         }
 
         public void WriteShort(short data)
@@ -149,17 +146,17 @@ namespace CassandraSharp.Transport
             _ms.Write(data, 0, data.Length);
         }
 
-        private void SendBuffer(byte[] buffer)
+        private void SendBuffer(Socket socket, byte[] buffer)
         {
-            SendBuffer(buffer, 0, buffer.Length);
+            SendBuffer(socket, buffer, 0, buffer.Length);
         }
 
-        private void SendBuffer(byte[] buffer, int offset, int len)
+        private static void SendBuffer(Socket socket, byte[] buffer, int offset, int len)
         {
             int written = 0;
             while (written != len)
             {
-                written += _socket.Send(buffer, offset + written, len - written, SocketFlags.None);
+                written += socket.Send(buffer, offset + written, len - written, SocketFlags.None);
             }
         }
     }
