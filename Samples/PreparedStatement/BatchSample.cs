@@ -20,7 +20,6 @@ namespace Samples.PreparedStatement
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
 
     public class BatchSample : Sample
     {
@@ -31,65 +30,52 @@ namespace Samples.PreparedStatement
         {
         }
 
-        protected override void InternalRun()
+        protected override void CreateKeyspace(ICluster cluster)
         {
-            XmlConfigurator.Configure();
-            using (var cluster = ClusterManager.GetCluster("TestCassandra"))
+            const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+            cluster.ExecuteNonQuery(createKeyspaceFoo).Wait();
+
+            const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
+            cluster.ExecuteNonQuery(createBar).Wait();
+        }
+
+        protected override void DropKeyspace(ICluster cluster)
+        {
+            cluster.ExecuteNonQuery("drop keyspace Foo").Wait();
+        }
+
+        protected override void InternalRun(ICluster cluster)
+        {
+            const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
+            var preparedInsert = cluster.Prepare(insertBatch);
+
+            const int times = 10;
+
+            var random = new Random();
+
+            for (int i = 0; i < times; i++)
             {
-                try
-                {
-                    const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                    cluster.ExecuteNonQuery(createKeyspaceFoo).Wait();
-                }
-                catch
-                {
-                    Console.WriteLine("Keyspace Foo already exists");
-                }
+                long running = Interlocked.Increment(ref _running);
 
-                try
-                {
-                    const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
-                    cluster.ExecuteNonQuery(createBar).Wait();
-                }
-                catch
-                {
-                    Console.WriteLine("CF Foo.Bar already exists");
-                }
+                Console.WriteLine("Current {0} Running {1}", i, running);
 
-                const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
-                var preparedInsert = cluster.Prepare(insertBatch);
-
-                const int times = 10;
-
-                var random = new Random();
-
-                for (int i = 0; i < times; i++)
-                {
-                    long running = Interlocked.Increment(ref _running);
-
-                    Console.WriteLine("Current {0} Running {1}", i, running);
-
-                    var data = new byte[30000];
-                    // var data = (float)random.NextDouble();
-                    preparedInsert.ExecuteNonQuery(new {id = i, Baz = data}, ConsistencyLevel.ONE)
-                                  .ContinueWith(_ => Interlocked.Decrement(ref _running));
-                }
-
-                while (Thread.VolatileRead(ref _running) > 0)
-                {
-                    Console.WriteLine("Running {0}", _running);
-                    Thread.Sleep(1000);
-                }
-
-                var result = cluster.Execute<Foo>("select * from Foo.Bar where id = 50").Result;
-                foreach (var res in result)
-                {
-                    Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);
-                }
-
-                cluster.ExecuteNonQuery("drop keyspace Foo").Wait();
+                var data = new byte[30000];
+                // var data = (float)random.NextDouble();
+                preparedInsert.ExecuteNonQuery(new {id = i, Baz = data}, ConsistencyLevel.ONE)
+                              .ContinueWith(_ => Interlocked.Decrement(ref _running));
             }
-            ClusterManager.Shutdown();
+
+            while (Thread.VolatileRead(ref _running) > 0)
+            {
+                Console.WriteLine("Running {0}", _running);
+                Thread.Sleep(1000);
+            }
+
+            var result = cluster.Execute<Foo>("select * from Foo.Bar where id = 50").Result;
+            foreach (var res in result)
+            {
+                Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);
+            }
         }
 
         public class Foo

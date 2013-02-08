@@ -31,7 +31,7 @@ namespace Samples
             new BatchSample().Run();
             new LinqSample().Run();
             new FutureSample().Run();
-            new POCOSample().Run();
+            new PocoSample().Run();
             new AsyncSample().Run();
 
             GC.Collect();

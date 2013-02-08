@@ -21,7 +21,6 @@ namespace Samples.Future
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
 
     public class SchemaKeyspaces
     {
@@ -47,27 +46,21 @@ namespace Samples.Future
         {
         }
 
-        protected override void InternalRun()
+        protected override void InternalRun(ICluster cluster)
         {
-            XmlConfigurator.Configure();
-            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
+            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+
+            var allResults = new List<Task<IList<SchemaKeyspaces>>>();
+            for (int i = 0; i < 100; ++i)
             {
-                const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
-
-                var allResults = new List<Task<IList<SchemaKeyspaces>>>();
-                for (int i = 0; i < 100; ++i)
-                {
-                    var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
-                    allResults.Add(futRes);
-                }
-
-                foreach (var result in allResults)
-                {
-                    DisplayKeyspace(result);
-                }
+                var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
+                allResults.Add(futRes);
             }
 
-            ClusterManager.Shutdown();
+            foreach (var result in allResults)
+            {
+                DisplayKeyspace(result);
+            }
         }
 
         private static void DisplayKeyspace(Task<IList<SchemaKeyspaces>> result)

@@ -20,7 +20,6 @@ namespace Samples.POCO
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
 
     public class NerdMovie
     {
@@ -33,77 +32,55 @@ namespace Samples.POCO
         public int Year;
     }
 
-    public class POCOSample : Sample
+    public class PocoSample : Sample
     {
-        public POCOSample()
+        public PocoSample()
                 : base("POCOSample")
         {
         }
 
-        protected override void InternalRun()
+        protected override void CreateKeyspace(ICluster cluster)
         {
-            XmlConfigurator.Configure();
-            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
-            {
-                const string createKeyspace = "CREATE KEYSPACE videos WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createKeyspace);
-                Console.WriteLine("============================================================");
+            const string createKeyspace = "CREATE KEYSPACE videos WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+            cluster.ExecuteNonQuery(createKeyspace).Wait();
 
-                var resCount = cluster.ExecuteNonQuery(createKeyspace);
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+            const string createNerdMovies = "CREATE TABLE videos.NerdMovies (movie text, " +
+                                            "director text, " +
+                                            "main_actor text, " +
+                                            "year int, " +
+                                            "PRIMARY KEY (movie, director))";
+            cluster.ExecuteNonQuery(createNerdMovies).Wait();
+        }
 
-                const string createNerdMovies = "CREATE TABLE videos.NerdMovies (movie text, " +
-                                                "director text, " +
-                                                "main_actor text, " +
-                                                "year int, " +
-                                                "PRIMARY KEY (movie, director))";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createNerdMovies);
-                Console.WriteLine("============================================================");
-                resCount = cluster.ExecuteNonQuery(createNerdMovies);
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+        protected override void DropKeyspace(ICluster cluster)
+        {
+            const string dropExcelsor = "drop keyspace videos";
+            cluster.ExecuteNonQuery(dropExcelsor).Wait();
+        }
 
-                const string insertNerdMovie = "INSERT INTO videos.NerdMovies (movie, director, main_actor, year)" +
-                                               "VALUES ('Serenity', 'Joss Whedon', 'Nathan Fillion', 2005) " +
-                                               "USING TTL 86400";
-                resCount = cluster.ExecuteNonQuery(insertNerdMovie);
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+        protected override void InternalRun(ICluster cluster)
+        {
+            const string insertNerdMovie = "INSERT INTO videos.NerdMovies (movie, director, main_actor, year)" +
+                                           "VALUES ('Serenity', 'Joss Whedon', 'Nathan Fillion', 2005) " +
+                                           "USING TTL 86400";
+            Console.WriteLine(insertNerdMovie);
+            cluster.ExecuteNonQuery(insertNerdMovie).Wait();
+            Console.WriteLine();
 
-                const string selectNerdMovies = "select * from videos.NerdMovies";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(selectNerdMovies);
-                Console.WriteLine("============================================================");
-                var taskSelectStartMovies = cluster.Execute<NerdMovie>(selectNerdMovies).ContinueWith(res => DisplayMovies(res.Result));
-                taskSelectStartMovies.Wait();
+            const string selectNerdMovies = "select * from videos.NerdMovies";
+            Console.WriteLine(selectNerdMovies);
+            var taskSelectStartMovies = cluster.Execute<NerdMovie>(selectNerdMovies).ContinueWith(res => DisplayMovies(res.Result));
+            taskSelectStartMovies.Wait();
+            Console.WriteLine();
 
-                const string selectAllFrom = "select * from videos.NerdMovies where director=? ALLOW FILTERING";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(selectAllFrom);
-                Console.WriteLine("============================================================");
-                var preparedAllFrom = cluster.Prepare(selectAllFrom);
-                var ds = new {Director = "Joss Whedon"};
-                var taskSelectWhere =
-                        preparedAllFrom.Execute<NerdMovie>(ds).ContinueWith(res => DisplayMovies(res.Result));
-                taskSelectWhere.Wait();
-
-                const string dropExcelsor = "drop keyspace videos";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(dropExcelsor);
-                Console.WriteLine("============================================================");
-                var taskDrop = cluster.ExecuteNonQuery(dropExcelsor);
-                taskDrop.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
-            }
-
-            ClusterManager.Shutdown();
+            const string selectAllFrom = "select * from videos.NerdMovies where director=? ALLOW FILTERING";
+            Console.WriteLine(selectAllFrom);
+            var preparedAllFrom = cluster.Prepare(selectAllFrom);
+            var ds = new {Director = "Joss Whedon"};
+            var taskSelectWhere =
+                    preparedAllFrom.Execute<NerdMovie>(ds).ContinueWith(res => DisplayMovies(res.Result));
+            taskSelectWhere.Wait();
+            Console.WriteLine();
         }
 
         private static void DisplayMovies(IEnumerable<NerdMovie> result)
@@ -113,8 +90,6 @@ namespace Samples.POCO
                 Console.WriteLine("Movie={0} Director={1} MainActor={2}, Year={3}",
                                   resMovie.Movie, resMovie.Director, resMovie.MainActor, resMovie.Year);
             }
-            Console.WriteLine();
-            Console.WriteLine();
         }
     }
 }

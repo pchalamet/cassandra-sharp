@@ -21,7 +21,6 @@ namespace Samples.TimeOut
     using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
 
     public class SchemaKeyspaces
     {
@@ -47,32 +46,25 @@ namespace Samples.TimeOut
         {
         }
 
-        protected override void InternalRun()
+        protected override void InternalRun(ICluster cluster)
         {
-            XmlConfigurator.Configure();
-            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
+            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+
+            Random rnd = new Random();
+            for (int i = 0; i < 10; ++i)
             {
-                const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
-
-                Random rnd = new Random();
-
-                for (int i = 0; i < 10; ++i)
-                {
-                    DateTime dtStart = DateTime.Now;
-                    DateTime dtStop = dtStart.AddSeconds(2); // 2 second max
-                    int wait = rnd.Next(4*1000);
-                    var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces)
-                                        .ContinueWith(t =>
-                                            {
-                                                // simulate an eventually long operation
-                                                Thread.Sleep(wait);
-                                                return t;
-                                            }).Unwrap().ContinueWith(t => DisplayKeyspace(t.Result, dtStop));
-                    futRes.Wait();
-                }
+                DateTime dtStart = DateTime.Now;
+                DateTime dtStop = dtStart.AddSeconds(2); // 2 second max
+                int wait = rnd.Next(4*1000);
+                var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces)
+                                    .ContinueWith(t =>
+                                        {
+                                            // simulate an eventually long operation
+                                            Thread.Sleep(wait);
+                                            return t;
+                                        }).Unwrap().ContinueWith(t => DisplayKeyspace(t.Result, dtStop));
+                futRes.Wait();
             }
-
-            ClusterManager.Shutdown();
         }
 
         private static void DisplayKeyspace(IEnumerable<SchemaKeyspaces> result, DateTime dtStop)

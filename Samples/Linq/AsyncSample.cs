@@ -20,7 +20,6 @@ namespace Samples.Linq
     using System.Linq;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
 
     public class SchemaColumns
     {
@@ -42,20 +41,14 @@ namespace Samples.Linq
         {
         }
 
-        protected override void InternalRun()
+        protected override void InternalRun(ICluster cluster)
         {
-            XmlConfigurator.Configure();
-            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
-            {
-                const string cqlKeyspaces = "SELECT * from system.schema_columns";
+            const string cqlKeyspaces = "SELECT * from system.schema_columns";
 
-                var req = from t in cluster.Execute<SchemaColumns>(cqlKeyspaces).Result
-                          where t.KeyspaceName == "system"
-                          select t;
-                DisplayResult(req);
-            }
-
-            ClusterManager.Shutdown();
+            var req = from t in cluster.Execute<SchemaColumns>(cqlKeyspaces).Result
+                      where t.KeyspaceName == "system"
+                      select t;
+            DisplayResult(req);
         }
 
         private static void DisplayResult(IEnumerable<SchemaColumns> req)

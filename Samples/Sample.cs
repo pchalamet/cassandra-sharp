@@ -16,6 +16,8 @@
 namespace Samples
 {
     using System;
+    using CassandraSharp;
+    using CassandraSharp.Config;
 
     public abstract class Sample
     {
@@ -32,25 +34,56 @@ namespace Samples
             Console.WriteLine("== RUNNING     {0}", _name);
             Console.WriteLine("=======================================================");
 
-            string msg;
             try
             {
-                InternalRun();
-                msg = string.Format("== DONE     {0}", _name);
-            }
-            catch (Exception ex)
-            {
-                msg = string.Format("== FAILED  with error\n{0}", ex);
-            }
+                XmlConfigurator.Configure();
+                using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
+                {
+                    try
+                    {
+                        DropKeyspace(cluster);
+                    }
+                    catch
+                    {
+                    }
 
-            Console.WriteLine("=======================================================");
-            Console.WriteLine(msg);
-            Console.WriteLine("=======================================================");
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
+                    CreateKeyspace(cluster);
+
+                    string msg;
+                    try
+                    {
+                        InternalRun(cluster);
+
+                        DropKeyspace(cluster);
+                        msg = string.Format("== DONE     {0}", _name);
+                    }
+                    catch (Exception ex)
+                    {
+                        msg = string.Format("== FAILED  with error\n{0}", ex);
+                    }
+
+                    Console.WriteLine("=======================================================");
+                    Console.WriteLine(msg);
+                    Console.WriteLine("=======================================================");
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine();
+                }
+            }
+            finally
+            {
+                ClusterManager.Shutdown();
+            }
         }
 
-        protected abstract void InternalRun();
+        protected virtual void CreateKeyspace(ICluster cluster)
+        {
+        }
+
+        protected abstract void InternalRun(ICluster cluster);
+
+        protected virtual void DropKeyspace(ICluster cluster)
+        {
+        }
     }
 }
