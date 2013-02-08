@@ -16,11 +16,12 @@
 namespace CassandraSharp.Instrumentation
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
 
     public class TracingSession
     {
-        public TracingSession(IPAddress coordinator, long duration, string parameters, string request, Guid sessionId, DateTime startedAt,
+        public TracingSession(IPAddress coordinator, long duration, IDictionary<string, string> parameters, string request, Guid sessionId, DateTime startedAt,
                               TracingEvent[] tracingEvents)
         {
             Coordinator = coordinator;
@@ -36,7 +37,7 @@ namespace CassandraSharp.Instrumentation
 
         public long Duration { get; private set; }
 
-        public string Parameters { get; private set; }
+        public IDictionary<string, string> Parameters { get; private set; }
 
         public string Request { get; private set; }
 

@@ -27,6 +27,6 @@ namespace CassandraSharp.Extensibility
 
         void ClientTrace(InstrumentationToken token, EventType eventType);
 
-        void ServerTrace(InstrumentationToken token, TracingSession session);
+        void ServerTrace(InstrumentationToken token, TracingSession tracingSession);
     }
 }

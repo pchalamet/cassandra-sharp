@@ -28,11 +28,18 @@ namespace CassandraSharp.CQLBinaryProtocol
     {
         public static Task<IEnumerable<T>> Query<T>(ICluster cluster, string cql, ConsistencyLevel cl, IDataMapperFactory factory, ExecutionFlags executionFlags)
         {
+            IConnection connection = cluster.GetConnection(null);
+            return Query(connection, cql, cl, factory, executionFlags).ContinueWith(res => res.Result.Cast<T>());
+        }
+
+        internal static Task<IEnumerable<object>> Query(IConnection connection, string cql, ConsistencyLevel cl, IDataMapperFactory factory,
+                                                        ExecutionFlags executionFlags)
+        {
             Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query);
             Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory);
 
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Query, cql);
-            return cluster.GetConnection(null).Execute(writer, reader, executionFlags, token).ContinueWith(res => res.Result.Cast<T>());
+            return connection.Execute(writer, reader, executionFlags, token);
         }
 
         internal static void WriteReady(IFrameWriter frameWriter, string cqlVersion)

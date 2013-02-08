@@ -16,13 +16,15 @@
 namespace CassandraSharp.Instrumentation
 {
     using System;
+    using System.Net;
 
     public class TracingEvent
     {
-        public TracingEvent(string activity, Guid eventId, long sourceElapsed, string thread)
+        public TracingEvent(string activity, Guid eventId, IPAddress source, long sourceElapsed, string thread)
         {
             Activity = activity;
             EventId = eventId;
+            Source = source;
             SourceElapsed = sourceElapsed;
             Thread = thread;
         }
@@ -30,6 +32,8 @@ namespace CassandraSharp.Instrumentation
         public string Activity { get; private set; }
 
         public Guid EventId { get; private set; }
+
+        public IPAddress Source { get; private set; }
 
         public long SourceElapsed { get; private set; }
 

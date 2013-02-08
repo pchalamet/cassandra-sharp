@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Instrumentation
 {
+    using System;
     using System.Net;
     using CassandraSharp.Extensibility;
 
@@ -32,7 +33,7 @@ namespace CassandraSharp.Instrumentation
         {
         }
 
-        public void ServerTrace(InstrumentationToken token, TracingSession session)
+        public void ServerTrace(InstrumentationToken token, TracingSession tracingSession)
         {
         }
     }

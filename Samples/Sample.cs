@@ -43,7 +43,9 @@ namespace Samples
                     {
                         DropKeyspace(cluster);
                     }
+// ReSharper disable EmptyGeneralCatchClause
                     catch
+// ReSharper restore EmptyGeneralCatchClause
                     {
                     }
 

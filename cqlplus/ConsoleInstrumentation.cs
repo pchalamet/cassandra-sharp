@@ -17,8 +17,8 @@ namespace cqlplus
 {
     using System;
     using System.Net;
+    using System.Text;
     using System.Threading;
-    using CassandraSharp;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;
 
@@ -26,7 +26,7 @@ namespace cqlplus
     {
         public void ClientQuery(InstrumentationToken token)
         {
-            if (CommandContext.DebugLog)
+            if (CommandContext.Tracing)
             {
                 string buffer = string.Format("INSTR {0} [{1}] - id:{2}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
@@ -37,7 +37,7 @@ namespace cqlplus
 
         public void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId)
         {
-            if (CommandContext.DebugLog)
+            if (CommandContext.Tracing)
             {
                 string buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3} coordinator:{4} streamId:{5} cql:{6}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
@@ -48,7 +48,7 @@ namespace cqlplus
 
         public void ClientTrace(InstrumentationToken token, EventType eventType)
         {
-            if (CommandContext.DebugLog)
+            if (CommandContext.Tracing)
             {
                 string buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3}",
                                               DateTime.Now, Thread.CurrentThread.ManagedThreadId,
@@ -57,8 +57,28 @@ namespace cqlplus
             }
         }
 
-        public void ServerTrace(InstrumentationToken token, TracingSession session)
+        public void ServerTrace(InstrumentationToken token, TracingSession tracingSession)
         {
+            if (CommandContext.Tracing)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("INSTR {0} [{1}] - ",
+                                DateTime.Now, Thread.CurrentThread.ManagedThreadId);
+                int len = sb.Length;
+                string offset = new string(' ', len);
+
+                sb.AppendFormat("sessionId:{0} startedAt:{1} coordinator:{2} duration:{3} request:{4}",
+                                tracingSession.SessionId, tracingSession.StartedAt, tracingSession.Coordinator, tracingSession.Duration,
+                                tracingSession.Parameters["query"]);
+                foreach (TracingEvent tracingEvent in tracingSession.TracingEvents)
+                {
+                    sb.AppendLine();
+                    sb.Append(offset);
+                    sb.AppendFormat("sourceElapsed:{0} activity:{1} thread:{2}", tracingEvent.SourceElapsed, tracingEvent.Activity, tracingEvent.Thread);
+                }
+
+                Console.WriteLine(sb);
+            }
         }
     }
 }

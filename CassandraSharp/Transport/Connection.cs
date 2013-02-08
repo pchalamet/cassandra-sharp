@@ -247,24 +247,33 @@ namespace CassandraSharp.Transport
             bool isFatal = ex is IOException || ex is SocketException || ex is OperationCanceledException;
             if (! isFatal)
             {
-                frameReader.SafeDispose();
-
                 InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
                 _instrumentation.ClientTrace(token, EventType.EndRead);
-
-                _queryInfos[streamId] = new QueryInfo();
 
                 // release streamId now
                 lock (_globalLock)
                 {
+                    _queryInfos[streamId] = new QueryInfo();
+
                     // release stream id (since result streaming has started)
                     _availableStreamIds.Push(streamId);
                     Monitor.Pulse(_globalLock);
                 }
 
-                if (_streaming && null != frameReader)
+                if (null != frameReader)
                 {
-                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                    frameReader.SafeDispose();
+
+                    if (_streaming)
+                    {
+                        Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                    }
+
+                    if (frameReader.TraceId.HasValue)
+                    {
+                        TracingSession tracingSession = this.GetTracingSession(frameReader.TraceId.Value);
+                        _instrumentation.ServerTrace(token, tracingSession);
+                    }
                 }
                 return;
             }
