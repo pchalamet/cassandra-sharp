@@ -43,16 +43,16 @@ namespace CassandraSharp.EndpointStrategy
 
         public IPAddress Pick(Token token)
         {
-            IPAddress endpoint = null;
             lock (_lock)
             {
+                IPAddress endpoint = null;
                 if (0 < _healthyEndpoints.Count)
                 {
                     endpoint = _healthyEndpoints[0];
                 }
-            }
 
-            return endpoint;
+                return endpoint;
+            }
         }
 
         public void Ban(IPAddress endPoint)
@@ -80,9 +80,9 @@ namespace CassandraSharp.EndpointStrategy
 
         public void Update(IEnumerable<IPAddress> endpoints)
         {
-            bool updated = false;
             lock (_lock)
             {
+                bool updated = false;
                 foreach (IPAddress endpoint in endpoints)
                 {
                     if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))

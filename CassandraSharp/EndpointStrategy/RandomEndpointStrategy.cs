@@ -39,17 +39,17 @@ namespace CassandraSharp.EndpointStrategy
 
         public IPAddress Pick(Token token)
         {
-            IPAddress endpoint = null;
             lock (_lock)
             {
+                IPAddress endpoint = null;
                 if (0 < _healthyEndpoints.Count)
                 {
                     int candidate = _rnd.Next(_healthyEndpoints.Count);
                     endpoint = _healthyEndpoints[candidate];
                 }
-            }
 
-            return endpoint;
+                return endpoint;
+            }
         }
 
         public void Ban(IPAddress endpoint)
