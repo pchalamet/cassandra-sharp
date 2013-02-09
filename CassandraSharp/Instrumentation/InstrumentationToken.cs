@@ -19,10 +19,11 @@ namespace CassandraSharp.Instrumentation
 
     public class InstrumentationToken
     {
-        private InstrumentationToken(Guid id, RequestType type, string cql)
+        private InstrumentationToken(Guid id, RequestType type, ExecutionFlags executionFlags, string cql)
         {
             Id = id;
             Type = type;
+            ExecutionFlags = executionFlags;
             Cql = cql;
         }
 
@@ -32,9 +33,11 @@ namespace CassandraSharp.Instrumentation
 
         public RequestType Type { get; private set; }
 
-        internal static InstrumentationToken Create(RequestType requestType, string cql = null)
+        public ExecutionFlags ExecutionFlags { get; private set; }
+
+        internal static InstrumentationToken Create(RequestType requestType, ExecutionFlags executionFlags, string cql = null)
         {
-            return new InstrumentationToken(Guid.NewGuid(), requestType, cql);
+            return new InstrumentationToken(Guid.NewGuid(), requestType, executionFlags, cql);
         }
     }
 }

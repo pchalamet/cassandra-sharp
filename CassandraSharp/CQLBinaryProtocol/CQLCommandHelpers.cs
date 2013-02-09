@@ -38,7 +38,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query);
             Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory);
 
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Query, cql);
+            InstrumentationToken token = InstrumentationToken.Create(RequestType.Query, executionFlags, cql);
             return connection.Execute(writer, reader, executionFlags, token);
         }
 

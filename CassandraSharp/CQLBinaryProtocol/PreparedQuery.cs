@@ -60,7 +60,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, _cql);
                         Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
 
-                        InstrumentationToken prepareToken = InstrumentationToken.Create(RequestType.Prepare, _cql);
+                        InstrumentationToken prepareToken = InstrumentationToken.Create(RequestType.Prepare, _executionFlags, _cql);
                         connection.Execute(writer, reader, _executionFlags, prepareToken).ContinueWith(ReadPreparedQueryInfo).Wait();
                         _connection = connection;
                     }
@@ -70,7 +70,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
             Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
 
-            InstrumentationToken queryToken = InstrumentationToken.Create(RequestType.Query, _cql);
+            InstrumentationToken queryToken = InstrumentationToken.Create(RequestType.Query, _executionFlags, _cql);
             return connection.Execute(execWriter, execReader, _executionFlags, queryToken);
         }
 
