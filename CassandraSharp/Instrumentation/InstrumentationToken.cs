@@ -19,9 +19,9 @@ namespace CassandraSharp.Instrumentation
 
     public class InstrumentationToken
     {
-        private InstrumentationToken(Guid id, RequestType type, ExecutionFlags executionFlags, string cql)
+        private InstrumentationToken(RequestType type, ExecutionFlags executionFlags, string cql)
         {
-            Id = id;
+            Id = Guid.NewGuid();
             Type = type;
             ExecutionFlags = executionFlags;
             Cql = cql;
@@ -37,7 +37,7 @@ namespace CassandraSharp.Instrumentation
 
         internal static InstrumentationToken Create(RequestType requestType, ExecutionFlags executionFlags, string cql = null)
         {
-            return new InstrumentationToken(Guid.NewGuid(), requestType, executionFlags, cql);
+            return new InstrumentationToken(requestType, executionFlags, cql);
         }
     }
 }

@@ -1,6 +1,6 @@
 version 2.3.0 [UNRELEASED]
 - fixed stalled client 
-- instrumentation for performance tracing
+- instrumentation for performance tracing client & server side
 - configurable Cluster type (see ClusterConfig.Type)
 
 version 2.2.1
