@@ -19,7 +19,6 @@ namespace CassandraSharp
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
-    using System.Runtime.CompilerServices;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
@@ -27,6 +26,8 @@ namespace CassandraSharp
 
     public class ClusterManager
     {
+        private static readonly object _lock = new object();
+
         private static CassandraSharpConfig _config;
 
         private static IRecoveryService _recoveryService;
@@ -54,7 +55,7 @@ namespace CassandraSharp
             clusterConfig.Endpoints.CheckArgumentNotNull("clusterConfig.Endpoints");
 
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
-            IRecoveryService recoveryService = FindRecoveryService(transportConfig.Recoverable);
+            IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
             IEndpointSnitch snitch = Factory.Create(clusterConfig.Endpoints.Snitch, _logger);
@@ -88,40 +89,46 @@ namespace CassandraSharp
             return clusterConfig;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        private static IRecoveryService FindRecoveryService(bool recover)
+        private static IRecoveryService GetRecoveryService(bool recover)
         {
-            return ! recover
-                           ? null
-                           : _recoveryService;
+            lock (_lock)
+            {
+                return !recover
+                               ? null
+                               : _recoveryService;
+            }
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void Shutdown()
         {
-            if (null != _recoveryService)
+            lock (_lock)
             {
-                _recoveryService.SafeDispose();
-                _recoveryService = null;
-            }
+                if (null != _recoveryService)
+                {
+                    _recoveryService.SafeDispose();
+                    _recoveryService = null;
+                }
 
-            _config = null;
+                _config = null;
+            }
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void Configure(CassandraSharpConfig config)
         {
             config.CheckArgumentNotNull("config");
 
-            if (null != _config)
+            lock (_lock)
             {
-                throw new InvalidOperationException("ClusterManager is already initialized");
-            }
+                if (null != _config)
+                {
+                    throw new InvalidOperationException("ClusterManager is already initialized");
+                }
 
-            _logger = Logger.Factory.Create(config.Logger);
-            _recoveryService = Recovery.Factory.Create(config.Recovery, _logger);
-            _instrumentation = Instrumentation.Factory.Create(config.Instrumentation);
-            _config = config;
+                _logger = Logger.Factory.Create(config.Logger);
+                _recoveryService = Recovery.Factory.Create(config.Recovery, _logger);
+                _instrumentation = Instrumentation.Factory.Create(config.Instrumentation);
+                _config = config;
+            }
         }
     }
 }

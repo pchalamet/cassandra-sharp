@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ namespace CassandraSharp.EndpointStrategy
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Runtime.CompilerServices;
     using CassandraSharp.Extensibility;
 
     internal class RandomEndpointStrategy : IEndpointStrategy
@@ -26,6 +25,8 @@ namespace CassandraSharp.EndpointStrategy
         private readonly List<IPAddress> _bannedEndpoints;
 
         private readonly List<IPAddress> _healthyEndpoints;
+
+        private readonly object _lock = new object();
 
         private readonly Random _rnd;
 
@@ -36,45 +37,53 @@ namespace CassandraSharp.EndpointStrategy
             _rnd = new Random();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public IPAddress Pick(Token token)
         {
-            if (0 < _healthyEndpoints.Count)
+            IPAddress endpoint = null;
+            lock (_lock)
             {
-                int candidate = _rnd.Next(_healthyEndpoints.Count);
-                IPAddress endpoint = _healthyEndpoints[candidate];
-                return endpoint;
+                if (0 < _healthyEndpoints.Count)
+                {
+                    int candidate = _rnd.Next(_healthyEndpoints.Count);
+                    endpoint = _healthyEndpoints[candidate];
+                }
             }
 
-            return null;
+            return endpoint;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Ban(IPAddress endpoint)
         {
-            if (_healthyEndpoints.Remove(endpoint))
+            lock (_lock)
             {
-                _bannedEndpoints.Add(endpoint);
+                if (_healthyEndpoints.Remove(endpoint))
+                {
+                    _bannedEndpoints.Add(endpoint);
+                }
             }
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Permit(IPAddress endpoint)
         {
-            if (_bannedEndpoints.Remove(endpoint))
+            lock (_lock)
             {
-                _healthyEndpoints.Add(endpoint);
+                if (_bannedEndpoints.Remove(endpoint))
+                {
+                    _healthyEndpoints.Add(endpoint);
+                }
             }
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Update(IEnumerable<IPAddress> endpoints)
         {
-            foreach (IPAddress endpoint in endpoints)
+            lock (_lock)
             {
-                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                foreach (IPAddress endpoint in endpoints)
                 {
-                    _healthyEndpoints.Add(endpoint);
+                    if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                    {
+                        _healthyEndpoints.Add(endpoint);
+                    }
                 }
             }
         }

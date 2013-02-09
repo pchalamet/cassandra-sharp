@@ -51,22 +51,19 @@ namespace Samples
 
                     CreateKeyspace(cluster);
 
-                    string msg;
                     try
                     {
                         InternalRun(cluster);
-
                         DropKeyspace(cluster);
-                        msg = string.Format("== DONE     {0}", _name);
                     }
                     catch (Exception ex)
                     {
-                        msg = string.Format("== FAILED  with error\n{0}", ex);
+                        string msg = string.Format("== FAILED  with error\n{0}", ex);
+                        Console.WriteLine("=======================================================");
+                        Console.WriteLine(msg);
+                        Console.WriteLine("=======================================================");
                     }
 
-                    Console.WriteLine("=======================================================");
-                    Console.WriteLine(msg);
-                    Console.WriteLine("=======================================================");
                     Console.WriteLine();
                     Console.WriteLine();
                     Console.WriteLine();
