@@ -87,7 +87,10 @@ namespace CassandraSharp.Transport
         public Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags,
                                                  InstrumentationToken instrumentationToken)
         {
-            _instrumentation.ClientQuery(instrumentationToken);
+            if (0 != (executionFlags & ExecutionFlags.ClientTracing))
+            {
+                _instrumentation.ClientQuery(instrumentationToken);
+            }
 
             Task<IEnumerable<object>> taskRead;
             byte streamId;
@@ -108,8 +111,12 @@ namespace CassandraSharp.Transport
                 taskRead = new Task<IEnumerable<object>>(() => ReadResultStream(streamId, reader));
                 _queryInfos[streamId].InstrumentationToken = instrumentationToken;
                 _queryInfos[streamId].ReadTask = taskRead;
+                _queryInfos[streamId].ExecutionFlags = executionFlags;
 
-                _instrumentation.ClientConnectionInfo(instrumentationToken, Endpoint, streamId);
+                if (0 != (executionFlags & ExecutionFlags.ClientTracing))
+                {
+                    _instrumentation.ClientConnectionInfo(instrumentationToken, Endpoint, streamId);
+                }
             }
             _logger.Debug("Using stream {0}@{1}", streamId, Endpoint);
 
@@ -137,7 +144,10 @@ namespace CassandraSharp.Transport
                 {
                     if (!_availableStreamIds.Contains(idx))
                     {
-                        _instrumentation.ClientTrace(_queryInfos[idx].InstrumentationToken, EventType.Cancellation);
+                        if (0 != (_queryInfos[idx].ExecutionFlags & ExecutionFlags.ClientTracing))
+                        {
+                            _instrumentation.ClientTrace(_queryInfos[idx].InstrumentationToken, EventType.Cancellation);
+                        }
 
                         _queryInfos[idx].Exception = cancelException;
                         _queryInfos[idx].ReadTask.RunSynchronously();
@@ -181,7 +191,10 @@ namespace CassandraSharp.Transport
             try
             {
                 InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
-                _instrumentation.ClientTrace(token, EventType.BeginWrite);
+                if (0 != (executionFlags & ExecutionFlags.ClientTracing))
+                {
+                    _instrumentation.ClientTrace(token, EventType.BeginWrite);
+                }
 
                 bool tracing = 0 != (executionFlags & ExecutionFlags.Tracing);
 
@@ -198,7 +211,11 @@ namespace CassandraSharp.Transport
                 }
 
                 _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-                _instrumentation.ClientTrace(token, EventType.EndWrite);
+
+                if (0 != (executionFlags & ExecutionFlags.ClientTracing))
+                {
+                    _instrumentation.ClientTrace(token, EventType.EndWrite);
+                }
             }
             catch (Exception ex)
             {
@@ -221,7 +238,10 @@ namespace CassandraSharp.Transport
                     _queryInfos[streamId].FrameReader = frameReader;
 
                     InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
-                    _instrumentation.ClientTrace(token, EventType.BeginRead);
+                    if (0 != (_queryInfos[streamId].ExecutionFlags & ExecutionFlags.ClientTracing))
+                    {
+                        _instrumentation.ClientTrace(token, EventType.BeginRead);
+                    }
 
                     // NOTE: the task is running just to return an IEnumerable<object> to the client
                     //       so it's better to execute it on our context immediately
@@ -247,8 +267,13 @@ namespace CassandraSharp.Transport
             bool isFatal = ex is IOException || ex is SocketException || ex is OperationCanceledException;
             if (! isFatal)
             {
+                if (null == frameReader)
+                {
+                    return;
+                }
+
+                ExecutionFlags executionFlags = _queryInfos[streamId].ExecutionFlags;
                 InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
-                _instrumentation.ClientTrace(token, EventType.EndRead);
 
                 // release streamId now
                 lock (_globalLock)
@@ -260,20 +285,22 @@ namespace CassandraSharp.Transport
                     Monitor.Pulse(_globalLock);
                 }
 
-                if (null != frameReader)
+                if (0 != (executionFlags & ExecutionFlags.ClientTracing))
                 {
-                    frameReader.SafeDispose();
+                    _instrumentation.ClientTrace(token, EventType.EndRead);
+                }
 
-                    if (_streaming)
-                    {
-                        Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
-                    }
+                frameReader.SafeDispose();
 
-                    if (frameReader.TraceId.HasValue)
-                    {
-                        TracingSession tracingSession = this.GetTracingSession(frameReader.TraceId.Value);
-                        _instrumentation.ServerTrace(token, tracingSession);
-                    }
+                if (_streaming)
+                {
+                    Task.Factory.StartNew(ReadNextFrameHeader, _cancellation.Token);
+                }
+
+                if (0 != (executionFlags & ExecutionFlags.ServerTracing) && frameReader.TraceId.HasValue)
+                {
+                    TracingSession tracingSession = this.GetTracingSession(frameReader.TraceId.Value);
+                    _instrumentation.ServerTrace(token, tracingSession);
                 }
                 return;
             }
@@ -339,6 +366,8 @@ namespace CassandraSharp.Transport
         private struct QueryInfo
         {
             public Exception Exception;
+
+            public ExecutionFlags ExecutionFlags;
 
             public IFrameReader FrameReader;
 

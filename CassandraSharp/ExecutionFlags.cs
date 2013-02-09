@@ -20,7 +20,12 @@ namespace CassandraSharp
     [Flags]
     public enum ExecutionFlags
     {
-        None,
-        Tracing
+        None = 0,
+
+        ClientTracing = 0x0001,
+        
+        ServerTracing = 0x0002,
+
+        Tracing = ClientTracing | ServerTracing,
     }
 }

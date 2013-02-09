@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.Extensibility
 {
-    using System;
     using System.Net;
     using CassandraSharp.Instrumentation;
 
