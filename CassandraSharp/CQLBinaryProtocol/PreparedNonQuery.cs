@@ -13,25 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQL
+namespace CassandraSharp.CQLBinaryProtocol
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.CQL;
+    using CassandraSharp.Extensibility;
 
-    public static class CQLExtensions
+    internal class PreparedNonQuery : IPreparedQuery
     {
-        public static Task<IList<T>> AsFuture<T>(this Task<IEnumerable<T>> @this)
+        private readonly IDataMapper _dataMapper;
+
+        private readonly CQLPreparedQueryHelpers _helpers;
+
+        public PreparedNonQuery(ICluster cluster, IDataMapper dataMapper, string cql, ExecutionFlags executionFlags)
         {
-            return @this.ContinueWith(a => (IList<T>) a.Result.ToList());
+            _dataMapper = dataMapper;
+            _helpers = new CQLPreparedQueryHelpers(cluster, cql, executionFlags);
         }
 
-        [Obsolete]
-        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public Task<int> Execute(object dataSource, ConsistencyLevel cl)
         {
-            return CQLCommandHelpers.Query<Unit>(cluster, cql, cl, null, executionFlags).ContinueWith(res => res.Result.Count());
+            IDataMapperFactory factory = _dataMapper.Create<Unit>(dataSource);
+            return _helpers.Execute(factory, cl).ContinueWith(res => res.Result.Count());
         }
     }
 }

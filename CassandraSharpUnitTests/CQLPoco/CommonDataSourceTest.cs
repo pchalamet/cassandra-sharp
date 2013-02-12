@@ -23,7 +23,7 @@ namespace CassandraSharpUnitTests.CQLPoco
 
     public abstract class CommonDataSourceTest
     {
-        protected abstract IDataSource GetDataSource<T>() where T : new();
+        protected abstract IDataSource GetDataSource<T>();
 
         private static IColumnSpec CreateColumnSpec(string name)
         {

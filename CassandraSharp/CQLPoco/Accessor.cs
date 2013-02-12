@@ -21,7 +21,7 @@ namespace CassandraSharp.CQLPoco
     using System.Reflection;
     using System.Reflection.Emit;
 
-    internal abstract class DynamicAccessor<T>
+    internal abstract class Accessor<T>
     {
         protected void GenerateAccessor(ILGenerator gen)
         {

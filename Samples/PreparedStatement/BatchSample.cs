@@ -18,7 +18,6 @@ namespace Samples.PreparedStatement
     using System;
     using System.Threading;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class BatchSample : Sample
@@ -32,22 +31,27 @@ namespace Samples.PreparedStatement
 
         protected override void CreateKeyspace(ICluster cluster)
         {
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+
             const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-            cluster.ExecuteNonQuery(createKeyspaceFoo).Wait();
+            cmd.Execute(createKeyspaceFoo).Wait();
 
             const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
-            cluster.ExecuteNonQuery(createBar).Wait();
+            cmd.Execute(createBar).Wait();
         }
 
         protected override void DropKeyspace(ICluster cluster)
         {
-            cluster.ExecuteNonQuery("drop keyspace Foo").Wait();
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+            cmd.Execute("drop keyspace Foo").Wait();
         }
 
         protected override void InternalRun(ICluster cluster)
         {
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+
             const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
-            var preparedInsert = cluster.Prepare(insertBatch);
+            var preparedInsert = cmd.Prepare(insertBatch);
 
             const int times = 10;
 
@@ -61,7 +65,7 @@ namespace Samples.PreparedStatement
 
                 var data = new byte[30000];
                 // var data = (float)random.NextDouble();
-                preparedInsert.ExecuteNonQuery(new {id = i, Baz = data}, ConsistencyLevel.ONE)
+                preparedInsert.Execute(new {id = i, Baz = data}, ConsistencyLevel.ONE)
                               .ContinueWith(_ => Interlocked.Decrement(ref _running));
             }
 
@@ -71,7 +75,7 @@ namespace Samples.PreparedStatement
                 Thread.Sleep(1000);
             }
 
-            var result = cluster.Execute<Foo>("select * from Foo.Bar where id = 50").Result;
+            var result = cmd.Execute<Foo>("select * from Foo.Bar where id = 50").Result;
             foreach (var res in result)
             {
                 Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);

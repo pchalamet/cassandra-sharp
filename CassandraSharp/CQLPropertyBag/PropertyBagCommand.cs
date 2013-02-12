@@ -13,18 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.CQLPoco
+namespace CassandraSharp.CQLPropertyBag
 {
-    using CassandraSharp.CQLPoco;
+    using System.Collections.Generic;
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
-    using NUnit.Framework;
 
-    [TestFixture]
-    public class DynamicInstanceBuilderTest : CommonInstanceBuilderTest
+    public class PropertyBagCommand : Command
     {
-        protected override IInstanceBuilder GetInstanceBuilder<T>() 
+        internal PropertyBagCommand(ICluster cluster)
+                : base(cluster, new PropertyBagMapperFactory())
         {
-            return new InstanceBuilder<T>();
+        }
+
+        private class PropertyBagMapperFactory : IDataMapper
+        {
+            public IDataMapperFactory Create<T>(object dataSource)
+            {
+                IDictionary<string, object> mapDataSource = (IDictionary<string, object>) dataSource;
+                return new DataMapperFactory(mapDataSource);
+            }
         }
     }
 }

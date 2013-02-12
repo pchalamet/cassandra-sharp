@@ -48,12 +48,14 @@ namespace Samples.Future
 
         protected override void InternalRun(ICluster cluster)
         {
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+
             const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
             var allResults = new List<Task<IList<SchemaKeyspaces>>>();
             for (int i = 0; i < 100; ++i)
             {
-                var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
                 allResults.Add(futRes);
             }
 

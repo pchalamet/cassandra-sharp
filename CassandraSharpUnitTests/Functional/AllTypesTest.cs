@@ -80,11 +80,13 @@ namespace CassandraSharpUnitTests.Functional
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
+                ICqlCommand cmd = new PocoCommand(cluster);
+
                 const string dropFoo = "drop keyspace Tests";
 
                 try
                 {
-                    cluster.ExecuteNonQuery(dropFoo).Wait();
+                    cmd.Execute(dropFoo).Wait();
                 }
                 catch
                 {
@@ -95,8 +97,7 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine(createFoo);
                 Console.WriteLine("============================================================");
 
-                var resCount = cluster.ExecuteNonQuery(createFoo);
-                resCount.Wait();
+                cmd.Execute(createFoo).Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -120,15 +121,14 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
-                resCount = cluster.ExecuteNonQuery(createBar);
-                resCount.Wait();
+                cmd.Execute(createBar).Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
                 const string insertBatch = @"insert into Tests.AllTypes (cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat,
                                                                          cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar)
                                              values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                var prepared = cluster.Prepare(insertBatch);
+                var prepared = cmd.Prepare(insertBatch);
 
                 var allTypesInsert = new AllTypes
                     {
@@ -147,13 +147,12 @@ namespace CassandraSharpUnitTests.Functional
                             CVarchar = "varchar"
                     };
 
-                prepared.ExecuteNonQuery(allTypesInsert).Wait();
+                prepared.Execute(allTypesInsert).Wait();
 
                 const string selectAll = "select * from Tests.AllTypes";
-                AllTypes allTypesSelect = cluster.Execute<AllTypes>(selectAll).Result.Single();
+                AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).Result.Single();
 
-                resCount = cluster.ExecuteNonQuery(dropFoo);
-                resCount.Wait();
+                cmd.Execute(dropFoo).Wait();
 
                 Assert.AreEqual(allTypesInsert.CAscii, allTypesSelect.CAscii);
                 Assert.AreEqual(allTypesInsert.CBigint, allTypesSelect.CBigint);

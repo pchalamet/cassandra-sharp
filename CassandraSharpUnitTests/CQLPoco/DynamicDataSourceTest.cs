@@ -32,7 +32,7 @@ namespace CassandraSharpUnitTests.CQLPoco
                         StringProperty = "String2"
                 };
 
-            return new DynamicDataSource<Toto>(toto);
+            return new DataSource<Toto>(toto);
         }
     }
 }

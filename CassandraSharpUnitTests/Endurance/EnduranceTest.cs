@@ -19,7 +19,6 @@ namespace CassandraSharpUnitTests.Endurance
     using System.Diagnostics;
     using System.Threading;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using NUnit.Framework;
@@ -47,10 +46,12 @@ namespace CassandraSharpUnitTests.Endurance
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
+                ICqlCommand cmd = new PocoCommand(cluster);
+
                 const string dropFoo = "drop keyspace Endurance";
                 try
                 {
-                    cluster.ExecuteNonQuery(dropFoo).Wait();
+                    cmd.Execute(dropFoo).Wait();
                 }
                 catch
                 {
@@ -61,7 +62,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine(createFoo);
                 Console.WriteLine("============================================================");
 
-                var resCount = cluster.ExecuteNonQuery(createFoo);
+                var resCount = cmd.Execute(createFoo);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -70,7 +71,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
-                resCount = cluster.ExecuteNonQuery(createBar);
+                resCount = cmd.Execute(createBar);
                 resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
@@ -79,7 +80,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine("============================================================");
                 Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
                 Console.WriteLine("============================================================");
-                var prepared = cluster.Prepare(insertPerf);
+                var prepared = cmd.Prepare(insertPerf);
 
                 var timer = Stopwatch.StartNew();
 
@@ -92,7 +93,7 @@ namespace CassandraSharpUnitTests.Endurance
                     }
 
                     Interlocked.Increment(ref running);
-                    prepared.ExecuteNonQuery(new {intid = i, strid = i.ToString("X")}).ContinueWith(_ => Interlocked.Decrement(ref running));
+                    prepared.Execute(new {intid = i, strid = i.ToString("X")}).ContinueWith(_ => Interlocked.Decrement(ref running));
                 }
 
                 while (0 != Interlocked.CompareExchange(ref running, 0, 0))
@@ -107,7 +108,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine(dropFoo);
                 Console.WriteLine("============================================================");
 
-                cluster.ExecuteNonQuery(dropFoo).Wait();
+                cmd.Execute(dropFoo).Wait();
             }
 
             ClusterManager.Shutdown();

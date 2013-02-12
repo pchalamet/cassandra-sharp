@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.CQL
 {
-    internal class Unit
+    public class Unit
     {
     }
 }

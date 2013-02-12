@@ -2,6 +2,7 @@ version 2.3.0 [UNRELEASED]
 - fixed stalled client 
 - instrumentation for performance tracing client & server side
 - configurable Cluster type (see ClusterConfig.Type)
+- break the interface - be sure to read NEWS.txt
 
 version 2.2.1
 - added version in Zip & NuGet

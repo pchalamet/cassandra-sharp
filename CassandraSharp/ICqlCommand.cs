@@ -13,20 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
+namespace CassandraSharp
 {
-    using System;
-    using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
 
-    internal class DynamicDataSourceFactory
+    public interface ICqlCommand
     {
-        public static IDataSource Create(object dataSource)
-        {
-            Type genDataSource = typeof(DynamicDataSource<>);
-            Type[] genParams = new[] {dataSource.GetType()};
-            Type typedDataSource = genDataSource.MakeGenericType(genParams);
-            IDataSource dynDataSource = (IDataSource) Activator.CreateInstance(typedDataSource, dataSource);
-            return dynDataSource;
-        }
+        Task<IEnumerable<T>> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
+
+        Task Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
+
+        IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
+
+        IPreparedQuery Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }
 }

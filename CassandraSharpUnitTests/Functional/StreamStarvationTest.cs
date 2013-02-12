@@ -93,12 +93,12 @@ namespace CassandraSharpUnitTests.Functional
                 {
                     if (0 == (i%2))
                     {
-                        prepared.ExecuteNonQuery(new {bar = "bar" + 1, strid = "1"}, ConsistencyLevel.ONE).Wait();
+                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}, ConsistencyLevel.ONE).Wait();
                         Assert.IsTrue(false, "Update should have failed");
                     }
                     else
                     {
-                        prepared.ExecuteNonQuery(new { bar = "bar" + 1, intid = i, strid = "1" }, ConsistencyLevel.ONE).Wait();
+                        prepared.Execute(new { bar = "bar" + 1, intid = i, strid = "1" }, ConsistencyLevel.ONE).Wait();
                         Console.WriteLine("Update {0} sucessful", i);
                     }
                 }
@@ -128,10 +128,12 @@ namespace CassandraSharpUnitTests.Functional
                 };
 
             ICluster cluster = ClusterManager.GetCluster(clusterConfig);
+            ICqlCommand cmd = new PocoCommand(cluster);
+
             const string dropKeySpace = "drop keyspace Tests";
             try
             {
-                cluster.ExecuteNonQuery(dropKeySpace).Wait();
+                cmd.Execute(dropKeySpace).Wait();
             }
             catch
             {
@@ -142,8 +144,7 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine(createKeySpace);
             Console.WriteLine("============================================================");
 
-            var resCount = cluster.ExecuteNonQuery(createKeySpace);
-            resCount.Wait();
+            cmd.Execute(createKeySpace).Wait();
             Console.WriteLine();
             Console.WriteLine();
 
@@ -151,8 +152,7 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine("============================================================");
             Console.WriteLine(createFoo);
             Console.WriteLine("============================================================");
-            resCount = cluster.ExecuteNonQuery(createFoo);
-            resCount.Wait();
+            cmd.Execute(createFoo).Wait();
             Console.WriteLine();
             Console.WriteLine();
 
@@ -161,8 +161,7 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine(" Cassandra-Sharp Driver reproducing stream starvation ");
             Console.WriteLine("============================================================");
 
-            IPreparedQuery prepared = cluster.Prepare(insertPerf);
-
+            var prepared = cmd.Prepare(insertPerf);
             Thread[] failsThreads = new Thread[NUM_THREADS];
 
             for (int i = 0; i < NUM_THREADS; i++)

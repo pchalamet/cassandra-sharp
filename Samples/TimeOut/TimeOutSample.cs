@@ -48,6 +48,8 @@ namespace Samples.TimeOut
 
         protected override void InternalRun(ICluster cluster)
         {
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+
             const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
             Random rnd = new Random();
@@ -56,7 +58,7 @@ namespace Samples.TimeOut
                 DateTime dtStart = DateTime.Now;
                 DateTime dtStop = dtStart.AddSeconds(2); // 2 second max
                 int wait = rnd.Next(4*1000);
-                var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces)
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces)
                                     .ContinueWith(t =>
                                         {
                                             // simulate an eventually long operation

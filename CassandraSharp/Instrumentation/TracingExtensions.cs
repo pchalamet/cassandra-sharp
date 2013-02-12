@@ -28,10 +28,14 @@ namespace CassandraSharp.Instrumentation
         private static int CompareTracingEvent(TracingEvent x, TracingEvent y)
         {
             if (x.SourceElapsed < y.SourceElapsed)
+            {
                 return -1;
+            }
 
             if (x.SourceElapsed > y.SourceElapsed)
+            {
                 return 1;
+            }
 
             return 0;
         }
@@ -40,10 +44,8 @@ namespace CassandraSharp.Instrumentation
         {
             string queryEvents = "select * from system_traces.events where session_id=" + tracingId.ToString();
             List<TracingEvent> tracingEvents = new List<TracingEvent>();
-            IDataMapperFactory factory = new DataMapperFactory();
-            foreach (
-                    IDictionary<string, object> mapEvents in
-                            CQLCommandHelpers.Query(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).Result)
+            IDataMapperFactory factory = new DataMapperFactory(null);
+            foreach (IDictionary<string, object> mapEvents in CQLCommandHelpers.Query(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).Result)
             {
                 TracingEvent tracingEvent = new TracingEvent((string) mapEvents["activity"],
                                                              (Guid) mapEvents["event_id"],

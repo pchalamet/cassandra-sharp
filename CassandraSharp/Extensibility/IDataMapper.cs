@@ -13,18 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.CQLPoco
+namespace CassandraSharp.Extensibility
 {
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
-    [TestFixture]
-    public class DynamicInstanceBuilderTest : CommonInstanceBuilderTest
+    public interface IDataMapper
     {
-        protected override IInstanceBuilder GetInstanceBuilder<T>() 
-        {
-            return new InstanceBuilder<T>();
-        }
+        IDataMapperFactory Create<T>(object dataSource = null);
     }
 }

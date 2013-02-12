@@ -32,7 +32,8 @@ namespace CassandraSharp.Discovery
 
         public IEnumerable<IPAddress> DiscoverPeers(ICluster cluster)
         {
-            var futPeers = cluster.Execute<Peer>("select rpc_address from system.peers", ConsistencyLevel.ONE).AsFuture();
+            ICqlCommand cqlCommand = new PocoCommand(cluster);
+            var futPeers = cqlCommand.Execute<Peer>("select rpc_address from system.peers", ConsistencyLevel.ONE).AsFuture();
             List<IPAddress> newPeers = new List<IPAddress>();
             foreach (Peer peer in futPeers.Result)
             {

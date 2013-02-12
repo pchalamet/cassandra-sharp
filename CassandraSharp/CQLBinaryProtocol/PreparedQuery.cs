@@ -15,92 +15,27 @@
 
 namespace CassandraSharp.CQLBinaryProtocol
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Instrumentation;
 
-    internal class PreparedQuery : IPreparedQuery
+    internal class PreparedQuery<T> : IPreparedQuery<T>
     {
-        private readonly ICluster _cluster;
+        private readonly IDataMapper _dataMapper;
 
-        private readonly string _cql;
+        private readonly CQLPreparedQueryHelpers _helpers;
 
-        private readonly ExecutionFlags _executionFlags;
-
-        private readonly object _lock = new object();
-
-        private byte[] _id;
-
-        private IColumnSpec[] _columnSpecs;
-
-        private volatile IConnection _connection;
-
-        public PreparedQuery(ICluster cluster, string cql, ExecutionFlags executionFlags)
+        public PreparedQuery(ICluster cluster, IDataMapper dataMapper, string cql, ExecutionFlags executionFlags)
         {
-            _cluster = cluster;
-            _cql = cql;
-            _executionFlags = executionFlags;
+            _dataMapper = dataMapper;
+            _helpers = new CQLPreparedQueryHelpers(cluster, cql, executionFlags);
         }
 
-        public Task<IEnumerable<object>> Execute(ConsistencyLevel cl, IDataMapperFactory factory)
+        public Task<IEnumerable<T>> Execute(object dataSource, ConsistencyLevel cl)
         {
-            IConnection connection;
-            if (null == (connection = _connection))
-            {
-                lock (_lock)
-                {
-                    if (null == (connection = _connection))
-                    {
-                        connection = _cluster.GetConnection(null);
-                        connection.OnFailure += ConnectionOnOnFailure;
-
-                        Action<IFrameWriter> writer = fw => CQLCommandHelpers.WritePrepareRequest(fw, _cql);
-                        Func<IFrameReader, IEnumerable<object>> reader = fr => CQLCommandHelpers.ReadPreparedQuery(fr, connection);
-
-                        InstrumentationToken prepareToken = InstrumentationToken.Create(RequestType.Prepare, _executionFlags, _cql);
-                        connection.Execute(writer, reader, _executionFlags, prepareToken).ContinueWith(ReadPreparedQueryInfo).Wait();
-                        _connection = connection;
-                    }
-                }
-            }
-
-            Action<IFrameWriter> execWriter = fw => WriteExecuteRequest(fw, cl, factory);
-            Func<IFrameReader, IEnumerable<object>> execReader = fr => CQLCommandHelpers.ReadRowSet(fr, factory);
-
-            InstrumentationToken queryToken = InstrumentationToken.Create(RequestType.Query, _executionFlags, _cql);
-            return connection.Execute(execWriter, execReader, _executionFlags, queryToken);
-        }
-
-        private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
-        {
-            _connection = null; 
-        }
-
-        private void ReadPreparedQueryInfo(Task<IEnumerable<object>> results)
-        {
-            Tuple<byte[], IColumnSpec[]> preparedInfo = (Tuple<byte[], IColumnSpec[]>) results.Result.Single();
-            _id = preparedInfo.Item1;
-            _columnSpecs = preparedInfo.Item2;
-        }
-
-        private void WriteExecuteRequest(IFrameWriter frameWriter, ConsistencyLevel cl, IDataMapperFactory factory)
-        {
-            frameWriter.WriteShortByteArray(_id);
-            frameWriter.WriteShort((short) _columnSpecs.Length);
-
-            IDataSource dataSource = factory.DataSource;
-            foreach (IColumnSpec columnSpec in _columnSpecs)
-            {
-                object data = dataSource.Get(columnSpec);
-                byte[] rawData = columnSpec.Serialize(data);
-                frameWriter.WriteByteArray(rawData);
-            }
-
-            frameWriter.WriteShort((short) cl);
-            frameWriter.SetMessageType(MessageOpcodes.Execute);
+            IDataMapperFactory factory = _dataMapper.Create<T>(dataSource);
+            return _helpers.Execute(factory, cl).ContinueWith(res => res.Result.Cast<T>());
         }
     }
 }

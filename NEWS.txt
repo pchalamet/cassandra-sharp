@@ -1,0 +1,15 @@
+version 2.3.0
+=============
+Change the POCO and PropertyBag interface. It is mostly source compatible but prepared queries.
+It is strongly advised to move to the new interface ICqlCommand and IPreparedQuery as more features will be added (Rx support notably).
+
+Use ICluster.CreatePocoCommand() or ICluster.CreatePropertyBagCommand() to obtain a reference on ICqlCommand.
+
+Previous interface               ==> New interface
+========================================================================
+ICluster.Execute<T>()            ==> ICqlCommand.Execute<T>()
+ICluster.ExecuteNonQuery()       ==> ICqlCommand.Execute()
+ICluster.Prepare()               ==> ICqlCommand.Prepare<T>() for query
+                                     ICqlCommand.Prepare() for non query
+IPreparedQuery.Execute<T>()      ==> IPreparedQuery<T>.Execute()
+IPreparedQuery.ExecuteNonQuery() ==> IPreparedQuery().Execute()

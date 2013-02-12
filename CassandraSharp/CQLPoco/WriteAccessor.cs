@@ -19,11 +19,11 @@ namespace CassandraSharp.CQLPoco
     using System.Reflection;
     using System.Reflection.Emit;
 
-    internal class DynamicWriteAccessor<T> : DynamicAccessor<T>
+    internal class WriteAccessor<T> : Accessor<T>
     {
         private readonly WriteValue _writeValue;
 
-        public DynamicWriteAccessor()
+        public WriteAccessor()
         {
             _writeValue = Generate();
         }

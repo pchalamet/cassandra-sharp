@@ -15,33 +15,47 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
-    using CassandraSharp.CQL;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
 
     public static class CQLPocoExtensions
     {
-        public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
-                where T : new()
+        public static ICqlCommand CreatePocoCommand(this ICluster @this)
         {
-            IDataMapperFactory factory = new DynamicDataMapperFactory<T>();
-            return CQLCommandHelpers.Query<T>(cluster, cql, cl, factory, executionFlags);
+            return new PocoCommand(@this);
         }
 
-        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
-                where T : new()
+        [Obsolete("Use PocoCommand.Execute<T>() instead")]
+        public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                                      ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            IDataMapperFactory factory = new DynamicDataMapperFactory<T>(dataSource);
-            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
+            var cmd = cluster.CreatePocoCommand();
+            return cmd.Execute<T>(cql, cl, executionFlags);
         }
 
-        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        [Obsolete("Use PocoCommand.Execute() instead")]
+        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                           ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            IDataMapperFactory factory = new DynamicDataMapperFactory<Unit>(dataSource);
-            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
+            var cmd = cluster.CreatePocoCommand();
+            return cmd.Execute(cql, cl, executionFlags);
+        }
+
+        [Obsolete("Use PocoCommand.Prepare<T>() instead")]
+        public static IPreparedQuery<T> Prepare<T>(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            var cmd = cluster.CreatePocoCommand();
+            IPreparedQuery<T> preparedQuery = cmd.Prepare<T>(cql, executionFlags);
+            return preparedQuery;
+        }
+
+        [Obsolete("Use PocoCommand.Prepare() instead")]
+        public static IPreparedQuery PrepareNonQuery(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            var cmd = cluster.CreatePocoCommand();
+            IPreparedQuery preparedQuery = cmd.Prepare(cql, executionFlags);
+            return preparedQuery;
         }
     }
 }

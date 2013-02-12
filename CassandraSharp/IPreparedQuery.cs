@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@ namespace CassandraSharp
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using CassandraSharp.Extensibility;
+
+    public interface IPreparedQuery<T>
+    {
+        Task<IEnumerable<T>> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
+    }
 
     public interface IPreparedQuery
     {
-        Task<IEnumerable<object>> Execute(ConsistencyLevel cl, IDataMapperFactory factory);
+        Task<int> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
     }
 }

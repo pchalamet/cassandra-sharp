@@ -22,7 +22,7 @@ namespace CassandraSharp.Config
     {
         public CassandraSharpConfig()
         {
-            Recovery = "Null";
+            Recovery = "Simple";
             Logger = "Null";
             Instrumentation = "Null";
         }

@@ -22,7 +22,7 @@ namespace CassandraSharpUnitTests.CQLPoco
 
     public abstract class CommonInstanceBuilderTest
     {
-        protected abstract IInstanceBuilder GetInstanceBuilder<T>() where T : new();
+        protected abstract IInstanceBuilder GetInstanceBuilder<T>();
 
         private static IColumnSpec CreateColumnSpec(string name)
         {

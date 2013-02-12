@@ -17,22 +17,21 @@ namespace CassandraSharp.CQLPoco
 {
     using CassandraSharp.Extensibility;
 
-    internal class DynamicDataMapperFactory<T> : IDataMapperFactory where T : new()
+    internal class DataMapperFactory<T> : IDataMapperFactory
     {
-        public DynamicDataMapperFactory()
+        public DataMapperFactory(object dataSource)
         {
-        }
-
-        public DynamicDataMapperFactory(object dataSource)
-        {
-            DataSource = DynamicDataSourceFactory.Create(dataSource);
+            if (null != dataSource)
+            {
+                DataSource = DataSourceFactory.Create(dataSource);
+            }
         }
 
         public IDataSource DataSource { get; private set; }
 
         public IInstanceBuilder CreateBuilder()
         {
-            return new DynamicInstanceBuilder<T>();
+            return new InstanceBuilder<T>();
         }
     }
 }

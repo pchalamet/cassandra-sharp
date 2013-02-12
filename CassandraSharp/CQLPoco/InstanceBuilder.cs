@@ -15,18 +15,20 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using System;
     using System.Runtime.Serialization;
     using CassandraSharp.Extensibility;
 
-    internal class DynamicInstanceBuilder<T> : IInstanceBuilder where T : new()
+    internal class InstanceBuilder<T> : IInstanceBuilder
     {
-        private static readonly DynamicWriteAccessor<T> _accessor = new DynamicWriteAccessor<T>();
+        private static readonly WriteAccessor<T> _accessor = new WriteAccessor<T>();
 
         private T _instance;
 
-        public DynamicInstanceBuilder()
+        public InstanceBuilder()
         {
-            _instance = new T();
+            // TODO: intance creation should be performed with the help of the accessor
+            _instance = (T) Activator.CreateInstance(typeof(T));
         }
 
         public bool Set(IColumnSpec columnSpec, object data)

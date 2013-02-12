@@ -49,10 +49,12 @@ namespace Samples.Async
         {
             const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+
             var allTasks = new List<Task>();
             for (int i = 0; i < 100; ++i)
             {
-                var futRes = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces).ContinueWith(t => DisplayKeyspace(t.Result));
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).ContinueWith(t => DisplayKeyspace(t.Result));
                 allTasks.Add(futRes);
             }
 

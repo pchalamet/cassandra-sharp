@@ -43,9 +43,11 @@ namespace Samples.Linq
 
         protected override void InternalRun(ICluster cluster)
         {
+            ICqlCommand cmd = cluster.CreatePocoCommand();
+
             const string cqlKeyspaces = "SELECT * from system.schema_columns";
 
-            var req = from t in cluster.Execute<SchemaColumns>(cqlKeyspaces).Result
+            var req = from t in cmd.Execute<SchemaColumns>(cqlKeyspaces).Result
                       where t.KeyspaceName == "system"
                       select t;
             DisplayResult(req);

@@ -13,18 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.CQLPoco
+namespace CassandraSharp.CQLPoco
 {
-    using CassandraSharp.CQLPoco;
+    using System;
     using CassandraSharp.Extensibility;
-    using NUnit.Framework;
 
-    [TestFixture]
-    public class DynamicInstanceBuilderTest : CommonInstanceBuilderTest
+    internal class DataSourceFactory
     {
-        protected override IInstanceBuilder GetInstanceBuilder<T>() 
+        public static IDataSource Create(object dataSource)
         {
-            return new InstanceBuilder<T>();
+            Type genDataSource = typeof(DataSource<>);
+            Type[] genParams = new[] {dataSource.GetType()};
+            Type typedDataSource = genDataSource.MakeGenericType(genParams);
+            IDataSource dynDataSource = (IDataSource) Activator.CreateInstance(typedDataSource, dataSource);
+            return dynDataSource;
         }
     }
 }

@@ -38,7 +38,8 @@ namespace cqlplus.Commands
                 executionFlags |= ExecutionFlags.Tracing;
             }
 
-            Task<IEnumerable<IDictionary<string, object>>> res = CommandContext.Cluster.Execute(_statement, CommandContext.CL, executionFlags);
+            ICqlCommand cmd = CommandContext.Cluster.CreatePropertyBagCommand();
+            Task<IEnumerable<IDictionary<string, object>>> res = cmd.Execute<IDictionary<string, object>>(_statement, CommandContext.CL, executionFlags);
 
             // ensure values are sorted accordingly to column name
             var sortedRes = from row in res.Result

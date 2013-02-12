@@ -15,30 +15,47 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
 
     public static class CQLPropertyBagExtensions
     {
-        public static Task<IEnumerable<IDictionary<string, object>>> Execute(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public static ICqlCommand CreatePropertyBagCommand(this ICluster @this)
         {
-            IDataMapperFactory factory = new DataMapperFactory();
-            return CQLCommandHelpers.Query<IDictionary<string, object>>(cluster, cql, cl, factory, executionFlags);
+            return new PropertyBagCommand(@this);
         }
 
-        public static Task<IEnumerable<T>> Execute<T>(this IPreparedQuery preparedQuery, IDictionary<string, object> dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        [Obsolete("Use PropertyBagCommand.Execute<T>() instead")]
+        public static Task<IEnumerable<IDictionary<string, object>>> Execute(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                                                             ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            IDataMapperFactory factory = new DataMapperFactory(dataSource);
-            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Cast<T>());
+            var cmd = cluster.CreatePropertyBagCommand();
+            return cmd.Execute<IDictionary<string, object>>(cql, cl, executionFlags);
         }
 
-        public static Task<int> ExecuteNonQuery(this IPreparedQuery preparedQuery, IDictionary<string, object> dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
+        [Obsolete("Use PropertyBagCommand.Execute() instead")]
+        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                           ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            IDataMapperFactory factory = new DataMapperFactory(dataSource);
-            return preparedQuery.Execute(cl, factory).ContinueWith(res => res.Result.Count());
+            var cmd = cluster.CreatePropertyBagCommand();
+            return cmd.Execute(cql, cl, executionFlags);
+        }
+
+        [Obsolete("Use PropertyBagCommand.Prepare<T>() instead")]
+        public static IPreparedQuery<IDictionary<string, object>> Prepare(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            var cmd = cluster.CreatePropertyBagCommand();
+            IPreparedQuery<IDictionary<string, object>> preparedQuery = cmd.Prepare<IDictionary<string, object>>(cql, executionFlags);
+            return preparedQuery;
+        }
+
+        [Obsolete("Use PropertyBagCommand.Prepare() instead")]
+        public static IPreparedQuery PrepareNonQuery(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            var cmd = cluster.CreatePropertyBagCommand();
+            IPreparedQuery preparedQuery = cmd.Prepare(cql, executionFlags);
+            return preparedQuery;
         }
     }
 }

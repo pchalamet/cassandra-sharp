@@ -15,35 +15,21 @@
 
 namespace CassandraSharp.CQLPoco
 {
-    using System;
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
 
-    internal class DynamicDataSource<T> : IDataSource
+    public class PocoCommand : Command
     {
-        private static readonly DynamicReadAccessor<T> _accessor = new DynamicReadAccessor<T>();
-
-        private T _dataSource;
-
-        public DynamicDataSource(T dataSource)
+        internal PocoCommand(ICluster cluster)
+                : base(cluster, new PocoDataMapperFactory())
         {
-            _dataSource = dataSource;
         }
 
-        public object Get(IColumnSpec columnSpec)
+        private class PocoDataMapperFactory : IDataMapper
         {
-            string colName = columnSpec.Name;
-            try
+            public IDataMapperFactory Create<T>(object dataSource)
             {
-                return _accessor.Get(ref _dataSource, colName);
-            }
-            catch (ArgumentException)
-            {
-                if (colName.Contains("_"))
-                {
-                    colName = colName.Replace("_", "");
-                }
-
-                return _accessor.Get(ref _dataSource, colName);
+                return new DataMapperFactory<T>(dataSource);
             }
         }
     }
