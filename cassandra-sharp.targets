@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NuGet>ThirdParties\NuGet\NuGet.exe</NuGet>
+		<NuGet>.nuget\NuGet.exe</NuGet>
 		<NuGetPackageDir>$(OutDir)\NuGetPackage</NuGetPackageDir>
 	</PropertyGroup>
 	
