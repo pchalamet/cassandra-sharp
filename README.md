@@ -96,14 +96,15 @@ Sample client
 			XmlConfigurator.Configure();
 			using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
 			{
+				var cmd = cluster.CreatePocoCommand();
+
 				const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
 				// async operation
-				var taskKeyspaces = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces);
+				var taskKeyspaces = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces);
 
 				// future operation meanwhile
-				var futKeyspaces = cluster.Execute<SchemaKeyspaces>(cqlKeyspaces)
-										  .AsFuture();
+				var futKeyspaces = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
 
 				// display the result of the async operation
 				var result = await taskKeyspaces;
