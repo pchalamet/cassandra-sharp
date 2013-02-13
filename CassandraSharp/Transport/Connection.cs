@@ -209,14 +209,15 @@ namespace CassandraSharp.Transport
 
         private void ReadNextFrameHeader()
         {
+            IFrameReader frameReader = null;
             byte streamId = 0xFF;
             try
             {
                 do
                 {
-                    IFrameReader frameReader = _streaming
-                                                       ? new StreamingFrameReader(_socket)
-                                                       : new BufferingFrameReader(_socket);
+                    frameReader = _streaming
+                                          ? new StreamingFrameReader(_socket)
+                                          : new BufferingFrameReader(_socket);
                     streamId = frameReader.StreamId;
                     _queryInfos[streamId].FrameReader = frameReader;
 
@@ -232,8 +233,15 @@ namespace CassandraSharp.Transport
             }
             catch (Exception ex)
             {
-                _queryInfos[streamId].Exception = ex;
-                _queryInfos[streamId].ReadTask.RunSynchronously();
+                if (null != frameReader)
+                {
+                    _queryInfos[streamId].Exception = ex;
+                    _queryInfos[streamId].ReadTask.RunSynchronously();
+                }
+                else
+                {
+                    HandleFrameTerminaison(ex, null, streamId);
+                }
             }
         }
 
@@ -244,14 +252,12 @@ namespace CassandraSharp.Transport
                 _logger.Debug("HandleFrameTerminaison notified with exception {0}", ex);
             }
 
-            bool isFatal = ex is IOException || ex is SocketException || ex is OperationCanceledException;
+            bool isFatal = ex is IOException
+                           || ex is SocketException
+                           || ex is OperationCanceledException
+                           || null == frameReader;
             if (! isFatal)
             {
-                if (null == frameReader)
-                {
-                    return;
-                }
-
                 InstrumentationToken token = _queryInfos[streamId].InstrumentationToken;
 
                 // release streamId now

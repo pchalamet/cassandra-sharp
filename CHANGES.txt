@@ -1,3 +1,6 @@
+version 2.3.1
+- fixed connection leak on read error
+
 version 2.3.0
 - fixed stalled client 
 - instrumentation for performance tracing client & server side

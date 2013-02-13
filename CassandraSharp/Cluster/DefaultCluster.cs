@@ -122,6 +122,8 @@ namespace CassandraSharp.Cluster
                     _logger.Error("connection {0} failed with error {1}", endpoint, e.Exception);
 
                     _ip2Connection.Remove(endpoint);
+                    sender.SafeDispose();
+
                     MarkEndpointForRecovery(endpoint);
                 }
             }
