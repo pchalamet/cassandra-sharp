@@ -15,10 +15,12 @@
 
 namespace CassandraSharp.CQLBinaryProtocol
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using CassandraSharp.CQL;
     using CassandraSharp.Extensibility;
 
     public abstract class Command : ICqlCommand
@@ -37,12 +39,68 @@ namespace CassandraSharp.CQLBinaryProtocol
                                                ExecutionFlags executionFlags = ExecutionFlags.None)
         {
             IDataMapperFactory factory = DataMapper.Create<T>();
-            return CQLCommandHelpers.Query<T>(Cluster, cql, cl, factory, executionFlags);
+            IConnection connection = Cluster.GetConnection(null);
+            IQuery query = CQLCommandHelpers.Query(connection, cql, cl, factory, executionFlags);
+
+            IEnumerable<T> dataStream = null;
+            Task<IEnumerable<T>> taskReader = new Task<IEnumerable<T>>(() => dataStream);
+
+            Action<IEnumerable<object>> dataAvailable = ds =>
+                {
+                    dataStream = ds.Cast<T>();
+                    taskReader.Start();
+                };
+            query.Schedule(dataAvailable);
+
+            return taskReader;
         }
 
         public Task Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            return CQLCommandHelpers.Query<Unit>(Cluster, cql, cl, null, executionFlags).ContinueWith(res => res.Result.Count());
+            IDataMapperFactory factory = DataMapper.Create<Unit>();
+            IConnection connection = Cluster.GetConnection(null);
+            IQuery query = CQLCommandHelpers.Query(connection, cql, cl, factory, executionFlags);
+
+            Task taskReader = new Task(() => { });
+
+            Action<IEnumerable<object>> dataAvailable = _ => taskReader.Start();
+            query.Schedule(dataAvailable);
+
+            return taskReader;
+        }
+
+        public IObservable<T> ExecuteQuery<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            IDataMapperFactory factory = DataMapper.Create<T>();
+            IConnection connection = Cluster.GetConnection(null);
+            IQuery query = CQLCommandHelpers.Query(connection, cql, cl, factory, executionFlags);
+
+            return Observable.Create<T>(obs =>
+                {
+                    Action<IEnumerable<object>> dataAvailable = data =>
+                        {
+                            try
+                            {
+                                foreach (T datum in data)
+                                {
+                                    obs.OnNext(datum);
+                                }
+                                obs.OnCompleted();
+                            }
+                            catch (Exception ex)
+                            {
+                                obs.OnError(ex);
+                            }
+                        };
+
+                    query.Schedule(dataAvailable);
+                    return query;
+                });
+        }
+
+        public IObservable<Unit> ExecuteNonQuery(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            return ExecuteQuery<Unit>(cql, cl, executionFlags);
         }
 
         public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)

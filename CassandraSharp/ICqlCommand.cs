@@ -15,7 +15,9 @@
 
 namespace CassandraSharp
 {
+    using System;
     using System.Collections.Generic;
+    using System.Reactive;
     using System.Threading.Tasks;
 
     public interface ICqlCommand
@@ -23,6 +25,10 @@ namespace CassandraSharp
         Task<IEnumerable<T>> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
 
         Task Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
+
+        IObservable<T> ExecuteQuery<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
+
+        IObservable<Unit> ExecuteNonQuery(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
 
         IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
 

@@ -18,7 +18,6 @@ namespace CassandraSharp
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Threading.Tasks;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;
 
@@ -31,7 +30,7 @@ namespace CassandraSharp
 
         event EventHandler<FailureEventArgs> OnFailure;
 
-        Task<IEnumerable<object>> Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags,
-                                          InstrumentationToken token);
+        IQuery Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags,
+                       InstrumentationToken token);
     }
 }

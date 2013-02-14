@@ -17,23 +17,21 @@ namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Security.Authentication;
-    using System.Threading.Tasks;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;
 
     internal static class CQLCommandHelpers
     {
-        public static Task<IEnumerable<T>> Query<T>(ICluster cluster, string cql, ConsistencyLevel cl, IDataMapperFactory factory, ExecutionFlags executionFlags)
-        {
-            IConnection connection = cluster.GetConnection(null);
-            return Query(connection, cql, cl, factory, executionFlags).ContinueWith(res => res.Result.Cast<T>());
-        }
+        //public static Task<IEnumerable<T>> Query<T>(ICluster cluster, string cql, ConsistencyLevel cl, IDataMapperFactory factory, ExecutionFlags executionFlags)
+        //{
+        //    IConnection connection = cluster.GetConnection(null);
+        //    return Query(connection, cql, cl, factory, executionFlags).ContinueWith(res => res.Result.Cast<T>());
+        //}
 
-        internal static Task<IEnumerable<object>> Query(IConnection connection, string cql, ConsistencyLevel cl, IDataMapperFactory factory,
-                                                        ExecutionFlags executionFlags)
+        internal static IQuery Query(IConnection connection, string cql, ConsistencyLevel cl, IDataMapperFactory factory,
+                                     ExecutionFlags executionFlags)
         {
             Action<IFrameWriter> writer = fw => WriteQueryRequest(fw, cql, cl, MessageOpcodes.Query);
             Func<IFrameReader, IEnumerable<object>> reader = fr => ReadRowSet(fr, factory);
@@ -42,210 +40,5 @@ namespace CassandraSharp.CQLBinaryProtocol
             return connection.Execute(writer, reader, executionFlags, token);
         }
 
-        internal static void WriteReady(IFrameWriter frameWriter, string cqlVersion)
-        {
-            Dictionary<string, string> options = new Dictionary<string, string>
-                {
-                        {"CQL_VERSION", cqlVersion}
-                };
-            frameWriter.WriteStringMap(options);
-            frameWriter.SetMessageType(MessageOpcodes.Startup);
-        }
-
-        internal static bool ReadReady(IFrameReader frameReader)
-        {
-            switch (frameReader.MessageOpcode)
-            {
-                case MessageOpcodes.Ready:
-                    return false;
-
-                case MessageOpcodes.Authenticate:
-                    return true;
-
-                default:
-                    throw new UnknownResponseException(frameReader.MessageOpcode);
-            }
-        }
-
-        internal static void WriteOptions(IFrameWriter frameWriter)
-        {
-            frameWriter.SetMessageType(MessageOpcodes.Options);
-        }
-
-        internal static void ReadOptions(IFrameReader frameReader)
-        {
-            if (frameReader.MessageOpcode != MessageOpcodes.Supported)
-            {
-                throw new UnknownResponseException(frameReader.MessageOpcode);
-            }
-        }
-
-        internal static void WriteAuthenticate(IFrameWriter frameWriter, string user, string password)
-        {
-            Dictionary<string, string> authParams = new Dictionary<string, string>
-                {
-                        {"username", user},
-                        {"password", password}
-                };
-            frameWriter.WriteStringMap(authParams);
-
-            frameWriter.SetMessageType(MessageOpcodes.Credentials);
-        }
-
-        internal static void ReadAuthenticate(IFrameReader frameReader)
-        {
-            if (frameReader.MessageOpcode != MessageOpcodes.Ready)
-            {
-                throw new InvalidCredentialException();
-            }
-        }
-
-        internal static void WritePrepareRequest(IFrameWriter frameWriter, string cql)
-        {
-            frameWriter.WriteLongString(cql);
-            frameWriter.SetMessageType(MessageOpcodes.Prepare);
-        }
-
-        internal static IEnumerable<object> ReadPreparedQuery(IFrameReader frameReader, IConnection connection)
-        {
-            if (MessageOpcodes.Result != frameReader.MessageOpcode)
-            {
-                throw new ArgumentException("Unknown server response");
-            }
-
-            ResultOpcode resultOpcode = (ResultOpcode) frameReader.ReadInt();
-            switch (resultOpcode)
-            {
-                case ResultOpcode.Prepared:
-                    byte[] queryId = frameReader.ReadShortBytes();
-                    IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
-                    yield return Tuple.Create(queryId, columnSpecs);
-                    break;
-
-                default:
-                    throw new ArgumentException("Unexpected ResultOpcode");
-            }
-        }
-
-        private static void WriteQueryRequest(IFrameWriter frameWriter, string cql, ConsistencyLevel cl, MessageOpcodes opcode)
-        {
-            frameWriter.WriteLongString(cql);
-            frameWriter.WriteShort((short) cl);
-            frameWriter.SetMessageType(opcode);
-        }
-
-        internal static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapperFactory mapperFactory)
-        {
-            if (MessageOpcodes.Result != frameReader.MessageOpcode)
-            {
-                throw new ArgumentException("Unknown server response");
-            }
-
-            if (null == mapperFactory)
-            {
-                yield break;
-            }
-
-            ResultOpcode resultOpcode = (ResultOpcode) frameReader.ReadInt();
-            switch (resultOpcode)
-            {
-                case ResultOpcode.Void:
-                    yield break;
-
-                case ResultOpcode.Rows:
-                    IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
-                    foreach (object row in ReadRows(frameReader, columnSpecs, mapperFactory))
-                    {
-                        yield return row;
-                    }
-                    break;
-
-                case ResultOpcode.SetKeyspace:
-                    yield break;
-
-                case ResultOpcode.SchemaChange:
-                    yield break;
-
-                default:
-                    throw new ArgumentException("Unexpected ResultOpcode");
-            }
-        }
-
-        private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapperFactory mapperFactory)
-        {
-            int rowCount = frameReader.ReadInt();
-            for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
-            {
-                IInstanceBuilder instanceBuilder = mapperFactory.CreateBuilder();
-                foreach (ColumnSpec colSpec in columnSpecs)
-                {
-                    byte[] rawData = frameReader.ReadBytes();
-                    object data = null != rawData
-                                          ? colSpec.Deserialize(rawData)
-                                          : null;
-
-                    // FIXME: require to support Nullable<T>
-                    if (null != data)
-                    {
-                        instanceBuilder.Set(colSpec, data);
-                    }
-                }
-
-                yield return instanceBuilder.Build();
-            }
-        }
-
-        internal static IColumnSpec[] ReadColumnSpec(IFrameReader frameReader)
-        {
-            MetadataFlags flags = (MetadataFlags) frameReader.ReadInt();
-            bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
-
-            int colCount = frameReader.ReadInt();
-
-            string keyspace = null;
-            string table = null;
-            if (globalTablesSpec)
-            {
-                keyspace = frameReader.ReadString();
-                table = frameReader.ReadString();
-            }
-
-            IColumnSpec[] columnSpecs = new IColumnSpec[colCount];
-            for (int colIdx = 0; colIdx < colCount; ++colIdx)
-            {
-                string colKeyspace = keyspace;
-                string colTable = table;
-                if (! globalTablesSpec)
-                {
-                    colKeyspace = frameReader.ReadString();
-                    colTable = frameReader.ReadString();
-                }
-                string colName = frameReader.ReadString();
-                ColumnType colType = (ColumnType) frameReader.ReadShort();
-                string colCustom = null;
-                ColumnType colKeyType = ColumnType.Custom;
-                ColumnType colValueType = ColumnType.Custom;
-                switch (colType)
-                {
-                    case ColumnType.Custom:
-                        colCustom = frameReader.ReadString();
-                        break;
-
-                    case ColumnType.List:
-                    case ColumnType.Set:
-                        colValueType = (ColumnType) frameReader.ReadShort();
-                        break;
-
-                    case ColumnType.Map:
-                        colKeyType = (ColumnType) frameReader.ReadShort();
-                        colValueType = (ColumnType) frameReader.ReadShort();
-                        break;
-                }
-
-                columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colKeyType, colValueType);
-            }
-
-            return columnSpecs;
-        }
     }
 }

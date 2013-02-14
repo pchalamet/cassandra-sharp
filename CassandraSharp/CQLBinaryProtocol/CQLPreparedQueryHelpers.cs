@@ -45,7 +45,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             _executionFlags = executionFlags;
         }
 
-        public Task<IEnumerable<object>> Execute(IDataMapperFactory factory, ConsistencyLevel cl)
+        public IQuery Execute(IDataMapperFactory factory, ConsistencyLevel cl, Action<IEnumerable<object> dataAvailable)
         {
             IConnection connection;
             if (null == (connection = _connection))
