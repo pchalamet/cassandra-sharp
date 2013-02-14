@@ -21,18 +21,22 @@ namespace Samples
     using Samples.Linq;
     using Samples.POCO;
     using Samples.PreparedStatement;
+    using Samples.Stress;
     using Samples.TimeOut;
 
     internal class Program
     {
         private static void Main(string[] args)
         {
-            new TimeOutSample().Run();
-            new BatchSample().Run();
-            new LinqSample().Run();
-            new FutureSample().Run();
-            new PocoSample().Run();
-            new AsyncSample().Run();
+            Stress.ResilienceTest test = new ResilienceTest();
+            test.RecoveryTest();
+
+            //new TimeOutSample().Run();
+            //new BatchSample().Run();
+            //new LinqSample().Run();
+            //new FutureSample().Run();
+            //new PocoSample().Run();
+            //new AsyncSample().Run();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

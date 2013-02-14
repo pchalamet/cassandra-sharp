@@ -185,7 +185,17 @@ namespace CassandraSharp.Transport
             int read = 0;
             while (read != len)
             {
-                read += _socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
+                try
+                {
+                    read += _socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
+                }
+                catch (SocketException ex)
+                {
+                    if (ex.SocketErrorCode != SocketError.TimedOut)
+                    {
+                        throw;
+                    }
+                }
             }
 
             return read;

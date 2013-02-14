@@ -63,6 +63,8 @@ namespace CassandraSharp.Transport
             _instrumentation = instrumentation;
             _tcpClient = new TcpClient();
             _tcpClient.Connect(address, _config.Port);
+            _tcpClient.ReceiveTimeout = 1000;
+            _tcpClient.SendTimeout = 100;
             _streaming = config.Streaming;
 
             for (byte idx = 0; idx < MAX_STREAMID; ++idx)
@@ -140,7 +142,10 @@ namespace CassandraSharp.Transport
                         _instrumentation.ClientTrace(_queryInfos[idx].InstrumentationToken, EventType.Cancellation);
 
                         _queryInfos[idx].Exception = cancelException;
-                        _queryInfos[idx].ReadTask.RunSynchronously();
+                        if (_queryInfos[idx].ReadTask.Status != TaskStatus.Created)
+                        {
+                            _queryInfos[idx].ReadTask.RunSynchronously();
+                        }
                     }
                 }
 

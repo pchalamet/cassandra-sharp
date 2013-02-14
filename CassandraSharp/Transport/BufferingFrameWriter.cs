@@ -52,31 +52,6 @@ namespace CassandraSharp.Transport
             _msgOpcode = msgOpcode;
         }
 
-        public void SendFrame(Socket socket)
-        {
-            const byte version = (byte)(FrameType.Request | FrameType.ProtocolVersion);
-            FrameHeaderFlags flags = FrameHeaderFlags.None;
-            if (_tracing)
-            {
-                flags |= FrameHeaderFlags.Tracing;
-            }
-
-            byte[] header = new byte[4];
-            header[0] = version;
-            header[1] = (byte)flags;
-            header[2] = _streamId;
-            header[3] = (byte)_msgOpcode;
-            SendBuffer(socket, header);
-
-            // len of body
-            int len = (int)_ms.Length;
-            byte[] bodyLen = len.GetBytes();
-            SendBuffer(socket, bodyLen);
-
-            // body
-            SendBuffer(socket, _ms.GetBuffer(), 0, len);
-        }
-
         public void WriteShort(short data)
         {
             byte[] buffer = data.GetBytes();
@@ -146,6 +121,31 @@ namespace CassandraSharp.Transport
             _ms.Write(data, 0, data.Length);
         }
 
+        public void SendFrame(Socket socket)
+        {
+            const byte version = (byte) (FrameType.Request | FrameType.ProtocolVersion);
+            FrameHeaderFlags flags = FrameHeaderFlags.None;
+            if (_tracing)
+            {
+                flags |= FrameHeaderFlags.Tracing;
+            }
+
+            byte[] header = new byte[4];
+            header[0] = version;
+            header[1] = (byte) flags;
+            header[2] = _streamId;
+            header[3] = (byte) _msgOpcode;
+            SendBuffer(socket, header);
+
+            // len of body
+            int len = (int) _ms.Length;
+            byte[] bodyLen = len.GetBytes();
+            SendBuffer(socket, bodyLen);
+
+            // body
+            SendBuffer(socket, _ms.GetBuffer(), 0, len);
+        }
+
         private void SendBuffer(Socket socket, byte[] buffer)
         {
             SendBuffer(socket, buffer, 0, buffer.Length);
@@ -156,7 +156,17 @@ namespace CassandraSharp.Transport
             int written = 0;
             while (written != len)
             {
-                written += socket.Send(buffer, offset + written, len - written, SocketFlags.None);
+                try
+                {
+                    written += socket.Send(buffer, offset + written, len - written, SocketFlags.None);
+                }
+                catch (SocketException ex)
+                {
+                    if (ex.SocketErrorCode != SocketError.TimedOut)
+                    {
+                        throw;
+                    }
+                }
             }
         }
     }
