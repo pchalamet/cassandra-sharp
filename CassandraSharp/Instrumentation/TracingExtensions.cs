@@ -19,6 +19,7 @@ namespace CassandraSharp.Instrumentation
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.CQLPropertyBag;
     using CassandraSharp.Extensibility;
@@ -45,13 +46,13 @@ namespace CassandraSharp.Instrumentation
             string queryEvents = "select * from system_traces.events where session_id=" + tracingId.ToString();
             List<TracingEvent> tracingEvents = new List<TracingEvent>();
             IDataMapperFactory factory = new DataMapperFactory(null);
-            foreach (IDictionary<string, object> mapEvents in CQLCommandHelpers.Query(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).Result)
+            foreach (IDictionary<string, object> mapEvents in CQLCommandHelpers.CreateQuery(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result)
             {
-                TracingEvent tracingEvent = new TracingEvent((string) mapEvents["activity"],
-                                                             (Guid) mapEvents["event_id"],
-                                                             (IPAddress) mapEvents["source"],
-                                                             (int) mapEvents["source_elapsed"],
-                                                             (string) mapEvents["thread"]);
+                TracingEvent tracingEvent = new TracingEvent((string)mapEvents["activity"],
+                                                             (Guid)mapEvents["event_id"],
+                                                             (IPAddress)mapEvents["source"],
+                                                             (int)mapEvents["source_elapsed"],
+                                                             (string)mapEvents["thread"]);
                 tracingEvents.Add(tracingEvent);
             }
             tracingEvents.Sort(CompareTracingEvent);
@@ -60,13 +61,13 @@ namespace CassandraSharp.Instrumentation
             string querySession = "select * from system_traces.sessions where session_id=" + tracingId.ToString();
             IDictionary<string, object> mapSession =
                     (IDictionary<string, object>)
-                    CQLCommandHelpers.Query(@this, querySession, ConsistencyLevel.ONE, factory, ExecutionFlags.None).Result.Single();
-            TracingSession tracingSession = new TracingSession((IPAddress) mapSession["coordinator"],
-                                                               (int) mapSession["duration"],
-                                                               (IDictionary<string, string>) mapSession["parameters"],
-                                                               (string) mapSession["request"],
-                                                               (Guid) mapSession["session_id"],
-                                                               (DateTime) mapSession["started_at"],
+                    CQLCommandHelpers.CreateQuery(@this, querySession, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result.Single();
+            TracingSession tracingSession = new TracingSession((IPAddress)mapSession["coordinator"],
+                                                               (int)mapSession["duration"],
+                                                               (IDictionary<string, string>)mapSession["parameters"],
+                                                               (string)mapSession["request"],
+                                                               (Guid)mapSession["session_id"],
+                                                               (DateTime)mapSession["started_at"],
                                                                events);
 
             return tracingSession;

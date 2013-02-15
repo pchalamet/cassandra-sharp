@@ -30,7 +30,8 @@
 		<CassandraSharpProjectName>cassandra-sharp</CassandraSharpProjectName>
         <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp</CassandraSharpAssembly>
         <CQLPlusAssembly>cqlplus\bin\$(Configuration)\cqlplus</CQLPlusAssembly>
-        <Log4NetAssembly>ThirdParties\log4net\log4net.dll</Log4NetAssembly>
+        <ReactiveCoreAssembly>CassandraSharp\bin\$(Configuration)\System.Reactive.Core</ReactiveCoreAssembly>
+        <ReactiveLinqAssembly>CassandraSharp\bin\$(Configuration)\System.Reactive.Linq</ReactiveLinqAssembly>
         <ChangesFile>CHANGES.txt</ChangesFile>
     </PropertyGroup>
 
@@ -59,6 +60,8 @@
             <ZipFilesCopy Include="$(CassandraSharpAssembly).pdb" />
             <ZipFilesCopy Include="$(CQLPlusAssembly).exe" />
             <ZipFilesCopy Include="$(CQLPlusAssembly).pdb" />
+            <ZipFilesCopy Include="$(ReactiveCoreAssembly).dll" />
+            <ZipFilesCopy Include="$(ReactiveLinqAssembly).dll" />
             <ZipFilesCopy Include="$(ChangesFile)" />
         </ItemGroup>
 		

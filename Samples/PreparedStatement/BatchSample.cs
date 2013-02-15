@@ -18,6 +18,7 @@ namespace Samples.PreparedStatement
     using System;
     using System.Threading;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class BatchSample : Sample
@@ -34,16 +35,16 @@ namespace Samples.PreparedStatement
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
             const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-            cmd.Execute(createKeyspaceFoo).Wait();
+            cmd.Execute(createKeyspaceFoo).AsFuture().Wait();
 
             const string createBar = "CREATE TABLE Foo.Bar (id int, Baz blob, PRIMARY KEY (id))";
-            cmd.Execute(createBar).Wait();
+            cmd.Execute(createBar).AsFuture().Wait();
         }
 
         protected override void DropKeyspace(ICluster cluster)
         {
             ICqlCommand cmd = cluster.CreatePocoCommand();
-            cmd.Execute("drop keyspace Foo").Wait();
+            cmd.Execute("drop keyspace Foo").AsFuture().Wait();
         }
 
         protected override void InternalRun(ICluster cluster)
@@ -65,7 +66,7 @@ namespace Samples.PreparedStatement
 
                 var data = new byte[30000];
                 // var data = (float)random.NextDouble();
-                preparedInsert.Execute(new {id = i, Baz = data}, ConsistencyLevel.ONE)
+                preparedInsert.Execute(new { id = i, Baz = data }, ConsistencyLevel.ONE).AsFuture()
                               .ContinueWith(_ => Interlocked.Decrement(ref _running));
             }
 
@@ -75,7 +76,7 @@ namespace Samples.PreparedStatement
                 Thread.Sleep(1000);
             }
 
-            var result = cmd.Execute<Foo>("select * from Foo.Bar where id = 50").Result;
+            var result = cmd.Execute<Foo>("select * from Foo.Bar where id = 50").AsFuture().Result;
             foreach (var res in result)
             {
                 Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);

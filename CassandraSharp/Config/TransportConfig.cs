@@ -25,7 +25,6 @@ namespace CassandraSharp.Config
             Type = "CqlBinary";
             Recoverable = true;
             CqlVersion = "3.0.0";
-            Streaming = true;
         }
 
         [XmlAttribute("port")]
@@ -45,8 +44,5 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("cqlver")]
         public string CqlVersion { get; set; }
-
-        [XmlAttribute("streaming")]
-        public bool Streaming { get; set; }
     }
 }

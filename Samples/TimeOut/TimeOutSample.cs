@@ -20,6 +20,7 @@ namespace Samples.TimeOut
     using System.Threading;
     using System.Threading.Tasks;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class SchemaKeyspaces
@@ -58,7 +59,7 @@ namespace Samples.TimeOut
                 DateTime dtStart = DateTime.Now;
                 DateTime dtStop = dtStart.AddSeconds(2); // 2 second max
                 int wait = rnd.Next(4*1000);
-                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces)
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture()
                                     .ContinueWith(t =>
                                         {
                                             // simulate an eventually long operation

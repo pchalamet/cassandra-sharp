@@ -17,21 +17,22 @@ namespace CassandraSharp.CQL
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
-    using CassandraSharp.CQLBinaryProtocol;
 
     public static class CQLExtensions
     {
-        public static Task<IList<T>> AsFuture<T>(this Task<IEnumerable<T>> @this)
+        public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable)
         {
-            return @this.ContinueWith(a => (IList<T>) a.Result.ToList());
-        }
-
-        [Obsolete]
-        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            return CQLCommandHelpers.Query<Unit>(cluster, cql, cl, null, executionFlags).ContinueWith(res => res.Result.Count());
+            var obsEnumerable = observable.Aggregate((IList<T>) new List<T>(),
+                                                     (acc, v) =>
+                                                         {
+                                                             acc.Add(v);
+                                                             return acc;
+                                                         });
+            var task = obsEnumerable.ToTask();
+            return task;
         }
     }
 }

@@ -1,3 +1,9 @@
+version 3.0.0 [not released]
+- total rewrite of Connection
+- expose a new interface using Rx (IObservable)
+- future are now a TPL Task returning a list of results
+- Mono support is probably broken because of Rx
+
 version 2.3.1
 - fixed connection leak on read error
 

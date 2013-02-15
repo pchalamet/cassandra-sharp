@@ -17,14 +17,8 @@ namespace CassandraSharp
 {
     using System;
 
-    public interface ICqlCommand
+    public interface IQuery : IDisposable
     {
-        IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
-
-        IObservable<NonQuery> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
-
-        IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
-
-        IPreparedQuery<NonQuery> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
+        void Schedule(IObserver<object> observer);
     }
 }

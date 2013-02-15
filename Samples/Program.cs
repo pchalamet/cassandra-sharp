@@ -27,11 +27,11 @@ namespace Samples
     {
         private static void Main(string[] args)
         {
+            new PocoSample().Run();
             new TimeOutSample().Run();
             new BatchSample().Run();
             new LinqSample().Run();
             new FutureSample().Run();
-            new PocoSample().Run();
             new AsyncSample().Run();
 
             GC.Collect();

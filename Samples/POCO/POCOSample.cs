@@ -18,6 +18,7 @@ namespace Samples.POCO
     using System;
     using System.Collections.Generic;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class NerdMovie
@@ -43,14 +44,14 @@ namespace Samples.POCO
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
             const string createKeyspace = "CREATE KEYSPACE videos WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-            cmd.Execute(createKeyspace).Wait();
+            cmd.Execute(createKeyspace).AsFuture().Wait();
 
             const string createNerdMovies = "CREATE TABLE videos.NerdMovies (movie text, " +
                                             "director text, " +
                                             "main_actor text, " +
                                             "year int, " +
                                             "PRIMARY KEY (movie, director))";
-            cmd.Execute(createNerdMovies).Wait();
+            cmd.Execute(createNerdMovies).AsFuture().Wait();
         }
 
         protected override void DropKeyspace(ICluster cluster)
@@ -58,7 +59,7 @@ namespace Samples.POCO
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
             const string dropExcelsor = "drop keyspace videos";
-            cmd.Execute(dropExcelsor).Wait();
+            cmd.Execute(dropExcelsor).AsFuture().Wait();
         }
 
         protected override void InternalRun(ICluster cluster)
@@ -69,12 +70,12 @@ namespace Samples.POCO
                                            "VALUES ('Serenity', 'Joss Whedon', 'Nathan Fillion', 2005) " +
                                            "USING TTL 86400";
             Console.WriteLine(insertNerdMovie);
-            cmd.Execute(insertNerdMovie).Wait();
+            cmd.Execute(insertNerdMovie).AsFuture().Wait();
             Console.WriteLine();
 
             const string selectNerdMovies = "select * from videos.NerdMovies";
             Console.WriteLine(selectNerdMovies);
-            var taskSelectStartMovies = cmd.Execute<NerdMovie>(selectNerdMovies).ContinueWith(res => DisplayMovies(res.Result));
+            var taskSelectStartMovies = cmd.Execute<NerdMovie>(selectNerdMovies).AsFuture().ContinueWith(res => DisplayMovies(res.Result));
             taskSelectStartMovies.Wait();
             Console.WriteLine();
 
@@ -83,7 +84,7 @@ namespace Samples.POCO
             var preparedAllFrom = cmd.Prepare<NerdMovie>(selectAllFrom);
             var ds = new {Director = "Joss Whedon"};
             var taskSelectWhere =
-                    preparedAllFrom.Execute(ds).ContinueWith(res => DisplayMovies(res.Result));
+                    preparedAllFrom.Execute(ds).AsFuture().ContinueWith(res => DisplayMovies(res.Result));
             taskSelectWhere.Wait();
             Console.WriteLine();
         }

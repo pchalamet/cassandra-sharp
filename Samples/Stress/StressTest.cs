@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.Stress
+namespace Samples.Stress
 {
     using System;
     using System.Linq;
@@ -25,7 +25,6 @@ namespace CassandraSharpUnitTests.Stress
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
-    using NUnit.Framework;
 
     public class DisconnectingProxy
     {
@@ -80,7 +79,6 @@ namespace CassandraSharpUnitTests.Stress
                 ThreadPool.QueueUserWorkItem(_ => Transmit(clientSocket, targetSocket));
                 ThreadPool.QueueUserWorkItem(_ => Transmit(targetSocket, clientSocket));
                 Killer(targetSocket, clientSocket, listenSocket);
-                Thread.Sleep(3000);
             }
         }
 
@@ -133,7 +131,6 @@ namespace CassandraSharpUnitTests.Stress
         }
     }
 
-    [TestFixture]
     public class ResilienceTest
     {
         public class ResilienceLogger : ILogger
@@ -169,7 +166,6 @@ namespace CassandraSharpUnitTests.Stress
             }
         }
 
-        [Test]
         public void RecoveryTest()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
@@ -215,11 +211,12 @@ namespace CassandraSharpUnitTests.Stress
 
                 proxy.EnableKiller();
 
-                for (int i = 0; i < 50000; ++i)
+                for (int i = 0; i < 100000; ++i)
                 {
                     int attempt = 0;
                     while (true)
                     {
+                        Thread.Sleep(100);
                         var now = DateTime.Now;
                         string insert = String.Format("insert into data.test(time) values ('{0}');", now);
                         Console.WriteLine("{0}.{1}) {2}", i, ++attempt, insert);
@@ -232,7 +229,11 @@ namespace CassandraSharpUnitTests.Stress
                         catch (Exception ex)
                         {
                             Console.WriteLine("Failed with error {0}", ex.Message);
-                            Thread.Sleep(1000);
+                        }
+
+                        if (attempt == 60)
+                        {
+                            System.Diagnostics.Debugger.Break();
                         }
                     }
                 }

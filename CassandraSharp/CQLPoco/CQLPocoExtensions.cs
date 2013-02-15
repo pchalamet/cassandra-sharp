@@ -15,47 +15,11 @@
 
 namespace CassandraSharp.CQLPoco
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
     public static class CQLPocoExtensions
     {
         public static ICqlCommand CreatePocoCommand(this ICluster @this)
         {
             return new PocoCommand(@this);
-        }
-
-        [Obsolete("Use PocoCommand.Execute<T>() instead")]
-        public static Task<IEnumerable<T>> Execute<T>(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                                      ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePocoCommand();
-            return cmd.Execute<T>(cql, cl, executionFlags);
-        }
-
-        [Obsolete("Use PocoCommand.Execute() instead")]
-        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                           ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePocoCommand();
-            return cmd.Execute(cql, cl, executionFlags);
-        }
-
-        [Obsolete("Use PocoCommand.Prepare<T>() instead")]
-        public static IPreparedQuery<T> Prepare<T>(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePocoCommand();
-            IPreparedQuery<T> preparedQuery = cmd.Prepare<T>(cql, executionFlags);
-            return preparedQuery;
-        }
-
-        [Obsolete("Use PocoCommand.Prepare() instead")]
-        public static IPreparedQuery PrepareNonQuery(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePocoCommand();
-            IPreparedQuery preparedQuery = cmd.Prepare(cql, executionFlags);
-            return preparedQuery;
         }
     }
 }

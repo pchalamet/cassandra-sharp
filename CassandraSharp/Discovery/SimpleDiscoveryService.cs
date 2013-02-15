@@ -15,8 +15,10 @@
 
 namespace CassandraSharp.Discovery
 {
+    using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Reactive.Linq;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
@@ -33,15 +35,11 @@ namespace CassandraSharp.Discovery
         public IEnumerable<IPAddress> DiscoverPeers(ICluster cluster)
         {
             ICqlCommand cqlCommand = new PocoCommand(cluster);
-            var futPeers = cqlCommand.Execute<Peer>("select rpc_address from system.peers", ConsistencyLevel.ONE).AsFuture();
-            List<IPAddress> newPeers = new List<IPAddress>();
-            foreach (Peer peer in futPeers.Result)
-            {
-                IPAddress newPeer = peer.RpcAddress;
-                newPeers.Add(newPeer);
-                _logger.Debug("Discovered peer {0}", newPeer);
-            }
-            return newPeers;
+            IObservable<Peer> obsPeers = cqlCommand.Execute<Peer>("select rpc_address from system.peers", ConsistencyLevel.ONE);
+            var taskPeers = obsPeers.Select(x => x.RpcAddress).AsFuture();
+            taskPeers.Wait();
+
+            return taskPeers.Result;
         }
 
         internal class Peer

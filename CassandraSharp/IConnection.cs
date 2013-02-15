@@ -30,7 +30,6 @@ namespace CassandraSharp
 
         event EventHandler<FailureEventArgs> OnFailure;
 
-        IQuery Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, ExecutionFlags executionFlags,
-                       InstrumentationToken token);
+        void Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, InstrumentationToken token, IObserver<object> observer);
     }
 }

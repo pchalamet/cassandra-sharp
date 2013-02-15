@@ -19,6 +19,7 @@ namespace CassandraSharpUnitTests.Endurance
     using System.Diagnostics;
     using System.Threading;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using NUnit.Framework;
@@ -26,7 +27,7 @@ namespace CassandraSharpUnitTests.Endurance
     [TestFixture]
     public class EnduranceTest
     {
-        private void BinaryProtocolRunWritePerformanceParallel(bool streaming)
+        private void BinaryProtocolRunWritePerformanceParallel()
         {
             //run Write Performance Test using cassandra-sharp driver
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
@@ -38,10 +39,6 @@ namespace CassandraSharpUnitTests.Endurance
                             {
                                     Servers = new[] {"localhost"}
                             },
-                        Transport = new TransportConfig
-                            {
-                                    Streaming = streaming
-                            }
                 };
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
@@ -51,7 +48,7 @@ namespace CassandraSharpUnitTests.Endurance
                 const string dropFoo = "drop keyspace Endurance";
                 try
                 {
-                    cmd.Execute(dropFoo).Wait();
+                    cmd.Execute(dropFoo).AsFuture().Wait();
                 }
                 catch
                 {
@@ -63,7 +60,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine("============================================================");
 
                 var resCount = cmd.Execute(createFoo);
-                resCount.Wait();
+                resCount.AsFuture().Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -72,7 +69,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
                 resCount = cmd.Execute(createBar);
-                resCount.Wait();
+                resCount.AsFuture().Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -93,7 +90,7 @@ namespace CassandraSharpUnitTests.Endurance
                     }
 
                     Interlocked.Increment(ref running);
-                    prepared.Execute(new {intid = i, strid = i.ToString("X")}).ContinueWith(_ => Interlocked.Decrement(ref running));
+                    prepared.Execute(new { intid = i, strid = i.ToString("X") }).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
                 }
 
                 while (0 != Interlocked.CompareExchange(ref running, 0, 0))
@@ -108,7 +105,7 @@ namespace CassandraSharpUnitTests.Endurance
                 Console.WriteLine(dropFoo);
                 Console.WriteLine("============================================================");
 
-                cmd.Execute(dropFoo).Wait();
+                cmd.Execute(dropFoo).AsFuture().Wait();
             }
 
             ClusterManager.Shutdown();
@@ -117,13 +114,7 @@ namespace CassandraSharpUnitTests.Endurance
         [Test]
         public void BinaryProtocolRunWritePerformanceParallelNoStreaming()
         {
-            BinaryProtocolRunWritePerformanceParallel(false);
-        }
-
-        [Test]
-        public void BinaryProtocolRunWritePerformanceParallelStreaming()
-        {
-            BinaryProtocolRunWritePerformanceParallel(true);
+            BinaryProtocolRunWritePerformanceParallel();
         }
     }
 }

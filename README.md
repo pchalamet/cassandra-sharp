@@ -3,15 +3,18 @@ cassandra-sharp
 cassandra-sharp is a .NET client for Apache Cassandra.  The philosophy of cassandra-sharp is to be really simple: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 
 Starting from version 2, only CQL binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Version 2 is also only .NET 4.0+ compatible.
-cassandra-sharp support async operations exposed as TPL tasks and efficient memory usage (streaming as much as it can using a pull model). Futures are also supported as well. Key points of cassandra-sharp are simplicity, robustness, efficiency, thread safety and cross-platform (Microsoft .NET or Mono).
+cassandra-sharp support async operations exposed as Rx subscription or TPL tasks. Efficient memory usage can be achieve using the push model of Rx.
+
+Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety.
 
 A command line tool is also available (cqlplus) to access a Cassandra cluster. It's also a great tool to understand what's happening under the cover.
 
 Features
 ========
-* async operations (TPL tasks)
-* TPL integration (compatible with C# 5 async)
-* streaming support with IEnumerable (compatible with Linq)
+* async operations (TPL tasks / Rx subscription)
+* Rx interface (IObservable / IObserver) for result streaming
+* TPL Task (compatible with C# 5 async) for future operations
+* Linq friendly
 * extensible rowset mapping (poco and map provided out of the box)
 * blazing fast object serializer/deserializer (dynamic gen code)
 * robust connection handling (connection recovery supported)
@@ -59,62 +62,50 @@ Sample configuration
 
 Sample client
 =============
-	using System;
-	using System.Collections.Generic;
-	using CassandraSharp;
-	using CassandraSharp.CQL;
-	using CassandraSharp.CQLPoco;
-	using CassandraSharp.Config;
-
 	public class SchemaKeyspaces
-	{
-		public bool DurableWrites { get; set; }
+    {
+        public bool DurableWrites { get; set; }
 
-		public string KeyspaceName { get; set; }
+        public string KeyspaceName { get; set; }
 
-		public string StrategyClass { get; set; }
+        public string StrategyClass { get; set; }
 
-		public string StrategyOptions { get; set; }
-	}
+        public string StrategyOptions { get; set; }
+    }
+	
+    public static class Sample
+    {
+        private static void DisplayKeyspace(SchemaKeyspaces ks)
+        {
+            Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
+                              ks.DurableWrites,
+                              ks.KeyspaceName,
+                              ks.StrategyClass,
+                              ks.StrategyOptions);
+        }
+	
+        public static async Task QueryKeyspaces()
+        {
+            XmlConfigurator.Configure();
+            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
+            {
+                var cmd = cluster.CreatePocoCommand();
 
-	public static class Sample
-	{
-		private static void DisplayKeyspace(IEnumerable<SchemaKeyspaces> result)
-		{
-			foreach (var resKeyspace in result)
-			{
-				Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
-									resKeyspace.DurableWrites,
-									resKeyspace.KeyspaceName,
-									resKeyspace.StrategyClass,
-									resKeyspace.StrategyOptions);
-			}
-		}
+                const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
-		public async static Task QueryKeyspaces()
-		{
-			XmlConfigurator.Configure();
-			using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
-			{
-				var cmd = cluster.CreatePocoCommand();
+                // async operation with streaming
+                cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).Subscribe(DisplayKeyspace);
 
-				const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+                // future
+                var kss = await cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
+                foreach (var ks in kss)
+                {
+                    DisplayKeyspace(ks);
+                }
+            }
 
-				// async operation
-				var taskKeyspaces = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces);
-
-				// future operation meanwhile
-				var futKeyspaces = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
-
-				// display the result of the async operation
-				var result = await taskKeyspaces;
-				DisplayKeyspace(result);
-
-				// display the future
-				DisplayKeyspace(futKeyspaces.Result);
-			}
-			ClusterManager.Shutdown();
-		}
+            ClusterManager.Shutdown();
+        }
 	}
 
 Thanks

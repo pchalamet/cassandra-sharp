@@ -15,47 +15,11 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
     public static class CQLPropertyBagExtensions
     {
         public static ICqlCommand CreatePropertyBagCommand(this ICluster @this)
         {
             return new PropertyBagCommand(@this);
-        }
-
-        [Obsolete("Use PropertyBagCommand.Execute<T>() instead")]
-        public static Task<IEnumerable<IDictionary<string, object>>> Execute(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                                                             ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePropertyBagCommand();
-            return cmd.Execute<IDictionary<string, object>>(cql, cl, executionFlags);
-        }
-
-        [Obsolete("Use PropertyBagCommand.Execute() instead")]
-        public static Task ExecuteNonQuery(this ICluster cluster, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                           ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePropertyBagCommand();
-            return cmd.Execute(cql, cl, executionFlags);
-        }
-
-        [Obsolete("Use PropertyBagCommand.Prepare<T>() instead")]
-        public static IPreparedQuery<IDictionary<string, object>> Prepare(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePropertyBagCommand();
-            IPreparedQuery<IDictionary<string, object>> preparedQuery = cmd.Prepare<IDictionary<string, object>>(cql, executionFlags);
-            return preparedQuery;
-        }
-
-        [Obsolete("Use PropertyBagCommand.Prepare() instead")]
-        public static IPreparedQuery PrepareNonQuery(this ICluster cluster, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            var cmd = cluster.CreatePropertyBagCommand();
-            IPreparedQuery preparedQuery = cmd.Prepare(cql, executionFlags);
-            return preparedQuery;
         }
     }
 }

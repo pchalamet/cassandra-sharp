@@ -19,6 +19,7 @@ namespace Samples.Linq
     using System.Collections.Generic;
     using System.Linq;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class SchemaColumns
@@ -47,7 +48,7 @@ namespace Samples.Linq
 
             const string cqlKeyspaces = "SELECT * from system.schema_columns";
 
-            var req = from t in cmd.Execute<SchemaColumns>(cqlKeyspaces).Result
+            var req = from t in cmd.Execute<SchemaColumns>(cqlKeyspaces).AsFuture().Result
                       where t.KeyspaceName == "system"
                       select t;
             DisplayResult(req);

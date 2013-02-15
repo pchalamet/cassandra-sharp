@@ -19,6 +19,7 @@ namespace Samples.Async
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class SchemaKeyspaces
@@ -54,7 +55,7 @@ namespace Samples.Async
             var allTasks = new List<Task>();
             for (int i = 0; i < 100; ++i)
             {
-                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).ContinueWith(t => DisplayKeyspace(t.Result));
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture().ContinueWith(t => DisplayKeyspace(t.Result));
                 allTasks.Add(futRes);
             }
 

@@ -18,7 +18,7 @@ namespace CassandraSharp.Extensibility
     using System;
     using System.Collections.Generic;
 
-    public interface IFrameReader
+    public interface IFrameReader : IDisposable
     {
         MessageOpcodes MessageOpcode { get; }
 

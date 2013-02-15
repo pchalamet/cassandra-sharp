@@ -23,8 +23,7 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
 
-    internal class StreamingFrameReader : IFrameReader,
-                                          IDisposable
+    internal class StreamingFrameReader : IFrameReader
     {
         private readonly Socket _socket;
 

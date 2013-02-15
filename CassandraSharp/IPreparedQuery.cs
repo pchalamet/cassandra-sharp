@@ -16,21 +16,9 @@
 namespace CassandraSharp
 {
     using System;
-    using System.Collections.Generic;
-    using System.Reactive;
-    using System.Threading.Tasks;
 
     public interface IPreparedQuery<T>
     {
-        Task<IEnumerable<T>> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
-
-        IObservable<T> ExecuteQuery(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
-    }
-
-    public interface IPreparedQuery
-    {
-        Task<int> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
-
-        IObservable<Unit> ExecuteQuery(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
+        IObservable<T> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM);
     }
 }

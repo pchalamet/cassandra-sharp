@@ -81,7 +81,7 @@ namespace CassandraSharpUnitTests.Functional
          * malformed prepared query cause issues to be swallwoed and hold indefinelty to stream_id.
          * */
 
-        public void FailingThread(IPreparedQuery prepared)
+        public void FailingThread(IPreparedQuery<NonQuery> prepared)
         {
             logger.Debug("Starting Failing thread ");
             Thread.Sleep(5000);
@@ -93,12 +93,12 @@ namespace CassandraSharpUnitTests.Functional
                 {
                     if (0 == (i%2))
                     {
-                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}, ConsistencyLevel.ONE).Wait();
+                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}, ConsistencyLevel.ONE).AsFuture().Wait();
                         Assert.IsTrue(false, "Update should have failed");
                     }
                     else
                     {
-                        prepared.Execute(new { bar = "bar" + 1, intid = i, strid = "1" }, ConsistencyLevel.ONE).Wait();
+                        prepared.Execute(new { bar = "bar" + 1, intid = i, strid = "1" }, ConsistencyLevel.ONE).AsFuture().Wait();
                         Console.WriteLine("Update {0} sucessful", i);
                     }
                 }
@@ -133,7 +133,7 @@ namespace CassandraSharpUnitTests.Functional
             const string dropKeySpace = "drop keyspace Tests";
             try
             {
-                cmd.Execute(dropKeySpace).Wait();
+                cmd.Execute(dropKeySpace).AsFuture().Wait();
             }
             catch
             {
@@ -144,7 +144,7 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine(createKeySpace);
             Console.WriteLine("============================================================");
 
-            cmd.Execute(createKeySpace).Wait();
+            cmd.Execute(createKeySpace).AsFuture().Wait();
             Console.WriteLine();
             Console.WriteLine();
 
@@ -152,7 +152,7 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine("============================================================");
             Console.WriteLine(createFoo);
             Console.WriteLine("============================================================");
-            cmd.Execute(createFoo).Wait();
+            cmd.Execute(createFoo).AsFuture().Wait();
             Console.WriteLine();
             Console.WriteLine();
 

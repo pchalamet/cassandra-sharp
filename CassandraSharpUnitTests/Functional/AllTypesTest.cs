@@ -86,7 +86,7 @@ namespace CassandraSharpUnitTests.Functional
 
                 try
                 {
-                    cmd.Execute(dropFoo).Wait();
+                    cmd.Execute(dropFoo).AsFuture().Wait();
                 }
                 catch
                 {
@@ -97,7 +97,7 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine(createFoo);
                 Console.WriteLine("============================================================");
 
-                cmd.Execute(createFoo).Wait();
+                cmd.Execute(createFoo).AsFuture().Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -121,7 +121,7 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
-                cmd.Execute(createBar).Wait();
+                cmd.Execute(createBar).AsFuture().Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -147,12 +147,12 @@ namespace CassandraSharpUnitTests.Functional
                             CVarchar = "varchar"
                     };
 
-                prepared.Execute(allTypesInsert).Wait();
+                prepared.Execute(allTypesInsert).AsFuture().Wait();
 
                 const string selectAll = "select * from Tests.AllTypes";
-                AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).Result.Single();
+                AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).AsFuture().Result.Single();
 
-                cmd.Execute(dropFoo).Wait();
+                cmd.Execute(dropFoo).AsFuture().Wait();
 
                 Assert.AreEqual(allTypesInsert.CAscii, allTypesSelect.CAscii);
                 Assert.AreEqual(allTypesInsert.CBigint, allTypesSelect.CBigint);

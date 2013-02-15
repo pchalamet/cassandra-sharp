@@ -19,6 +19,7 @@ namespace cqlplus.Commands
     using System.Linq;
     using System.Threading.Tasks;
     using CassandraSharp;
+    using CassandraSharp.CQL;
     using CassandraSharp.CQLPropertyBag;
 
     internal class CqlStatement : CommandBase
@@ -39,7 +40,7 @@ namespace cqlplus.Commands
             }
 
             ICqlCommand cmd = CommandContext.Cluster.CreatePropertyBagCommand();
-            Task<IEnumerable<IDictionary<string, object>>> res = cmd.Execute<IDictionary<string, object>>(_statement, CommandContext.CL, executionFlags);
+            Task<IList<IDictionary<string, object>>> res = cmd.Execute<IDictionary<string, object>>(_statement, CommandContext.CL, executionFlags).AsFuture();
 
             // ensure values are sorted accordingly to column name
             var sortedRes = from row in res.Result

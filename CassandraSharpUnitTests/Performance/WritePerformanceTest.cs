@@ -43,7 +43,7 @@
                 const string dropFoo = "drop keyspace Tests";
                 try
                 {
-                    cmd.Execute(dropFoo).Wait();
+                    cmd.Execute(dropFoo).AsFuture().Wait();
                 }
                 catch
                 {
@@ -55,7 +55,7 @@
                 Console.WriteLine("============================================================");
 
                 var resCount = cmd.Execute(createFoo);
-                resCount.Wait();
+                resCount.AsFuture().Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -64,7 +64,7 @@
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
                 resCount = cmd.Execute(createBar);
-                resCount.Wait();
+                resCount.AsFuture().Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -81,11 +81,11 @@
 
                     for (int i = 0; i < NUM_WRITES_PER_ROUND; i++)
                     {
-                        prepared.Execute(new {intid = i, strid = i.ToString("X")}).Wait();
+                        prepared.Execute(new { intid = i, strid = i.ToString("X") }).AsFuture().Wait();
                     }
 
                     timer.Stop();
-                    double rate = NUM_WRITES_PER_ROUND/(timer.ElapsedMilliseconds/1000d);
+                    double rate = (1000.0 * NUM_WRITES_PER_ROUND) / timer.ElapsedMilliseconds;
                     Console.WriteLine("[Cassandra-Sharp] Time : " + timer.ElapsedMilliseconds + " (rate: " + rate + " qps)");
                     n++;
                 }
@@ -95,7 +95,7 @@
                 Console.WriteLine("============================================================");
 
                 resCount = cmd.Execute(dropFoo);
-                resCount.Wait();
+                resCount.AsFuture().Wait();
             }
         }
 
@@ -158,7 +158,7 @@
                 }
 
                 timer.Stop();
-                double rate = NUM_WRITES_PER_ROUND/(timer.ElapsedMilliseconds/1000d);
+                double rate = (1000.0*NUM_WRITES_PER_ROUND)/timer.ElapsedMilliseconds;
                 Console.WriteLine("[Cassandra-Thrift] Time : " + timer.ElapsedMilliseconds + " (rate: " + rate + " qps)");
                 n++;
             }
