@@ -139,70 +139,58 @@ namespace CassandraSharp.Transport
         {
             try
             {
-                while (0 == Thread.VolatileRead(ref _isClosed))
-                {
-                    QueryInfo queryInfo;
-                    if (_pendingQueries.TryDequeue(out queryInfo))
-                    {
-                        try
-                        {
-                            // acquire the global lock to write the request
-                            InstrumentationToken token = queryInfo.Token;
-                            bool tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
-                            using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(tracing))
-                            {
-                                queryInfo.Writer(bufferingFrameWriter);
-
-                                byte streamId;
-                                while (!_availableStreamIds.TryPop(out streamId))
-                                {
-                                    _pulseWriter.WaitOne();
-
-                                    if (0 != Thread.VolatileRead(ref _isClosed))
-                                    {
-                                        throw new OperationCanceledException();
-                                    }
-                                }
-
-                                _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
-                                _instrumentation.ClientTrace(token, EventType.BeginWrite);
-
-                                _queryInfos[streamId] = queryInfo;
-                                bufferingFrameWriter.SendFrame(streamId, _socket);
-
-                                _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-                                _instrumentation.ClientTrace(token, EventType.EndWrite);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            queryInfo.Observer.OnError(ex);
-                            throw;
-                        }
-                    }
-                }
-            }
-            catch (SocketException ex)
-            {
-                if (0 == Thread.VolatileRead(ref _isClosed))
-                {
-                    _logger.Fatal("Error while trying to send query : {0}", ex);
-                }
-                HandleError(ex);
-            }
-            catch (IOException ex)
-            {
-                if (0 == Thread.VolatileRead(ref _isClosed))
-                {
-                    _logger.Fatal("Error while trying to send query : {0}", ex);
-                }
-                HandleError(ex);
+                SendQuery();
             }
             catch (Exception ex)
             {
-                if (0 == Thread.VolatileRead(ref _isClosed))
+                _logger.Fatal("Error while trying to send query : {0}", ex);
+                HandleError(ex);
+            }
+        }
+
+        private void SendQuery()
+        {
+            while (0 == Thread.VolatileRead(ref _isClosed))
+            {
+                QueryInfo queryInfo;
+                if (_pendingQueries.TryDequeue(out queryInfo))
                 {
-                    _logger.Fatal("Error while trying to send query : {0}", ex);
+                    try
+                    {
+                        // acquire the global lock to write the request
+                        InstrumentationToken token = queryInfo.Token;
+                        bool tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
+                        using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(tracing))
+                        {
+                            queryInfo.Writer(bufferingFrameWriter);
+
+                            byte streamId;
+                            while (!_availableStreamIds.TryPop(out streamId))
+                            {
+                                _pulseWriter.WaitOne();
+
+                                if (0 != Thread.VolatileRead(ref _isClosed))
+                                {
+                                    throw new OperationCanceledException();
+                                }
+                            }
+
+                            _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
+                            _instrumentation.ClientTrace(token, EventType.BeginWrite);
+
+                            _queryInfos[streamId] = queryInfo;
+                            bufferingFrameWriter.SendFrame(streamId, _socket);
+
+                            _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
+                            _instrumentation.ClientTrace(token, EventType.EndWrite);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        queryInfo.Observer.OnError(ex);
+                        if (ex is SocketException || ex is IOException)
+                            throw;
+                    }
                 }
             }
         }
@@ -211,65 +199,53 @@ namespace CassandraSharp.Transport
         {
             try
             {
-                while (true)
-                {
-                    using (IFrameReader frameReader = new StreamingFrameReader(_socket))
-                    {
-                        byte streamId = frameReader.StreamId;
-                        QueryInfo queryInfo = _queryInfos[streamId];
-                        _queryInfos[streamId] = null;
-                        _availableStreamIds.Push(streamId);
-
-                        _pulseWriter.Set();
-
-                        _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
-                        IObserver<object> observer = queryInfo.Observer;
-                        if (null == frameReader.ResponseException)
-                        {
-                            try
-                            {
-                                IEnumerable<object> data = queryInfo.Reader(frameReader);
-                                foreach (object datum in data)
-                                {
-                                    observer.OnNext(datum);
-                                }
-                                observer.OnCompleted();
-                            }
-                            catch (Exception ex)
-                            {
-                                observer.OnError(ex);
-                                throw;
-                            }
-                        }
-                        else
-                        {
-                            observer.OnError(frameReader.ResponseException);
-                        }
-                        _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
-                    }
-                }
-            }
-            catch (SocketException ex)
-            {
-                if (0 == Thread.VolatileRead(ref _isClosed))
-                {
-                    _logger.Fatal("Error while trying to receive response: {0}", ex);
-                }
-                HandleError(ex);
-            }
-            catch (IOException ex)
-            {
-                if (0 == Thread.VolatileRead(ref _isClosed))
-                {
-                    _logger.Fatal("Error while trying to receive response: {0}", ex);
-                }
-                HandleError(ex);
+                ReadResponse();
             }
             catch (Exception ex)
             {
-                if (0 == Thread.VolatileRead(ref _isClosed))
+                _logger.Fatal("Error while trying to receive response: {0}", ex);
+                HandleError(ex);
+            }
+        }
+
+        private void ReadResponse()
+        {
+            while (true)
+            {
+                using (IFrameReader frameReader = new StreamingFrameReader(_socket))
                 {
-                    _logger.Fatal("Error while trying to receive response: {0}", ex);
+                    byte streamId = frameReader.StreamId;
+                    QueryInfo queryInfo = _queryInfos[streamId];
+                    _queryInfos[streamId] = null;
+                    _availableStreamIds.Push(streamId);
+
+                    _pulseWriter.Set();
+
+                    _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
+                    IObserver<object> observer = queryInfo.Observer;
+                    if (null == frameReader.ResponseException)
+                    {
+                        try
+                        {
+                            IEnumerable<object> data = queryInfo.Reader(frameReader);
+                            foreach (object datum in data)
+                            {
+                                observer.OnNext(datum);
+                            }
+                            observer.OnCompleted();
+                        }
+                        catch (Exception ex)
+                        {
+                            observer.OnError(ex);
+                            if (ex is SocketException || ex is IOException)
+                                throw;
+                        }
+                    }
+                    else
+                    {
+                        observer.OnError(frameReader.ResponseException);
+                    }
+                    _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
                 }
             }
         }

@@ -25,8 +25,8 @@ namespace CassandraSharp.Config
             Port = 9042;
             Recoverable = true;
             CqlVersion = "3.0.0";
-            ReceiveTimeout = 10000;
-            SendTimeout = 10000;
+            ReceiveTimeout = 60000;
+            SendTimeout = 60000;
         }
 
         [XmlAttribute("port")]

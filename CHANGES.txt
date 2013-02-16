@@ -2,6 +2,8 @@ version 3.0.0 [not released]
 - total rewrite of Connection
 - expose a new interface using Rx (IObservable)
 - future are now a TPL Task returning a list of results
+- improved throughput using LongRunning connection type
+- released binaries only compatible with .NET 4.5 - source is still compatible with .NET 4.0 and Mono
 
 version 2.3.1
 - fixed connection leak on read error

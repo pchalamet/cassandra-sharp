@@ -27,7 +27,7 @@ namespace CassandraSharpUnitTests.Endurance
     [TestFixture]
     public class EnduranceTest
     {
-        private void BinaryProtocolRunWritePerformanceParallel()
+        private void BinaryProtocolRunWritePerformanceParallel(string transportType)
         {
             //run Write Performance Test using cassandra-sharp driver
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
@@ -39,6 +39,10 @@ namespace CassandraSharpUnitTests.Endurance
                             {
                                     Servers = new[] {"localhost"}
                             },
+                        Transport = new TransportConfig
+                            {
+                                    Type = transportType
+                            }
                 };
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
@@ -90,7 +94,7 @@ namespace CassandraSharpUnitTests.Endurance
                     }
 
                     Interlocked.Increment(ref running);
-                    prepared.Execute(new { intid = i, strid = i.ToString("X") }).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
+                    prepared.Execute(new {intid = i, strid = i.ToString("X")}).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
                 }
 
                 while (0 != Interlocked.CompareExchange(ref running, 0, 0))
@@ -112,9 +116,15 @@ namespace CassandraSharpUnitTests.Endurance
         }
 
         [Test]
-        public void BinaryProtocolRunWritePerformanceParallelNoStreaming()
+        public void BinaryProtocolRunWritePerformanceParallelLongRunning()
         {
-            BinaryProtocolRunWritePerformanceParallel();
+            BinaryProtocolRunWritePerformanceParallel("LongRunning");
+        }
+
+        [Test]
+        public void BinaryProtocolRunWritePerformanceParallelShortRunning()
+        {
+            BinaryProtocolRunWritePerformanceParallel("ShortRunning");
         }
     }
 }

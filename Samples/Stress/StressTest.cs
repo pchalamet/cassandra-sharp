@@ -178,7 +178,7 @@ namespace Samples.Stress
                         Transport = new TransportConfig
                             {
                                     Port = 666,
-                                    Type = "LongRunning",
+                                    Type = "ShortRunning",
                                     ReceiveTimeout = 10000,
                                     SendTimeout = 10000,
                             }

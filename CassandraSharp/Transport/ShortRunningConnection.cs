@@ -78,7 +78,7 @@ namespace CassandraSharp.Transport
             _tcpClient.Connect(address, _config.Port);
             _socket = _tcpClient.Client;
 
-            Task.Factory.StartNew(ReadResponse, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
 
             // readify the connection
             _logger.Debug("Readyfying connection for {0}", Endpoint);
@@ -148,7 +148,20 @@ namespace CassandraSharp.Transport
 
         private void AsyncSendQuery(byte streamId, QueryInfo queryInfo)
         {
-            Task.Factory.StartNew(() => SendQuery(streamId, queryInfo));
+            Task.Factory.StartNew(() => SendQueryWorker(streamId, queryInfo));
+        }
+
+        private void SendQueryWorker(byte streamId, QueryInfo queryInfo)
+        {
+            try
+            {
+                SendQuery(streamId, queryInfo);
+            }
+            catch (Exception ex)
+            {
+                _logger.Fatal("Error while trying to send query '{0}': {1}", queryInfo.Token.Cql, ex);
+                HandleError(ex);
+            }
         }
 
         private void SendQuery(byte streamId, QueryInfo queryInfo)
@@ -175,112 +188,86 @@ namespace CassandraSharp.Transport
 
                 _instrumentation.ClientTrace(token, EventType.EndWrite);
             }
-            catch (SocketException ex)
+            catch (Exception ex)
             {
-                if (!_isClosed)
+                queryInfo.Observer.OnError(ex);
+                if (ex is SocketException || ex is IOException)
                 {
-                    _logger.Fatal("Error while trying to send query '{0}': {1}", queryInfo.Token.Cql, ex);
+                    throw;
                 }
-                HandleError();
             }
-            catch (IOException ex)
+        }
+
+        private void ReadResponseWorker()
+        {
+            try
             {
-                if (!_isClosed)
-                {
-                    _logger.Fatal("Error while trying to send query '{0}': {1}", queryInfo.Token.Cql, ex);
-                }
-                HandleError();
+                ReadResponse();
             }
             catch (Exception ex)
             {
-                if (!_isClosed)
-                {
-                    _logger.Fatal("Error while trying to send query '{0}': {1}", queryInfo.Token.Cql, ex);
-                }
-                queryInfo.Observer.OnError(ex);
+                _logger.Fatal("Error while trying to receive response: {0}", ex);
+                HandleError(ex);
             }
         }
 
         private void ReadResponse()
         {
-            try
+            while (true)
             {
-                while (true)
+                using (IFrameReader frameReader = new StreamingFrameReader(_socket))
                 {
-                    using (IFrameReader frameReader = new StreamingFrameReader(_socket))
+                    byte streamId = frameReader.StreamId;
+                    QueryInfo queryInfo = _queryInfos[streamId];
+
+                    // a streamId is available, we can enqueue a pending one if any
+                    lock (_lock)
                     {
-                        byte streamId = frameReader.StreamId;
-                        QueryInfo queryInfo = _queryInfos[streamId];
-
-                        // a streamId is available, we can enqueue a pending one if any
-                        lock (_lock)
+                        if (0 < _pendingQueries.Count)
                         {
-                            if (0 < _pendingQueries.Count)
-                            {
-                                QueryInfo newQueryInfo = _pendingQueries.Dequeue();
-                                _queryInfos[streamId] = newQueryInfo;
-                                AsyncSendQuery(streamId, newQueryInfo);
-                            }
-                            else
-                            {
-                                _availableStreamIds.Push(streamId);
-                                _queryInfos[streamId] = null;
-                            }
-                        }
-
-                        _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
-                        IObserver<object> observer = queryInfo.Observer;
-                        if (null == frameReader.ResponseException)
-                        {
-                            try
-                            {
-                                IEnumerable<object> data = queryInfo.Reader(frameReader);
-                                foreach (object datum in data)
-                                {
-                                    observer.OnNext(datum);
-                                }
-                                observer.OnCompleted();
-                            }
-                            catch (Exception ex)
-                            {
-                                observer.OnError(ex);
-                                throw;
-                            }
+                            QueryInfo newQueryInfo = _pendingQueries.Dequeue();
+                            _queryInfos[streamId] = newQueryInfo;
+                            AsyncSendQuery(streamId, newQueryInfo);
                         }
                         else
                         {
-                            observer.OnError(frameReader.ResponseException);
+                            _availableStreamIds.Push(streamId);
+                            _queryInfos[streamId] = null;
                         }
-                        _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
                     }
-                }
-            }
-            catch (SocketException ex)
-            {
-                if (!_isClosed)
-                {
-                    _logger.Fatal("Error while trying to receive response: {0}", ex);
-                }
-                HandleError();
-            }
-            catch (IOException ex)
-            {
-                if (!_isClosed)
-                {
-                    _logger.Fatal("Error while trying to receive response: {0}", ex);
-                }
-                HandleError();
-            }
-            catch (Exception ex)
-            {
-                if (!_isClosed)
-                {
-                    _logger.Fatal("Error while trying to receive response: {0}", ex);
+
+                    _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
+                    IObserver<object> observer = queryInfo.Observer;
+                    if (null == frameReader.ResponseException)
+                    {
+                        try
+                        {
+                            IEnumerable<object> data = queryInfo.Reader(frameReader);
+                            foreach (object datum in data)
+                            {
+                                observer.OnNext(datum);
+                            }
+                            observer.OnCompleted();
+                        }
+                        catch (Exception ex)
+                        {
+                            observer.OnError(ex);
+                            if (ex is SocketException || ex is IOException)
+                            {
+                                throw;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        observer.OnError(frameReader.ResponseException);
+                    }
+                    _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
                 }
             }
         }
 
-        private void HandleError()
+        private void HandleError(Exception ex)
         {
             Close(true);
         }
