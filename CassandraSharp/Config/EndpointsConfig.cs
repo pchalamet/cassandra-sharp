@@ -21,9 +21,9 @@ namespace CassandraSharp.Config
     {
         public EndpointsConfig()
         {
-            Snitch = "RackInferring";
-            Strategy = "Nearest";
-            Discovery = "Simple";
+            Snitch = "Default";
+            Strategy = "Default";
+            Discovery = new DiscoveryConfig();
         }
 
         [XmlElement("Server")]
@@ -35,7 +35,7 @@ namespace CassandraSharp.Config
         [XmlAttribute("strategy")]
         public string Strategy { get; set; }
 
-        [XmlAttribute("discovery")]
-        public string Discovery { get; set; }
+        [XmlElement("Discovery")]
+        public DiscoveryConfig Discovery { get; set; }
     }
 }

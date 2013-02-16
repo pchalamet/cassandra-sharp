@@ -29,7 +29,7 @@ namespace CassandraSharpUnitTests
             CassandraSharpConfig cassandraSharpConfig = (CassandraSharpConfig) ConfigurationManager.GetSection("CassandraSharp");
 
             Assert.IsNotNull(cassandraSharpConfig);
-            Assert.AreEqual("TestClient.Logger4Log4Net, TestClient", cassandraSharpConfig.Logger);
+            Assert.AreEqual("TestClient.Logger4Log4Net, TestClient", cassandraSharpConfig.Logger.Type);
             Assert.AreEqual(4, cassandraSharpConfig.Clusters.Length);
             Assert.IsNotNull(cassandraSharpConfig.Clusters[1]);
 //            Assert.IsNotNull(cassandraSharpConfig.Clusters[1].BehaviorConfig);

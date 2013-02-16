@@ -23,11 +23,11 @@ namespace CassandraSharp.Discovery
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
 
-    internal class SimpleDiscoveryService : IDiscoveryService
+    internal class SystemPeersDiscoveryService : IDiscoveryService
     {
         private readonly ILogger _logger;
 
-        public SimpleDiscoveryService(ILogger logger)
+        public SystemPeersDiscoveryService(ILogger logger)
         {
             _logger = logger;
         }

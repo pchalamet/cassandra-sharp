@@ -98,7 +98,7 @@ namespace CassandraSharpUnitTests.Functional
                     }
                     else
                     {
-                        prepared.Execute(new { bar = "bar" + 1, intid = i, strid = "1" }, ConsistencyLevel.ONE).AsFuture().Wait();
+                        prepared.Execute(new {bar = "bar" + 1, intid = i, strid = "1"}, ConsistencyLevel.ONE).AsFuture().Wait();
                         Console.WriteLine("Update {0} sucessful", i);
                     }
                 }
@@ -115,10 +115,12 @@ namespace CassandraSharpUnitTests.Functional
         [Test]
         public void StreamStarvationMultiThread()
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            //a dirty hack to push the logger to Config.
-            cassandraSharpConfig.Logger = typeof(ConsoleDebugLogger).AssemblyQualifiedName;
+            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
+                {
+                        Logger = new LoggerConfig {Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName}
+                };
             ClusterManager.Configure(cassandraSharpConfig);
+
             ClusterConfig clusterConfig = new ClusterConfig
                 {
                         Endpoints = new EndpointsConfig

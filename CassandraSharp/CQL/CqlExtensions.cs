@@ -34,5 +34,11 @@ namespace CassandraSharp.CQL
             var task = obsEnumerable.ToTask();
             return task;
         }
+
+        public static Task AsFuture(this IObservable<NonQuery> observable)
+        {
+            Task task = observable.Count().ToTask();
+            return task;
+        }
     }
 }

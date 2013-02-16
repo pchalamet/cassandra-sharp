@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
+    using CassandraSharp.Utils;
     using NUnit.Framework;
 
     [TestFixture]
@@ -66,7 +67,8 @@ namespace CassandraSharpUnitTests.EndpointStrategy
             string customType = typeof(CustomEndpointStrategy).AssemblyQualifiedName;
 
             IEnumerable<IPAddress> endpoints = new List<IPAddress> {null};
-            IEndpointStrategy endpointStrategy = CassandraSharp.EndpointStrategy.Factory.Create(customType, endpoints, new SimpleSnitch());
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>(customType, endpoints,
+                                                                                                                                     new SimpleSnitch());
 
             CustomEndpointStrategy customEndpointStrategy = endpointStrategy as CustomEndpointStrategy;
             Assert.IsNotNull(customEndpointStrategy);
@@ -77,14 +79,20 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         [Test]
         public void TestCreateNearest()
         {
-            IEndpointStrategy endpointStrategy = CassandraSharp.EndpointStrategy.Factory.Create("Nearest", Enumerable.Empty<IPAddress>(), new SimpleSnitch());
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Nearest",
+                                                                                                                                     Enumerable.Empty<IPAddress>
+                                                                                                                                             (),
+                                                                                                                                     new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is NearestEndpointStrategy);
         }
 
         [Test]
         public void TestCreateRandom()
         {
-            IEndpointStrategy endpointStrategy = CassandraSharp.EndpointStrategy.Factory.Create("Random", Enumerable.Empty<IPAddress>(), new SimpleSnitch());
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random",
+                                                                                                                                     Enumerable.Empty<IPAddress>
+                                                                                                                                             (),
+                                                                                                                                     new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is RandomEndpointStrategy);
         }
     }

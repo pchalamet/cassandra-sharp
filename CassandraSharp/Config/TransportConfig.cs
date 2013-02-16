@@ -21,10 +21,12 @@ namespace CassandraSharp.Config
     {
         public TransportConfig()
         {
+            Type = "Default";
             Port = 9042;
-            Type = "CqlBinary";
             Recoverable = true;
             CqlVersion = "3.0.0";
+            ReceiveTimeout = 10000;
+            SendTimeout = 10000;
         }
 
         [XmlAttribute("port")]
@@ -32,6 +34,12 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("type")]
         public string Type { get; set; }
+
+        [XmlAttribute("rcvtimeout")]
+        public int ReceiveTimeout { get; set; }
+
+        [XmlAttribute("sndtimeout")]
+        public int SendTimeout { get; set; }
 
         [XmlAttribute("recoverable")]
         public bool Recoverable { get; set; }

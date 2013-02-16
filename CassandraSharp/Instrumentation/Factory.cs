@@ -15,19 +15,21 @@
 
 namespace CassandraSharp.Instrumentation
 {
-    using CassandraSharp.Extensibility;
+    using System;
+    using System.Collections.Generic;
     using CassandraSharp.Utils;
 
-    internal static class Factory
+    internal class Factory : IServiceDescriptor
     {
-        public static IInstrumentation Create(string customType, params object[] prms)
-        {
-            if (customType == "Null")
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {
-                customType = ServiceActivator.GetTypeName<NullInstrumentation>();
-            }
+                    {"Default", typeof(NullInstrumentation)},
+                    {"Null", typeof(NullInstrumentation)},
+            };
 
-            return ServiceActivator.Create<IInstrumentation>(customType, prms);
+        public IDictionary<string, Type> Definition
+        {
+            get { return _def; }
         }
     }
 }

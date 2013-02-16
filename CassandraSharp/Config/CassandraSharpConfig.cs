@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,24 +17,23 @@ namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
 
-    [XmlRoot("CassandraSharpConfig")]
     public class CassandraSharpConfig
     {
         public CassandraSharpConfig()
         {
-            Recovery = "Simple";
-            Logger = "Null";
-            Instrumentation = "Null";
+            Recovery = new RecoveryConfig();
+            Logger = new LoggerConfig();
+            Instrumentation = new InstrumentationConfig();
         }
 
-        [XmlAttribute("recovery")]
-        public string Recovery { get; set; }
+        [XmlElement("Recovery")]
+        public RecoveryConfig Recovery { get; set; }
 
-        [XmlAttribute("logger")]
-        public string Logger { get; set; }
+        [XmlElement("Logger")]
+        public LoggerConfig Logger { get; set; }
 
-        [XmlAttribute("Instrumentation")]
-        public string Instrumentation { get; set; }
+        [XmlElement("Instrumentation")]
+        public InstrumentationConfig Instrumentation { get; set; }
 
         [XmlElement("Cluster")]
         public ClusterConfig[] Clusters { get; set; }

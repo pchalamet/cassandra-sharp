@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,22 @@
 
 namespace CassandraSharp.EndpointStrategy
 {
-    using CassandraSharp.Extensibility;
+    using System;
+    using System.Collections.Generic;
     using CassandraSharp.Utils;
 
-    internal static class Factory
+    internal class Factory : IServiceDescriptor
     {
-        public static IEndpointStrategy Create(string customType, params object[] prms)
-        {
-            if (customType == "Random")
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {
-                customType = ServiceActivator.GetTypeName<RandomEndpointStrategy>();
-            }
-            else if (customType == "Nearest")
-            {
-                customType = ServiceActivator.GetTypeName<NearestEndpointStrategy>();
-            }
+                    {"Default", typeof(NearestEndpointStrategy)},
+                    {"Random", typeof(RandomEndpointStrategy)},
+                    {"Nearest", typeof(NearestEndpointStrategy)},
+            };
 
-            return ServiceActivator.Create<IEndpointStrategy>(customType, prms);
+        public IDictionary<string, Type> Definition
+        {
+            get { return _def; }
         }
     }
 }

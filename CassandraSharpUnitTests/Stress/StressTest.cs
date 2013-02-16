@@ -173,23 +173,23 @@ namespace CassandraSharpUnitTests.Stress
         public void RecoveryTest()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
-            {
-                Recovery = "Simple",
-                Logger = typeof(ResilienceLogger).AssemblyQualifiedName,
-            };
+                {
+                        Logger = new LoggerConfig {Type = typeof(ResilienceLogger).AssemblyQualifiedName},
+                        Recovery = new RecoveryConfig { Interval=2}
+                };
             ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
-            {
-                Endpoints = new EndpointsConfig
                 {
-                    Servers = new[] { "localhost" },
-                },
-                Transport = new TransportConfig
-                {
-                    Port = 666
-                }
-            };
+                        Endpoints = new EndpointsConfig
+                            {
+                                    Servers = new[] {"localhost"},
+                            },
+                        Transport = new TransportConfig
+                            {
+                                    Port = 666
+                            }
+                };
 
             DisconnectingProxy proxy = new DisconnectingProxy(666, 9042);
             proxy.Start();
@@ -215,7 +215,7 @@ namespace CassandraSharpUnitTests.Stress
 
                 proxy.EnableKiller();
 
-                for (int i = 0; i < 50000; ++i)
+                for (int i = 0; i < 10000; ++i)
                 {
                     int attempt = 0;
                     while (true)

@@ -20,6 +20,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using System.Net;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
     using NUnit.Framework;
 
     [TestFixture]
@@ -34,7 +35,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
                 ips[i] = new IPAddress(new byte[] {192, 168, 0, i});
             }
 
-            IEndpointStrategy endpointStrategy = Factory.Create("Random", ips.AsEnumerable());
+            IEndpointStrategy endpointStrategy = ServiceActivator<Factory>.Create<IEndpointStrategy>("Random", ips.AsEnumerable());
 
             List<IPAddress> alls = new List<IPAddress>();
             for (int i = 0; i < 10000; ++i)

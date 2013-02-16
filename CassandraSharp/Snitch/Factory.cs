@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,22 @@
 
 namespace CassandraSharp.Snitch
 {
-    using CassandraSharp.Extensibility;
+    using System;
+    using System.Collections.Generic;
     using CassandraSharp.Utils;
 
-    internal static class Factory
+    internal class Factory : IServiceDescriptor
     {
-        public static IEndpointSnitch Create(string customType, params object[] prms)
-        {
-            if (customType == "Simple")
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {
-                customType = ServiceActivator.GetTypeName<SimpleSnitch>();
-            }
-            else if (customType == "RackInferring")
-            {
-                customType = ServiceActivator.GetTypeName<RackInferringSnitch>();
-            }
+                    {"Default", typeof(RackInferringSnitch)},
+                    {"Simple", typeof(SimpleSnitch)},
+                    {"RackInferring", typeof(RackInferringSnitch)},
+            };
 
-            return ServiceActivator.Create<IEndpointSnitch>(customType, prms);
+        public IDictionary<string, Type> Definition
+        {
+            get { return _def; }
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,33 @@
 namespace CassandraSharp.Utils
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
-    internal static class ServiceActivator
+    internal interface IServiceDescriptor
     {
-        public static string GetTypeName<T>()
-        {
-            return typeof(T).AssemblyQualifiedName;
-        }
+        IDictionary<string, Type> Definition { get; }
+    }
 
-        public static T Create<T>(string customType, params object[] prms)
+    internal class ServiceActivator<T> where T : IServiceDescriptor, new()
+    {
+        private static readonly IServiceDescriptor _descriptor = new T();
+
+        public static TI Create<TI>(string customType, params object[] prms)
         {
             if (string.IsNullOrEmpty(customType))
             {
-                return default(T);
+                return default(TI);
             }
 
-            Type type = Type.GetType(customType);
-            if (null == type || !typeof(T).IsAssignableFrom(type))
+            Type type;
+            if (!_descriptor.Definition.TryGetValue(customType, out type))
+            {
+                type = Type.GetType(customType);
+            }
+
+            if (null == type || !typeof(TI).IsAssignableFrom(type))
             {
                 string invalidTypeMsg = string.Format("'{0}' is not a valid type", customType);
                 throw new ArgumentException(invalidTypeMsg);
@@ -50,7 +58,7 @@ namespace CassandraSharp.Utils
                 ciPrms[idx] = prms.First(piType.IsInstanceOfType);
             }
 
-            return (T) Activator.CreateInstance(type, ciPrms);
+            return (TI) Activator.CreateInstance(type, ciPrms);
         }
     }
 }

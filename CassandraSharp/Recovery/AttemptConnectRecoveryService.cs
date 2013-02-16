@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,24 +19,25 @@ namespace CassandraSharp.Recovery
     using System.Collections.Generic;
     using System.Net;
     using System.Timers;
+    using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class SimpleRecoveryService : IRecoveryService
+    internal class AttemptConnectRecoveryService : IRecoveryService
     {
-        private readonly ILogger _logger;
-
         private readonly object _lock;
+
+        private readonly ILogger _logger;
 
         private readonly Timer _timer;
 
         private readonly List<RecoveryItem> _toRecover;
 
-        public SimpleRecoveryService(ILogger logger)
+        public AttemptConnectRecoveryService(ILogger logger, RecoveryConfig config)
         {
             _logger = logger;
             _toRecover = new List<RecoveryItem>();
-            _timer = new Timer(60*1000);
+            _timer = new Timer(config.Interval*1000);
             _timer.Elapsed += (s, e) => TryRecover();
             _timer.AutoReset = false;
             _lock = new object();

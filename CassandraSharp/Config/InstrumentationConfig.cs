@@ -13,26 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
+namespace CassandraSharp.Config
 {
-    using System;
+    using System.Xml.Serialization;
 
-    internal static class ArrayExtensions
+    [XmlRoot("InstrumentationConfig")]
+    public class InstrumentationConfig
     {
-        public static void ReverseIfLittleEndian(this byte[] buffer)
+        public InstrumentationConfig()
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer);
-            }
+            Type = "Default";
         }
 
-        public static void ReverseIfLittleEndian(this byte[] buffer, int index, int length)
-        {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer, index, length);
-            }
-        }
+        [XmlAttribute("type")]
+        public string Type { get; set; }
     }
 }

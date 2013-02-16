@@ -17,24 +17,15 @@ namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
 
-    [XmlRoot("ClusterConfig")]
-    public class ClusterConfig
+    [XmlRoot("LoggerConfig")]
+    public class LoggerConfig
     {
-        public ClusterConfig()
+        public LoggerConfig()
         {
             Type = "Default";
         }
 
-        [XmlElement("Endpoints")]
-        public EndpointsConfig Endpoints { get; set; }
-
-        [XmlAttribute("name")]
-        public string Name { get; set; }
-
         [XmlAttribute("type")]
         public string Type { get; set; }
-
-        [XmlElement("Transport")]
-        public TransportConfig Transport { get; set; }
     }
 }

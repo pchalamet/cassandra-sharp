@@ -58,17 +58,23 @@ namespace CassandraSharp
             IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = Factory.Create(clusterConfig.Endpoints.Snitch, _logger);
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find);
 
             // create required services
-            IEndpointStrategy endpointsManager = EndpointStrategy.Factory.Create(clusterConfig.Endpoints.Strategy, endpoints, snitch, _logger);
-            IConnectionFactory connectionFactory = Transport.Factory.Create(transportConfig.Type, transportConfig, _logger, _instrumentation);
+            IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
+                                                                                                                      endpoints, snitch,
+                                                                                                                      _logger);
+            IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, _logger,
+                                                                                                                  _instrumentation);
 
             // create the cluster now
-            ICluster cluster = Cluster.Factory.Create(clusterConfig.Type, endpointsManager, _logger, connectionFactory, recoveryService);
+            ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
+                                                                                  recoveryService);
 
-            IDiscoveryService discoveryService = Discovery.Factory.Create(clusterConfig.Endpoints.Discovery, _logger);
+            IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
+                                                                                                               clusterConfig.Endpoints.Discovery,
+                                                                                                               _logger);
             var newPeers = discoveryService.DiscoverPeers(cluster);
             endpointsManager.Update(newPeers);
 
@@ -124,9 +130,9 @@ namespace CassandraSharp
                     throw new InvalidOperationException("ClusterManager is already initialized");
                 }
 
-                _logger = Logger.Factory.Create(config.Logger);
-                _recoveryService = Recovery.Factory.Create(config.Recovery, _logger);
-                _instrumentation = Instrumentation.Factory.Create(config.Instrumentation);
+                _logger = ServiceActivator<Logger.Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
+                _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
+                _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
             }
         }

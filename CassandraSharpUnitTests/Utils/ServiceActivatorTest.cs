@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 
 namespace CassandraSharpUnitTests.Utils
 {
+    using System;
+    using System.Collections.Generic;
     using CassandraSharp.Utils;
     using NUnit.Framework;
 
@@ -38,6 +40,16 @@ namespace CassandraSharpUnitTests.Utils
         public int Value { get; private set; }
     }
 
+    public class FactoryWithCustomType : IServiceDescriptor
+    {
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>();
+
+        public IDictionary<string, Type> Definition
+        {
+            get { return _def; }
+        }
+    }
+
     [TestFixture]
     public class ServiceActivatorTest
     {
@@ -48,7 +60,7 @@ namespace CassandraSharpUnitTests.Utils
             const string key = "tralala";
             const int value = 42;
 
-            ITestService testService = ServiceActivator.Create<ITestService>(type, key, value);
+            ITestService testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
             Assert.IsNotNull(testService);
             Assert.IsTrue(key == testService.Key);
             Assert.IsTrue(value == testService.Value);
@@ -57,11 +69,11 @@ namespace CassandraSharpUnitTests.Utils
         [Test]
         public void TestCreateWithEmpty()
         {
-            string type = "";
+            const string type = "";
             const string key = "tralala";
             const int value = 42;
 
-            ITestService testService = ServiceActivator.Create<ITestService>(type, key, value);
+            ITestService testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
             Assert.IsNull(testService);
         }
 
@@ -72,7 +84,7 @@ namespace CassandraSharpUnitTests.Utils
             const string key = "tralala";
             const int value = 42;
 
-            ITestService testService = ServiceActivator.Create<ITestService>(type, key, value);
+            ITestService testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
             Assert.IsNull(testService);
         }
     }

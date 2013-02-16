@@ -21,7 +21,7 @@ namespace CassandraSharp.Cluster
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class DefaultCluster : ICluster
+    internal class SingleConnectionPerEndpointCluster : ICluster
     {
         private readonly IConnectionFactory _connectionFactory;
 
@@ -35,8 +35,8 @@ namespace CassandraSharp.Cluster
 
         private readonly IRecoveryService _recoveryService;
 
-        public DefaultCluster(IEndpointStrategy endpointStrategy, ILogger logger,
-                              IConnectionFactory connectionFactory, IRecoveryService recoveryService)
+        public SingleConnectionPerEndpointCluster(IEndpointStrategy endpointStrategy, ILogger logger,
+                                                  IConnectionFactory connectionFactory, IRecoveryService recoveryService)
         {
             _ip2Connection = new Dictionary<IPAddress, IConnection>();
             _endpointStrategy = endpointStrategy;

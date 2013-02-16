@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
 
 namespace CassandraSharp.Cluster
 {
+    using System;
+    using System.Collections.Generic;
     using CassandraSharp.Utils;
 
-    internal static class Factory
+    internal class Factory : IServiceDescriptor
     {
-        public static ICluster Create(string customType, params object[] prms)
-        {
-            if (customType == "Default")
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {
-                customType = ServiceActivator.GetTypeName<DefaultCluster>();
-            }
+                    {"Default", typeof(SingleConnectionPerEndpointCluster)},
+                    {"SingleConnectionPerEndpoint", typeof(SingleConnectionPerEndpointCluster)},
+            };
 
-            return ServiceActivator.Create<ICluster>(customType, prms);
+        public IDictionary<string, Type> Definition
+        {
+            get { return _def; }
         }
     }
 }

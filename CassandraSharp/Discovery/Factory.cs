@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,22 @@
 
 namespace CassandraSharp.Discovery
 {
-    using CassandraSharp.Extensibility;
+    using System;
+    using System.Collections.Generic;
     using CassandraSharp.Utils;
 
-    internal static class Factory
+    internal class Factory : IServiceDescriptor
     {
-        public static IDiscoveryService Create(string customType, params object[] prms)
-        {
-            if (customType == "Null")
+        private static readonly Dictionary<string, Type> _def = new Dictionary<string, Type>
             {
-                customType = ServiceActivator.GetTypeName<NullDiscoveryService>();
-            }
-            else if (customType == "Simple")
-            {
-                customType = ServiceActivator.GetTypeName<SimpleDiscoveryService>();
-            }
+                    {"Default", typeof(SystemPeersDiscoveryService)},
+                    {"Null", typeof(NullDiscoveryService)},
+                    {"SystemPeers", typeof(SystemPeersDiscoveryService)},
+            };
 
-            return ServiceActivator.Create<IDiscoveryService>(customType, prms);
+        public IDictionary<string, Type> Definition
+        {
+            get { return _def; }
         }
     }
 }

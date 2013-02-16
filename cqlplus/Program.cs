@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,9 +60,11 @@ namespace cqlplus
 
         private static void Run(IStatementReader statementReader)
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            cassandraSharpConfig.Logger = typeof(ConsoleDebugLogger).AssemblyQualifiedName;
-            cassandraSharpConfig.Instrumentation = typeof(ConsoleInstrumentation).AssemblyQualifiedName;
+            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
+                {
+                        Logger = new LoggerConfig {Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName},
+                        Instrumentation = new InstrumentationConfig {Type = typeof(ConsoleInstrumentation).AssemblyQualifiedName}
+                };
             ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
@@ -75,7 +77,7 @@ namespace cqlplus
                         Endpoints = new EndpointsConfig
                             {
                                     Servers = new[] {_cliArgs.Hostname},
-                                    Discovery = "Null",
+                                    Discovery = new DiscoveryConfig {Type = "Null"}
                             }
                 };
 

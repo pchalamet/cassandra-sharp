@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
 
-    internal class ConnectionFactory : IConnectionFactory
+    internal class LongRunningConnectionFactory : IConnectionFactory
     {
         private readonly TransportConfig _config;
 
-        private readonly ILogger _logger;
-
         private readonly IInstrumentation _instrumentation;
 
-        public ConnectionFactory(TransportConfig config, ILogger logger, IInstrumentation instrumentation)
+        private readonly ILogger _logger;
+
+        public LongRunningConnectionFactory(TransportConfig config, ILogger logger, IInstrumentation instrumentation)
         {
             _config = config;
             _logger = logger;
@@ -38,7 +38,7 @@ namespace CassandraSharp.Transport
         {
             _logger.Debug("Creating connection to {0}", address);
 
-            Connection connection = new Connection(address, _config, _logger, _instrumentation);
+            LongRunningConnection connection = new LongRunningConnection(address, _config, _logger, _instrumentation);
             return connection;
         }
     }

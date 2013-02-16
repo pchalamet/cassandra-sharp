@@ -27,6 +27,8 @@ namespace Samples
     {
         private static void Main(string[] args)
         {
+            //new Stress.ResilienceTest().RecoveryTest();
+
             new PocoSample().Run();
             new TimeOutSample().Run();
             new BatchSample().Run();

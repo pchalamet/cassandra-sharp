@@ -13,28 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Config
+namespace CassandraSharp.Transport.Stream
 {
-    using System.Xml.Serialization;
+    using System;
 
-    [XmlRoot("ClusterConfig")]
-    public class ClusterConfig
+    internal static class ArrayExtensions
     {
-        public ClusterConfig()
+        public static void ReverseIfLittleEndian(this byte[] buffer)
         {
-            Type = "Default";
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(buffer);
+            }
         }
 
-        [XmlElement("Endpoints")]
-        public EndpointsConfig Endpoints { get; set; }
-
-        [XmlAttribute("name")]
-        public string Name { get; set; }
-
-        [XmlAttribute("type")]
-        public string Type { get; set; }
-
-        [XmlElement("Transport")]
-        public TransportConfig Transport { get; set; }
+        public static void ReverseIfLittleEndian(this byte[] buffer, int index, int length)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(buffer, index, length);
+            }
+        }
     }
 }

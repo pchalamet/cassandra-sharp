@@ -17,24 +17,19 @@ namespace CassandraSharp.Config
 {
     using System.Xml.Serialization;
 
-    [XmlRoot("ClusterConfig")]
-    public class ClusterConfig
+    [XmlRoot("Recovery")]
+    public class RecoveryConfig
     {
-        public ClusterConfig()
+        public RecoveryConfig()
         {
             Type = "Default";
+            Interval = 60;
         }
-
-        [XmlElement("Endpoints")]
-        public EndpointsConfig Endpoints { get; set; }
-
-        [XmlAttribute("name")]
-        public string Name { get; set; }
 
         [XmlAttribute("type")]
         public string Type { get; set; }
 
-        [XmlElement("Transport")]
-        public TransportConfig Transport { get; set; }
+        [XmlAttribute("interval")]
+        public int Interval { get; set; }
     }
 }

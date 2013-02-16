@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
+namespace CassandraSharp.Transport.Stream
 {
     using System;
     using System.Collections.Generic;
@@ -29,15 +29,12 @@ namespace CassandraSharp.Transport
     {
         private readonly MemoryStream _ms;
 
-        private readonly byte _streamId;
-
         private readonly bool _tracing;
 
         private MessageOpcodes _msgOpcode = MessageOpcodes.Error;
 
-        internal BufferingFrameWriter(byte streamId, bool tracing)
+        internal BufferingFrameWriter(bool tracing)
         {
-            _streamId = streamId;
             _tracing = tracing;
             _ms = new MemoryStream();
         }
@@ -50,31 +47,6 @@ namespace CassandraSharp.Transport
         public void SetMessageType(MessageOpcodes msgOpcode)
         {
             _msgOpcode = msgOpcode;
-        }
-
-        public void SendFrame(Socket socket)
-        {
-            const byte version = (byte)(FrameType.Request | FrameType.ProtocolVersion);
-            FrameHeaderFlags flags = FrameHeaderFlags.None;
-            if (_tracing)
-            {
-                flags |= FrameHeaderFlags.Tracing;
-            }
-
-            byte[] header = new byte[4];
-            header[0] = version;
-            header[1] = (byte)flags;
-            header[2] = _streamId;
-            header[3] = (byte)_msgOpcode;
-            SendBuffer(socket, header);
-
-            // len of body
-            int len = (int)_ms.Length;
-            byte[] bodyLen = len.GetBytes();
-            SendBuffer(socket, bodyLen);
-
-            // body
-            SendBuffer(socket, _ms.GetBuffer(), 0, len);
         }
 
         public void WriteShort(short data)
@@ -144,6 +116,31 @@ namespace CassandraSharp.Transport
             byte[] bufLen = len.GetBytes();
             _ms.Write(bufLen, 0, bufLen.Length);
             _ms.Write(data, 0, data.Length);
+        }
+
+        public void SendFrame(byte streamId, Socket socket)
+        {
+            const byte version = (byte) (FrameType.Request | FrameType.ProtocolVersion);
+            FrameHeaderFlags flags = FrameHeaderFlags.None;
+            if (_tracing)
+            {
+                flags |= FrameHeaderFlags.Tracing;
+            }
+
+            byte[] header = new byte[4];
+            header[0] = version;
+            header[1] = (byte) flags;
+            header[2] = streamId;
+            header[3] = (byte) _msgOpcode;
+            SendBuffer(socket, header);
+
+            // len of body
+            int len = (int) _ms.Length;
+            byte[] bodyLen = len.GetBytes();
+            SendBuffer(socket, bodyLen);
+
+            // body
+            SendBuffer(socket, _ms.GetBuffer(), 0, len);
         }
 
         private void SendBuffer(Socket socket, byte[] buffer)

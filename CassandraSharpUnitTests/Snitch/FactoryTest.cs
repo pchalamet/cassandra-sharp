@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ namespace CassandraSharpUnitTests.Snitch
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using CassandraSharp;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
+    using CassandraSharp.Utils;
     using NUnit.Framework;
 
     [TestFixture]
@@ -53,21 +53,21 @@ namespace CassandraSharpUnitTests.Snitch
         public void TestCreateCustom()
         {
             string customType = typeof(CustomSnitch).AssemblyQualifiedName;
-            IEndpointSnitch snitch = Factory.Create(customType);
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(customType);
             Assert.IsTrue(snitch is CustomSnitch);
         }
 
         [Test]
         public void TestCreateRackInferring()
         {
-            IEndpointSnitch snitch = Factory.Create("RackInferring");
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>("RackInferring");
             Assert.IsTrue(snitch is RackInferringSnitch);
         }
 
         [Test]
         public void TestCreateSimple()
         {
-            IEndpointSnitch snitch = Factory.Create("Simple");
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>("Simple");
             Assert.IsTrue(snitch is SimpleSnitch);
         }
     }
