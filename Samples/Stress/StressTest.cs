@@ -69,16 +69,22 @@ namespace Samples.Stress
             {
                 EndPoint targetEndpoint = new IPEndPoint(ipAddress, _target);
                 Socket targetSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                targetSocket.ReceiveTimeout = 10000;
+                targetSocket.SendTimeout = 10000;
                 targetSocket.Connect(targetEndpoint);
 
                 Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                listenSocket.ReceiveTimeout = 10000;
+                listenSocket.SendTimeout = 10000;
                 listenSocket.Bind(listenEndpoint);
                 listenSocket.Listen(10);
 
                 Socket clientSocket = listenSocket.Accept();
+                clientSocket.ReceiveTimeout = 10000;
+                clientSocket.SendTimeout = 10000;
                 ThreadPool.QueueUserWorkItem(_ => Transmit(clientSocket, targetSocket));
                 ThreadPool.QueueUserWorkItem(_ => Transmit(targetSocket, clientSocket));
-                Killer(targetSocket, clientSocket, listenSocket);
+                Killer(targetSocket, listenSocket);
             }
         }
 
@@ -96,22 +102,25 @@ namespace Samples.Stress
                 }
             }
 
-            Console.WriteLine("Killing connection");
+            Console.WriteLine("******* Killing connection");
 
             foreach (Socket socket in sockets)
             {
                 try
                 {
+                   // socket.Disconnect(false);
                     socket.Dispose();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine("Failure while shutdown {0}", ex);
                 }
             }
         }
 
-        private static void Transmit(Socket source, Socket target)
+        private void Transmit(Socket source, Socket target)
         {
+            Random rnd = new Random();
             try
             {
                 byte[] buffer = new byte[1024];
@@ -121,6 +130,13 @@ namespace Samples.Stress
                     int write = 0;
                     while (write != count)
                     {
+                        int proba = rnd.Next(1000);
+                        if (_enableKiller && 900 < proba)
+                        {
+                            Console.WriteLine("******* Introducing slowness");
+                            Thread.Sleep(20*1000);
+                        }
+
                         write += target.Send(buffer, write, count - write, SocketFlags.None);
                     }
                 }
@@ -229,11 +245,6 @@ namespace Samples.Stress
                         catch (Exception ex)
                         {
                             Console.WriteLine("Failed with error {0}", ex.Message);
-                        }
-
-                        if (attempt == 60)
-                        {
-                            System.Diagnostics.Debugger.Break();
                         }
                     }
                 }

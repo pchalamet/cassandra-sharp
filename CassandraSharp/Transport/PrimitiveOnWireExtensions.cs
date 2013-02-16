@@ -18,7 +18,6 @@ namespace CassandraSharp.Transport
     using System;
     using System.Net;
     using System.Text;
-    using CassandraSharp.CQLBinaryProtocol;
 
     internal static class PrimitiveOnWireExtensions
     {

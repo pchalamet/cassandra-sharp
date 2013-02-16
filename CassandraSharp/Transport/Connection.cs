@@ -70,13 +70,14 @@ namespace CassandraSharp.Transport
 
             _tcpClient = new TcpClient
                 {
-                        ReceiveTimeout = 10000, 
-                        SendTimeout = 10000
+                        ReceiveTimeout = 10000,
+                        SendTimeout = 10000,
+                        NoDelay = true,
                 };
             _tcpClient.Connect(address, _config.Port);
             _socket = _tcpClient.Client;
 
-            Task.Factory.StartNew(FrameReaderDispatcher, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(ReadResponse, TaskCreationOptions.LongRunning);
 
             // readify the connection
             _logger.Debug("Readyfying connection for {0}", Endpoint);
@@ -180,7 +181,7 @@ namespace CassandraSharp.Transport
                     _logger.Fatal("Error while trying to send query '{0}' : {1}", queryInfo.Token.Cql, ex);
                 }
 
-                HandleError();  
+                HandleError();
             }
             catch (IOException ex)
             {
@@ -197,7 +198,7 @@ namespace CassandraSharp.Transport
             }
         }
 
-        private void FrameReaderDispatcher()
+        private void ReadResponse()
         {
             try
             {
