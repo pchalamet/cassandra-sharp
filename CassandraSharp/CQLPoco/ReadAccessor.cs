@@ -67,7 +67,7 @@ namespace CassandraSharp.CQLPoco
             Type valueType = null;
             if (null != propertyInfo)
             {
-                gen.Emit(OpCodes.Call, propertyInfo.GetGetMethod());
+                gen.Emit(OpCodes.Call, propertyInfo.GetGetMethod(true));
                 if (propertyInfo.PropertyType.IsValueType)
                 {
                     valueType = propertyInfo.PropertyType;

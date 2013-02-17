@@ -72,7 +72,7 @@ namespace CassandraSharp.CQLPoco
                                  ? OpCodes.Castclass
                                  : OpCodes.Unbox_Any, propertyInfo.PropertyType);
 
-                gen.Emit(OpCodes.Call, propertyInfo.GetSetMethod());
+                gen.Emit(OpCodes.Call, propertyInfo.GetSetMethod(true));
             }
             else
             {

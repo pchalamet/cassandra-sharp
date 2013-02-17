@@ -18,13 +18,18 @@ namespace CassandraSharpUnitTests.Performance
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Text;
+    using System.Threading;
     using Apache.Cassandra;
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
+    using CassandraSharp.Extensibility;
+    using CassandraSharp.Instrumentation;
     using NUnit.Framework;
     using Thrift.Protocol;
     using Thrift.Transport;
@@ -36,11 +41,63 @@ namespace CassandraSharpUnitTests.Performance
 
         public const int NUM_WRITES_PER_ROUND = 10000;
 
+        public class PerformanceInstrumentation : IInstrumentation
+        {
+            private readonly object _lock = new object();
+
+            public static string RootFolder;
+
+            private TextWriter _txtWriter;
+
+            public PerformanceInstrumentation()
+            {
+                Guid guid = Guid.NewGuid();
+                string filename = Path.Combine(RootFolder, guid.ToString()) + ".csv";
+                _txtWriter = new StreamWriter(filename, false, Encoding.ASCII);
+                _txtWriter.WriteLine("SessionId,Activity,EventId,Source,SourceElapsed,Thread");
+            }
+
+            public void ClientQuery(InstrumentationToken token)
+            {
+            }
+
+            public void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId)
+            {
+            }
+
+            public void ClientTrace(InstrumentationToken token, EventType eventType)
+            {
+            }
+
+            public void ServerTrace(InstrumentationToken token, TracingSession tracingSession)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (TracingEvent te in tracingSession.TracingEvents)
+                {
+                    sb.AppendFormat("{0},{1},{2},{3},{4},{5}", tracingSession.SessionId, te.Activity, te.EventId, te.Source, te.SourceElapsed, te.Thread);
+                    sb.AppendLine();
+                }
+
+                lock (_lock)
+                    _txtWriter.Write(sb);
+            }
+
+            public void Dispose()
+            {
+                _txtWriter.Dispose();
+                _txtWriter = null;
+            }
+        }
+
         [Test]
         public void BinaryProtocolRunWritePerformanceSingleThread()
         {
+            PerformanceInstrumentation.RootFolder = "";
+
             //run Write Performance Test using cassandra-sharp driver
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            cassandraSharpConfig.Instrumentation = new InstrumentationConfig();
+            cassandraSharpConfig.Instrumentation.Type = typeof(PerformanceInstrumentation).AssemblyQualifiedName;
             ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
@@ -87,7 +144,7 @@ namespace CassandraSharpUnitTests.Performance
                 Console.WriteLine("============================================================");
                 Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
                 Console.WriteLine("============================================================");
-                var prepared = cmd.Prepare(insertPerf);
+                var prepared = cmd.Prepare(insertPerf, ExecutionFlags.ServerTracing);
                 int n = 0;
                 while (n < NUM_ROUND)
                 {
@@ -112,6 +169,8 @@ namespace CassandraSharpUnitTests.Performance
                 resCount = cmd.Execute(dropFoo);
                 resCount.AsFuture().Wait();
             }
+
+            Thread.Sleep(10*1000);
 
             ClusterManager.Shutdown();
         }

@@ -20,23 +20,14 @@ namespace CassandraSharp.Instrumentation
 
     public class TracingEvent
     {
-        public TracingEvent(string activity, Guid eventId, IPAddress source, long sourceElapsed, string thread)
-        {
-            Activity = activity;
-            EventId = eventId;
-            Source = source;
-            SourceElapsed = sourceElapsed;
-            Thread = thread;
-        }
+        public string Activity { get; internal set; }
 
-        public string Activity { get; private set; }
+        public Guid EventId { get; internal set; }
 
-        public Guid EventId { get; private set; }
+        public IPAddress Source { get; internal set; }
 
-        public IPAddress Source { get; private set; }
+        public int SourceElapsed { get; internal set; }
 
-        public long SourceElapsed { get; private set; }
-
-        public string Thread { get; private set; }
+        public string Thread { get; internal set; }
     }
 }

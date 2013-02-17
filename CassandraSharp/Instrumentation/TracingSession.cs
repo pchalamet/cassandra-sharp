@@ -21,30 +21,18 @@ namespace CassandraSharp.Instrumentation
 
     public class TracingSession
     {
-        public TracingSession(IPAddress coordinator, long duration, IDictionary<string, string> parameters, string request, Guid sessionId, DateTime startedAt,
-                              TracingEvent[] tracingEvents)
-        {
-            Coordinator = coordinator;
-            Duration = duration;
-            Parameters = parameters;
-            Request = request;
-            SessionId = sessionId;
-            StartedAt = startedAt;
-            TracingEvents = tracingEvents;
-        }
+        public IPAddress Coordinator { get; internal set; }
 
-        public IPAddress Coordinator { get; private set; }
+        public int Duration { get; internal set; }
 
-        public long Duration { get; private set; }
+        public IDictionary<string, string> Parameters { get; internal set; }
 
-        public IDictionary<string, string> Parameters { get; private set; }
+        public string Request { get; internal set; }
 
-        public string Request { get; private set; }
+        public Guid SessionId { get; internal set; }
 
-        public Guid SessionId { get; private set; }
+        public DateTime StartedAt { get; internal set; }
 
-        public DateTime StartedAt { get; private set; }
-
-        public TracingEvent[] TracingEvents { get; private set; }
+        public TracingEvent[] TracingEvents { get; internal set; }
     }
 }

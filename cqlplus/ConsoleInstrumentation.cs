@@ -78,5 +78,9 @@ namespace cqlplus
 
             Console.WriteLine(sb);
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

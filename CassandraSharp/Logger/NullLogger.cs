@@ -43,5 +43,9 @@ namespace CassandraSharp.Logger
         {
             return false;
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

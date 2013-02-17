@@ -167,6 +167,10 @@ namespace CassandraSharpUnitTests.Stress
             {
                 return true;
             }
+
+            public void Dispose()
+            {
+            }
         }
 
         [Test]

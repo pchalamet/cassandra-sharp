@@ -16,16 +16,15 @@
 namespace CassandraSharp.Instrumentation
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Net;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.CQLPropertyBag;
+    using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
 
-    internal static class TracingExtensions
+    internal static class TracingHelpers
     {
         private static int CompareTracingEvent(TracingEvent x, TracingEvent y)
         {
@@ -48,8 +47,9 @@ namespace CassandraSharp.Instrumentation
             Task.Factory.StartNew(() => QueryAndPushTracingSessionWorker(connection, tracingId, token, instrumentation, logger));
         }
 
-        private static void QueryAndPushTracingSessionWorker(IConnection connection, Guid tracingId, InstrumentationToken token, IInstrumentation instrumentation,
-                                                            ILogger logger)
+        private static void QueryAndPushTracingSessionWorker(IConnection connection, Guid tracingId, InstrumentationToken token,
+                                                             IInstrumentation instrumentation,
+                                                             ILogger logger)
         {
             try
             {
@@ -64,33 +64,19 @@ namespace CassandraSharp.Instrumentation
         private static void QueryAndPushTracingSession(IConnection connection, Guid tracingId, InstrumentationToken token, IInstrumentation instrumentation)
         {
             string queryEvents = "select * from system_traces.events where session_id=" + tracingId;
-            List<TracingEvent> tracingEvents = new List<TracingEvent>();
-            IDataMapperFactory factory = new DataMapperFactory(null);
-            foreach (
-                    IDictionary<string, object> mapEvents in
-                            CQLCommandHelpers.CreateQuery(connection, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result)
-            {
-                TracingEvent tracingEvent = new TracingEvent((string) mapEvents["activity"],
-                                                             (Guid) mapEvents["event_id"],
-                                                             (IPAddress) mapEvents["source"],
-                                                             (int) mapEvents["source_elapsed"],
-                                                             (string) mapEvents["thread"]);
-                tracingEvents.Add(tracingEvent);
-            }
+            IDataMapperFactory facEvents = new DataMapperFactory<TracingEvent>(null);
+            var obsEvents = CQLCommandHelpers.CreateQuery(connection, queryEvents, ConsistencyLevel.ONE, facEvents, ExecutionFlags.None).Cast<TracingEvent>();
+            var tracingEvents = obsEvents.AsFuture().Result.ToList();
             tracingEvents.Sort(CompareTracingEvent);
             TracingEvent[] events = tracingEvents.ToArray();
 
-            string querySession = "select * from system_traces.sessions where session_id=" + tracingId.ToString();
-            IDictionary<string, object> mapSession =
-                    (IDictionary<string, object>)
-                    CQLCommandHelpers.CreateQuery(connection, querySession, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result.Single();
-            TracingSession tracingSession = new TracingSession((IPAddress) mapSession["coordinator"],
-                                                               (int) mapSession["duration"],
-                                                               (IDictionary<string, string>) mapSession["parameters"],
-                                                               (string) mapSession["request"],
-                                                               (Guid) mapSession["session_id"],
-                                                               (DateTime) mapSession["started_at"],
-                                                               events);
+            string querySession = "select * from system_traces.sessions where session_id=" + tracingId;
+
+            IDataMapperFactory facSession = new DataMapperFactory<TracingSession>(null);
+            var obsSession =
+                    CQLCommandHelpers.CreateQuery(connection, querySession, ConsistencyLevel.ONE, facSession, ExecutionFlags.None).Cast<TracingSession>();
+            TracingSession tracingSession = obsSession.AsFuture().Result.Single();
+            tracingSession.TracingEvents = events;
 
             instrumentation.ServerTrace(token, tracingSession);
         }

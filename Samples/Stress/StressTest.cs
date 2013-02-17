@@ -282,6 +282,10 @@ namespace Samples.Stress
             {
                 return true;
             }
+
+            public void Dispose()
+            {
+            }
         }
     }
 }

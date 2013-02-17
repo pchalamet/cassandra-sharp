@@ -64,6 +64,10 @@ namespace CassandraSharpUnitTests.Functional
             sb.AppendFormat(format, prms);
             Console.WriteLine(sb);
         }
+
+        public void Dispose()
+        {
+        }
     }
 
     [TestFixture]

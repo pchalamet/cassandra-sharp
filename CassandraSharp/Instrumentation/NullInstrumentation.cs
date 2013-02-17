@@ -35,5 +35,9 @@ namespace CassandraSharp.Instrumentation
         public void ServerTrace(InstrumentationToken token, TracingSession tracingSession)
         {
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

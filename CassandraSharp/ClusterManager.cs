@@ -109,11 +109,14 @@ namespace CassandraSharp
         {
             lock (_lock)
             {
-                if (null != _recoveryService)
-                {
-                    _recoveryService.SafeDispose();
-                    _recoveryService = null;
-                }
+                _recoveryService.SafeDispose();
+                _recoveryService = null;
+
+                _instrumentation.SafeDispose();
+                _instrumentation = null;
+
+                _logger.SafeDispose();
+                _logger = null;
 
                 _config = null;
             }

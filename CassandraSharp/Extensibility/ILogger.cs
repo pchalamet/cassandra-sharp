@@ -15,7 +15,9 @@
 
 namespace CassandraSharp.Extensibility
 {
-    public interface ILogger
+    using System;
+
+    public interface ILogger : IDisposable
     {
         void Debug(string format, params object[] prms);
 

@@ -15,10 +15,11 @@
 
 namespace CassandraSharp.Extensibility
 {
+    using System;
     using System.Net;
     using CassandraSharp.Instrumentation;
 
-    public interface IInstrumentation
+    public interface IInstrumentation : IDisposable
     {
         void ClientQuery(InstrumentationToken token);
 

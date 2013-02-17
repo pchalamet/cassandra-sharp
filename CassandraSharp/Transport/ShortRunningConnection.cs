@@ -268,7 +268,7 @@ namespace CassandraSharp.Transport
                     InstrumentationToken token = queryInfo.Token;
                     if (0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing))
                     {
-                        TracingExtensions.AsyncQueryAndPushTracingSession(this, frameReader.TraceId, token, _instrumentation, _logger);
+                        TracingHelpers.AsyncQueryAndPushTracingSession(this, frameReader.TraceId, token, _instrumentation, _logger);
                     }
                 }
             }

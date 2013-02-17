@@ -42,8 +42,9 @@ namespace CassandraSharp.CQLPoco
                                                              new Type[0],
                                                              null);
 
+            const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
             SortedDictionary<int, List<MemberInfo>> hash2Mis = new SortedDictionary<int, List<MemberInfo>>();
-            IEnumerable<MemberInfo> memberInfos = type.GetProperties().Concat<MemberInfo>(type.GetFields());
+            IEnumerable<MemberInfo> memberInfos = type.GetProperties(bindingFlags).Concat<MemberInfo>(type.GetFields(bindingFlags));
 
             foreach (MemberInfo memberInfo in memberInfos)
             {
