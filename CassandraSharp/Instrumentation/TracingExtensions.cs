@@ -19,12 +19,13 @@ namespace CassandraSharp.Instrumentation
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using System.Threading.Tasks;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.CQLPropertyBag;
     using CassandraSharp.Extensibility;
 
-    public static class TracingExtensions
+    internal static class TracingExtensions
     {
         private static int CompareTracingEvent(TracingEvent x, TracingEvent y)
         {
@@ -41,14 +42,33 @@ namespace CassandraSharp.Instrumentation
             return 0;
         }
 
-        public static TracingSession GetTracingSession(this IConnection @this, Guid tracingId)
+        public static void AsyncQueryAndPushTracingSession(IConnection connection, Guid tracingId, InstrumentationToken token, IInstrumentation instrumentation,
+                                                           ILogger logger)
         {
-            string queryEvents = "select * from system_traces.events where session_id=" + tracingId.ToString();
+            Task.Factory.StartNew(() => QueryAndPushTracingSessionWorker(connection, tracingId, token, instrumentation, logger));
+        }
+
+        private static void QueryAndPushTracingSessionWorker(IConnection connection, Guid tracingId, InstrumentationToken token, IInstrumentation instrumentation,
+                                                            ILogger logger)
+        {
+            try
+            {
+                QueryAndPushTracingSession(connection, tracingId, token, instrumentation);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Failed to read performance for {0}: {1}", tracingId, ex);
+            }
+        }
+
+        private static void QueryAndPushTracingSession(IConnection connection, Guid tracingId, InstrumentationToken token, IInstrumentation instrumentation)
+        {
+            string queryEvents = "select * from system_traces.events where session_id=" + tracingId;
             List<TracingEvent> tracingEvents = new List<TracingEvent>();
             IDataMapperFactory factory = new DataMapperFactory(null);
             foreach (
                     IDictionary<string, object> mapEvents in
-                            CQLCommandHelpers.CreateQuery(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result)
+                            CQLCommandHelpers.CreateQuery(connection, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result)
             {
                 TracingEvent tracingEvent = new TracingEvent((string) mapEvents["activity"],
                                                              (Guid) mapEvents["event_id"],
@@ -63,7 +83,7 @@ namespace CassandraSharp.Instrumentation
             string querySession = "select * from system_traces.sessions where session_id=" + tracingId.ToString();
             IDictionary<string, object> mapSession =
                     (IDictionary<string, object>)
-                    CQLCommandHelpers.CreateQuery(@this, querySession, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result.Single();
+                    CQLCommandHelpers.CreateQuery(connection, querySession, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result.Single();
             TracingSession tracingSession = new TracingSession((IPAddress) mapSession["coordinator"],
                                                                (int) mapSession["duration"],
                                                                (IDictionary<string, string>) mapSession["parameters"],
@@ -72,7 +92,7 @@ namespace CassandraSharp.Instrumentation
                                                                (DateTime) mapSession["started_at"],
                                                                events);
 
-            return tracingSession;
+            instrumentation.ServerTrace(token, tracingSession);
         }
     }
 }

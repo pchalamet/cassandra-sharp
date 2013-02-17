@@ -17,6 +17,7 @@ Features
 * extensible rowset mapping (poco and map provided out of the box)
 * blazing fast object marshaler (dynamic gen'ed code)
 * robust connection handling (connection recovery supported)
+* ability to understand performance issues (client and server side)
 * multiple extension points
 * command line tool (cqlplus)
 * .NET 4.0+ support

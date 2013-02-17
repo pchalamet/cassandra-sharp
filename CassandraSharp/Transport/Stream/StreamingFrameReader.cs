@@ -68,7 +68,7 @@ namespace CassandraSharp.Transport.Stream
             }
         }
 
-        public Guid? TraceId { get; private set; }
+        public Guid TraceId { get; private set; }
 
         public virtual void Dispose()
         {

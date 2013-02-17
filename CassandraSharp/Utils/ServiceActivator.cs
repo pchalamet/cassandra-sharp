@@ -27,7 +27,9 @@ namespace CassandraSharp.Utils
 
     internal class ServiceActivator<T> where T : IServiceDescriptor, new()
     {
+// ReSharper disable StaticFieldInGenericType
         private static readonly IServiceDescriptor _descriptor = new T();
+// ReSharper restore StaticFieldInGenericType
 
         public static TI Create<TI>(string customType, params object[] prms)
         {

@@ -24,7 +24,7 @@ namespace CassandraSharp.Extensibility
 
         byte StreamId { get; }
 
-        Guid? TraceId { get; }
+        Guid TraceId { get; }
 
         Exception ResponseException { get; }
 
