@@ -10,22 +10,23 @@
     <projectUrl>https://github.com/pchalamet/cassandra-sharp</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>cassandra-sharp is a CQL Binary Protocol .NET 4.0+ client for Apache Cassandra 1.2+, fully supporting asynchronous operations (using TPL) and CQL 3.</summary>
-    <description>cassandra-sharp is a CQL Binary Protocol .NET client for Apache Cassandra.
+    <description>cassandra-sharp is the high performance CQL Binary Protocol for Apache Cassandra.
 
-Major features:
-* async operations
-* TPL integration (compatible with C# 5 async)
-* streaming support with IEnumerable (compatible with Linq)
+Major features ():
+* async operations (Rx / TPL) - fully compatible with C# async
+* streaming support
 * extensible rowset mapping (poco and map provided out of the box)
-* robust connection handling (connection can then be recovered)
+* robust connection handling (with recovery)
 * multiple extension points
 
-cassandra-sharp does only support:
+cassandra-sharp does support:
 * .NET 4.0+ (Microsoft .NET or Mono)
 * CQL 3.0 (Binary Protocol)
 * Apache Cassandra 1.2+
+
+See https://github.com/pchalamet/cassandra-sharp for more information.
 </description>
-    <tags>apache cassandra .net40 .net45 database nosql mono</tags>
+    <tags>apache cassandra net40 net45 mono database nosql tpl rx reactive high performance</tags>
     <references>
         <reference file="CassandraSharp.dll" />
     </references>

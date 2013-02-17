@@ -1,22 +1,21 @@
-cassandra-sharp
-===============
-cassandra-sharp is a .NET client for Apache Cassandra.  The philosophy of cassandra-sharp is to be really simple: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
-
-Starting from version 2, only CQL binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Starting from version 2, only .NET 4.0/4.5 are supported.
-cassandra-sharp support async operations exposed as Rx subscription or TPL tasks. Efficient memory usage can be achieve using the push model of Rx.
-
+cassandra-sharp: the high performance CQL Binary Protocol for Apache Cassandra
+==============================================================================
+The philosophy of cassandra-sharp is to be really simple: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety.
+
+Starting from version 2, only CQL binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Also, only .NET 4.0 and 4.5 are supported.
+cassandra-sharp support async operations exposed as Rx subscription or TPL tasks. Efficient memory usage can be achieve using the push model of Rx.
 
 A command line tool is also available (cqlplus) to access a Cassandra cluster. It's also a great tool to understand what's happening under the cover.
 
 Features
 ========
-* async operations (TPL tasks / Rx subscription)
+* async operations (TPL tasks / Rx subscriptions)
 * Rx interface (IObservable / IObserver) for result streaming
 * TPL Task (compatible with C# 5 async) for future operations
 * Linq friendly
 * extensible rowset mapping (poco and map provided out of the box)
-* blazing fast object serializer/deserializer (dynamic gen code)
+* blazing fast object marshaler (dynamic gen'ed code)
 * robust connection handling (connection recovery supported)
 * multiple extension points
 * command line tool (cqlplus)
