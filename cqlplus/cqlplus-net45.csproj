@@ -18,7 +18,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\net45\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Debug\</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +29,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\net45\Release\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Release\</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -58,7 +60,7 @@
     <None Include="Parser\cqlplus.tpg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj">
+    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
       <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
       <Name>CassandraSharp</Name>
     </ProjectReference>

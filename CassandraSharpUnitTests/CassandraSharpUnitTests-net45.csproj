@@ -20,7 +20,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\net45\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Debug\</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +30,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\net45\Release\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Release\</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -62,15 +64,15 @@
     <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra.csproj">
+    <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra-net45.csproj">
       <Project>{984a4b04-c71a-4550-9193-817cfacba30a}</Project>
       <Name>Apache.Cassandra</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj">
+    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
       <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
       <Name>CassandraSharp</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Thrift\Thrift.csproj">
+    <ProjectReference Include="..\Thrift\Thrift-net45.csproj">
       <Project>{499eb63c-d74c-47e8-ae48-a2fc94538e9d}</Project>
       <Name>Thrift</Name>
     </ProjectReference>

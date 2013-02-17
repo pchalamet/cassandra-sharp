@@ -28,14 +28,27 @@
 
     <PropertyGroup>
 		<CassandraSharpProjectName>cassandra-sharp</CassandraSharpProjectName>
-        <CassandraSharpAssembly>CassandraSharp\bin\$(Configuration)\CassandraSharp</CassandraSharpAssembly>
-        <CQLPlusAssembly>cqlplus\bin\$(Configuration)\cqlplus</CQLPlusAssembly>
-        <ReactiveAssemblies>CassandraSharp\bin\$(Configuration)\System.Reactive.*.dll</ReactiveAssemblies>
+        <CassandraSharpAssembly>CassandraSharp</CassandraSharpAssembly>
+        <CQLPlusAssembly>cqlplus</CQLPlusAssembly>
         <ChangesFile>CHANGES.txt</ChangesFile>
     </PropertyGroup>
 
+	<ItemGroup>
+		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CassandraSharpAssembly).dll" />
+		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CassandraSharpAssembly).pdb" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CassandraSharpAssembly).dll" />
+		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CassandraSharpAssembly).pdb" />
+		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CQLPlusAssembly).exe" />
+		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CQLPlusAssembly).pdb" />
+	</ItemGroup>
+	
 	<Target Name="Clean">
 		<Exec Command="rmdir /q /s $(OutDir)" />
+		<Exec Command="rmdir /q /s $(bin)" />
+		<Exec Command="rmdir /q /s $(obj)" />
 		<MakeDir Directories="$(OutDir)" />
 		<MakeDir Directories="$(ZipDir)" />
 		<MakeDir Directories="$(NuGetPackageDir)" />
@@ -54,16 +67,9 @@
     </Target>
 
 	<Target Name="BuildZipPackage" DependsOnTargets="Clean;Compile">
-        <ItemGroup>
-            <ZipFilesCopy Include="$(CassandraSharpAssembly).dll" />
-            <ZipFilesCopy Include="$(CassandraSharpAssembly).pdb" />
-            <ZipFilesCopy Include="$(CQLPlusAssembly).exe" />
-            <ZipFilesCopy Include="$(CQLPlusAssembly).pdb" />
-            <ZipFilesCopy Include="$(ReactiveAssemblies)" />
-            <ZipFilesCopy Include="$(ChangesFile)" />
-        </ItemGroup>
-		
-		<Copy SourceFiles="@(ZipFilesCopy)" DestinationFolder="$(ZipDir)" />
+		<Copy SourceFiles="@(ZipFilesCopy-net40)" DestinationFolder="$(ZipDir)\net40" />
+		<Copy SourceFiles="@(ZipFilesCopy-net45)" DestinationFolder="$(ZipDir)\net45" />
+		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(ZipDir) " />
 
         <ItemGroup>
             <ZipFiles Include="$(ZipDir)\**\*.*" />
@@ -73,13 +79,13 @@
 	</Target>
 	
 	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile">
-		<Copy SourceFiles="$(CassandraSharpAssembly).dll" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
-		<Copy SourceFiles="$(CassandraSharpAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
-		<Copy SourceFiles="$(CQLPlusAssembly).exe" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
-		<Copy SourceFiles="$(CQLPlusAssembly).pdb" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
-		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
+		<Copy SourceFiles="@(ZipFilesCopy-net40)" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="@(ZipFilesCopy-net45)" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
 		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(NuGetPackageDir)" />
+		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
+	
 		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)$(VersionStatus)" />
+
 		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory $(OutDir)" />
 	</Target>
 	

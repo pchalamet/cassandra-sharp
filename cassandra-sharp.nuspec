@@ -3,6 +3,7 @@
   <metadata>
     <id>cassandra-sharp</id>
     <version>0.0.0.0</version>
+	<title>cassandra-sharp: the high performance CQL Binary Protocol for Apache Cassandra</title>
     <authors>Pierre Chalamet</authors>
     <owners>Pierre Chalamet</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
@@ -28,14 +29,13 @@ cassandra-sharp does only support:
     <references>
         <reference file="CassandraSharp.dll" />
     </references>
+	
 	<dependencies>
-		<group targetFramework="net45">
-			<dependency id="Rx-Core" version="2.1.30214.0" />
-			<dependency id="Rx-Interfaces" version="2.1.30214.0" />
-			<dependency id="Rx-Linq" version="2.1.30214.0" />
-			<dependency id="Rx-Main" version="2.1.30214.0" />
-			<dependency id="Rx-PlatformServices" version="2.1.30214.0" />
-		</group>
+		<dependency id="Rx-Core" version="2.1.30214.0" />
+		<dependency id="Rx-Interfaces" version="2.1.30214.0" />
+		<dependency id="Rx-Linq" version="2.1.30214.0" />
+		<dependency id="Rx-Main" version="2.1.30214.0" />
+		<dependency id="Rx-PlatformServices" version="2.1.30214.0" />
 	</dependencies>
   </metadata>
 </package>

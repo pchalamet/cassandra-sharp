@@ -2,7 +2,7 @@ cassandra-sharp
 ===============
 cassandra-sharp is a .NET client for Apache Cassandra.  The philosophy of cassandra-sharp is to be really simple: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 
-Starting from version 2, only CQL binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Version 3 is also only .NET 4.5 compatible.
+Starting from version 2, only CQL binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Starting from version 2, only .NET 4.0/4.5 are supported.
 cassandra-sharp support async operations exposed as Rx subscription or TPL tasks. Efficient memory usage can be achieve using the push model of Rx.
 
 Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety.
@@ -20,7 +20,7 @@ Features
 * robust connection handling (connection recovery supported)
 * multiple extension points
 * command line tool (cqlplus)
-* .NET 4.5 compatible
+* .NET 4.0/4.5 support
 
 If you are looking for a Thrift compatible client, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.
 

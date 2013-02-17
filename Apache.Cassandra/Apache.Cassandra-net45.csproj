@@ -17,7 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\net45\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Debug\</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +27,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\net45\Release\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Release\</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -51,7 +53,7 @@
     <None Include="cassandra.thrift" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Thrift\Thrift.csproj">
+    <ProjectReference Include="..\Thrift\Thrift-net45.csproj">
       <Project>{81DA65BC-9ACD-4271-9ED0-84A3B3A1FB7A}</Project>
       <Name>Thrift</Name>
     </ProjectReference>
