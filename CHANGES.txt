@@ -3,6 +3,7 @@ version 3.0.0 [not released]
 - expose a new interface using Rx (IObservable)
 - future are now a TPL Task returning a list of results
 - improved throughput using LongRunning connection type
+- NuGet support for net40 and net45 binaries
 
 version 2.3.1
 - fixed connection leak on read error

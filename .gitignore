@@ -6,3 +6,4 @@ cassandra-sharp-version.cs
 *.user
 bin/
 obj/
+Resharper.DotSettings
