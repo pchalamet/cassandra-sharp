@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("CassandraSharp")]
-[assembly: AssemblyDescription("cassandra-sharp core library")]
+[assembly: AssemblyDescription("high performance .NET driver for Apache Cassandra")]
 [assembly:
         InternalsVisibleTo(
                 "CassandraSharpUnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f9405d912eeb97aa3ec5968c71608e75b2b672a918568a43345ea9c474999026643de7a44fc861de7f8fbccce1611114277975ac0f4ceb57a87616ad60d9e9805a9ff25fbee8a9fc406828d2b31fd1766373b62825616e00b621a5fc28ca74898ddf4bdef767abd2c804bea0d300a3f57a12371bef43b4e94f67cc5edbb50cad"

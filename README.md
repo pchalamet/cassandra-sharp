@@ -1,5 +1,5 @@
-cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
-=============================================================================================
+cassandra-sharp - high performance .NET client for Apache Cassandra
+===================================================================
 The philosophy of cassandra-sharp is to be really simple: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 Key points of cassandra-sharp are simplicity, robustness, efficiency and thread safety.
 

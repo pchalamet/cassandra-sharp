@@ -1,3 +1,11 @@
+version 3.0.0
+=============
+Interface has changed a little bit again. This time, IObservable<T> replace Task<IEnumerable<T>>. This does not mean asynchronous interface was abandonned, only the way to subscribe for results.
+
+To build previous client with this version, you have to convert IObservable<T> to a Task<IEnumerable<T>>. To help with keeping compatibility, the extension method AsFuture() can be used to perform this task. In practice, this mean that the result is materialized as a future.
+
+There are no problem with future but high volume of data (because a future is just a buffering in memory of all results). To cope with high volumetry, just subscribe an IObserver to the IObservable.
+
 version 2.3.0
 =============
 Change the POCO and PropertyBag interface. It is mostly source compatible but prepared queries.
