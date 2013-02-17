@@ -97,6 +97,8 @@
                 resCount = cmd.Execute(dropFoo);
                 resCount.AsFuture().Wait();
             }
+
+            ClusterManager.Shutdown();
         }
 
         [Test]

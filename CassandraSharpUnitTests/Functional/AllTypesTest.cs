@@ -132,19 +132,19 @@ namespace CassandraSharpUnitTests.Functional
 
                 var allTypesInsert = new AllTypes
                     {
-                            CAscii = "ascii",
+                            CAscii = new string('x', 8000),
                             CBigint = 0x0102030405060708,
-                            CBlob = new byte[] {0x1, 0x02, 0x03, 0x04, 0x05},
+                            CBlob = Enumerable.Repeat((byte)42, 7142).ToArray(),
                             CBoolean = true,
                             CDouble = 1234.5678,
                             CFloat = 234.567f,
                             CInet = new IPAddress(new byte[] {0x01, 0x02, 0x03, 0x04}),
                             CInt = 42,
-                            CText = "text",
+                            CText = new string('x', 3000),
                             CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
                             CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
                             CUuid = Guid.NewGuid(),
-                            CVarchar = "varchar"
+                            CVarchar = new string('x', 5000),
                     };
 
                 prepared.Execute(allTypesInsert).AsFuture().Wait();
