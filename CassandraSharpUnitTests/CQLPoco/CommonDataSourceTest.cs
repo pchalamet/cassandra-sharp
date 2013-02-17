@@ -35,6 +35,10 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             IDataSource dataSource = GetDataSource<Toto>();
 
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("NullNullableInt")), null);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("NullNullableIntProperty")), null);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("NullableInt")), 42);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("NullableIntProperty")), 666);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("Int")), 1);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("IntProperty")), 2);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("String")), "String1");
@@ -46,6 +50,10 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             IDataSource dataSource = GetDataSource<Toto>();
 
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("nullnullableint")), null);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("nullnullableintproperty")), null);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("nullableint")), 42);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("nullableintproperty")), 666);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("int")), 1);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("intproperty")), 2);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("string")), "String1");
@@ -57,6 +65,10 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             IDataSource dataSource = GetDataSource<Toto>();
 
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("Null_nullable_Int")), null);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("null_nullable_int_Property")), null);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("Nullable_int")), 42);
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("Nullable_int_Property")), 666);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("Int")), 1);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("Int_Property")), 2);
             Assert.AreEqual(dataSource.Get(CreateColumnSpec("String")), "String1");
@@ -72,6 +84,14 @@ namespace CassandraSharpUnitTests.CQLPoco
 
         public class Toto
         {
+            public int? NullableInt;
+
+            public int? NullableIntProperty { get; set; }
+
+            public int? NullNullableInt;
+
+            public int? NullNullableIntProperty { get; set; }
+
             public int Int;
 
             public string String;

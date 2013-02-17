@@ -5,6 +5,7 @@ version 3.0.0 [not released]
 - improved throughput using LongRunning connection type
 - NuGet support for net40 and net45 binaries
 - performance report is asynchronous
+- official support for nullable
 
 version 2.3.1
 - fixed connection leak on read error

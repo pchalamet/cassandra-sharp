@@ -26,24 +26,38 @@ namespace CassandraSharpUnitTests.Performance
     [TestFixture]
     public class PacketSizePerformanceTest
     {
-        private static void InsertData(string data, IPreparedQuery<NonQuery> preparedQuery)
+        private static long InsertData(string data, IPreparedQuery<NonQuery> preparedQuery)
         {
             Console.WriteLine("Buffer size {0}", data.Length);
             Stopwatch totalwatch = Stopwatch.StartNew();
-            for (var i = 0; i < 200; ++i)
+
+            // warmup
+            for (int i = 0; i < 10; ++i)
+            {
+                preparedQuery.Execute(new {x = "abc", y = data}).AsFuture().Wait();
+            }
+
+            const long nbQueries = 5000;
+            for (var i = 0; i < nbQueries; ++i)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 preparedQuery.Execute(new {x = "abc", y = data}).AsFuture().Wait();
                 stopwatch.Stop();
-                Console.WriteLine("Insert: {0}", stopwatch.ElapsedMilliseconds);
+                //Console.WriteLine("Insert: {0}", stopwatch.ElapsedMilliseconds);
             }
             totalwatch.Stop();
-            Console.WriteLine("Total inserts: {0}", totalwatch.ElapsedMilliseconds);
+            Console.WriteLine("Total inserts time ms: {0}", totalwatch.ElapsedMilliseconds);
+            Console.WriteLine("Total inserts/s: {0}", (1000.0*nbQueries)/totalwatch.ElapsedMilliseconds);
+
+            return totalwatch.ElapsedMilliseconds;
         }
 
         [Test]
         public void PacketSizeTest()
         {
+            long time1423;
+            long time1424;
+
             //run Write Performance Test using cassandra-sharp driver
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
             ClusterManager.Configure(cassandraSharpConfig);
@@ -90,10 +104,10 @@ namespace CassandraSharpUnitTests.Performance
 
                 var preparedQuery = cmd.Prepare("insert into Tests.tbl (x, y) values (?, ?)");
 
-                InsertData(new string('x', 1423), preparedQuery);
+                time1423 = InsertData(new string('x', 1423), preparedQuery);
                 Console.WriteLine();
 
-                InsertData(new string('x', 1424), preparedQuery);
+                time1424 = InsertData(new string('x', 1424), preparedQuery);
                 Console.WriteLine();
 
                 Console.WriteLine("============================================================");
@@ -105,6 +119,11 @@ namespace CassandraSharpUnitTests.Performance
             }
 
             ClusterManager.Shutdown();
+
+            long delta = Math.Abs(time1424 - time1423);
+            long min = Math.Max(time1423, time1424);
+            double percent = delta/(double) min;
+            Assert.IsTrue(percent < 0.1);
         }
     }
 }

@@ -34,6 +34,8 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             IInstanceBuilder instanceBuilder = GetInstanceBuilder<Toto>();
 
+            instanceBuilder.Set(CreateColumnSpec("NullableInt"), 42);
+            instanceBuilder.Set(CreateColumnSpec("NullableIntProperty"), 666);
             instanceBuilder.Set(CreateColumnSpec("Int"), 1);
             instanceBuilder.Set(CreateColumnSpec("IntProperty"), 2);
             instanceBuilder.Set(CreateColumnSpec("String"), "String1");
@@ -42,6 +44,8 @@ namespace CassandraSharpUnitTests.CQLPoco
             Toto toto = instanceBuilder.Build() as Toto;
             Assert.NotNull(toto);
 
+            Assert.AreEqual(toto.NullableInt, 42);
+            Assert.AreEqual(toto.NullableIntProperty, 666);
             Assert.AreEqual(toto.Int, 1);
             Assert.AreEqual(toto.IntProperty, 2);
             Assert.AreEqual(toto.String, "String1");
@@ -53,6 +57,8 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             IInstanceBuilder instanceBuilder = GetInstanceBuilder<Toto>();
 
+            instanceBuilder.Set(CreateColumnSpec("nullableint"), 42);
+            instanceBuilder.Set(CreateColumnSpec("nullableintproperty"), 666);
             instanceBuilder.Set(CreateColumnSpec("int"), 1);
             instanceBuilder.Set(CreateColumnSpec("intproperty"), 2);
             instanceBuilder.Set(CreateColumnSpec("string"), "String1");
@@ -61,6 +67,8 @@ namespace CassandraSharpUnitTests.CQLPoco
             Toto toto = instanceBuilder.Build() as Toto;
             Assert.NotNull(toto);
 
+            Assert.AreEqual(toto.NullableInt, 42);
+            Assert.AreEqual(toto.NullableIntProperty, 666);
             Assert.AreEqual(toto.Int, 1);
             Assert.AreEqual(toto.IntProperty, 2);
             Assert.AreEqual(toto.String, "String1");
@@ -72,6 +80,8 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             IInstanceBuilder instanceBuilder = GetInstanceBuilder<Toto>();
 
+            instanceBuilder.Set(CreateColumnSpec("nullable_int"), 42);
+            instanceBuilder.Set(CreateColumnSpec("nullable_int_property"), 666);
             instanceBuilder.Set(CreateColumnSpec("int"), 1);
             instanceBuilder.Set(CreateColumnSpec("int_property"), 2);
             instanceBuilder.Set(CreateColumnSpec("string"), "String1");
@@ -80,6 +90,8 @@ namespace CassandraSharpUnitTests.CQLPoco
             Toto toto = instanceBuilder.Build() as Toto;
             Assert.NotNull(toto);
 
+            Assert.AreEqual(toto.NullableInt, 42);
+            Assert.AreEqual(toto.NullableIntProperty, 666);
             Assert.AreEqual(toto.Int, 1);
             Assert.AreEqual(toto.IntProperty, 2);
             Assert.AreEqual(toto.String, "String1");
@@ -95,6 +107,10 @@ namespace CassandraSharpUnitTests.CQLPoco
 
         public class Toto
         {
+            public int? NullableInt;
+
+            public int? NullableIntProperty { get; set; }
+
             public int Int;
 
             public string String;

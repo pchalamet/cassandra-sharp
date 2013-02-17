@@ -219,8 +219,6 @@ namespace CassandraSharp.CQLBinaryProtocol
                     object data = null != rawData
                                           ? colSpec.Deserialize(rawData)
                                           : null;
-
-                    // FIXME: require to support Nullable<T>
                     if (null != data)
                     {
                         instanceBuilder.Set(colSpec, data);
@@ -293,6 +291,12 @@ namespace CassandraSharp.CQLBinaryProtocol
             foreach (IColumnSpec columnSpec in columnSpecs)
             {
                 object data = dataSource.Get(columnSpec);
+                if (null == data)
+                {
+                    // FIXME: this is not supported for the moment with binary protocol
+                    throw new ArgumentNullException(columnSpec.Name);
+                }
+
                 byte[] rawData = columnSpec.Serialize(data);
                 frameWriter.WriteByteArray(rawData);
             }

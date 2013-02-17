@@ -26,6 +26,8 @@ namespace CassandraSharpUnitTests.CQLPoco
         {
             Toto toto = new Toto
                 {
+                        NullableInt = 42,
+                        NullableIntProperty = 666,
                         Int = 1,
                         IntProperty = 2,
                         String = "String1",
