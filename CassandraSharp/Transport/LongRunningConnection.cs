@@ -225,9 +225,9 @@ namespace CassandraSharp.Transport
 
                     _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
                     IObserver<object> observer = queryInfo.Observer;
-                    if (null == frameReader.ResponseException)
+                    try
                     {
-                        try
+                        if (null == frameReader.ResponseException)
                         {
                             IEnumerable<object> data = queryInfo.Reader(frameReader);
                             foreach (object datum in data)
@@ -236,18 +236,18 @@ namespace CassandraSharp.Transport
                             }
                             observer.OnCompleted();
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            observer.OnError(ex);
-                            if (ex is SocketException || ex is IOException)
-                            {
-                                throw;
-                            }
+                            observer.OnError(frameReader.ResponseException);
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        observer.OnError(frameReader.ResponseException);
+                        observer.OnError(ex);
+                        if (ex is SocketException || ex is IOException)
+                        {
+                            throw;
+                        }
                     }
                     _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
                 }
