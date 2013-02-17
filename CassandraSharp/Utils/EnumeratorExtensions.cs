@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,11 @@ namespace CassandraSharp.Utils
             return count;
         }
 
+        public static IEnumerator<T> Cast<T>(this IEnumerator<object> enumerator)
+        {
+            return new CastEnumerator<T>(enumerator);
+        }
+
         private class CastEnumerator<T> : IEnumerator<T>
         {
             private readonly IEnumerator<object> _enumerator;
@@ -76,18 +81,13 @@ namespace CassandraSharp.Utils
 
             public T Current
             {
-                get { return (T)_enumerator.Current; }
+                get { return (T) _enumerator.Current; }
             }
 
             object IEnumerator.Current
             {
                 get { return Current; }
             }
-        }
-
-        public static IEnumerator<T> Cast<T>(this IEnumerator<object> enumerator)
-        {
-            return new CastEnumerator<T>(enumerator);
         }
     }
 }

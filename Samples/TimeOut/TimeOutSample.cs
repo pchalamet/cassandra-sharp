@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,12 +60,12 @@ namespace Samples.TimeOut
                 DateTime dtStop = dtStart.AddSeconds(2); // 2 second max
                 int wait = rnd.Next(4*1000);
                 var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture()
-                                    .ContinueWith(t =>
-                                        {
-                                            // simulate an eventually long operation
-                                            Thread.Sleep(wait);
-                                            return t;
-                                        }).Unwrap().ContinueWith(t => DisplayKeyspace(t.Result, dtStop));
+                                .ContinueWith(t =>
+                                    {
+                                        // simulate an eventually long operation
+                                        Thread.Sleep(wait);
+                                        return t;
+                                    }).Unwrap().ContinueWith(t => DisplayKeyspace(t.Result, dtStop));
                 futRes.Wait();
             }
         }

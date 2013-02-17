@@ -1,4 +1,19 @@
-﻿namespace CassandraSharpUnitTests.Performance
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace CassandraSharpUnitTests.Performance
 {
     using System;
     using System.Collections.Generic;
@@ -81,11 +96,11 @@
 
                     for (int i = 0; i < NUM_WRITES_PER_ROUND; i++)
                     {
-                        prepared.Execute(new { intid = i, strid = i.ToString("X") }).AsFuture().Wait();
+                        prepared.Execute(new {intid = i, strid = i.ToString("X")}).AsFuture().Wait();
                     }
 
                     timer.Stop();
-                    double rate = (1000.0 * NUM_WRITES_PER_ROUND) / timer.ElapsedMilliseconds;
+                    double rate = (1000.0*NUM_WRITES_PER_ROUND)/timer.ElapsedMilliseconds;
                     Console.WriteLine("[Cassandra-Sharp] Time : " + timer.ElapsedMilliseconds + " (rate: " + rate + " qps)");
                     n++;
                 }
@@ -136,7 +151,7 @@
             const string createBar = "CREATE TABLE Tests.stresstest (strid varchar,intid int,PRIMARY KEY (strid))";
             Console.WriteLine("============================================================");
             Console.WriteLine(createBar);
-            Console.WriteLine("============================================================"); 
+            Console.WriteLine("============================================================");
 
             client.execute_cql3_query(Encoding.UTF8.GetBytes(createBar), Compression.NONE,
                                       Apache.Cassandra.ConsistencyLevel.QUORUM);
@@ -155,8 +170,12 @@
                 for (int i = 0; i < NUM_WRITES_PER_ROUND; i++)
                 {
                     CqlResult res = client.execute_prepared_cql3_query(query.ItemId,
-                                                      new List<byte[]> {BitConverter.GetBytes(i).Reverse().ToArray(), Encoding.ASCII.GetBytes(i.ToString("X"))}, 
-                                                      Apache.Cassandra.ConsistencyLevel.QUORUM);
+                                                                       new List<byte[]>
+                                                                           {
+                                                                                   BitConverter.GetBytes(i).Reverse().ToArray(),
+                                                                                   Encoding.ASCII.GetBytes(i.ToString("X"))
+                                                                           },
+                                                                       Apache.Cassandra.ConsistencyLevel.QUORUM);
                 }
 
                 timer.Stop();

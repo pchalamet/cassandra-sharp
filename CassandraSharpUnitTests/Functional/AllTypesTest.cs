@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@ namespace CassandraSharpUnitTests.Functional
     using System;
     using System.Linq;
     using System.Net;
-    using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
@@ -134,7 +133,7 @@ namespace CassandraSharpUnitTests.Functional
                     {
                             CAscii = new string('x', 8000),
                             CBigint = 0x0102030405060708,
-                            CBlob = Enumerable.Repeat((byte)42, 7142).ToArray(),
+                            CBlob = Enumerable.Repeat((byte) 42, 7142).ToArray(),
                             CBoolean = true,
                             CDouble = 1234.5678,
                             CFloat = 234.567f,

@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,13 +46,15 @@ namespace CassandraSharp.Instrumentation
             string queryEvents = "select * from system_traces.events where session_id=" + tracingId.ToString();
             List<TracingEvent> tracingEvents = new List<TracingEvent>();
             IDataMapperFactory factory = new DataMapperFactory(null);
-            foreach (IDictionary<string, object> mapEvents in CQLCommandHelpers.CreateQuery(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result)
+            foreach (
+                    IDictionary<string, object> mapEvents in
+                            CQLCommandHelpers.CreateQuery(@this, queryEvents, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result)
             {
-                TracingEvent tracingEvent = new TracingEvent((string)mapEvents["activity"],
-                                                             (Guid)mapEvents["event_id"],
-                                                             (IPAddress)mapEvents["source"],
-                                                             (int)mapEvents["source_elapsed"],
-                                                             (string)mapEvents["thread"]);
+                TracingEvent tracingEvent = new TracingEvent((string) mapEvents["activity"],
+                                                             (Guid) mapEvents["event_id"],
+                                                             (IPAddress) mapEvents["source"],
+                                                             (int) mapEvents["source_elapsed"],
+                                                             (string) mapEvents["thread"]);
                 tracingEvents.Add(tracingEvent);
             }
             tracingEvents.Sort(CompareTracingEvent);
@@ -62,12 +64,12 @@ namespace CassandraSharp.Instrumentation
             IDictionary<string, object> mapSession =
                     (IDictionary<string, object>)
                     CQLCommandHelpers.CreateQuery(@this, querySession, ConsistencyLevel.ONE, factory, ExecutionFlags.None).AsFuture().Result.Single();
-            TracingSession tracingSession = new TracingSession((IPAddress)mapSession["coordinator"],
-                                                               (int)mapSession["duration"],
-                                                               (IDictionary<string, string>)mapSession["parameters"],
-                                                               (string)mapSession["request"],
-                                                               (Guid)mapSession["session_id"],
-                                                               (DateTime)mapSession["started_at"],
+            TracingSession tracingSession = new TracingSession((IPAddress) mapSession["coordinator"],
+                                                               (int) mapSession["duration"],
+                                                               (IDictionary<string, string>) mapSession["parameters"],
+                                                               (string) mapSession["request"],
+                                                               (Guid) mapSession["session_id"],
+                                                               (DateTime) mapSession["started_at"],
                                                                events);
 
             return tracingSession;

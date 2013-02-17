@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,27 @@
 // limitations under the License.
 
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("cqlplus")]
-[assembly: AssemblyDescription("CQLPlus is a command line tool to access an Apache Cassandra cluster")]
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug")]
+#else
+
+[assembly: AssemblyConfiguration("Release")]
+#endif
+
+[assembly: AssemblyCompany("Pierre Chalamet")]
+[assembly: AssemblyProduct("cassandra-sharp")]
+[assembly: AssemblyCopyright("(c) 2011-2013 Pierre Chalamet")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+
+[assembly: ComVisible(false)]

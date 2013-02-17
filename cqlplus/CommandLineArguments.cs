@@ -1,209 +1,17 @@
-//////////////////////////////////////////////////////////////////////////////
-//    Command Line Argument Parser
-//    ----------------------------
-//
-//    Author: hotweird@hotmail.com
-//
-//    Microsoft Public License (Ms-PL)
-//
-//    This license governs use of the accompanying software. If you use the software, you
-//    accept this license. If you do not accept the license, do not use the software.
-//
-//    1. Definitions
-//
-//    The terms "reproduce," "reproduction," "derivative works," and "distribution" have the
-//    same meaning here as under U.S. copyright law.
-//
-//    A "contribution" is the original software, or any additions or changes to the software.
-//
-//    A "contributor" is any person that distributes its contribution under this license.
-//
-//    "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-//
-//    2. Grant of Rights
-//
-//    (A) Copyright Grant- Subject to the terms of this license, including the license conditions
-//        and limitations in section 3, each contributor grants you a non-exclusive, worldwide,
-//        royalty-free copyright license to reproduce its contribution, prepare derivative works
-//        of its contribution, and distribute its contribution or any derivative works that you create.
-//
-//    (B) Patent Grant- Subject to the terms of this license, including the license conditions and
-//        limitations in section 3, each contributor grants you a non-exclusive, worldwide,
-//        royalty-free license under its licensed patents to make, have made, use, sell, offer for
-//        sale, import, and/or otherwise dispose of its contribution in the software or derivative
-//        works of the contribution in the software.
-//
-//    3. Conditions and Limitations
-//
-//    (A) No Trademark License- This license does not grant you rights to use any contributors'
-//        name, logo, or trademarks.
-//
-//    (B) If you bring a patent claim against any contributor over patents that you claim are
-//        infringed by the software, your patent license from such contributor to the software ends
-//        automatically.
-//
-//    (C) If you distribute any portion of the software, you must retain all copyright, patent,
-//        trademark, and attribution notices that are present in the software.
-//
-//    (D) If you distribute any portion of the software in source code form, you may do so only under
-//        this license by including a complete copy of this license with your distribution. If you
-//        distribute any portion of the software in compiled or object code form, you may only do so
-//        under a license that complies with this license.
-//
-//    (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no
-//        express warranties, guarantees or conditions. You may have additional consumer rights under
-//        your local laws which this license cannot change. To the extent permitted under your local
-//        laws, the contributors exclude the implied warranties of merchantability, fitness for a
-//        particular purpose and non-infringement.
-//
-//    Usage
-//    -----
-//
-//    Parsing command line arguments to a console application is a common problem. 
-//    This library handles the common task of reading arguments from a command line 
-//    and filling in the values in a type.
-//
-//    To use this library, define a class whose fields represent the data that your 
-//    application wants to receive from arguments on the command line. Then call 
-//    CommandLine.ParseArguments() to fill the object with the data 
-//    from the command line. Each field in the class defines a command line argument. 
-//    The type of the field is used to validate the data read from the command line. 
-//    The name of the field defines the name of the command line option.
-//
-//    The parser can handle fields of the following types:
-//
-//    - string
-//    - int
-//    - uint
-//    - bool
-//    - enum
-//    - array of the above type
-//
-//    For example, suppose you want to read in the argument list for wc (word count). 
-//    wc takes three optional boolean arguments: -l, -w, and -c and a list of files.
-//
-//    You could parse these arguments using the following code:
-//
-//    class WCArguments
-//    {
-//        public bool lines;
-//        public bool words;
-//        public bool chars;
-//        public string[] files;
-//    }
-//
-//    class WC
-//    {
-//        static void Main(string[] args)
-//        {
-//            if (CommandLine.ParseArgumentsWithUsage(args, parsedArgs))
-//            {
-//            //     insert application code here
-//            }
-//        }
-//    }
-//
-//    So you could call this aplication with the following command line to count 
-//    lines in the foo and bar files:
-//
-//        wc.exe /lines /files:foo /files:bar
-//
-//    The program will display the following usage message when bad command line 
-//    arguments are used:
-//
-//        wc.exe -x
-//
-//    Unrecognized command line argument '-x'
-//        /lines[+|-]                         short form /l
-//        /words[+|-]                         short form /w
-//        /chars[+|-]                         short form /c
-//        /files:<string>                     short form /f
-//        @<file>                             Read response file for more options
-//
-//    That was pretty easy. However, you realy want to omit the "/files:" for the 
-//    list of files. The details of field parsing can be controled using custom 
-//    attributes. The attributes which control parsing behaviour are:
-//
-//    ArgumentAttribute 
-//        - controls short name, long name, required, allow duplicates, default value
-//        and help text
-//    DefaultArgumentAttribute 
-//        - allows omition of the "/name".
-//        - This attribute is allowed on only one field in the argument class.
-//
-//    So for the wc.exe program we want this:
-//
-//    using System;
-//    using Utilities;
-//
-//    class WCArguments
-//    {
-//        [Argument(ArgumentType.AtMostOnce, HelpText="Count number of lines in the input text.")]
-//        public bool lines;
-//        [Argument(ArgumentType.AtMostOnce, HelpText="Count number of words in the input text.")]
-//        public bool words;
-//        [Argument(ArgumentType.AtMostOnce, HelpText="Count number of chars in the input text.")]
-//        public bool chars;
-//        [DefaultArgument(ArgumentType.MultipleUnique, HelpText="Input files to count.")]
-//        public string[] files;
-//    }
-//
-//    class WC
-//    {
-//        static void Main(string[] args)
-//        {
-//            WCArguments parsedArgs = new WCArguments();
-//            if (CommandLine.ParseArgumentsWithUsage(args, parsedArgs))
-//            {
-//            //     insert application code here
-//            }
-//        }
-//    }
-//
-//
-//
-//    So now we have the command line we want:
-//
-//        wc.exe /lines foo bar
-//
-//    This will set lines to true and will set files to an array containing the 
-//    strings "foo" and "bar".
-//
-//    The new usage message becomes:
-//
-//        wc.exe -x
-//
-//    Unrecognized command line argument '-x'
-//    /lines[+|-]  Count number of lines in the input text. (short form /l)
-//    /words[+|-]  Count number of words in the input text. (short form /w)
-//    /chars[+|-]  Count number of chars in the input text. (short form /c)
-//    @<file>      Read response file for more options
-//    <files>      Input files to count. (short form /f)
-//
-//    If you want more control over how error messages are reported, how /help is 
-//    dealt with, etc you can instantiate the CommandLine.Parser class.
-//
-//
-//
-//    Cheers,
-//    Peter Hallam
-//    C# Compiler Developer
-//    Microsoft Corp.
-//
-//
-//
-//
-//    Release Notes
-//    -------------
-//
-//    10/02/2002 Initial Release
-//    10/14/2002 Bug Fix
-//    01/08/2003 Bug Fix in @ include files
-//    10/23/2004 Added user specified help text, formatting of help text to 
-//            screen width. Added ParseHelp for /?.
-//    11/23/2004 Added support for default values.
-//    02/23/2005 Fix bug with short name and default arguments.
-//////////////////////////////////////////////////////////////////////////////
+// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 namespace cqlplus
 {
@@ -1026,7 +834,7 @@ namespace cqlplus
             {
                 return null;
             }
-            
+
             return attribute.HelpText;
         }
 
@@ -1053,7 +861,7 @@ namespace cqlplus
             {
                 return field.FieldType.GetElementType();
             }
-            
+
             return null;
         }
 
@@ -1063,12 +871,12 @@ namespace cqlplus
             {
                 return attribute.Type;
             }
-            
+
             if (IsCollectionType(field.FieldType))
             {
                 return ArgumentType.MultipleUnique;
             }
-            
+
             return ArgumentType.AtMostOnce;
         }
 
@@ -1126,9 +934,9 @@ namespace cqlplus
                 _defaultValue = CommandLineParser.DefaultValue(attribute, field);
                 _elementType = ElementType(field);
                 _flags = Flags(attribute, field);
-                this._field = field;
+                _field = field;
                 _seenValue = false;
-                this._reporter = reporter;
+                _reporter = reporter;
                 _isDefault = attribute is DefaultArgumentAttribute;
 
                 if (IsCollection)

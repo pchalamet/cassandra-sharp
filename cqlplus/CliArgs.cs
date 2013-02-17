@@ -1,5 +1,5 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,11 @@ namespace cqlplus
 {
     internal class CliArgs
     {
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Display help on startup", ShortName = "nohelp")]
-        public bool NoHelp = false;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable command tracing", ShortName = "trace")]
-        public bool Tracing = false;
-
         [Argument(ArgumentType.AtMostOnce, HelpText = "Do not check connection", ShortName = "chkcn")]
         public bool CheckConnection = true;
+
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable debug log", ShortName = "dbglog")]
+        public bool DebugLog = false;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
         public string File = null;
@@ -32,16 +29,19 @@ namespace cqlplus
         [Argument(ArgumentType.AtMostOnce, HelpText = "Hostname", ShortName = "h")]
         public string Hostname = "localhost";
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Display help on startup", ShortName = "nohelp")]
+        public bool NoHelp = false;
+
         [Argument(ArgumentType.AtMostOnce, HelpText = "Password", ShortName = "x")]
         public string Password = null;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Port", ShortName = "p")]
         public int Port = 9042;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable command tracing", ShortName = "trace")]
+        public bool Tracing = false;
+
         [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
         public string User = null;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable debug log", ShortName = "dbglog")]
-        public bool DebugLog = false;
     }
 }

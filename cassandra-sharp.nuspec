@@ -3,14 +3,14 @@
   <metadata>
     <id>cassandra-sharp</id>
     <version>0.0.0.0</version>
-	<title>cassandra-sharp: the high performance CQL Binary Protocol for Apache Cassandra</title>
+	<title>cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra</title>
     <authors>Pierre Chalamet</authors>
     <owners>Pierre Chalamet</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/pchalamet/cassandra-sharp</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <summary>cassandra-sharp is a CQL Binary Protocol .NET 4.0+ client for Apache Cassandra 1.2+, fully supporting asynchronous operations (using TPL) and CQL 3.</summary>
-    <description>cassandra-sharp is the high performance CQL Binary Protocol for Apache Cassandra.
+    <summary>cassandra-sharp is the high performance .NET CQL 3 Binary Protocol client for Apache Cassandra, fully supporting asynchronous operations (using TPL and Rx) and CQL 3 binary protocol.</summary>
+    <description>cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra.
 
 Major features ():
 * async operations (Rx / TPL) - fully compatible with C# async

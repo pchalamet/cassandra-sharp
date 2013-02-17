@@ -1,5 +1,5 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 
 namespace CassandraSharp.Exceptions
 {
-    using CassandraSharp.CQLBinaryProtocol;
-
     public class UnknownResponseException : CassandraException
     {
         public UnknownResponseException(MessageOpcodes messageOpcode)

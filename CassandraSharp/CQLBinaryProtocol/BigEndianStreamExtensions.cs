@@ -1,5 +1,5 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using CassandraSharp.Transport;
     using CassandraSharp.Transport.Stream;
 
     internal static class BigEndianStreamExtensions
@@ -41,7 +40,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         public static void WriteString(this Stream stream, string data)
         {
             byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            short len = (short)bufStr.Length;
+            short len = (short) bufStr.Length;
             stream.WriteShort(len);
             stream.Write(bufStr, 0, len);
         }

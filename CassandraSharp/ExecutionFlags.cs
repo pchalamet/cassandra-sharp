@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ namespace CassandraSharp
         None = 0,
 
         ClientTracing = 0x0001,
-        
+
         ServerTracing = 0x0002,
 
         Tracing = ClientTracing | ServerTracing,

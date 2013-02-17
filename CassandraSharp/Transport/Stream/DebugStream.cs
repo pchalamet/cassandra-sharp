@@ -1,5 +1,5 @@
-﻿// cassandra-sharp - a .NET client for Apache Cassandra
-// Copyright (c) 2011-2012 Pierre Chalamet
+﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,30 +20,13 @@ namespace CassandraSharp.Transport.Stream
 
     internal class DebugStream : Stream
     {
-        private Stream _stream;
-
-        private enum OperationState
-        {
-            Unknown,
-            Read,
-            Write
-        }
-
         private OperationState _opeState = OperationState.Unknown;
+
+        private Stream _stream;
 
         public DebugStream(Stream stream)
         {
             _stream = stream;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            if (disposing)
-            {
-                _stream.Dispose();
-                _stream = null;
-            }
         }
 
         public override bool CanRead
@@ -70,6 +53,16 @@ namespace CassandraSharp.Transport.Stream
         {
             get { return _stream.Position; }
             set { _stream.Position = value; }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
+            {
+                _stream.Dispose();
+                _stream = null;
+            }
         }
 
         public override void Flush()
@@ -109,19 +102,28 @@ namespace CassandraSharp.Transport.Stream
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if(_opeState != OperationState.Write)
+            if (_opeState != OperationState.Write)
             {
                 _opeState = OperationState.Write;
                 Console.WriteLine();
                 Console.Write("WRITE: ");
             }
-            
+
             for (int i = 0; i < count; ++i)
             {
                 Console.Write("{0:X2}", buffer[offset + i]);
             }
 
             _stream.Write(buffer, offset, count);
+        }
+
+        private enum OperationState
+        {
+            Unknown,
+
+            Read,
+
+            Write
         }
     }
 }
