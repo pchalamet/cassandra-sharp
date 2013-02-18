@@ -144,7 +144,7 @@ namespace CassandraSharpUnitTests.Performance
                 Console.WriteLine("============================================================");
                 Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
                 Console.WriteLine("============================================================");
-                var prepared = cmd.Prepare(insertPerf, ExecutionFlags.ServerTracing);
+                var prepared = cmd.Prepare(insertPerf);
                 int n = 0;
                 while (n < NUM_ROUND)
                 {

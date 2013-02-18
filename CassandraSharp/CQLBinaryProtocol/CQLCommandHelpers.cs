@@ -17,10 +17,13 @@ namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Security.Authentication;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;
+    using CassandraSharp.Utils.Stream;
 
     internal static class CQLCommandHelpers
     {
@@ -37,8 +40,17 @@ namespace CassandraSharp.CQLBinaryProtocol
         internal static IObservable<object> CreateReadyQuery(IConnection connection, string cqlVersion)
         {
             Action<IFrameWriter> writer = fw => WriteReady(fw, cqlVersion);
-            Func<IFrameReader, IEnumerable<object>> reader = fr => new object[] {ReadReady(fr)};
+            Func<IFrameReader, IEnumerable<object>> reader = ReadReady;
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
+            Query query = new Query(writer, reader, token, connection);
+            return query;
+        }
+
+        internal static IObservable<object> CreateOptionsQuery(IConnection connection)
+        {
+            Action<IFrameWriter> writer = WriteOptions;
+            Func<IFrameReader, IEnumerable<object>> reader = ReadOptions;
+            InstrumentationToken token = InstrumentationToken.Create(RequestType.Options, ExecutionFlags.None);
             Query query = new Query(writer, reader, token, connection);
             return query;
         }
@@ -46,11 +58,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         internal static IObservable<object> CreateAuthenticateQuery(IConnection connection, string user, string password)
         {
             Action<IFrameWriter> writer = fw => WriteAuthenticate(fw, user, password);
-            Func<IFrameReader, IEnumerable<object>> reader = fr =>
-                {
-                    ReadAuthenticate(fr);
-                    return null;
-                };
+            Func<IFrameReader, IEnumerable<object>> reader = ReadAuthenticate;
 
             // ReSharper disable ReturnValueOfPureMethodIsNotUsed
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Authenticate, ExecutionFlags.None);
@@ -61,7 +69,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         internal static IObservable<object> CreatePrepareQuery(IConnection connection, string cql, ExecutionFlags executionFlags)
         {
             Action<IFrameWriter> writer = fw => WritePrepareRequest(fw, cql);
-            Func<IFrameReader, IEnumerable<object>> reader = fr => ReadPreparedQuery(fr, connection);
+            Func<IFrameReader, IEnumerable<object>> reader = ReadPreparedQuery;
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Prepare, executionFlags, cql);
             Query query = new Query(writer, reader, token, connection);
             return query;
@@ -84,23 +92,14 @@ namespace CassandraSharp.CQLBinaryProtocol
                 {
                         {"CQL_VERSION", cqlVersion}
                 };
-            frameWriter.WriteStringMap(options);
+            frameWriter.WriteOnlyStream.WriteStringMap(options);
             frameWriter.SetMessageType(MessageOpcodes.Startup);
         }
 
-        private static bool ReadReady(IFrameReader frameReader)
+        private static IEnumerable<object> ReadReady(IFrameReader frameReader)
         {
-            switch (frameReader.MessageOpcode)
-            {
-                case MessageOpcodes.Ready:
-                    return false;
-
-                case MessageOpcodes.Authenticate:
-                    return true;
-
-                default:
-                    throw new UnknownResponseException(frameReader.MessageOpcode);
-            }
+            bool mustAuthenticate = frameReader.MessageOpcode == MessageOpcodes.Authenticate;
+            yield return mustAuthenticate;
         }
 
         private static void WriteOptions(IFrameWriter frameWriter)
@@ -108,52 +107,60 @@ namespace CassandraSharp.CQLBinaryProtocol
             frameWriter.SetMessageType(MessageOpcodes.Options);
         }
 
-        private static void ReadOptions(IFrameReader frameReader)
+        private static IEnumerable<object> ReadOptions(IFrameReader frameReader)
         {
             if (frameReader.MessageOpcode != MessageOpcodes.Supported)
             {
                 throw new UnknownResponseException(frameReader.MessageOpcode);
             }
+
+            Stream stream = frameReader.ReadOnlyStream;
+            Dictionary<string, string[]> res = stream.ReadStringMultimap();
+            yield return res;
         }
 
         private static void WriteAuthenticate(IFrameWriter frameWriter, string user, string password)
         {
+            Stream stream = frameWriter.WriteOnlyStream;
             Dictionary<string, string> authParams = new Dictionary<string, string>
                 {
                         {"username", user},
                         {"password", password}
                 };
-            frameWriter.WriteStringMap(authParams);
-
+            stream.WriteStringMap(authParams);
             frameWriter.SetMessageType(MessageOpcodes.Credentials);
         }
 
-        private static void ReadAuthenticate(IFrameReader frameReader)
+        private static IEnumerable<object> ReadAuthenticate(IFrameReader frameReader)
         {
             if (frameReader.MessageOpcode != MessageOpcodes.Ready)
             {
                 throw new InvalidCredentialException();
             }
+
+            return Enumerable.Empty<object>();
         }
 
         private static void WritePrepareRequest(IFrameWriter frameWriter, string cql)
         {
-            frameWriter.WriteLongString(cql);
+            Stream stream = frameWriter.WriteOnlyStream;
+            stream.WriteLongString(cql);
             frameWriter.SetMessageType(MessageOpcodes.Prepare);
         }
 
-        private static IEnumerable<object> ReadPreparedQuery(IFrameReader frameReader, IConnection connection)
+        private static IEnumerable<object> ReadPreparedQuery(IFrameReader frameReader)
         {
             if (MessageOpcodes.Result != frameReader.MessageOpcode)
             {
                 throw new ArgumentException("Unknown server response");
             }
 
-            ResultOpcode resultOpcode = (ResultOpcode) frameReader.ReadInt();
+            Stream stream = frameReader.ReadOnlyStream;
+            ResultOpcode resultOpcode = (ResultOpcode) stream.ReadInt();
             switch (resultOpcode)
             {
                 case ResultOpcode.Prepared:
-                    byte[] queryId = frameReader.ReadShortBytes();
+                    byte[] queryId = stream.ReadShortBytes();
                     IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
                     yield return Tuple.Create(queryId, columnSpecs);
                     break;
@@ -165,8 +172,9 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private static void WriteQueryRequest(IFrameWriter frameWriter, string cql, ConsistencyLevel cl, MessageOpcodes opcode)
         {
-            frameWriter.WriteLongString(cql);
-            frameWriter.WriteShort((short) cl);
+            Stream stream = frameWriter.WriteOnlyStream;
+            stream.WriteLongString(cql);
+            stream.WriteShort((short) cl);
             frameWriter.SetMessageType(opcode);
         }
 
@@ -182,7 +190,8 @@ namespace CassandraSharp.CQLBinaryProtocol
                 yield break;
             }
 
-            ResultOpcode resultOpcode = (ResultOpcode) frameReader.ReadInt();
+            Stream stream = frameReader.ReadOnlyStream;
+            ResultOpcode resultOpcode = (ResultOpcode) stream.ReadInt();
             switch (resultOpcode)
             {
                 case ResultOpcode.Void:
@@ -209,20 +218,18 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapperFactory mapperFactory)
         {
-            int rowCount = frameReader.ReadInt();
+            Stream stream = frameReader.ReadOnlyStream;
+            int rowCount = stream.ReadInt();
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
                 IInstanceBuilder instanceBuilder = mapperFactory.CreateBuilder();
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
-                    byte[] rawData = frameReader.ReadBytes();
+                    byte[] rawData = stream.ReadByteArray();
                     object data = null != rawData
                                           ? colSpec.Deserialize(rawData)
                                           : null;
-                    if (null != data)
-                    {
-                        instanceBuilder.Set(colSpec, data);
-                    }
+                    instanceBuilder.Set(colSpec, data);
                 }
 
                 yield return instanceBuilder.Build();
@@ -231,17 +238,18 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private static IColumnSpec[] ReadColumnSpec(IFrameReader frameReader)
         {
-            MetadataFlags flags = (MetadataFlags) frameReader.ReadInt();
+            Stream stream = frameReader.ReadOnlyStream;
+            MetadataFlags flags = (MetadataFlags) stream.ReadInt();
             bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
 
-            int colCount = frameReader.ReadInt();
+            int colCount = stream.ReadInt();
 
             string keyspace = null;
             string table = null;
             if (globalTablesSpec)
             {
-                keyspace = frameReader.ReadString();
-                table = frameReader.ReadString();
+                keyspace = stream.ReadString();
+                table = stream.ReadString();
             }
 
             IColumnSpec[] columnSpecs = new IColumnSpec[colCount];
@@ -251,28 +259,28 @@ namespace CassandraSharp.CQLBinaryProtocol
                 string colTable = table;
                 if (!globalTablesSpec)
                 {
-                    colKeyspace = frameReader.ReadString();
-                    colTable = frameReader.ReadString();
+                    colKeyspace = stream.ReadString();
+                    colTable = stream.ReadString();
                 }
-                string colName = frameReader.ReadString();
-                ColumnType colType = (ColumnType) frameReader.ReadShort();
+                string colName = stream.ReadString();
+                ColumnType colType = (ColumnType) stream.ReadShort();
                 string colCustom = null;
                 ColumnType colKeyType = ColumnType.Custom;
                 ColumnType colValueType = ColumnType.Custom;
                 switch (colType)
                 {
                     case ColumnType.Custom:
-                        colCustom = frameReader.ReadString();
+                        colCustom = stream.ReadString();
                         break;
 
                     case ColumnType.List:
                     case ColumnType.Set:
-                        colValueType = (ColumnType) frameReader.ReadShort();
+                        colValueType = (ColumnType) stream.ReadShort();
                         break;
 
                     case ColumnType.Map:
-                        colKeyType = (ColumnType) frameReader.ReadShort();
-                        colValueType = (ColumnType) frameReader.ReadShort();
+                        colKeyType = (ColumnType) stream.ReadShort();
+                        colValueType = (ColumnType) stream.ReadShort();
                         break;
                 }
 
@@ -284,24 +292,19 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private static void WriteExecuteRequest(IFrameWriter frameWriter, byte[] id, IColumnSpec[] columnSpecs, ConsistencyLevel cl, IDataMapperFactory factory)
         {
-            frameWriter.WriteShortByteArray(id);
-            frameWriter.WriteShort((short) columnSpecs.Length);
+            Stream stream = frameWriter.WriteOnlyStream;
+            stream.WriteShortByteArray(id);
+            stream.WriteShort((short) columnSpecs.Length);
 
             IDataSource dataSource = factory.DataSource;
             foreach (IColumnSpec columnSpec in columnSpecs)
             {
                 object data = dataSource.Get(columnSpec);
-                if (null == data)
-                {
-                    // FIXME: this is not supported for the moment with binary protocol
-                    throw new ArgumentNullException(columnSpec.Name);
-                }
-
                 byte[] rawData = columnSpec.Serialize(data);
-                frameWriter.WriteByteArray(rawData);
+                stream.WriteByteArray(rawData);
             }
 
-            frameWriter.WriteShort((short) cl);
+            stream.WriteShort((short) cl);
             frameWriter.SetMessageType(MessageOpcodes.Execute);
         }
     }

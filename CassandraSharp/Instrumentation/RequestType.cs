@@ -19,6 +19,8 @@ namespace CassandraSharp.Instrumentation
     {
         Ready,
 
+        Options,
+
         Authenticate,
 
         Prepare,

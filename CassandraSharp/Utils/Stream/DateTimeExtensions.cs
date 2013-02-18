@@ -13,26 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport.Stream
+namespace CassandraSharp.Utils.Stream
 {
     using System;
 
-    internal static class ArrayExtensions
+    internal static class DateTimeExtensions
     {
-        public static void ReverseIfLittleEndian(this byte[] buffer)
+        public static readonly DateTime _epoch = new DateTime(1970, 1, 1);
+
+        public static long ToTimestamp(this DateTime dt)
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer);
-            }
+            return (long) dt.Subtract(_epoch).TotalMilliseconds;
         }
 
-        public static void ReverseIfLittleEndian(this byte[] buffer, int index, int length)
+        public static DateTime ToDateTime(this long ts)
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer, index, length);
-            }
+            return _epoch.AddMilliseconds(ts);
         }
     }
 }

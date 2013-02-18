@@ -15,25 +15,11 @@
 
 namespace CassandraSharp.Extensibility
 {
-    using System.Collections.Generic;
+    using System.IO;
 
     public interface IFrameWriter
     {
-        void WriteShort(short data);
-
-        void WriteInt(int data);
-
-        void WriteString(string data);
-
-        void WriteShortByteArray(byte[] data);
-
-        void WriteLongString(string data);
-
-        void WriteStringMap(Dictionary<string, string> dic);
-
-        void WriteStringList(string[] data);
-
-        void WriteByteArray(byte[] data);
+        Stream WriteOnlyStream { get; }
 
         void SetMessageType(MessageOpcodes msgOpcode);
     }

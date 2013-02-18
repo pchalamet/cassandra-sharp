@@ -15,6 +15,7 @@
 
 namespace CassandraSharpUnitTests.CQLPoco
 {
+    using System.Collections.Generic;
     using CassandraSharp;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
@@ -29,73 +30,81 @@ namespace CassandraSharpUnitTests.CQLPoco
             return new ColumnSpec(0, null, null, name, ColumnType.Custom, null, ColumnType.Custom, ColumnType.Custom);
         }
 
-        [Test]
-        public void TestBuilding()
+        private void TestBuildingWithSetter(Dictionary<string, object> data)
         {
             IInstanceBuilder instanceBuilder = GetInstanceBuilder<Toto>();
 
-            instanceBuilder.Set(CreateColumnSpec("NullableInt"), 42);
-            instanceBuilder.Set(CreateColumnSpec("NullableIntProperty"), 666);
-            instanceBuilder.Set(CreateColumnSpec("Int"), 1);
-            instanceBuilder.Set(CreateColumnSpec("IntProperty"), 2);
-            instanceBuilder.Set(CreateColumnSpec("String"), "String1");
-            instanceBuilder.Set(CreateColumnSpec("StringProperty"), "String2");
+            foreach (KeyValuePair<string, object> datum in data)
+            {
+                instanceBuilder.Set(CreateColumnSpec(datum.Key), datum.Value); 
+            }
 
             Toto toto = instanceBuilder.Build() as Toto;
             Assert.NotNull(toto);
 
+            Assert.AreEqual(toto.NullNullableInt, null);
+            Assert.AreEqual(toto.NullNullableIntProperty, null);
             Assert.AreEqual(toto.NullableInt, 42);
             Assert.AreEqual(toto.NullableIntProperty, 666);
             Assert.AreEqual(toto.Int, 1);
             Assert.AreEqual(toto.IntProperty, 2);
             Assert.AreEqual(toto.String, "String1");
-            Assert.AreEqual(toto.StringProperty, "String2");
+            Assert.AreEqual(toto.StringProperty, "String2");            
+        }
+
+
+        [Test]
+        public void TestBuilding()
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>
+                {
+                        {"NullNullableInt", null},
+                        {"NullNullableIntProperty", null},
+                        {"NullableInt", 42},
+                        {"NullableIntProperty", 666},
+                        {"Int", 1},
+                        {"IntProperty", 2},
+                        {"String", "String1"},
+                        {"StringProperty", "String2"},
+                };
+
+            TestBuildingWithSetter(data);
         }
 
         [Test]
         public void TestBuildingCaseInsensitive()
         {
-            IInstanceBuilder instanceBuilder = GetInstanceBuilder<Toto>();
+            Dictionary<string, object> data = new Dictionary<string, object>
+                {
+                        {"nullnullableint", null},
+                        {"nullnullableintproperty", null},
+                        {"nullableint", 42},
+                        {"nullableintproperty", 666},
+                        {"int", 1},
+                        {"intproperty", 2},
+                        {"string", "String1"},
+                        {"stringproperty", "String2"},
+                };
 
-            instanceBuilder.Set(CreateColumnSpec("nullableint"), 42);
-            instanceBuilder.Set(CreateColumnSpec("nullableintproperty"), 666);
-            instanceBuilder.Set(CreateColumnSpec("int"), 1);
-            instanceBuilder.Set(CreateColumnSpec("intproperty"), 2);
-            instanceBuilder.Set(CreateColumnSpec("string"), "String1");
-            instanceBuilder.Set(CreateColumnSpec("stringproperty"), "String2");
-
-            Toto toto = instanceBuilder.Build() as Toto;
-            Assert.NotNull(toto);
-
-            Assert.AreEqual(toto.NullableInt, 42);
-            Assert.AreEqual(toto.NullableIntProperty, 666);
-            Assert.AreEqual(toto.Int, 1);
-            Assert.AreEqual(toto.IntProperty, 2);
-            Assert.AreEqual(toto.String, "String1");
-            Assert.AreEqual(toto.StringProperty, "String2");
+            TestBuildingWithSetter(data);
         }
 
         [Test]
         public void TestBuildingUnderscore()
         {
-            IInstanceBuilder instanceBuilder = GetInstanceBuilder<Toto>();
+            Dictionary<string, object> data = new Dictionary<string, object>
+                {
+                        {"null_nullable_int", null},
+                        {"null_nullable_int_property", null},
+                        {"nullable_int", 42},
+                        {"nullable_int_property", 666},
+                        {"_int_", 1},
+                        {"int_property", 2},
+                        {"_string_", "String1"},
+                        {"string_property", "String2"},
+                };
 
-            instanceBuilder.Set(CreateColumnSpec("nullable_int"), 42);
-            instanceBuilder.Set(CreateColumnSpec("nullable_int_property"), 666);
-            instanceBuilder.Set(CreateColumnSpec("int"), 1);
-            instanceBuilder.Set(CreateColumnSpec("int_property"), 2);
-            instanceBuilder.Set(CreateColumnSpec("string"), "String1");
-            instanceBuilder.Set(CreateColumnSpec("string_property"), "String2");
-
-            Toto toto = instanceBuilder.Build() as Toto;
-            Assert.NotNull(toto);
-
-            Assert.AreEqual(toto.NullableInt, 42);
-            Assert.AreEqual(toto.NullableIntProperty, 666);
-            Assert.AreEqual(toto.Int, 1);
-            Assert.AreEqual(toto.IntProperty, 2);
-            Assert.AreEqual(toto.String, "String1");
-            Assert.AreEqual(toto.StringProperty, "String2");
+            TestBuildingWithSetter(data);
         }
 
         [Test]
@@ -107,9 +116,19 @@ namespace CassandraSharpUnitTests.CQLPoco
 
         public class Toto
         {
+            public Toto()
+            {
+                NullNullableInt = 42;
+                NullNullableIntProperty = 666;
+            }
+
             public int? NullableInt;
 
             public int? NullableIntProperty { get; set; }
+
+            public int? NullNullableInt;
+
+            public int? NullNullableIntProperty { get; set; }
 
             public int Int;
 

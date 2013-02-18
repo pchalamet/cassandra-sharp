@@ -5,7 +5,9 @@ version 3.0.0 [not released]
 - improved throughput using LongRunning connection type
 - NuGet support for net40 and net45 binaries
 - performance report is asynchronous
-- official support for nullable
+- official support for nullable (NOTE: sending null in prepare statement is supported but only with C* 1.2.2+)
+- receive and send timeout support (disabled by default)
+- keep alive support (by default, using OS configuration)
 
 version 2.3.1
 - fixed connection leak on read error

@@ -13,16 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport.Stream
+namespace CassandraSharp.Utils.Stream
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Net.Sockets;
-    using System.Text;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
 
     internal class BufferingFrameWriter : IFrameWriter,
                                           IDisposable
@@ -44,78 +41,14 @@ namespace CassandraSharp.Transport.Stream
             _ms.SafeDispose();
         }
 
+        public Stream WriteOnlyStream
+        {
+            get { return _ms; }
+        }
+
         public void SetMessageType(MessageOpcodes msgOpcode)
         {
             _msgOpcode = msgOpcode;
-        }
-
-        public void WriteShort(short data)
-        {
-            byte[] buffer = data.GetBytes();
-            _ms.Write(buffer, 0, buffer.Length);
-        }
-
-        public void WriteInt(int data)
-        {
-            byte[] buffer = data.GetBytes();
-            _ms.Write(buffer, 0, buffer.Length);
-        }
-
-        public void WriteString(string data)
-        {
-            byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            short len = (short) bufStr.Length;
-            byte[] bufLen = len.GetBytes();
-            _ms.Write(bufLen, 0, bufLen.Length);
-            _ms.Write(bufStr, 0, bufStr.Length);
-        }
-
-        public void WriteShortByteArray(byte[] data)
-        {
-            short len = (short) data.Length;
-            byte[] bufLen = len.GetBytes();
-            _ms.Write(bufLen, 0, bufLen.Length);
-            _ms.Write(data, 0, data.Length);
-        }
-
-        public void WriteLongString(string data)
-        {
-            byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            int len = bufStr.Length;
-            byte[] bufLen = len.GetBytes();
-            _ms.Write(bufLen, 0, bufLen.Length);
-            _ms.Write(bufStr, 0, bufStr.Length);
-        }
-
-        public void WriteStringMap(Dictionary<string, string> dic)
-        {
-            short len = (short) dic.Count;
-            byte[] bufLen = len.GetBytes();
-            _ms.Write(bufLen, 0, bufLen.Length);
-            foreach (var kvp in dic)
-            {
-                WriteString(kvp.Key);
-                WriteString(kvp.Value);
-            }
-        }
-
-        public void WriteStringList(string[] data)
-        {
-            short len = (short) data.Length;
-            byte[] bufLen = len.GetBytes();
-            _ms.Write(bufLen, 0, bufLen.Length);
-            foreach (string s in data)
-            {
-                WriteString(s);
-            }
-        }
-
-        public void WriteByteArray(byte[] data)
-        {
-            int len = data.Length;
-            byte[] bufLen = len.GetBytes();
-            _ms.Write(bufLen, 0, bufLen.Length);
-            _ms.Write(data, 0, data.Length);
         }
 
         public void SendFrame(byte streamId, Socket socket)
@@ -134,7 +67,6 @@ namespace CassandraSharp.Transport.Stream
             header[3] = (byte) _msgOpcode;
             SendBuffer(socket, header);
 
-            // len of body
             int len = (int) _ms.Length;
             byte[] bodyLen = len.GetBytes();
             SendBuffer(socket, bodyLen);
@@ -143,7 +75,7 @@ namespace CassandraSharp.Transport.Stream
             SendBuffer(socket, _ms.GetBuffer(), 0, len);
         }
 
-        private void SendBuffer(Socket socket, byte[] buffer)
+        private static void SendBuffer(Socket socket, byte[] buffer)
         {
             SendBuffer(socket, buffer, 0, buffer.Length);
         }

@@ -22,8 +22,8 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Net;
     using System.Text;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Transport.Stream;
     using CassandraSharp.Utils;
+    using CassandraSharp.Utils.Stream;
 
     internal static class ValueSerialization
     {

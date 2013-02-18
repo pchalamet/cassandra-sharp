@@ -16,7 +16,7 @@
 namespace CassandraSharp.Extensibility
 {
     using System;
-    using System.Collections.Generic;
+    using System.IO;
 
     public interface IFrameReader : IDisposable
     {
@@ -28,20 +28,6 @@ namespace CassandraSharp.Extensibility
 
         Exception ResponseException { get; }
 
-        byte ReadByte();
-
-        short ReadShort();
-
-        int ReadInt();
-
-        string ReadString();
-
-        string[] ReadStringList();
-
-        byte[] ReadBytes();
-
-        byte[] ReadShortBytes();
-
-        Dictionary<string, string[]> ReadStringMultimap();
+        Stream ReadOnlyStream { get; }
     }
 }

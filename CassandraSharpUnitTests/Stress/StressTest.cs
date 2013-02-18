@@ -191,7 +191,8 @@ namespace CassandraSharpUnitTests.Stress
                             },
                         Transport = new TransportConfig
                             {
-                                    Port = 666
+                                    Port = 666,
+                                    ReceiveTimeout = 10*1000,
                             }
                 };
 

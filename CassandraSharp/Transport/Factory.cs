@@ -24,7 +24,6 @@ namespace CassandraSharp.Transport
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {
                     {"Default", typeof(LongRunningConnectionFactory)},
-                    {"ShortRunning", typeof(ShortRunningConnectionFactory)},
                     {"LongRunning", typeof(LongRunningConnectionFactory)},
             };
 

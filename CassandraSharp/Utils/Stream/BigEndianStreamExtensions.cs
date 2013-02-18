@@ -13,13 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
+namespace CassandraSharp.Utils.Stream
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using CassandraSharp.Transport.Stream;
 
     internal static class BigEndianStreamExtensions
     {
@@ -81,9 +80,16 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         public static void WriteByteArray(this Stream stream, byte[] data)
         {
-            int len = data.Length;
-            stream.WriteInt(len);
-            stream.Write(data, 0, len);
+            if (null != data)
+            {
+                int len = data.Length;
+                stream.WriteInt(len);
+                stream.Write(data, 0, len);
+            }
+            else
+            {
+                stream.WriteInt(-1);
+            }
         }
 
         private static void ReadBuffer(this Stream stream, byte[] buffer)
@@ -119,28 +125,28 @@ namespace CassandraSharp.CQLBinaryProtocol
         public static string ReadString(this Stream stream)
         {
             short len = stream.ReadShort();
-            if (0 == len)
+            if (0 != len)
             {
-                return string.Empty;
+                byte[] bufStr = new byte[len];
+                stream.ReadBuffer(bufStr);
+                string data = Encoding.UTF8.GetString(bufStr);
+                return data;
             }
 
-            byte[] bufStr = new byte[len];
-            stream.ReadBuffer(bufStr);
-            string data = Encoding.UTF8.GetString(bufStr);
-            return data;
+            return string.Empty;
         }
 
-        public static byte[] ReadBytes(this Stream stream)
+        public static byte[] ReadByteArray(this Stream stream)
         {
             int len = stream.ReadInt();
-            if (-1 == len)
+            if (-1 != len)
             {
-                return null;
+                byte[] data = new byte[len];
+                stream.ReadBuffer(data);
+                return data;
             }
 
-            byte[] data = new byte[len];
-            stream.ReadBuffer(data);
-            return data;
+            return null;
         }
 
         public static byte[] ReadShortBytes(this Stream stream)

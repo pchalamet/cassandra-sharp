@@ -30,8 +30,8 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;
-    using CassandraSharp.Transport.Stream;
     using CassandraSharp.Utils;
+    using CassandraSharp.Utils.Stream;
 
     internal class LongRunningConnection : IConnection,
                                            IDisposable
@@ -52,9 +52,9 @@ namespace CassandraSharp.Transport
 
         private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
 
-        private readonly Socket _socket;
-
         private readonly TcpClient _tcpClient;
+
+        private readonly Socket _socket;
 
         private int _isClosed;
 
@@ -76,9 +76,17 @@ namespace CassandraSharp.Transport
                         ReceiveTimeout = _config.ReceiveTimeout,
                         SendTimeout = _config.SendTimeout,
                         NoDelay = true,
+                        LingerState = {Enabled = true, LingerTime = 0},
                 };
+
             _tcpClient.Connect(address, _config.Port);
             _socket = _tcpClient.Client;
+
+            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
+            if (_config.KeepAlive && 0 != _config.KeepAliveTime)
+            {
+                SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
+            }
 
             Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
@@ -105,6 +113,22 @@ namespace CassandraSharp.Transport
         public void Dispose()
         {
             Close(false);
+        }
+
+        public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
+        {
+            // marshal the equivalent of the native structure into a byte array
+            byte[] inOptionValues = new byte[12];
+
+            int enable = 0 != keepaliveTime
+                                 ? 1
+                                 : 0;
+            BitConverter.GetBytes(enable).CopyTo(inOptionValues, 0);
+            BitConverter.GetBytes(keepaliveTime).CopyTo(inOptionValues, 4);
+            BitConverter.GetBytes(keepaliveInterval).CopyTo(inOptionValues, 8);
+
+            // write SIO_VALS to Socket IOControl
+            socket.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
         }
 
         private void Close(bool notifyFailure)
@@ -267,19 +291,12 @@ namespace CassandraSharp.Transport
             Close(true);
         }
 
-        //        private void GetOptions()
-        //        {
-        //            Action<IFrameWriter> writer = CQLCommandHelpers.WriteOptions;
-        //            Func<IFrameReader, IEnumerable<object>> reader = fr =>
-        //                {
-        //                    CQLCommandHelpers.ReadOptions(fr);
-        //                    return null;
-        //                };
-
-        //// ReSharper disable ReturnValueOfPureMethodIsNotUsed
-        //            Execute(writer, reader, ExecutionFlags.None).Result.Count();
-        //// ReSharper restore ReturnValueOfPureMethodIsNotUsed
-        //        }
+        private void GetOptions()
+        {
+            IObservable<object> obsOptions = CQLCommandHelpers.CreateOptionsQuery(this);
+            Task<IList<object>> res = obsOptions.AsFuture();
+            res.Wait();
+        }
 
         private void ReadifyConnection()
         {

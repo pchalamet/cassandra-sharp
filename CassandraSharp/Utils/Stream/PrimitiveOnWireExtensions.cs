@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport.Stream
+namespace CassandraSharp.Utils.Stream
 {
     using System;
     using System.Net;

@@ -25,8 +25,8 @@ namespace CassandraSharp.Config
             Port = 9042;
             Recoverable = true;
             CqlVersion = "3.0.0";
-            ReceiveTimeout = 60000;
-            SendTimeout = 60000;
+
+            KeepAlive = true;
         }
 
         [XmlAttribute("port")]
@@ -35,11 +35,17 @@ namespace CassandraSharp.Config
         [XmlAttribute("type")]
         public string Type { get; set; }
 
-        [XmlAttribute("rcvtimeout")]
+        [XmlAttribute("rcvTimeout")]
         public int ReceiveTimeout { get; set; }
 
-        [XmlAttribute("sndtimeout")]
+        [XmlAttribute("sndTimeout")]
         public int SendTimeout { get; set; }
+
+        [XmlAttribute("keepAlive")]
+        public bool KeepAlive;
+
+        [XmlAttribute("keepAliveTime")]
+        public int KeepAliveTime;
 
         [XmlAttribute("recoverable")]
         public bool Recoverable { get; set; }

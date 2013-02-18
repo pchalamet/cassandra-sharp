@@ -120,11 +120,5 @@ namespace CassandraSharpUnitTests.Endurance
         {
             BinaryProtocolRunWritePerformanceParallel("LongRunning");
         }
-
-        [Test]
-        public void BinaryProtocolRunWritePerformanceParallelShortRunning()
-        {
-            BinaryProtocolRunWritePerformanceParallel("ShortRunning");
-        }
     }
 }
