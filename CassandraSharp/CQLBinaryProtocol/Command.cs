@@ -31,7 +31,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             DataMapper = dataMapper;
         }
 
-        public IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None,
+                                         object key = null)
         {
             IDataMapperFactory factory = DataMapper.Create<T>();
             IConnection connection = Cluster.GetConnection(null);
@@ -39,19 +40,9 @@ namespace CassandraSharp.CQLBinaryProtocol
             return query.Cast<T>();
         }
 
-        public IObservable<NonQuery> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            return Execute<NonQuery>(cql, cl, executionFlags);
-        }
-
         public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
             return new PreparedQuery<T>(Cluster, DataMapper, cql, executionFlags);
-        }
-
-        public IPreparedQuery<NonQuery> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
-        {
-            return Prepare<NonQuery>(cql, executionFlags);
         }
     }
 }

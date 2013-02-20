@@ -47,7 +47,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             _executionFlags = executionFlags;
         }
 
-        public IObservable<T> Execute(object dataSource, ConsistencyLevel cl)
+        public IObservable<T> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM)
         {
             IConnection connection;
             if (null == (connection = _connection))

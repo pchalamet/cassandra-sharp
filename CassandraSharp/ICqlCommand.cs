@@ -19,12 +19,9 @@ namespace CassandraSharp
 
     public interface ICqlCommand
     {
-        IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
-
-        IObservable<NonQuery> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None);
+        IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None,
+                                  object key = null);
 
         IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
-
-        IPreparedQuery<NonQuery> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }
 }

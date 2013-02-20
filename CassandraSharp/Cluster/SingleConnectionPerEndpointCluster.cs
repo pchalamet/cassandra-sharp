@@ -18,6 +18,7 @@ namespace CassandraSharp.Cluster
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -45,7 +46,7 @@ namespace CassandraSharp.Cluster
             _recoveryService = recoveryService;
         }
 
-        public IConnection GetConnection(Token token)
+        public IConnection GetConnection(BigInteger? token = null)
         {
             lock (_globalLock)
             {

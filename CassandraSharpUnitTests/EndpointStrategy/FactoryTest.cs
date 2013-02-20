@@ -19,6 +19,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Extensibility;
@@ -40,7 +41,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
 
             public IEnumerable<IPAddress> Endpoints { get; set; }
 
-            public IPAddress Pick(Token token)
+            public IPAddress Pick(BigInteger? token = null)
             {
                 throw new NotImplementedException();
             }

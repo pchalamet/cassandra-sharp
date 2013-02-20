@@ -18,6 +18,7 @@ namespace CassandraSharp.EndpointStrategy
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Extensibility;
 
     internal class RandomEndpointStrategy : IEndpointStrategy
@@ -37,7 +38,7 @@ namespace CassandraSharp.EndpointStrategy
             _rnd = new Random();
         }
 
-        public IPAddress Pick(Token token)
+        public IPAddress Pick(BigInteger? token = null)
         {
             lock (_lock)
             {

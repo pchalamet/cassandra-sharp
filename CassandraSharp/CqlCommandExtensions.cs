@@ -13,23 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp
 {
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Numerics;
+    using System;
 
-    /// <summary>
-    ///     IEndpointStrategy helps choosing a server to connect to Implementation must be thread safe
-    /// </summary>
-    public interface IEndpointStrategy
+    public static class CqlCommandExtensions
     {
-        IPAddress Pick(BigInteger? token = null);
+        public static IObservable<NonQuery> Execute(this ICqlCommand @this, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                                    ExecutionFlags executionFlags = ExecutionFlags.None, object key = null)
+        {
+            return @this.Execute<NonQuery>(cql, cl, executionFlags);
+        }
 
-        void Ban(IPAddress endpoint);
-
-        void Permit(IPAddress endpoint);
-
-        void Update(IEnumerable<IPAddress> endpoints);
+        public static IPreparedQuery<NonQuery> Prepare(this ICqlCommand @this, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            return @this.Prepare<NonQuery>(cql, executionFlags);
+        }
     }
 }

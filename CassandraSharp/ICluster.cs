@@ -16,12 +16,13 @@
 namespace CassandraSharp
 {
     using System;
+    using System.Numerics;
 
     /// <summary>
     ///     Primary interface to execute commands against a Cassandra cluster Implementation of this interface must be thread safe
     /// </summary>
     public interface ICluster : IDisposable
     {
-        IConnection GetConnection(Token token);
+        IConnection GetConnection(BigInteger? token = null);
     }
 }
