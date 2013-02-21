@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Transport
 {
+    using System;
     using System.Net;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
@@ -37,9 +38,16 @@ namespace CassandraSharp.Transport
         public IConnection Create(IPAddress address)
         {
             _logger.Debug("Creating connection to {0}", address);
-
-            LongRunningConnection connection = new LongRunningConnection(address, _config, _logger, _instrumentation);
-            return connection;
+            try
+            {
+                LongRunningConnection connection = new LongRunningConnection(address, _config, _logger, _instrumentation);
+                return connection;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to create new connection: {0}", ex);
+                throw;
+            }
         }
     }
 }

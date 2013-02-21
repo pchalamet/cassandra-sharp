@@ -77,7 +77,7 @@ namespace cqlplus
                         Endpoints = new EndpointsConfig
                             {
                                     Servers = new[] {_cliArgs.Hostname},
-//                                    Discovery = new DiscoveryConfig {Type = "Null"}
+                                    Discovery = new DiscoveryConfig {Type = "Null"}
                             }
                 };
 
