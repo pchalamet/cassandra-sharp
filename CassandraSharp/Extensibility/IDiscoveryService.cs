@@ -17,9 +17,17 @@ namespace CassandraSharp.Extensibility
 {
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
+
+    public class Peer
+    {
+        public IPAddress RpcAddress { get; internal set; }
+
+        public BigInteger[] Tokens { get; internal set; }
+    }
 
     public interface IDiscoveryService
     {
-        IEnumerable<IPAddress> DiscoverPeers(ICluster cluster);
+        IEnumerable<Peer> DiscoverPeers(ICluster cluster);
     }
 }

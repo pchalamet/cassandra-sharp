@@ -30,6 +30,6 @@ namespace CassandraSharp.Extensibility
 
         void Permit(IPAddress endpoint);
 
-        void Update(IEnumerable<IPAddress> endpoints);
+        void Update(IEnumerable<Peer> endpoints);
     }
 }

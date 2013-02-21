@@ -16,14 +16,14 @@
 namespace CassandraSharp.Discovery
 {
     using System.Collections.Generic;
-    using System.Net;
+    using System.Linq;
     using CassandraSharp.Extensibility;
 
     internal class NullDiscoveryService : IDiscoveryService
     {
-        public IEnumerable<IPAddress> DiscoverPeers(ICluster cluster)
+        public IEnumerable<Peer> DiscoverPeers(ICluster cluster)
         {
-            yield break;
+            return Enumerable.Empty<Peer>();
         }
     }
 }

@@ -35,7 +35,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                                          object key = null)
         {
             IDataMapperFactory factory = DataMapper.Create<T>();
-            IConnection connection = Cluster.GetConnection(null);
+            IConnection connection = Cluster.GetConnection();
             IObservable<object> query = CQLCommandHelpers.CreateQuery(connection, cql, cl, factory, executionFlags);
             return query.Cast<T>();
         }

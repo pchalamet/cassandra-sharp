@@ -25,7 +25,7 @@ namespace CassandraSharp.CQLPoco
         {
         }
 
-        private class PocoDataMapperFactory : IDataMapper
+        internal class PocoDataMapperFactory : IDataMapper
         {
             public IDataMapperFactory Create<T>(object dataSource)
             {

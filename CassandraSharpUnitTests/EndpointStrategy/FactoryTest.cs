@@ -20,7 +20,6 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using System.Linq;
     using System.Net;
     using System.Numerics;
-    using CassandraSharp;
     using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
@@ -56,7 +55,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
                 throw new NotImplementedException();
             }
 
-            public void Update(IEnumerable<IPAddress> endpoints)
+            public void Update(IEnumerable<Peer> endpoints)
             {
                 throw new NotImplementedException();
             }

@@ -77,7 +77,7 @@ namespace cqlplus
                         Endpoints = new EndpointsConfig
                             {
                                     Servers = new[] {_cliArgs.Hostname},
-                                    Discovery = new DiscoveryConfig {Type = "Null"}
+//                                    Discovery = new DiscoveryConfig {Type = "Null"}
                             }
                 };
 
@@ -90,6 +90,17 @@ namespace cqlplus
                     Console.WriteLine("Connecting to {0}:{1}...", _cliArgs.Hostname, _cliArgs.Port);
                     const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
                     new Exec {Statement = checkStatement}.Execute();
+                    if (CommandContext.LastCommandFailed)
+                    {
+                        return;
+                    }
+
+                    Console.WriteLine();
+                    Console.WriteLine("Querying ring state...");
+                    const string peersStatement = "select rpc_address,tokens,release_version from system.peers";
+                    new Exec { Statement = peersStatement }.Execute();
+                    Console.WriteLine();
+
                     if (CommandContext.LastCommandFailed)
                     {
                         return;
