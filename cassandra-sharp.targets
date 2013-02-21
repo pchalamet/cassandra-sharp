@@ -36,6 +36,8 @@
 	<ItemGroup>
 		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CassandraSharpAssembly).dll" />
 		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CassandraSharpAssembly).pdb" />
+		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CQLPlusAssembly).exe" />
+		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CQLPlusAssembly).pdb" />
 	</ItemGroup>
 
 	<ItemGroup>

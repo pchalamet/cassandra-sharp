@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8B2359B2-4A73-4A49-8E1E-646014A768A4}</ProjectGuid>
+    <ProjectGuid>{78237ADE-F2F1-4297-8353-EF4E19F17656}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Samples</RootNamespace>
-    <AssemblyName>Samples</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>cqlplus</RootNamespace>
+    <AssemblyName>cqlplus</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -18,8 +18,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>$(SolutionDir)\bin\net45\Debug\</OutputPath>
-    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\bin\net40\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net40\Debug\</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,16 +29,26 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>$(SolutionDir)\bin\net45\Release\</OutputPath>
-    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Release\</BaseIntermediateOutputPath>
+    <OutputPath>$(SolutionDir)\bin\net40\Release\</OutputPath>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net40\Release\</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>cassandra.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\cassandra-sharp-version.cs">
@@ -50,14 +60,19 @@
     <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
+    <None Include="Parser\cqlplus.tpg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
-      <Project>{c1d252b7-d766-4c28-9c46-0696f896846c}</Project>
-      <Name>CassandraSharp-net45</Name>
+    <None Include="..\..\cassandra-sharp.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="cassandra.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net40.csproj">
+      <Project>{cca30206-6177-416c-9303-8d57d6038c77}</Project>
+      <Name>CassandraSharp-net40</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

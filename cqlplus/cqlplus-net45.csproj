@@ -47,6 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -63,16 +64,16 @@
     <None Include="Parser\cqlplus.tpg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
-      <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
-      <Name>CassandraSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\cassandra-sharp.snk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="cassandra.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
+      <Project>{c1d252b7-d766-4c28-9c46-0696f896846c}</Project>
+      <Name>CassandraSharp-net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -54,8 +54,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Thrift\Thrift-net45.csproj">
-      <Project>{81DA65BC-9ACD-4271-9ED0-84A3B3A1FB7A}</Project>
-      <Name>Thrift</Name>
+      <Project>{499eb63c-d74c-47e8-ae48-a2fc94538e9d}</Project>
+      <Name>Thrift-net45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
