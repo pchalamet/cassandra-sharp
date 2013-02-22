@@ -15,15 +15,16 @@
 
 namespace CassandraSharp.Discovery
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using CassandraSharp.Extensibility;
 
     internal class NullDiscoveryService : IDiscoveryService
     {
-        public IEnumerable<Peer> DiscoverPeers(ICluster cluster)
+        public void Dispose()
         {
-            return Enumerable.Empty<Peer>();
         }
+
+#pragma warning disable 67
+        public event TopologyUpdate OnTopologyUpdate;
+#pragma warning restore 67
     }
 }

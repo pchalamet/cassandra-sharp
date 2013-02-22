@@ -22,9 +22,13 @@ namespace CassandraSharp.Config
         public DiscoveryConfig()
         {
             Type = "Default";
+            Interval = 300;
         }
 
         [XmlAttribute("type")]
         public string Type { get; set; }
+
+        [XmlAttribute("interval")]
+        public int Interval { get; set; }
     }
 }

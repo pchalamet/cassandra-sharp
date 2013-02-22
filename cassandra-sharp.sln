@@ -34,8 +34,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp-net40", "Cas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus-net40", "cqlplus\cqlplus-net40.csproj", "{78237ADE-F2F1-4297-8353-EF4E19F17656}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legacy", "Legacy", "{C4449BDB-E2F5-4D46-99EF-910FF85C55D7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,9 +75,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{CCA30206-6177-416C-9303-8D57D6038C77} = {C4449BDB-E2F5-4D46-99EF-910FF85C55D7}
-		{78237ADE-F2F1-4297-8353-EF4E19F17656} = {C4449BDB-E2F5-4D46-99EF-910FF85C55D7}
 	EndGlobalSection
 EndGlobal

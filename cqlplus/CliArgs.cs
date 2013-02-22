@@ -41,6 +41,9 @@ namespace cqlplus
         [Argument(ArgumentType.AtMostOnce, HelpText = "Enable command tracing", ShortName = "trace")]
         public bool Tracing = false;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable discovery", ShortName = "disco")]
+        public bool Discovery = false;
+
         [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
         public string User = null;
     }

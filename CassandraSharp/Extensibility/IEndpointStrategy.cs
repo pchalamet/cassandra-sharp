@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.Extensibility
 {
-    using System.Collections.Generic;
     using System.Net;
     using System.Numerics;
 
@@ -30,6 +29,6 @@ namespace CassandraSharp.Extensibility
 
         void Permit(IPAddress endpoint);
 
-        void Update(IEnumerable<Peer> endpoints);
+        void Update(NotificationKind kind, Peer peer);
     }
 }

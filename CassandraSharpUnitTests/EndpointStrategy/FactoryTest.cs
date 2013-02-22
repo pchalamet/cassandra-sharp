@@ -55,7 +55,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
                 throw new NotImplementedException();
             }
 
-            public void Update(IEnumerable<Peer> endpoints)
+            public void Update(NotificationKind kind, Peer peer)
             {
                 throw new NotImplementedException();
             }

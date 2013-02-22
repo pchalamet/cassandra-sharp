@@ -79,19 +79,16 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-        public void Update(IEnumerable<Peer> endpoints)
+        public void Update(NotificationKind kind, Peer peer)
         {
             lock (_lock)
             {
                 bool updated = false;
-                foreach (Peer peer in endpoints)
+                IPAddress endpoint = peer.RpcAddress;
+                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
                 {
-                    IPAddress endpoint = peer.RpcAddress;
-                    if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
-                    {
-                        _healthyEndpoints.Add(endpoint);
-                        updated = true;
-                    }
+                    _healthyEndpoints.Add(endpoint);
+                    updated = true;
                 }
 
                 if (updated)

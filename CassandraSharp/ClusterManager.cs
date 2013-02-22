@@ -74,9 +74,10 @@ namespace CassandraSharp
 
             IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
                                                                                                                clusterConfig.Endpoints.Discovery,
-                                                                                                               _logger);
-            var newPeers = discoveryService.DiscoverPeers(cluster);
-            endpointsManager.Update(newPeers);
+                                                                                                               _logger,
+                                                                                                               cluster);
+
+            discoveryService.OnTopologyUpdate += endpointsManager.Update;
 
             return cluster;
         }

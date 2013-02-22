@@ -15,24 +15,12 @@
 
 namespace CassandraSharp.Extensibility
 {
-    public interface IBehaviorConfig
+    public enum NotificationKind
     {
-        //string KeySpace { get; }
+        Add,
 
-        //ConsistencyLevel? DefaultReadCL { get; }
+        Remove,
 
-        //int? DefaultTTL { get; }
-
-        //ConsistencyLevel? DefaultWriteCL { get; }
-
-        //int? MaxRetries { get; }
-
-        //bool? RetryOnNotFound { get; }
-
-        //bool? RetryOnTimeout { get; }
-
-        //bool? RetryOnUnavailable { get; }
-
-        //int? SleepBeforeRetry { get; }
+        Update,
     }
 }

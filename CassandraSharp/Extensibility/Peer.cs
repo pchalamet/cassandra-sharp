@@ -15,23 +15,13 @@
 
 namespace CassandraSharp.Extensibility
 {
-    public interface IInstanceBuilder
-    {
-        // data type can be:
-        //   * string
-        //   * byte[]
-        //   * double / double?
-        //   * float / float?
-        //   * long / long?
-        //   * int / int?
-        //   * DateTime / DateTime?
-        //   * Guid / Guid?
-        //   * IPAddress
-        //   * IList<V> with V same as data type
-        //   * ISet<V> with V same as data type
-        //   * IDictionary<K, V> with K, V same as data type
-        bool Set(IColumnSpec columnSpec, object data);
+    using System.Net;
+    using System.Numerics;
 
-        object Build();
+    public class Peer
+    {
+        public IPAddress RpcAddress { get; internal set; }
+
+        public BigInteger[] Tokens { get; internal set; }
     }
 }

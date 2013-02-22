@@ -21,65 +21,81 @@ namespace CassandraSharp.Discovery
     using System.Net;
     using System.Numerics;
     using System.Reactive.Linq;
-    using CassandraSharp.CQL;
+    using System.Timers;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
 
     internal class SystemPeersDiscoveryService : IDiscoveryService
     {
+        private readonly ICluster _cluster;
+
         private readonly ILogger _logger;
 
-        public SystemPeersDiscoveryService(ILogger logger)
+        private readonly IDataMapperFactory _peerFactory;
+
+        private readonly Timer _timer;
+
+        public SystemPeersDiscoveryService(ILogger logger, ICluster cluster, DiscoveryConfig config)
         {
+            PocoCommand.PocoDataMapperFactory mapper = new PocoCommand.PocoDataMapperFactory();
+            _peerFactory = mapper.Create<DiscoveredPeer>(null);
+
             _logger = logger;
+            _cluster = cluster;
+            _timer = new Timer(config.Interval*1000);
+            _timer.Elapsed += (s, e) => TryDiscover();
+            _timer.AutoReset = true;
+
+            TryDiscover();
         }
 
-        public IEnumerable<Peer> DiscoverPeers(ICluster cluster)
+        public void Dispose()
+        {
+            _timer.SafeDispose();
+        }
+
+        public event TopologyUpdate OnTopologyUpdate;
+
+        private void Notify(IPAddress rpcAddress, IEnumerable<string> tokens)
+        {
+            if (null != OnTopologyUpdate)
+            {
+                Peer peer = new Peer
+                    {
+                            RpcAddress = rpcAddress,
+                            Tokens = tokens.Select(BigInteger.Parse).ToArray()
+                    };
+
+                _logger.Info("Discovered peer {0}", rpcAddress);
+
+                OnTopologyUpdate(NotificationKind.Update, peer);
+            }
+        }
+
+        private void TryDiscover()
         {
             try
             {
-                IDataMapper mapper = new PocoCommand.PocoDataMapperFactory();
-                IConnection connection = cluster.GetConnection();
+                IConnection connection = _cluster.GetConnection();
 
-                IDataMapperFactory peerFactory = mapper.Create<DiscoveredPeer>();
                 var obsLocalPeer = CQLCommandHelpers.CreateQuery(connection, "select tokens from system.local",
-                                                                 ConsistencyLevel.ONE, peerFactory, ExecutionFlags.None).Cast<DiscoveredPeer>();
-                var taskLocalPeer = obsLocalPeer.AsFuture();
+                                                                 ConsistencyLevel.ONE, _peerFactory, ExecutionFlags.None).Cast<DiscoveredPeer>();
+                obsLocalPeer.Subscribe(x => Notify(connection.Endpoint, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
 
                 var obsPeers = CQLCommandHelpers.CreateQuery(connection, "select rpc_address,tokens from system.peers",
-                                                             ConsistencyLevel.ONE, peerFactory, ExecutionFlags.None).Cast<DiscoveredPeer>();
-                var taskPeers = obsPeers.AsFuture();
-
-                taskPeers.Wait();
-                taskLocalPeer.Wait();
-
-                List<Peer> result = new List<Peer>();
-                foreach (var op in taskPeers.Result)
-                {
-                    var peer = new Peer
-                        {
-                                RpcAddress = op.RpcAddress,
-                                Tokens = op.Tokens.Select(BigInteger.Parse).ToArray()
-                        };
-                    result.Add(peer);
-                }
-
-                var localPeer = (from lp in taskLocalPeer.Result
-                                 select new Peer {RpcAddress = connection.Endpoint, Tokens = lp.Tokens.Select(BigInteger.Parse).ToArray()}).Single();
-                result.Add(localPeer);
-
-                return result;
+                                                             ConsistencyLevel.ONE, _peerFactory, ExecutionFlags.None).Cast<DiscoveredPeer>();
+                obsPeers.Subscribe(x => Notify(x.RpcAddress, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
             }
             catch (Exception ex)
             {
-                _logger.Error("Discovery failed with error {0}", ex);
+                _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex);
             }
-
-            return Enumerable.Empty<Peer>();
         }
 
-        private class DiscoveredPeer
+        internal class DiscoveredPeer
         {
             public IPAddress RpcAddress { get; internal set; }
 

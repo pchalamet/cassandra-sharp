@@ -15,19 +15,12 @@
 
 namespace CassandraSharp.Extensibility
 {
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Numerics;
+    using System;
 
-    public class Peer
+    public delegate void TopologyUpdate(NotificationKind kind, Peer peer);
+
+    public interface IDiscoveryService : IDisposable
     {
-        public IPAddress RpcAddress { get; internal set; }
-
-        public BigInteger[] Tokens { get; internal set; }
-    }
-
-    public interface IDiscoveryService
-    {
-        IEnumerable<Peer> DiscoverPeers(ICluster cluster);
+        event TopologyUpdate OnTopologyUpdate;
     }
 }
