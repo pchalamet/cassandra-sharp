@@ -19,7 +19,7 @@ namespace CassandraSharp.Utils.Stream
 
     internal static class DateTimeExtensions
     {
-        public static readonly DateTime _epoch = new DateTime(1970, 1, 1);
+        private static readonly DateTime _epoch = new DateTime(1970, 1, 1);
 
         public static long ToTimestamp(this DateTime dt)
         {
