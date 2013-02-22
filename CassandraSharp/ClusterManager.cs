@@ -19,6 +19,7 @@ namespace CassandraSharp
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
@@ -76,10 +77,9 @@ namespace CassandraSharp
                                                                                                                clusterConfig.Endpoints.Discovery,
                                                                                                                _logger,
                                                                                                                cluster);
-
             discoveryService.OnTopologyUpdate += endpointsManager.Update;
 
-            return cluster;
+            return new ClusterWithDependencies(cluster, discoveryService);
         }
 
         private static ClusterConfig GetClusterConfig(string name)
@@ -138,6 +138,30 @@ namespace CassandraSharp
                 _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
+            }
+        }
+
+        private class ClusterWithDependencies : ICluster
+        {
+            private readonly ICluster _cluster;
+
+            private readonly IDiscoveryService _discoveryService;
+
+            public ClusterWithDependencies(ICluster cluster, IDiscoveryService discoveryService)
+            {
+                _cluster = cluster;
+                _discoveryService = discoveryService;
+            }
+
+            public void Dispose()
+            {
+                _discoveryService.SafeDispose();
+                _cluster.SafeDispose();
+            }
+
+            public IConnection GetConnection(BigInteger? token = null)
+            {
+                return _cluster.GetConnection(token);
             }
         }
     }

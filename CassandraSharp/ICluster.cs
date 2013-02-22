@@ -18,6 +18,8 @@ namespace CassandraSharp
     using System;
     using System.Numerics;
 
+    public delegate void ClusterShutdown();
+
     /// <summary>
     ///     Primary interface to execute commands against a Cassandra cluster Implementation of this interface must be thread safe
     /// </summary>
