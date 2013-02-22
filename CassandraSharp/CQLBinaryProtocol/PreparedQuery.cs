@@ -56,7 +56,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 {
                     if (null == (connection = _connection))
                     {
-                        connection = _cluster.GetConnection(null);
+                        connection = _cluster.GetConnection();
                         connection.OnFailure += ConnectionOnOnFailure;
 
                         var obsPrepare = CQLCommandHelpers.CreatePrepareQuery(connection, _cql, _executionFlags);
