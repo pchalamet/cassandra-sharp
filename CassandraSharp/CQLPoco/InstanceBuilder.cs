@@ -27,8 +27,7 @@ namespace CassandraSharp.CQLPoco
 
         public InstanceBuilder()
         {
-            // TODO: intance creation should be performed with the help of the accessor
-            _instance = (T) Activator.CreateInstance(typeof(T));
+            _instance = _accessor.CreateInstance();
         }
 
         public bool Set(IColumnSpec columnSpec, object data)

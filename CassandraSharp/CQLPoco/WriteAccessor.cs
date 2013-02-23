@@ -23,9 +23,17 @@ namespace CassandraSharp.CQLPoco
     {
         private readonly WriteValue _writeValue;
 
+        private readonly NewInstance _newInstance;
+
         public WriteAccessor()
         {
-            _writeValue = Generate();
+            _writeValue = GenerateWrite();
+            _newInstance = GenerateNew();
+        }
+
+        public T CreateInstance()
+        {
+            return _newInstance();
         }
 
         public bool Set(ref T target, string name, object value)
@@ -33,7 +41,7 @@ namespace CassandraSharp.CQLPoco
             return _writeValue(ref target, name, value);
         }
 
-        private WriteValue Generate()
+        private WriteValue GenerateWrite()
         {
             Type type = typeof(T);
             string methodName = "WriteToObject" + Guid.NewGuid();
@@ -52,6 +60,33 @@ namespace CassandraSharp.CQLPoco
 
             WriteValue writeValue = (WriteValue) dm.CreateDelegate(typeof(WriteValue));
             return writeValue;
+        }
+
+        private static NewInstance GenerateNew()
+        {
+            Type type = typeof(T);
+            string methodName = "New" + Guid.NewGuid();
+            var dm = new DynamicMethod(methodName, type, new Type[0], type.Module, true);
+            ILGenerator gen = dm.GetILGenerator();
+
+            if (type.IsClass)
+            {
+                const BindingFlags ctorFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+                ConstructorInfo ctor = type.GetConstructor(ctorFlags, null, new Type[0], null);
+                gen.Emit(OpCodes.Newobj, ctor);
+            }
+            else
+            {
+                gen.DeclareLocal(type);
+
+                gen.Emit(OpCodes.Ldloca_S, 0);
+                gen.Emit(OpCodes.Initobj, type);
+                gen.Emit(OpCodes.Ldloc_0);
+            }
+            gen.Emit(OpCodes.Ret);
+
+            NewInstance newInstance = (NewInstance)dm.CreateDelegate(typeof(NewInstance));
+            return newInstance;
         }
 
         protected override void GenerateMemberAccess(ILGenerator gen, MemberInfo mi)
@@ -95,5 +130,7 @@ namespace CassandraSharp.CQLPoco
         }
 
         private delegate bool WriteValue(ref T dataSource, string name, object value);
+
+        private delegate T NewInstance();
     }
 }
