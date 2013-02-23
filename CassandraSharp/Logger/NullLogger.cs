@@ -39,11 +39,6 @@ namespace CassandraSharp.Logger
         {
         }
 
-        public bool IsDebugEnabled()
-        {
-            return false;
-        }
-
         public void Dispose()
         {
         }

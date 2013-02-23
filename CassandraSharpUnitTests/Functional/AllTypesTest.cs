@@ -22,7 +22,9 @@ namespace CassandraSharpUnitTests.Functional
     using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
+    using CassandraSharp.Utils;
     using CassandraSharpUnitTests.EndpointStrategy;
+    using CassandraSharpUnitTests.Utils;
     using NUnit.Framework;
 
     [TestFixture]

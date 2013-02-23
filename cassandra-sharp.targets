@@ -9,9 +9,6 @@
 	
 	<PropertyGroup>
 		<OutDir>OutDir</OutDir>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<ZipDir>$(OutDir)\Zip</ZipDir>
 	</PropertyGroup>
 
@@ -27,24 +24,23 @@
     </PropertyGroup>
 
     <PropertyGroup>
-		<CassandraSharpProjectName>cassandra-sharp</CassandraSharpProjectName>
-        <CassandraSharpAssembly>CassandraSharp</CassandraSharpAssembly>
+		<ProjectName>cassandra-sharp</ProjectName>
         <CQLPlusAssembly>cqlplus</CQLPlusAssembly>
         <ChangesFile>CHANGES.txt</ChangesFile>
     </PropertyGroup>
 
 	<ItemGroup>
-		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CassandraSharpAssembly).dll" />
-		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CassandraSharpAssembly).pdb" />
-		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CQLPlusAssembly).exe" />
-		<ZipFilesCopy-net40 Include="bin\net40\$(Configuration)\$(CQLPlusAssembly).pdb" />
+		<Files-net40 Include="bin\net40\$(Configuration)\CassandraSharp.dll" />
+		<Files-net40 Include="bin\net40\$(Configuration)\CassandraSharp.pdb" />
+		<Files-net40 Include="bin\net40\$(Configuration)\cqlplus.exe" />
+		<Files-net40 Include="bin\net40\$(Configuration)\cqlplus.pdb" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CassandraSharpAssembly).dll" />
-		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CassandraSharpAssembly).pdb" />
-		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CQLPlusAssembly).exe" />
-		<ZipFilesCopy-net45 Include="bin\net45\$(Configuration)\$(CQLPlusAssembly).pdb" />
+		<Files-net45 Include="bin\net45\$(Configuration)\CassandraSharp.dll" />
+		<Files-net45 Include="bin\net45\$(Configuration)\CassandraSharp.pdb" />
+		<Files-net45 Include="bin\net45\$(Configuration)\cqlplus.exe" />
+		<Files-net45 Include="bin\net45\$(Configuration)\cqlplus.pdb" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -64,7 +60,7 @@
 	</Target>
 	
     <Target Name="GenerateAssemblyInfo">
-        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)$(VersionStatus)" OutputFile="$(CassandraSharpProjectName)-version.cs" />
+        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)$(VersionStatus)" OutputFile="$(ProjectName)-version.cs" />
     </Target>
 
     <Target Name="GenerateThrift">
@@ -72,12 +68,12 @@
     </Target>
 
     <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo;GenerateThrift">
-        <MSBuild Projects="$(CassandraSharpProjectName).sln" />
+        <MSBuild Projects="$(ProjectName).sln" />
     </Target>
 
 	<Target Name="BuildZipPackage" DependsOnTargets="Clean;Compile">
-		<Copy SourceFiles="@(ZipFilesCopy-net40)" DestinationFolder="$(ZipDir)\net40" />
-		<Copy SourceFiles="@(ZipFilesCopy-net45)" DestinationFolder="$(ZipDir)\net45" />
+		<Copy SourceFiles="@(Files-net40)" DestinationFolder="$(ZipDir)\net40" />
+		<Copy SourceFiles="@(Files-net45)" DestinationFolder="$(ZipDir)\net45" />
 		<Copy SourceFiles="@(Rx-net45)" DestinationFolder="$(ZipDir)\net45" />
 		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(ZipDir) " />
 
@@ -85,18 +81,18 @@
             <ZipFiles Include="$(ZipDir)\**\*.*" />
         </ItemGroup>
 		
-        <Zip ZipFileName="$(OutDir)\$(CassandraSharpProjectName)-bin-$(Version)$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
+        <Zip ZipFileName="$(OutDir)\$(ProjectName)-bin-$(Version)$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
 	</Target>
 	
-	<Target Name="BuildNuGetPackage" DependsOnTargets="Compile">
-		<Copy SourceFiles="@(ZipFilesCopy-net40)" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
-		<Copy SourceFiles="@(ZipFilesCopy-net45)" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
+	<Target Name="BuildNuGetPackage" DependsOnTargets="Clean;Compile">
+		<Copy SourceFiles="@(Files-net40)" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
+		<Copy SourceFiles="@(Files-net45)" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
 		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(NuGetPackageDir)" />
-		<Copy SourceFiles="$(CassandraSharpProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
+		<Copy SourceFiles="$(ProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
 	
-		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)$(VersionStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(ProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)$(VersionStatus)" />
 
-		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(CassandraSharpProjectName).nuspec -OutputDirectory $(OutDir)" />
+		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(ProjectName).nuspec -OutputDirectory $(OutDir)" />
 	</Target>
 	
     <Target Name="GenerateVersion" DependsOnTargets="BuildZipPackage;BuildNuGetPackage">

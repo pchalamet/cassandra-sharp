@@ -28,7 +28,5 @@ namespace CassandraSharp.Extensibility
         void Error(string format, params object[] prms);
 
         void Fatal(string format, params object[] prms);
-
-        bool IsDebugEnabled();
     }
 }

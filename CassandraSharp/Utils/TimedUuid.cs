@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.EndpointStrategy
+namespace CassandraSharp.Utils
 {
     using System;
 
@@ -28,7 +28,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         Random = 0x04
     }
 
-    internal static class TimedUuid
+    public static class TimedUuid
     {
         // number of bytes in guid
         private const int BYTE_ARRAY_SIZE = 16;
@@ -90,7 +90,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
             return GenerateTimeBasedGuid(dateTime, _randomNode);
         }
 
-        public static Guid GenerateTimeBasedGuid(DateTime dateTime, byte[] node)
+        private static Guid GenerateTimeBasedGuid(DateTime dateTime, byte[] node)
         {
             dateTime = dateTime.ToUniversalTime();
             long ticks = (dateTime - _gregorianCalendarStart).Ticks;
