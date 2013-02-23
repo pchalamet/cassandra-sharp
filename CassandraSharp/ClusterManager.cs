@@ -78,8 +78,9 @@ namespace CassandraSharp
                                                                                                                _logger,
                                                                                                                cluster);
             discoveryService.OnTopologyUpdate += endpointsManager.Update;
+            cluster.OnClosed += discoveryService.SafeDispose;
 
-            return new ClusterWithDependencies(cluster, discoveryService);
+            return cluster;
         }
 
         private static ClusterConfig GetClusterConfig(string name)
@@ -138,30 +139,6 @@ namespace CassandraSharp
                 _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
-            }
-        }
-
-        private class ClusterWithDependencies : ICluster
-        {
-            private readonly ICluster _cluster;
-
-            private readonly IDiscoveryService _discoveryService;
-
-            public ClusterWithDependencies(ICluster cluster, IDiscoveryService discoveryService)
-            {
-                _cluster = cluster;
-                _discoveryService = discoveryService;
-            }
-
-            public void Dispose()
-            {
-                _discoveryService.SafeDispose();
-                _cluster.SafeDispose();
-            }
-
-            public IConnection GetConnection(BigInteger? token = null)
-            {
-                return _cluster.GetConnection(token);
             }
         }
     }

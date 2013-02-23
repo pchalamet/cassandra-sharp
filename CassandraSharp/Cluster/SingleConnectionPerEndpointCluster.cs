@@ -46,6 +46,8 @@ namespace CassandraSharp.Cluster
             _recoveryService = recoveryService;
         }
 
+        public event ClusterClosed OnClosed;
+
         public IConnection GetConnection(BigInteger? token = null)
         {
             lock (_globalLock)
@@ -92,6 +94,11 @@ namespace CassandraSharp.Cluster
                     connection.SafeDispose();
                 }
                 _ip2Connection.Clear();
+
+                if (null != OnClosed)
+                {
+                    OnClosed();
+                }
             }
         }
 
