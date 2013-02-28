@@ -16,7 +16,6 @@
 namespace CassandraSharp.Transport
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -37,25 +36,25 @@ namespace CassandraSharp.Transport
     {
         private const byte MAX_STREAMID = 0x80;
 
-        private readonly ConcurrentStack<byte> _availableStreamIds = new ConcurrentStack<byte>();
+        private readonly Stack<byte> _availableStreamIds = new Stack<byte>();
 
         private readonly TransportConfig _config;
 
         private readonly IInstrumentation _instrumentation;
 
+        private readonly object _lock = new object();
+
         private readonly ILogger _logger;
 
-        private readonly ConcurrentQueue<QueryInfo> _pendingQueries = new ConcurrentQueue<QueryInfo>();
-
-        private readonly AutoResetEvent _pulseWriter = new AutoResetEvent(false);
+        private readonly Queue<QueryInfo> _pendingQueries = new Queue<QueryInfo>();
 
         private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
 
-        private readonly TcpClient _tcpClient;
-
         private readonly Socket _socket;
 
-        private int _isClosed;
+        private readonly TcpClient _tcpClient;
+
+        private bool _isClosed;
 
         public LongRunningConnection(IPAddress address, TransportConfig config, ILogger logger, IInstrumentation instrumentation)
         {
@@ -105,8 +104,16 @@ namespace CassandraSharp.Transport
                             IObserver<object> observer)
         {
             QueryInfo queryInfo = new QueryInfo(writer, reader, token, observer);
-            _pendingQueries.Enqueue(queryInfo);
-            _pulseWriter.Set();
+            lock (_lock)
+            {
+                if (_isClosed)
+                {
+                    throw new OperationCanceledException();
+                }
+
+                _pendingQueries.Enqueue(queryInfo);
+                Monitor.Pulse(_lock);
+            }
         }
 
         public void Dispose()
@@ -133,12 +140,16 @@ namespace CassandraSharp.Transport
         private void Close(bool notifyFailure)
         {
             // already in close state ?
-            if (1 == Interlocked.Exchange(ref _isClosed, 1))
+            lock (_lock)
             {
-                return;
-            }
+                if (_isClosed)
+                {
+                    return;
+                }
 
-            _pulseWriter.Set();
+                _isClosed = true;
+                Monitor.Pulse(_lock);
+            }
 
             _tcpClient.SafeDispose();
 
@@ -173,48 +184,71 @@ namespace CassandraSharp.Transport
 
         private void SendQuery()
         {
-            while (0 == Thread.VolatileRead(ref _isClosed))
+            while (true)
             {
                 QueryInfo queryInfo;
-                if (_pendingQueries.TryDequeue(out queryInfo))
+                lock (_lock)
                 {
-                    try
+                    while (0 == _pendingQueries.Count)
                     {
-                        // acquire the global lock to write the request
-                        InstrumentationToken token = queryInfo.Token;
-                        bool tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
-                        using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(tracing))
+                        if (_isClosed)
                         {
-                            queryInfo.Writer(bufferingFrameWriter);
+                            return;
+                        }
+                        Monitor.Wait(_lock);
+                    }
+                    if (_isClosed)
+                    {
+                        return;
+                    }
 
-                            byte streamId;
-                            while (!_availableStreamIds.TryPop(out streamId))
+                    queryInfo = _pendingQueries.Dequeue();
+                }
+
+                try
+                {
+                    // acquire the global lock to write the request
+                    InstrumentationToken token = queryInfo.Token;
+                    bool tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
+                    using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(tracing))
+                    {
+                        queryInfo.Writer(bufferingFrameWriter);
+
+                        byte streamId;
+                        lock (_lock)
+                        {
+                            while (0 == _availableStreamIds.Count)
                             {
-                                _pulseWriter.WaitOne();
-
-                                if (0 != Thread.VolatileRead(ref _isClosed))
+                                if (_isClosed)
                                 {
-                                    throw new OperationCanceledException();
+                                    return;
                                 }
+                                Monitor.Wait(_lock);
+                            }
+                            if (_isClosed)
+                            {
+                                return;
                             }
 
-                            _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
-                            _instrumentation.ClientTrace(token, EventType.BeginWrite);
-
-                            _queryInfos[streamId] = queryInfo;
-                            bufferingFrameWriter.SendFrame(streamId, _socket);
-
-                            _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
-                            _instrumentation.ClientTrace(token, EventType.EndWrite);
+                            streamId = _availableStreamIds.Pop();
                         }
+
+                        _logger.Debug("Starting writing frame for stream {0}@{1}", streamId, Endpoint);
+                        _instrumentation.ClientTrace(token, EventType.BeginWrite);
+
+                        _queryInfos[streamId] = queryInfo;
+                        bufferingFrameWriter.SendFrame(streamId, _socket);
+
+                        _logger.Debug("Done writing frame for stream {0}@{1}", streamId, Endpoint);
+                        _instrumentation.ClientTrace(token, EventType.EndWrite);
                     }
-                    catch (Exception ex)
+                }
+                catch (Exception ex)
+                {
+                    queryInfo.Observer.OnError(ex);
+                    if (ex is SocketException || ex is IOException)
                     {
-                        queryInfo.Observer.OnError(ex);
-                        if (ex is SocketException || ex is IOException)
-                        {
-                            throw;
-                        }
+                        throw;
                     }
                 }
             }
@@ -242,9 +276,11 @@ namespace CassandraSharp.Transport
                     byte streamId = frameReader.StreamId;
                     QueryInfo queryInfo = _queryInfos[streamId];
                     _queryInfos[streamId] = null;
-                    _availableStreamIds.Push(streamId);
-
-                    _pulseWriter.Set();
+                    lock (_lock)
+                    {
+                        _availableStreamIds.Push(streamId);
+                        Monitor.Pulse(_lock);
+                    }
 
                     _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
                     IObserver<object> observer = queryInfo.Observer;
