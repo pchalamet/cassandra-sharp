@@ -15,12 +15,11 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    using System.Collections.Generic;
     using CassandraSharp.Extensibility;
 
     internal class DataMapperFactory : IDataMapperFactory
     {
-        public DataMapperFactory(IDictionary<string, object> dataSource)
+        public DataMapperFactory(PropertyBag dataSource)
         {
             if (null != dataSource)
             {

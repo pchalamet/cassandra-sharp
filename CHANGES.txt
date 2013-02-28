@@ -8,6 +8,7 @@ version 3.0.0 [not released]
 - official support for nullable (NOTE: sending null in prepare statement is supported but only with C* 1.2.2+)
 - receive and send timeout support (disabled by default)
 - keep alive support (by default, using OS configuration)
+- changed the PropertyBag interface : use a typed class instead of IDictionary
 
 version 2.3.1
 - fixed connection leak on read error

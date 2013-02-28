@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,20 +21,20 @@ namespace Samples
     using Samples.Linq;
     using Samples.POCO;
     using Samples.PreparedStatement;
+    using Samples.PropertyBag;
     using Samples.TimeOut;
 
     internal class Program
     {
         private static void Main(string[] args)
         {
-            //new Stress.ResilienceTest().RecoveryTest();
-
             new PocoSample().Run();
             new TimeOutSample().Run();
             new BatchSample().Run();
             new LinqSample().Run();
             new FutureSample().Run();
             new AsyncSample().Run();
+            new PropertyBagSample().Run();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

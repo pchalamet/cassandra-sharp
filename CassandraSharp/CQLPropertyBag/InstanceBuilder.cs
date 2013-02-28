@@ -15,12 +15,11 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    using System.Collections.Generic;
     using CassandraSharp.Extensibility;
 
     internal class InstanceBuilder : IInstanceBuilder
     {
-        private readonly Dictionary<string, object> _data = new Dictionary<string, object>();
+        private readonly PropertyBag _data = new PropertyBag();
 
         public bool Set(IColumnSpec columnSpec, object data)
         {

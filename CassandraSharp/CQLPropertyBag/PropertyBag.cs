@@ -15,20 +15,31 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
+    using System.Linq;
 
-    internal class DataSource : IDataSource
+    public class PropertyBag
     {
-        private readonly PropertyBag _dataSource;
+        private readonly Dictionary<string, object> _map = new Dictionary<string, object>();
 
-        public DataSource(PropertyBag dataSource)
+        public object this[string name]
         {
-            _dataSource = dataSource;
+            get
+            {
+                string lowName = name.ToLower().Replace("_", "");
+                return _map[lowName];
+            }
+
+            set
+            {
+                string lowName = name.ToLower().Replace("_", "");
+                _map[lowName] = value;
+            }
         }
 
-        public object Get(IColumnSpec columnSpec)
+        public string[] Keys
         {
-            return _dataSource[columnSpec.Name];
+            get { return _map.Keys.ToArray(); }
         }
     }
 }
