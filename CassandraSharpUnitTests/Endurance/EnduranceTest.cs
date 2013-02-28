@@ -19,7 +19,6 @@ namespace CassandraSharpUnitTests.Endurance
     using System.Diagnostics;
     using System.Threading;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using NUnit.Framework;

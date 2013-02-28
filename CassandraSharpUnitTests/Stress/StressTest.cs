@@ -21,7 +21,6 @@ namespace CassandraSharpUnitTests.Stress
     using System.Net.Sockets;
     using System.Threading;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;

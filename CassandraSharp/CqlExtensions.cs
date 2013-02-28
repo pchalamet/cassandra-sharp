@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQL
+namespace CassandraSharp
 {
     using System;
     using System.Collections.Generic;

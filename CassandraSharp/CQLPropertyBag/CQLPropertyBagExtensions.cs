@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPropertyBag
 {
     public static class CQLPropertyBagExtensions
     {
-        public static ICqlCommand CreatePropertyBagCommand(this ICluster @this)
+        public static PropertyBagCommand CreatePropertyBagCommand(this ICluster @this)
         {
             return new PropertyBagCommand(@this);
         }

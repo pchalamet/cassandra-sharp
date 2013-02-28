@@ -19,7 +19,6 @@ namespace CassandraSharpUnitTests.Functional
     using System.Linq;
     using System.Net;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Utils;

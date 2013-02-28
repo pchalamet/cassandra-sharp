@@ -19,7 +19,6 @@ namespace Samples.Linq
     using System.Collections.Generic;
     using System.Linq;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class SchemaColumns

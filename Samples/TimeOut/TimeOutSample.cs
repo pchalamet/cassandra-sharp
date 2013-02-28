@@ -20,7 +20,6 @@ namespace Samples.TimeOut
     using System.Threading;
     using System.Threading.Tasks;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class SchemaKeyspaces

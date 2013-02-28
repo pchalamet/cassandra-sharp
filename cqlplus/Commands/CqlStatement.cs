@@ -19,7 +19,6 @@ namespace cqlplus.Commands
     using System.Linq;
     using System.Threading.Tasks;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPropertyBag;
 
     internal class CqlStatement : CommandBase

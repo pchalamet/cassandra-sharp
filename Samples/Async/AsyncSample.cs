@@ -19,7 +19,6 @@ namespace Samples.Async
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
 
     public class SchemaKeyspaces

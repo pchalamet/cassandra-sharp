@@ -19,7 +19,6 @@ namespace CassandraSharp.Instrumentation
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;

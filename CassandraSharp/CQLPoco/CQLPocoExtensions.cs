@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPoco
 {
     public static class CQLPocoExtensions
     {
-        public static ICqlCommand CreatePocoCommand(this ICluster @this)
+        public static PocoCommand CreatePocoCommand(this ICluster @this)
         {
             return new PocoCommand(@this);
         }

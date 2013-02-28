@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using System;
     using System.Collections.Generic;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
@@ -24,6 +25,18 @@ namespace CassandraSharp.CQLPropertyBag
         internal PropertyBagCommand(ICluster cluster)
                 : base(cluster, new PropertyBagMapperFactory())
         {
+        }
+
+        public IObservable<IDictionary<string, object>> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                                                ExecutionFlags executionFlags = ExecutionFlags.None,
+                                                                object key = null)
+        {
+            return Execute<IDictionary<string, object>>(cql, cl, executionFlags, key);
+        }
+
+        public IPreparedQuery<IDictionary<string, object>> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            return Prepare<IDictionary<string, object>>(cql, executionFlags);
         }
 
         private class PropertyBagMapperFactory : IDataMapper

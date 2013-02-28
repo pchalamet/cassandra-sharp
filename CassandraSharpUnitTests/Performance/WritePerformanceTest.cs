@@ -25,7 +25,6 @@ namespace CassandraSharpUnitTests.Performance
     using System.Threading;
     using Apache.Cassandra;
     using CassandraSharp;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;

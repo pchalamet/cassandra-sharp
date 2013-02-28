@@ -18,7 +18,6 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System;
     using System.Linq;
     using System.Reactive.Linq;
-    using CassandraSharp.CQL;
     using CassandraSharp.Extensibility;
 
     internal class PreparedQuery<T> : IPreparedQuery<T>

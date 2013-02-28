@@ -25,7 +25,6 @@ namespace CassandraSharp.Transport
     using System.Security.Authentication;
     using System.Threading;
     using System.Threading.Tasks;
-    using CassandraSharp.CQL;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
