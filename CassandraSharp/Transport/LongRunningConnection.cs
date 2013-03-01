@@ -106,13 +106,14 @@ namespace CassandraSharp.Transport
             QueryInfo queryInfo = new QueryInfo(writer, reader, token, observer);
             lock (_lock)
             {
+                Monitor.Pulse(_lock);
+
                 if (_isClosed)
                 {
                     throw new OperationCanceledException();
                 }
 
                 _pendingQueries.Enqueue(queryInfo);
-                Monitor.Pulse(_lock);
             }
         }
 
@@ -142,13 +143,14 @@ namespace CassandraSharp.Transport
             // already in close state ?
             lock (_lock)
             {
+                Monitor.Pulse(_lock);
+
                 if (_isClosed)
                 {
                     return;
                 }
 
                 _isClosed = true;
-                Monitor.Pulse(_lock);
             }
 
             _tcpClient.SafeDispose();
@@ -189,16 +191,13 @@ namespace CassandraSharp.Transport
                 QueryInfo queryInfo;
                 lock (_lock)
                 {
-                    while (0 == _pendingQueries.Count)
+                    while (!_isClosed && 0 == _pendingQueries.Count)
                     {
-                        if (_isClosed)
-                        {
-                            return;
-                        }
                         Monitor.Wait(_lock);
                     }
                     if (_isClosed)
                     {
+                        Monitor.Pulse(_lock);
                         return;
                     }
 
@@ -217,16 +216,13 @@ namespace CassandraSharp.Transport
                         byte streamId;
                         lock (_lock)
                         {
-                            while (0 == _availableStreamIds.Count)
+                            while (!_isClosed && 0 == _availableStreamIds.Count)
                             {
-                                if (_isClosed)
-                                {
-                                    return;
-                                }
                                 Monitor.Wait(_lock);
                             }
                             if (_isClosed)
                             {
+                                Monitor.Pulse(_lock);
                                 return;
                             }
 
