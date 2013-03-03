@@ -32,7 +32,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         }
 
         public IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None,
-                                         object key = null)
+                                         QueryHint hint = null)
         {
             IDataMapperFactory factory = DataMapper.Create<T>();
             IConnection connection = Cluster.GetConnection();

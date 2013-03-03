@@ -27,6 +27,6 @@ namespace CassandraSharp
     {
         event ClusterClosed OnClosed;
 
-        IConnection GetConnection(BigInteger? token = null);
+        IConnection GetConnection(QueryHint hint = null);
     }
 }

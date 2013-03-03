@@ -48,7 +48,24 @@ namespace CassandraSharp.Cluster
 
         public event ClusterClosed OnClosed;
 
-        public IConnection GetConnection(BigInteger? token = null)
+        public void Dispose()
+        {
+            lock (_globalLock)
+            {
+                foreach (IConnection connection in _ip2Connection.Values)
+                {
+                    connection.SafeDispose();
+                }
+                _ip2Connection.Clear();
+
+                if (null != OnClosed)
+                {
+                    OnClosed();
+                }
+            }
+        }
+
+        public IConnection GetConnection(QueryHint hint = null)
         {
             lock (_globalLock)
             {
@@ -58,7 +75,7 @@ namespace CassandraSharp.Cluster
                     while (null == connection)
                     {
                         // pick and initialize a new endpoint connection
-                        IPAddress endpoint = _endpointStrategy.Pick(token);
+                        IPAddress endpoint = _endpointStrategy.Pick(hint);
                         if (null == endpoint)
                         {
                             throw new ArgumentException("Can't find any valid endpoint");
@@ -81,23 +98,6 @@ namespace CassandraSharp.Cluster
                 {
                     connection.SafeDispose();
                     throw;
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            lock (_globalLock)
-            {
-                foreach (IConnection connection in _ip2Connection.Values)
-                {
-                    connection.SafeDispose();
-                }
-                _ip2Connection.Clear();
-
-                if (null != OnClosed)
-                {
-                    OnClosed();
                 }
             }
         }

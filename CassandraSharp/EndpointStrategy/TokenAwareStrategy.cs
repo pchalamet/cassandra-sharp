@@ -20,102 +20,120 @@ namespace CassandraSharp.EndpointStrategy
     using System.Net;
     using System.Numerics;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
 
     internal class TokenAwareStrategy : IEndpointStrategy
     {
-        private readonly List<IPAddress> _endpoints = new List<IPAddress>();
+        private readonly IComparer<Partition> _comparer = new TokenComparer();
 
         private readonly object _lock = new object();
 
-        private readonly SortedDictionary<BigInteger, int> _ring = new SortedDictionary<BigInteger, int>();
+        private readonly Partition[] _partitions = new Partition[0];
 
-        private readonly List<bool> _stateEndpoints = new List<bool>();
+        private readonly Dictionary<IPAddress, bool> _stateEndpoints = new Dictionary<IPAddress, bool>();
 
         public TokenAwareStrategy(IEnumerable<IPAddress> endpoints)
         {
             foreach (IPAddress endpoint in endpoints)
             {
-                Enable(endpoint, true);
+                _stateEndpoints[endpoint] = true;
             }
         }
 
-        public IPAddress Pick(BigInteger? token = null)
+        public IPAddress Pick(QueryHint hint)
         {
-            if (token.HasValue)
+            if (null == hint)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("hint");
             }
 
-            BigInteger tokenValue = token.Value;
+            // TODO: convert Key to BigInteger
+            BigInteger tokenValue = 0;
+
+            Partition tmpPartition = new Partition {Token = tokenValue};
             lock (_lock)
             {
-                int idx = _endpoints.Count - 1;
-                foreach (KeyValuePair<BigInteger, int> kvp in _ring)
+                int idx = Array.BinarySearch(_partitions, tmpPartition, _comparer);
+                if (idx < 0)
                 {
-                    if (tokenValue < kvp.Key)
-                    {
-                        idx = kvp.Value;
-                        break;
-                    }
+                    idx = ~idx;
                 }
 
-                return _endpoints[idx];
+                int rf = hint.ReplicationFactor;
+                while (rf > 0)
+                {
+                    idx = idx%_partitions.Length;
+                    IPAddress endpoint = _partitions[idx].Node;
+                    if (_stateEndpoints[endpoint])
+                    {
+                        return endpoint;
+                    }
+
+                    --rf;
+                    ++idx;
+                }
+
+                return null;
             }
         }
 
         public void Ban(IPAddress endpoint)
         {
             lock (_lock)
-                Enable(endpoint, false);
+                _stateEndpoints[endpoint] = false;
         }
 
         public void Permit(IPAddress endpoint)
         {
             lock (_lock)
-                Enable(endpoint, true);
+                _stateEndpoints[endpoint] = true;
         }
 
         public void Update(NotificationKind kind, Peer peer)
         {
             lock (_lock)
             {
-                int idx = _endpoints.IndexOf(peer.RpcAddress);
-                if (-1 == idx)
-                {
-                    idx = Enable(peer.RpcAddress, true);
-                }
-
                 switch (kind)
                 {
                     case NotificationKind.Add:
                     case NotificationKind.Update:
+                        IPAddress endpoint = peer.RpcAddress;
+                        if (!_stateEndpoints.ContainsKey(endpoint))
+                        {
+                            _stateEndpoints[endpoint] = true;
+                        }
+
                         foreach (BigInteger token in peer.Tokens)
                         {
-                            _ring[token] = idx;
+                            Partition newPartition = new Partition {Node = endpoint, Token = token};
+                            _partitions.BinaryAdd(newPartition, _comparer);
                         }
                         break;
 
                     case NotificationKind.Remove:
-                        _stateEndpoints.RemoveAt(idx);
-                        _endpoints.RemoveAt(idx);
                         foreach (BigInteger token in peer.Tokens)
                         {
-                            _ring.Remove(token);
+                            Partition newPartition = new Partition {Token = token};
+                            _partitions.BinaryRemove(newPartition, _comparer);
                         }
                         break;
                 }
             }
         }
 
-        private int Enable(IPAddress endpoint, bool state)
+        private struct Partition
         {
-            int idx = _endpoints.IndexOf(endpoint);
-            if (-1 != idx)
-            {
-                _stateEndpoints[idx] = state;
-            }
+            public IPAddress Node;
 
-            return idx;
+            public BigInteger Token;
+        }
+
+        private class TokenComparer : IComparer<Partition>
+        {
+            public int Compare(Partition x, Partition y)
+            {
+                return x.Token.CompareTo(y);
+            }
         }
     }
 }

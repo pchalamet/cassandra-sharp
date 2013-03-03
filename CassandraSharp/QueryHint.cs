@@ -13,26 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Stream
+namespace CassandraSharp
 {
-    using System;
-
-    internal static class ArrayExtensions
+    public class QueryHint
     {
-        public static void ReverseIfLittleEndian(this byte[] buffer)
+        public QueryHint()
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer);
-            }
+            ReplicationFactor = 1;
         }
 
-        public static void ReverseIfLittleEndian(this byte[] buffer, int index, int length)
-        {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer, index, length);
-            }
-        }
+        public object Key { get; set; }
+
+        public int ReplicationFactor { get; set; }
     }
 }

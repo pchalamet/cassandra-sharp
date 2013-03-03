@@ -15,7 +15,7 @@
 
 namespace CassandraSharp
 {
-    public class NonQuery
+    public abstract class NonQuery
     {
     }
 }

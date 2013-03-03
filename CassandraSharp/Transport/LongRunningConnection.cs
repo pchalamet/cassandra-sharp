@@ -107,7 +107,6 @@ namespace CassandraSharp.Transport
             lock (_lock)
             {
                 Monitor.Pulse(_lock);
-
                 if (_isClosed)
                 {
                     throw new OperationCanceledException();
@@ -144,7 +143,6 @@ namespace CassandraSharp.Transport
             lock (_lock)
             {
                 Monitor.Pulse(_lock);
-
                 if (_isClosed)
                 {
                     return;
@@ -274,8 +272,13 @@ namespace CassandraSharp.Transport
                     _queryInfos[streamId] = null;
                     lock (_lock)
                     {
-                        _availableStreamIds.Push(streamId);
                         Monitor.Pulse(_lock);
+                        if (_isClosed)
+                        {
+                            throw new OperationCanceledException();
+                        }
+                        
+                        _availableStreamIds.Push(streamId);
                     }
 
                     _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);

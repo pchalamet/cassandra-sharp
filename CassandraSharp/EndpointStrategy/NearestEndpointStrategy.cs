@@ -17,7 +17,6 @@ namespace CassandraSharp.EndpointStrategy
 {
     using System.Collections.Generic;
     using System.Net;
-    using System.Numerics;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -42,7 +41,7 @@ namespace CassandraSharp.EndpointStrategy
             _clientAddress = NetworkFinder.Find(Dns.GetHostName());
         }
 
-        public IPAddress Pick(BigInteger? token = null)
+        public IPAddress Pick(QueryHint hint)
         {
             lock (_lock)
             {

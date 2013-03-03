@@ -17,6 +17,7 @@ namespace CassandraSharp
 {
     public enum ConsistencyLevel
     {
+// ReSharper disable InconsistentNaming
         ANY = 0x0000,
 
         ONE = 0x0001,
@@ -32,5 +33,6 @@ namespace CassandraSharp
         LOCAL_QUORUM = 0x0006,
 
         EACH_QUORUM = 0x0007,
+        // ReSharper restore InconsistentNaming
     }
 }

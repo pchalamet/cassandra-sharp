@@ -20,7 +20,7 @@ namespace CassandraSharp
     public interface ICqlCommand
     {
         IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None,
-                                  object key = null);
+                                  QueryHint hint = null);
 
         IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }

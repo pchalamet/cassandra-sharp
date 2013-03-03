@@ -28,9 +28,9 @@ namespace CassandraSharp.CQLPropertyBag
 
         public IObservable<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
                                                 ExecutionFlags executionFlags = ExecutionFlags.None,
-                                                object key = null)
+                                                QueryHint hint = null)
         {
-            return Execute<PropertyBag>(cql, cl, executionFlags, key);
+            return Execute<PropertyBag>(cql, cl, executionFlags, hint);
         }
 
         public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
