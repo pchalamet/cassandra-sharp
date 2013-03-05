@@ -1,4 +1,4 @@
-version 3.0.0 [not released]
+version 3.0.0
 - total rewrite of Connection
 - expose a new interface using Rx (IObservable)
 - future are now a TPL Task returning a list of results
