@@ -17,20 +17,21 @@ namespace cqlplus.ResultWriter
 {
     using System.Collections.Generic;
     using System.IO;
+    using CassandraSharp.CQLPropertyBag;
 
     public class RowKeyValue : IResultWriter
     {
-        public void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<PropertyBag> rowSet)
         {
             int rowNum = 0;
             foreach (var row in rowSet)
             {
                 txtWriter.Write("{0,-2}: ", rowNum++);
                 string offset = "";
-                foreach (var col in row)
+                foreach (var col in row.Keys)
                 {
-                    string sValue = ValueFormatter.Format(col.Value);
-                    txtWriter.WriteLine("{0}{1} : {2} ", offset, col.Key, sValue);
+                    string sValue = ValueFormatter.Format(row[col]);
+                    txtWriter.WriteLine("{0}{1} : {2} ", offset, col, sValue);
                     offset = "    ";
                 }
                 txtWriter.WriteLine();

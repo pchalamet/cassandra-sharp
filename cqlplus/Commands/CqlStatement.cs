@@ -15,9 +15,6 @@
 
 namespace cqlplus.Commands
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPropertyBag;
 
@@ -38,14 +35,10 @@ namespace cqlplus.Commands
                 executionFlags |= ExecutionFlags.Tracing;
             }
 
-            ICqlCommand cmd = CommandContext.Cluster.CreatePropertyBagCommand();
-            Task<IList<IDictionary<string, object>>> res = cmd.Execute<IDictionary<string, object>>(_statement, CommandContext.CL, executionFlags).AsFuture();
+            var cmd = CommandContext.Cluster.CreatePropertyBagCommand();
+            var res = cmd.Execute(_statement, CommandContext.CL, executionFlags).AsFuture();
 
-            // ensure values are sorted accordingly to column name
-            var sortedRes = from row in res.Result
-                            select new SortedDictionary<string, object>(row);
-
-            CommandContext.ResultWriter.Write(CommandContext.TextWriter, sortedRes);
+            CommandContext.ResultWriter.Write(CommandContext.TextWriter, res.Result);
         }
     }
 }

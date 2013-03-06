@@ -19,6 +19,7 @@ namespace cqlplus.ResultWriter
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using CassandraSharp.CQLPropertyBag;
 
     public class Tabular : IResultWriter
     {
@@ -29,7 +30,7 @@ namespace cqlplus.ResultWriter
             _maxWidth = maxWidth;
         }
 
-        public void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<PropertyBag> rowSet)
         {
             string rowSeparator = null;
 
@@ -42,30 +43,30 @@ namespace cqlplus.ResultWriter
 
                     rowSeparator = BuildRowSeparator(colWidths);
                     string headerSeparator = rowSeparator.Replace('-', '=');
-                    string header = BuildRowValues(row, colWidths, kvp => kvp.Key);
+                    string header = BuildRowValues(row, colWidths, (key, value) => key);
 
                     txtWriter.WriteLine(rowSeparator);
                     txtWriter.WriteLine(header);
                     txtWriter.WriteLine(headerSeparator);
                 }
 
-                string rowValues = BuildRowValues(row, colWidths, kvp => ValueFormatter.Format(kvp.Value));
+                string rowValues = BuildRowValues(row, colWidths, (key, value) => ValueFormatter.Format(value));
                 txtWriter.WriteLine(rowValues);
                 txtWriter.WriteLine(rowSeparator);
             }
         }
 
-        private static Dictionary<string, int> DetermineColumnWidth(IEnumerable<KeyValuePair<string, object>> row, int maxWidth)
+        private static Dictionary<string, int> DetermineColumnWidth(PropertyBag row, int maxWidth)
         {
             Dictionary<string, int> colWidths = new Dictionary<string, int>();
-            foreach (var value in row)
+            foreach (var col in row.Keys)
             {
-                string sValue = ValueFormatter.Format(value.Value);
-                int keyWidth = value.Key.Length;
+                string sValue = ValueFormatter.Format(row[col]);
+                int keyWidth = col.Length;
                 int valWidth = sValue.Length;
                 int colWidth = 4 + Math.Max(keyWidth, valWidth);
                 colWidth = Math.Min(colWidth, maxWidth);
-                colWidths.Add(value.Key, colWidth);
+                colWidths.Add(col, colWidth);
             }
             return colWidths;
         }
@@ -84,14 +85,14 @@ namespace cqlplus.ResultWriter
             return rowSeparator;
         }
 
-        private static string BuildRowValues(IEnumerable<KeyValuePair<string, object>> row, IDictionary<string, int> colWidths,
-                                             Func<KeyValuePair<string, object>, string> formatter)
+        private static string BuildRowValues(PropertyBag row, IDictionary<string, int> colWidths,
+                                             Func<string, object, string> formatter)
         {
             StringBuilder sbValues = new StringBuilder();
-            foreach (var value in row)
+            foreach (var col in row.Keys)
             {
-                string sValue = formatter(value);
-                int colWidth = colWidths[value.Key];
+                string sValue = formatter(col, row[col]);
+                int colWidth = colWidths[col];
                 string colFormat = string.Format("{{0,-{0}}}", colWidth);
 
                 string colValue = string.Format(colFormat, sValue);

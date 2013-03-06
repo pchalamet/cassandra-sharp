@@ -18,10 +18,11 @@ namespace cqlplus.ResultWriter
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using CassandraSharp.CQLPropertyBag;
 
     internal class CSV : IResultWriter
     {
-        public void Write(TextWriter txtWriter, IEnumerable<IDictionary<string, object>> rowSet)
+        public void Write(TextWriter txtWriter, IEnumerable<PropertyBag> rowSet)
         {
             bool first = true;
             foreach (var row in rowSet)
@@ -31,9 +32,9 @@ namespace cqlplus.ResultWriter
                 {
                     StringBuilder sbHeader = new StringBuilder();
                     sep = string.Empty;
-                    foreach (var kvp in row)
+                    foreach (var col in row.Keys)
                     {
-                        sbHeader.AppendFormat("{0}{1}", sep, kvp.Key);
+                        sbHeader.AppendFormat("{0}{1}", sep, col);
                         sep = ",";
                     }
 
@@ -44,9 +45,9 @@ namespace cqlplus.ResultWriter
 
                 StringBuilder sbValues = new StringBuilder();
                 sep = string.Empty;
-                foreach (var kvp in row)
+                foreach (var col in row.Keys)
                 {
-                    sbValues.AppendFormat("{0}{1}", sep, ValueFormatter.Format(kvp.Value));
+                    sbValues.AppendFormat("{0}{1}", sep, ValueFormatter.Format(row[col]));
                     sep = ",";
                 }
                 string values = sbValues.ToString();
