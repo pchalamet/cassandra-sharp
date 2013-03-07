@@ -44,6 +44,13 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+		<Rx-net40 Include="packages\Rx-Core.2.1.30214.0\lib\Net40\System.Reactive.Core.dll" />
+		<Rx-net40 Include="packages\Rx-Interfaces.2.1.30214.0\lib\Net40\System.Reactive.Interfaces.dll" />
+		<Rx-net40 Include="packages\Rx-Linq.2.1.30214.0\lib\Net40\System.Reactive.Linq.dll" />
+		<Rx-net40 Include="packages\Rx-PlatformServices.2.1.30214.0\lib\Net40\System.Reactive.PlatformServices.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Rx-net45 Include="packages\Rx-Core.2.1.30214.0\lib\Net45\System.Reactive.Core.dll" />
 		<Rx-net45 Include="packages\Rx-Interfaces.2.1.30214.0\lib\Net45\System.Reactive.Interfaces.dll" />
 		<Rx-net45 Include="packages\Rx-Linq.2.1.30214.0\lib\Net45\System.Reactive.Linq.dll" />
@@ -73,8 +80,11 @@
 
 	<Target Name="BuildZipPackage" DependsOnTargets="Clean;Compile">
 		<Copy SourceFiles="@(Files-net40)" DestinationFolder="$(ZipDir)\net40" />
+		<Copy SourceFiles="@(Rx-net40)" DestinationFolder="$(ZipDir)\net40" />
+
 		<Copy SourceFiles="@(Files-net45)" DestinationFolder="$(ZipDir)\net45" />
 		<Copy SourceFiles="@(Rx-net45)" DestinationFolder="$(ZipDir)\net45" />
+
 		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(ZipDir) " />
 
         <ItemGroup>

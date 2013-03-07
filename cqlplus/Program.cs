@@ -35,8 +35,7 @@ namespace cqlplus
                 return 5;
             }
 
-            string hostname = _cliArgs.Hostname;
-            IStatementReader statementInput = new ConsoleInput(hostname);
+            IStatementReader statementInput = new ConsoleInput(_cliArgs.Hostname);
             if (null != _cliArgs.File)
             {
                 statementInput = new FileInput(_cliArgs.File);

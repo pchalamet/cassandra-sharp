@@ -1,3 +1,10 @@
+version 3.0.2
+- reduce dns lookup
+- ClusterManager now fails if no valid endpoint found
+- ClusterManager now fails if current machine ip can't be resolved
+- more env info in cqlplus !help
+- Rx binaries are now in net40
+
 version 3.0.1
 - fixed invalid cast in cqlplus
 

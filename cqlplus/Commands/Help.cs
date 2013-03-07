@@ -33,7 +33,9 @@ namespace cqlplus.Commands
             }
 
             string version = typeof(ClusterManager).Assembly.GetName().Version.ToString();
-            Console.WriteLine("Using cassandra-sharp v{0}", version);
+            Console.WriteLine("cassandra-sharp {0}", version);
+            Console.WriteLine("OS {0} / .NET {1}", Environment.OSVersion, Environment.Version);
+            Console.WriteLine("OS x64 {0} / Process x64 {1} / Proc count {2}", Environment.Is64BitOperatingSystem, Environment.Is64BitProcess, Environment.ProcessorCount);
             Console.WriteLine();
 
             Console.WriteLine("Commands:");

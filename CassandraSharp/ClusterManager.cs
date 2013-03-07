@@ -19,7 +19,6 @@ namespace CassandraSharp
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
-    using System.Numerics;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Snitch;
@@ -60,7 +59,11 @@ namespace CassandraSharp
 
             // create endpoints
             IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
-            IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find);
+            IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find).Where(x => null != x);
+            if (!endpoints.Any())
+            {
+                throw new ArgumentException("Expecting at least one valid endpoint");
+            }
 
             // create required services
             IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,

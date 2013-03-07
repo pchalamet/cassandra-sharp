@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.EndpointStrategy
 {
+    using System;
     using System.Collections.Generic;
     using System.Net;
     using CassandraSharp.Extensibility;
@@ -35,10 +36,14 @@ namespace CassandraSharp.EndpointStrategy
         public NearestEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
         {
             _snitch = snitch;
-            IPAddress clientAddress = NetworkFinder.Find(Dns.GetHostName());
-            _healthyEndpoints = snitch.GetSortedListByProximity(clientAddress, endpoints);
-            _bannedEndpoints = new List<IPAddress>();
             _clientAddress = NetworkFinder.Find(Dns.GetHostName());
+            if (null == _clientAddress)
+            {
+                throw new ArgumentException("Failed to resolve IP for client address");    
+            }
+
+            _healthyEndpoints = snitch.GetSortedListByProximity(_clientAddress, endpoints);
+            _bannedEndpoints = new List<IPAddress>();
         }
 
         public IPAddress Pick(QueryHint hint)
