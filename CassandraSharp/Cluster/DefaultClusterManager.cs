@@ -13,30 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Cluster
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
+    using System.Threading.Tasks;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Snitch;
     using CassandraSharp.Utils;
 
-    public class ClusterManager
+    public class DefaultClusterManager : IClusterManager
     {
-        private static readonly object _lock = new object();
+        private readonly object _lock = new object();
 
-        private static CassandraSharpConfig _config;
+        private CassandraSharpConfig _config;
 
-        private static IRecoveryService _recoveryService;
+        private IInstrumentation _instrumentation;
 
-        private static ILogger _logger;
+        private ILogger _logger;
 
-        private static IInstrumentation _instrumentation;
+        private IRecoveryService _recoveryService;
 
-        public static ICluster GetCluster(string name)
+        public ICluster GetCluster(string name)
         {
             name.CheckArgumentNotNull("name");
 
@@ -49,7 +51,7 @@ namespace CassandraSharp
             return GetCluster(clusterConfig);
         }
 
-        public static ICluster GetCluster(ClusterConfig clusterConfig)
+        public ICluster GetCluster(ClusterConfig clusterConfig)
         {
             clusterConfig.CheckArgumentNotNull("clusterConfig");
             clusterConfig.Endpoints.CheckArgumentNotNull("clusterConfig.Endpoints");
@@ -58,7 +60,7 @@ namespace CassandraSharp
             IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
+            IEndpointSnitch snitch = ServiceActivator<Snitch.Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find).Where(x => null != x).ToArray();
             if (!endpoints.Any())
             {
@@ -73,8 +75,8 @@ namespace CassandraSharp
                                                                                                                   _instrumentation);
 
             // create the cluster now
-            ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
-                                                                                  recoveryService);
+            ICluster cluster = ServiceActivator<Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
+                                                                          recoveryService);
 
             IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
                                                                                                                clusterConfig.Endpoints.Discovery,
@@ -86,31 +88,7 @@ namespace CassandraSharp
             return cluster;
         }
 
-        private static ClusterConfig GetClusterConfig(string name)
-        {
-            ClusterConfig clusterConfig = (from config in _config.Clusters
-                                           where config.Name == name
-                                           select config).FirstOrDefault();
-            if (null == clusterConfig)
-            {
-                string msg = string.Format("Can't find cluster configuration '{0}'", name);
-                throw new KeyNotFoundException(msg);
-            }
-
-            return clusterConfig;
-        }
-
-        private static IRecoveryService GetRecoveryService(bool recover)
-        {
-            lock (_lock)
-            {
-                return !recover
-                               ? null
-                               : _recoveryService;
-            }
-        }
-
-        public static void Shutdown()
+        public void Shutdown()
         {
             lock (_lock)
             {
@@ -127,7 +105,7 @@ namespace CassandraSharp
             }
         }
 
-        public static void Configure(CassandraSharpConfig config)
+        public void Configure(CassandraSharpConfig config)
         {
             config.CheckArgumentNotNull("config");
 
@@ -142,6 +120,48 @@ namespace CassandraSharp
                 _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
+            }
+        }
+
+        public Task<IList<T>> AsFuture<T>(IObservable<T> observable)
+        {
+            var obsEnumerable = observable.Aggregate((IList<T>) new List<T>(),
+                                                     (acc, v) =>
+                                                         {
+                                                             acc.Add(v);
+                                                             return acc;
+                                                         });
+            var task = obsEnumerable.ToTask();
+            return task;
+        }
+
+        public Task AsFuture(IObservable<NonQuery> observable)
+        {
+            Task task = observable.Count().ToTask();
+            return task;
+        }
+
+        private ClusterConfig GetClusterConfig(string name)
+        {
+            ClusterConfig clusterConfig = (from config in _config.Clusters
+                                           where config.Name == name
+                                           select config).FirstOrDefault();
+            if (null == clusterConfig)
+            {
+                string msg = string.Format("Can't find cluster configuration '{0}'", name);
+                throw new KeyNotFoundException(msg);
+            }
+
+            return clusterConfig;
+        }
+
+        private IRecoveryService GetRecoveryService(bool recover)
+        {
+            lock (_lock)
+            {
+                return !recover
+                               ? null
+                               : _recoveryService;
             }
         }
     }

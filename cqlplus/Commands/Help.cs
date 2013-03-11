@@ -19,7 +19,7 @@ namespace cqlplus.Commands
     using System.Linq;
     using System.Reflection;
     using System.Text;
-    using CassandraSharp;
+    using CassandraSharp.Cluster;
 
     [Description("display help")]
     internal class Help : CommandBase
@@ -32,10 +32,11 @@ namespace cqlplus.Commands
                 cmdMaxLen = Math.Max(cmdMaxLen, cmdType.Key.Length);
             }
 
-            string version = typeof(ClusterManager).Assembly.GetName().Version.ToString();
+            string version = typeof(DefaultClusterManager).Assembly.GetName().Version.ToString();
             Console.WriteLine("cassandra-sharp {0}", version);
             Console.WriteLine("OS {0} / .NET {1}", Environment.OSVersion, Environment.Version);
-            Console.WriteLine("OS x64 {0} / Process x64 {1} / Proc count {2}", Environment.Is64BitOperatingSystem, Environment.Is64BitProcess, Environment.ProcessorCount);
+            Console.WriteLine("OS x64 {0} / Process x64 {1} / Proc count {2}", Environment.Is64BitOperatingSystem, Environment.Is64BitProcess,
+                              Environment.ProcessorCount);
             Console.WriteLine();
 
             Console.WriteLine("Commands:");

@@ -44,6 +44,9 @@
     <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CassandraSharp.Interfaces">
+      <HintPath>..\packages\cassandra-sharp-interfaces.3.1.2\lib\net45\CassandraSharp.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Numerics" />

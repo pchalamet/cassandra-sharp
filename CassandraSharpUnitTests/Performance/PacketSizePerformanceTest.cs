@@ -19,6 +19,7 @@ namespace CassandraSharpUnitTests.Performance
     using System.Diagnostics;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using NUnit.Framework;
 

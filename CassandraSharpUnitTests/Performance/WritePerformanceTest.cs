@@ -26,6 +26,7 @@ namespace CassandraSharpUnitTests.Performance
     using Apache.Cassandra;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;

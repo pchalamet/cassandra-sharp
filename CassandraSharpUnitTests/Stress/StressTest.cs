@@ -22,6 +22,7 @@ namespace CassandraSharpUnitTests.Stress
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;

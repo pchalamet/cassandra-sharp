@@ -20,6 +20,7 @@ namespace CassandraSharpUnitTests.Functional
     using System.Net;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Utils;
     using CassandraSharpUnitTests.EndpointStrategy;

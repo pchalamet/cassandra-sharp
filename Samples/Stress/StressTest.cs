@@ -24,6 +24,7 @@ namespace Samples.Stress
     using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
 
