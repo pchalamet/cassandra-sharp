@@ -22,7 +22,6 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Security.Authentication;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Instrumentation;
     using CassandraSharp.Utils.Stream;
 
     internal static class CQLCommandHelpers

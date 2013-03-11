@@ -42,8 +42,9 @@
     <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CassandraSharp.Interfaces">
-      <HintPath>..\packages\cassandra-sharp-interfaces.3.1.2\lib\net40\CassandraSharp.Interfaces.dll</HintPath>
+    <Reference Include="CassandraSharp.Interfaces, Version=3.1.3.0, Culture=neutral, PublicKeyToken=038f94e6e91ef981, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\cassandra-sharp-interfaces.3.1.3\lib\net40\CassandraSharp.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
