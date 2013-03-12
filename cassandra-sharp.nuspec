@@ -31,6 +31,7 @@ See https://github.com/pchalamet/cassandra-sharp for more information.
     </references>
 	
 	<dependencies>
+		<dependency id="cassandra-sharp-interfaces" version="0.0.0" />
 		<dependency id="Rx-Core" version="2.1.30214.0" />
 		<dependency id="Rx-Interfaces" version="2.1.30214.0" />
 		<dependency id="Rx-Linq" version="2.1.30214.0" />

@@ -22,6 +22,8 @@
 	</Target>
 
 	<PropertyGroup>
+		<BinDir>bin</BinDir>
+		<ObjDir>obj</ObjDir>
 		<OutDir>OutDir</OutDir>
 		<ZipDir>$(OutDir)\Zip</ZipDir>
 	</PropertyGroup>
@@ -93,10 +95,9 @@
 	<Target Name="Clean">
 		<Exec Command="rmdir /q /s $(ThriftOutput)\gen-csharp" />
 		<Exec Command="rmdir /q /s $(OutDir)" />
-		<Exec Command="rmdir /q /s $(bin)" />
-		<Exec Command="rmdir /q /s $(obj)" />
+		<Exec Command="rmdir /q /s $(BinDir)" />
+		<Exec Command="rmdir /q /s $(ObjDir)" />
 		<MakeDir Directories="$(OutDir)" />
-		<MakeDir Directories="$(NuGetPackageDir)" />
 	</Target>
 	
     <Target Name="GenerateAssemblyInfo">
@@ -134,6 +135,7 @@
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetCorePackageDir)" />
 		<Copy SourceFiles="$(CoreProjectName).nuspec" DestinationFolder="$(NuGetCorePackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/version" Value="$(CoreVersion)$(CoreStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='cassandra-sharp-interfaces']/@version" Value="$(ApiVersion)$(ApiStatus)" />
 		<Exec Command="$(NuGet) pack $(NuGetCorePackageDir)\$(CoreProjectName).nuspec -OutputDirectory $(OutDir)" />
 		
 		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		

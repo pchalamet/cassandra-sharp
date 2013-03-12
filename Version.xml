@@ -1,4 +1,4 @@
 <version>
 	<cassandra-sharp-interfaces version="3.1.4" status="" />
-	<cassandra-sharp version="3.1.0" status="-beta" />
+	<cassandra-sharp version="3.1.0" status="" />
 </version>
