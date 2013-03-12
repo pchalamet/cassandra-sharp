@@ -13,24 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
+namespace CassandraSharp.CQLPropertyBag
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-
-    internal class PocoCommand : Command
+    public static class CQLPropertyBagExtensions
     {
-        internal PocoCommand(ICluster cluster)
-                : base(cluster, new PocoDataMapperFactory())
+        public static IPropertyBagCommand CreatePropertyBagCommand(this ICluster @this)
         {
-        }
-
-        internal class PocoDataMapperFactory : IDataMapper
-        {
-            public IDataMapperFactory Create<T>(object dataSource)
-            {
-                return new DataMapperFactory<T>(dataSource);
-            }
+            return Enlightenment.EnglightenmentMgr.PropertyBagCommandFactory().Create(@this);
         }
     }
 }

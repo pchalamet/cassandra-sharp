@@ -13,13 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
+namespace CassandraSharp.Enlightenment
 {
-    public static class CQLPropertyBagExtensions
+    using CassandraSharp.CQLPoco;
+
+    internal class PocoCommandFactory : IPocoCommandFactory
     {
-        public static PropertyBagCommand CreatePropertyBagCommand(this ICluster @this)
+        public ICqlCommand Create(ICluster cluster)
         {
-            return new PropertyBagCommand(@this);
+            return new PocoCommand(cluster);
         }
     }
 }

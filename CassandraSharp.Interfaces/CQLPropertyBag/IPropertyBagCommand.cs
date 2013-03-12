@@ -13,13 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
+namespace CassandraSharp.CQLPropertyBag
 {
-    public static class CQLPocoExtensions
+    using System;
+
+    public interface IPropertyBagCommand : ICqlCommand
     {
-        public static PocoCommand CreatePocoCommand(this ICluster @this)
-        {
-            return new PocoCommand(@this);
-        }
+        IObservable<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                         ExecutionFlags executionFlags = ExecutionFlags.None,
+                                         QueryHint hint = null);
+
+        IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }
 }

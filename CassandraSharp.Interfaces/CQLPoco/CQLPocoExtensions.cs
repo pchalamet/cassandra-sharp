@@ -15,22 +15,13 @@
 
 namespace CassandraSharp.CQLPoco
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
+    using CassandraSharp.Enlightenment;
 
-    internal class PocoCommand : Command
+    public static class CQLPocoExtensions
     {
-        internal PocoCommand(ICluster cluster)
-                : base(cluster, new PocoDataMapperFactory())
+        public static ICqlCommand CreatePocoCommand(this ICluster @this)
         {
-        }
-
-        internal class PocoDataMapperFactory : IDataMapper
-        {
-            public IDataMapperFactory Create<T>(object dataSource)
-            {
-                return new DataMapperFactory<T>(dataSource);
-            }
+            return EnglightenmentMgr.PocoCommandFactory().Create(@this);
         }
     }
 }

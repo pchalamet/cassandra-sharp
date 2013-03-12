@@ -19,7 +19,8 @@ namespace CassandraSharp.CQLPropertyBag
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
 
-    public class PropertyBagCommand : Command
+    internal class PropertyBagCommand : Command,
+                                        IPropertyBagCommand
     {
         internal PropertyBagCommand(ICluster cluster)
                 : base(cluster, new PropertyBagMapperFactory())
