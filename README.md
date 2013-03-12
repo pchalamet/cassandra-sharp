@@ -33,20 +33,10 @@ How to build
 To build cassandra-sharp, load cassandra-sharp.sln in Visual Studio 2012.
 To build from command line and to regenerate thrift proxy, use Build.cmd.
 
-If you want to build a specific version or specific flavor, use:
-
-	GenerateVersion.cmd <flavor> <VersionNumber> <VersionStatus>
-	
-NOTE: type "GenerateVersion.cmd /?" for more info.
-  
-You will find a package named in the OutDir folder:
-
-	cassandra-sharp-bin-<VersionNumber>-<VersionStatus>.zip
-
 Sample configuration
 ====================
 	<configSections>
-		<section name="CassandraSharp" type="CassandraSharp.SectionHandler, CassandraSharp" />
+		<section name="CassandraSharp" type="CassandraSharp.SectionHandler, CassandraSharp.Interfaces" />
 	</configSections>
 
 	<CassandraSharp>
