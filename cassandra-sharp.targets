@@ -2,11 +2,25 @@
 
     <Import Project="ThirdParties\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
 
-    <PropertyGroup>
-        <Version>0.0.0.0</Version>		
-        <VersionStatus></VersionStatus>		
-    </PropertyGroup>
 	
+	<Target Name="ReadVersions">
+		<XmlQuery XmlFileName="Version.xml" XPath="/version/cassandra-sharp-interfaces/@version">
+			<Output TaskParameter="Values" PropertyName="ApiVersion" />
+		</XmlQuery>
+		
+		<XmlQuery XmlFileName="Version.xml" XPath="/version/cassandra-sharp-interfaces/@status">
+			<Output TaskParameter="Values" PropertyName="ApiStatus" />
+		</XmlQuery>
+
+		<XmlQuery XmlFileName="Version.xml" XPath="/version/cassandra-sharp/@version">
+			<Output TaskParameter="Values" PropertyName="CoreVersion" />
+		</XmlQuery>
+		
+		<XmlQuery XmlFileName="Version.xml" XPath="/version/cassandra-sharp/@state">
+			<Output TaskParameter="Values" PropertyName="CoreStatus" />
+		</XmlQuery>
+	</Target>
+
 	<PropertyGroup>
 		<OutDir>OutDir</OutDir>
 		<ZipDir>$(OutDir)\Zip</ZipDir>
@@ -14,7 +28,15 @@
 
 	<PropertyGroup>
 		<NuGet>.nuget\NuGet.exe</NuGet>
-		<NuGetPackageDir>$(OutDir)\NuGetPackage</NuGetPackageDir>
+
+		<ApiProjectName>cassandra-sharp-interfaces</ApiProjectName>
+		<CoreProjectName>cassandra-sharp</CoreProjectName>
+		<ToolsProjectName>cassandra-sharp-tools</ToolsProjectName>
+
+		<NuGetRootDir>$(OutDir)\NuGet</NuGetRootDir>
+		<NuGetApiPackageDir>$(NuGetRootDir)\$(ApiProjectName)</NuGetApiPackageDir>
+		<NuGetCorePackageDir>$(NuGetRootDir)\$(CoreProjectName)</NuGetCorePackageDir>
+		<NuGetToolsPackageDir>$(NuGetRootDir)\$(ToolsProjectName)</NuGetToolsPackageDir>
 	</PropertyGroup>
 	
     <PropertyGroup>
@@ -23,51 +45,72 @@
         <ThriftOutput>Apache.Cassandra</ThriftOutput>
     </PropertyGroup>
 
-    <PropertyGroup>
-		<ProjectName>cassandra-sharp</ProjectName>
-        <CQLPlusAssembly>cqlplus</CQLPlusAssembly>
-        <ChangesFile>CHANGES.txt</ChangesFile>
-    </PropertyGroup>
-
 	<ItemGroup>
-		<Files-net40 Include="bin\net40\$(Configuration)\CassandraSharp.dll" />
-		<Files-net40 Include="bin\net40\$(Configuration)\CassandraSharp.pdb" />
-		<Files-net40 Include="bin\net40\$(Configuration)\cqlplus.exe" />
-		<Files-net40 Include="bin\net40\$(Configuration)\cqlplus.pdb" />
+		<ApiFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.Interfaces.dll" />
+		<ApiFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.Interfaces.pdb" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Files-net45 Include="bin\net45\$(Configuration)\CassandraSharp.dll" />
-		<Files-net45 Include="bin\net45\$(Configuration)\CassandraSharp.pdb" />
-		<Files-net45 Include="bin\net45\$(Configuration)\cqlplus.exe" />
-		<Files-net45 Include="bin\net45\$(Configuration)\cqlplus.pdb" />
+		<ApiFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.Interfaces.dll" />
+		<ApiFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.Interfaces.pdb" />
 	</ItemGroup>
 	
 	<ItemGroup>
-		<Rx-net40 Include="packages\Rx-Core.2.1.30214.0\lib\Net40\System.Reactive.Core.dll" />
-		<Rx-net40 Include="packages\Rx-Interfaces.2.1.30214.0\lib\Net40\System.Reactive.Interfaces.dll" />
-		<Rx-net40 Include="packages\Rx-Linq.2.1.30214.0\lib\Net40\System.Reactive.Linq.dll" />
-		<Rx-net40 Include="packages\Rx-PlatformServices.2.1.30214.0\lib\Net40\System.Reactive.PlatformServices.dll" />
+		<CoreFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.dll" />
+		<CoreFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.pdb" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Rx-net45 Include="packages\Rx-Core.2.1.30214.0\lib\Net45\System.Reactive.Core.dll" />
-		<Rx-net45 Include="packages\Rx-Interfaces.2.1.30214.0\lib\Net45\System.Reactive.Interfaces.dll" />
-		<Rx-net45 Include="packages\Rx-Linq.2.1.30214.0\lib\Net45\System.Reactive.Linq.dll" />
-		<Rx-net45 Include="packages\Rx-PlatformServices.2.1.30214.0\lib\Net45\System.Reactive.PlatformServices.dll" />
+		<CoreFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.dll" />
+		<CoreFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.pdb" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ToolsFiles-net40 Include="bin\net40\$(Configuration)\cqlplus.exe" />
+		<ToolsFiles-net40 Include="bin\net40\$(Configuration)\cqlplus.pdb" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ToolsFiles-net45 Include="bin\net45\$(Configuration)\cqlplus.exe" />
+		<ToolsFiles-net45 Include="bin\net45\$(Configuration)\cqlplus.pdb" />
+	</ItemGroup>
+	
+	
+	<ItemGroup>
+		<RxFiles-net40 Include="packages\Rx-Core.2.1.30214.0\lib\Net40\System.Reactive.Core.dll" />
+		<RxFiles-net40 Include="packages\Rx-Interfaces.2.1.30214.0\lib\Net40\System.Reactive.Interfaces.dll" />
+		<RxFiles-net40 Include="packages\Rx-Linq.2.1.30214.0\lib\Net40\System.Reactive.Linq.dll" />
+		<RxFiles-net40 Include="packages\Rx-PlatformServices.2.1.30214.0\lib\Net40\System.Reactive.PlatformServices.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<RxFiles-net45 Include="packages\Rx-Core.2.1.30214.0\lib\Net45\System.Reactive.Core.dll" />
+		<RxFiles-net45 Include="packages\Rx-Interfaces.2.1.30214.0\lib\Net45\System.Reactive.Interfaces.dll" />
+		<RxFiles-net45 Include="packages\Rx-Linq.2.1.30214.0\lib\Net45\System.Reactive.Linq.dll" />
+		<RxFiles-net45 Include="packages\Rx-PlatformServices.2.1.30214.0\lib\Net45\System.Reactive.PlatformServices.dll" />
 	</ItemGroup>
 	
 	<Target Name="Clean">
+		<Exec Command="rmdir /q /s $(ThriftOutput)\gen-csharp" />
 		<Exec Command="rmdir /q /s $(OutDir)" />
 		<Exec Command="rmdir /q /s $(bin)" />
 		<Exec Command="rmdir /q /s $(obj)" />
 		<MakeDir Directories="$(OutDir)" />
-		<MakeDir Directories="$(ZipDir)" />
 		<MakeDir Directories="$(NuGetPackageDir)" />
 	</Target>
 	
     <Target Name="GenerateAssemblyInfo">
-        <AssemblyInfo CodeLanguage="CS" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)" AssemblyInformationalVersion="$(Version)$(VersionStatus)" OutputFile="$(ProjectName)-version.cs" />
+        <AssemblyInfo CodeLanguage="CS" 
+					  AssemblyVersion="$(ApiVersion)" 
+					  AssemblyFileVersion="$(ApiVersion)"
+					  AssemblyInformationalVersion="$(ApiVersion)$(CoreStatus)"
+					  OutputFile="$(ApiProjectName)-version.cs" />
+
+					  <AssemblyInfo CodeLanguage="CS" 
+					  AssemblyVersion="$(CoreVersion)" 
+					  AssemblyFileVersion="$(CoreVersion)"
+					  AssemblyInformationalVersion="$(CoreVersion)$(CoreStatus)"
+					  OutputFile="$(CoreProjectName)-version.cs" />
     </Target>
 
     <Target Name="GenerateThrift">
@@ -75,37 +118,39 @@
     </Target>
 
     <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo;GenerateThrift">
-        <MSBuild Projects="$(ProjectName).sln" />
+        <MSBuild Projects="$(CoreProjectName).sln" />
     </Target>
 
-	<Target Name="BuildZipPackage" DependsOnTargets="Clean;Compile">
-		<Copy SourceFiles="@(Files-net40)" DestinationFolder="$(ZipDir)\net40" />
-		<Copy SourceFiles="@(Rx-net40)" DestinationFolder="$(ZipDir)\net40" />
+	<Target Name="BuildNuGetPackages" DependsOnTargets="Clean;Compile">
+		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetApiPackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(ApiFiles-net45)" DestinationFolder="$(NuGetApiPackageDir)\lib\net45" />		
+		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetApiPackageDir)" />
+		<Copy SourceFiles="$(ApiProjectName).nuspec" DestinationFolder="$(NuGetApiPackageDir)" />
+		<XmlPoke XmlInputPath="$(NuGetApiPackageDir)\$(ApiProjectName).nuspec" Query="/package/metadata/version" Value="$(ApiVersion)$(ApiStatus)" />
+		<Exec Command="$(NuGet) pack $(NuGetApiPackageDir)\$(ApiProjectName).nuspec -OutputDirectory $(OutDir)" />
 
-		<Copy SourceFiles="@(Files-net45)" DestinationFolder="$(ZipDir)\net45" />
-		<Copy SourceFiles="@(Rx-net45)" DestinationFolder="$(ZipDir)\net45" />
-
-		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(ZipDir) " />
-
-        <ItemGroup>
-            <ZipFiles Include="$(ZipDir)\**\*.*" />
-        </ItemGroup>
+		<Copy SourceFiles="@(CoreFiles-net40)" DestinationFolder="$(NuGetCorePackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(CoreFiles-net45)" DestinationFolder="$(NuGetCorePackageDir)\lib\net45" />		
+		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetCorePackageDir)" />
+		<Copy SourceFiles="$(CoreProjectName).nuspec" DestinationFolder="$(NuGetCorePackageDir)" />
+		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/version" Value="$(CoreVersion)$(CoreStatus)" />
+		<Exec Command="$(NuGet) pack $(NuGetCorePackageDir)\$(CoreProjectName).nuspec -OutputDirectory $(OutDir)" />
 		
-        <Zip ZipFileName="$(OutDir)\$(ProjectName)-bin-$(Version)$(VersionStatus).zip" Files="@(ZipFiles)" WorkingDirectory="$(ZipDir)" ZipLevel="9" />
+		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(CoreFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(CoreFiles-net45)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net45" />		
+		<Copy SourceFiles="@(ToolsFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(ToolsFiles-net45)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net45" />		
+		<Copy SourceFiles="@(RxFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(RxFiles-net45)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net45" />				
+		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetToolsPackageDir)" />
+		<Copy SourceFiles="$(ToolsProjectName).nuspec" DestinationFolder="$(NuGetToolsPackageDir)" />
+		<XmlPoke XmlInputPath="$(NuGetToolsPackageDir)\$(ToolsProjectName).nuspec" Query="/package/metadata/version" Value="$(CoreVersion)$(CoreStatus)" />
+		<Exec Command="$(NuGet) pack $(NuGetToolsPackageDir)\$(ToolsProjectName).nuspec -OutputDirectory $(OutDir)" />		
 	</Target>
 	
-	<Target Name="BuildNuGetPackage" DependsOnTargets="Clean;Compile">
-		<Copy SourceFiles="@(Files-net40)" DestinationFolder="$(NuGetPackageDir)\lib\net40" />
-		<Copy SourceFiles="@(Files-net45)" DestinationFolder="$(NuGetPackageDir)\lib\net45" />
-		<Copy SourceFiles="$(ChangesFile)" DestinationFolder="$(NuGetPackageDir)" />
-		<Copy SourceFiles="$(ProjectName).nuspec" DestinationFolder="$(NuGetPackageDir)" />
-	
-		<XmlPoke XmlInputPath="$(NuGetPackageDir)\$(ProjectName).nuspec" Query="/package/metadata/version" Value="$(Version)$(VersionStatus)" />
-
-		<Exec Command="$(NuGet) pack $(NuGetPackageDir)\$(ProjectName).nuspec -OutputDirectory $(OutDir)" />
-	</Target>
-	
-    <Target Name="GenerateVersion" DependsOnTargets="BuildZipPackage;BuildNuGetPackage">
+    <Target Name="GenerateVersion" DependsOnTargets="ReadVersions;BuildNuGetPackages">
     </Target>
 
 </Project>

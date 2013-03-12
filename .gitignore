@@ -1,7 +1,8 @@
 OutDir/
-Apache.Cassandra/gen-csharp/
+#Apache.Cassandra/gen-csharp/
 packages/
-cassandra-sharp-version.cs
+#cassandra-sharp-version.cs
+#cassandra-sharp-interface-version.cs
 *.suo
 *.user
 bin/

@@ -82,6 +82,12 @@
     <None Include="..\..\cassandra-sharp.snk" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net45.csproj">
+      <Project>{6f6eb447-9569-406a-a23b-c09b6dbdbe10}</Project>
+      <Name>CassandraSharp.Interfaces-net45</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

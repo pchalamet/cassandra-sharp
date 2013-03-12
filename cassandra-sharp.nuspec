@@ -28,7 +28,6 @@ See https://github.com/pchalamet/cassandra-sharp for more information.
 </description>
     <tags>apache cassandra driver net40 net45 mono database nosql tpl rx reactive high performance streaming</tags>
     <references>
-        <reference file="CassandraSharp.dll" />
     </references>
 	
 	<dependencies>

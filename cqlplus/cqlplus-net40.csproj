@@ -48,10 +48,6 @@
     <ApplicationIcon>cassandra.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CassandraSharp.Interfaces, Version=3.1.3.0, Culture=neutral, PublicKeyToken=038f94e6e91ef981, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cassandra-sharp-interfaces.3.1.3\lib\net40\CassandraSharp.Interfaces.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.XML" />
@@ -76,6 +72,10 @@
     <Content Include="cassandra.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net40.csproj">
+      <Project>{a2114728-05bc-4d36-9b3c-327b53cccbf4}</Project>
+      <Name>CassandraSharp.Interfaces-net40</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp-net40.csproj">
       <Project>{cca30206-6177-416c-9303-8d57d6038c77}</Project>
       <Name>CassandraSharp-net40</Name>

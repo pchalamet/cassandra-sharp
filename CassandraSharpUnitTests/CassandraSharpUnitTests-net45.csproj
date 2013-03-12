@@ -44,10 +44,6 @@
     <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CassandraSharp.Interfaces, Version=3.1.3.0, Culture=neutral, PublicKeyToken=038f94e6e91ef981, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\cassandra-sharp-interfaces.3.1.3\lib\net45\CassandraSharp.Interfaces.dll</HintPath>
-    </Reference>
     <Reference Include="Moq, Version=4.0.10827.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
@@ -87,6 +83,10 @@
     <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra-net45.csproj">
       <Project>{984a4b04-c71a-4550-9193-817cfacba30a}</Project>
       <Name>Apache.Cassandra-net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net45.csproj">
+      <Project>{6f6eb447-9569-406a-a23b-c09b6dbdbe10}</Project>
+      <Name>CassandraSharp.Interfaces-net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
       <Project>{c1d252b7-d766-4c28-9c46-0696f896846c}</Project>
