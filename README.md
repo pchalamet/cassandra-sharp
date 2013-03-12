@@ -30,9 +30,8 @@ Zip archive are also available at Google Code (since GitHub removed binaries upl
 
 How to build
 ============
-To build cassandra-sharp, run this command: 
-
-	GenerateVersion.cmd
+To build cassandra-sharp, load cassandra-sharp.sln in Visual Studio 2012.
+To build from command line and to regenerate thrift proxy, use Build.cmd.
 
 If you want to build a specific version or specific flavor, use:
 

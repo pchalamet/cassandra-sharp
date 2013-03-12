@@ -13,11 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Enlightenment
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using CassandraSharp.Config;
 
     public interface IClusterManager
@@ -29,9 +26,5 @@ namespace CassandraSharp
         void Shutdown();
 
         void Configure(CassandraSharpConfig config);
-
-        Task<IList<T>> AsFuture<T>(IObservable<T> observable);
-
-        Task AsFuture(IObservable<NonQuery> observable);
     }
 }

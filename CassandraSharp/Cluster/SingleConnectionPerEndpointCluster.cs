@@ -18,7 +18,6 @@ namespace CassandraSharp.Cluster
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Numerics;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 

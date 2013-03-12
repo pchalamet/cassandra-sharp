@@ -16,9 +16,22 @@
 namespace CassandraSharp
 {
     using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using CassandraSharp.Enlightenment;
 
     public static class CqlCommandExtensions
     {
+        public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable)
+        {
+            return EnglightenmentMgr.Future().AsFuture(observable);
+        }
+
+        public static Task AsFuture(this IObservable<NonQuery> observable)
+        {
+            return EnglightenmentMgr.Future().AsFuture(observable);
+        }
+
         public static IObservable<NonQuery> Execute(this ICqlCommand @this, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
                                                     ExecutionFlags executionFlags = ExecutionFlags.None, object key = null)
         {

@@ -13,20 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Cluster
+namespace CassandraSharp.Enlightenment
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
-    using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
-    using System.Threading.Tasks;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Snitch;
     using CassandraSharp.Utils;
 
-    public class DefaultClusterManager : IClusterManager
+    internal class ClusterManager : IClusterManager
     {
         private readonly object _lock = new object();
 
@@ -60,7 +58,7 @@ namespace CassandraSharp.Cluster
             IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = ServiceActivator<Snitch.Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find).Where(x => null != x).ToArray();
             if (!endpoints.Any())
             {
@@ -75,8 +73,8 @@ namespace CassandraSharp.Cluster
                                                                                                                   _instrumentation);
 
             // create the cluster now
-            ICluster cluster = ServiceActivator<Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
-                                                                          recoveryService);
+            ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
+                                                                                  recoveryService);
 
             IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
                                                                                                                clusterConfig.Endpoints.Discovery,
@@ -121,24 +119,6 @@ namespace CassandraSharp.Cluster
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
             }
-        }
-
-        public Task<IList<T>> AsFuture<T>(IObservable<T> observable)
-        {
-            var obsEnumerable = observable.Aggregate((IList<T>) new List<T>(),
-                                                     (acc, v) =>
-                                                         {
-                                                             acc.Add(v);
-                                                             return acc;
-                                                         });
-            var task = obsEnumerable.ToTask();
-            return task;
-        }
-
-        public Task AsFuture(IObservable<NonQuery> observable)
-        {
-            Task task = observable.Count().ToTask();
-            return task;
         }
 
         private ClusterConfig GetClusterConfig(string name)

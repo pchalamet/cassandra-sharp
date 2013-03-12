@@ -1,5 +1,9 @@
 version 3.1.0
 - moved interface to separate assemblies (avoid Rx dependencies & just update the implementation without rebuilding)
+- moved tools and interfaces to separate nuget packages
+- revised the build process, using Version.xml to describe versions instead of command line
+- renamed GenerateVersion.cmd to Build.cmd
+- renamed PublishNugetVersion.cmd to Publish.cmd
 
 version 3.0.3
 - reduce dns resolve calls

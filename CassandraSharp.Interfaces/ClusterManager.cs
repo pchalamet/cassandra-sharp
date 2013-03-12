@@ -15,51 +15,29 @@
 
 namespace CassandraSharp
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using CassandraSharp.Config;
+    using CassandraSharp.Enlightenment;
 
     public static class ClusterManager
     {
-        private static readonly Lazy<IClusterManager> _instance = new Lazy<IClusterManager>(CreateClusterManager);
-
-        public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable)
-        {
-            return _instance.Value.AsFuture(observable);
-        }
-
-        public static Task AsFuture(this IObservable<NonQuery> observable)
-        {
-            return _instance.Value.AsFuture(observable);
-        }
-
-        private static IClusterManager CreateClusterManager()
-        {
-            const string typeName = "CassandraSharp.Cluster.DefaultClusterManager, CassandraSharp";
-            Type type = Type.GetType(typeName, true);
-            IClusterManager clusterManager = (IClusterManager) Activator.CreateInstance(type);
-            return clusterManager;
-        }
-
         public static ICluster GetCluster(string name)
         {
-            return _instance.Value.GetCluster(name);
+            return EnglightenmentMgr.ClusterManager().GetCluster(name);
         }
 
         public static ICluster GetCluster(ClusterConfig clusterConfig)
         {
-            return _instance.Value.GetCluster(clusterConfig);
+            return EnglightenmentMgr.ClusterManager().GetCluster(clusterConfig);
         }
 
         public static void Shutdown()
         {
-            _instance.Value.Shutdown();
+            EnglightenmentMgr.ClusterManager().Shutdown();
         }
 
         public static void Configure(CassandraSharpConfig config)
         {
-            _instance.Value.Configure(config);
+            EnglightenmentMgr.ClusterManager().Configure(config);
         }
     }
 }
