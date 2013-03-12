@@ -184,7 +184,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         {
                             byte[] elemRawKey = ms.ReadShortBytes();
                             byte[] elemRawValue = ms.ReadShortBytes();
-                            object key = Deserialize(columnSpec.CollectionValueType, elemRawKey);
+                            object key = Deserialize(columnSpec.CollectionKeyType, elemRawKey);
                             object value = Deserialize(columnSpec.CollectionValueType, elemRawValue);
                             dic.Add(key, value);
                             --nbElem;
