@@ -130,6 +130,8 @@
 		<XmlPoke XmlInputPath="$(NuGetApiPackageDir)\$(ApiProjectName).nuspec" Query="/package/metadata/version" Value="$(ApiVersion)$(ApiStatus)" />
 		<Exec Command="$(NuGet) pack $(NuGetApiPackageDir)\$(ApiProjectName).nuspec -OutputDirectory $(OutDir)" />
 
+		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetCorePackageDir)\lib\net40" />		
+		<Copy SourceFiles="@(ApiFiles-net45)" DestinationFolder="$(NuGetCorePackageDir)\lib\net45" />		
 		<Copy SourceFiles="@(CoreFiles-net40)" DestinationFolder="$(NuGetCorePackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(CoreFiles-net45)" DestinationFolder="$(NuGetCorePackageDir)\lib\net45" />		
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetCorePackageDir)" />

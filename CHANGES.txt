@@ -1,3 +1,6 @@
+version 3.1.2
+- reference on cassandra-sharp should reference automatically Cassandra.Interfaces.dll
+
 version 3.1.1
 - fixed deserialization of key for map
 

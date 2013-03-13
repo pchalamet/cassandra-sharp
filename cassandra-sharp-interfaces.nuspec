@@ -3,14 +3,14 @@
   <metadata>
     <id>cassandra-sharp-interfaces</id>
     <version>0.0.0.0</version>
-	<title>cassandra-sharp-interfaces - high performance .NET driver for Apache Cassandra</title>
+	<title>cassandra-sharp-interfaces - interfaces for cassandra-sharp</title>
     <authors>Pierre Chalamet</authors>
     <owners>Pierre Chalamet</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/pchalamet/cassandra-sharp</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>cassandra-sharp is a high performance .NET driver for Apache Cassandra, fully supporting asynchronous operations (using TPL and Rx) and CQL 3 binary protocol.</summary>
-    <description>Interfaces for cassandra-sharp-interfaces</description>
+    <description>Interfaces for cassandra-sharp</description>
     <tags>apache cassandra driver net40 net45 mono database nosql tpl rx reactive high performance streaming</tags>
     <references>
         <reference file="CassandraSharp.Interfaces.dll" />
