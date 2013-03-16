@@ -50,7 +50,10 @@ namespace CassandraSharp.CQLBinaryProtocol
             switch (columnSpec.ColumnType)
             {
                 case ColumnType.List:
-                    ICollection coll = (ICollection) data;
+                case ColumnType.Set:
+                    var colType = columnSpec.CollectionValueType.ToType();
+                    Type typedColl = typeof(CollectionAccessor<>).MakeGenericType(colType);
+                    ICollectionAccessor coll = (ICollectionAccessor) Activator.CreateInstance(typedColl, data);
                     using (MemoryStream ms = new MemoryStream())
                     {
                         ms.WriteShort((short) coll.Count);
@@ -62,19 +65,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         rawData = ms.ToArray();
                     }
                     break;
-                case ColumnType.Set:
-                    IEnumerable set = (IEnumerable)data;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ms.WriteShort(Convert.ToInt16(data.GetType().GetProperty("Count").GetValue(data, null)));
-                        foreach (object elem in set)
-                        {
-                            byte[] rawDataElem = Serialize(columnSpec.CollectionValueType, elem);
-                            ms.WriteShortByteArray(rawDataElem);
-                        }
-                        rawData = ms.ToArray();
-                    }
-                    break;
+
                 case ColumnType.Map:
                     IDictionary map = (IDictionary) data;
                     using (MemoryStream ms = new MemoryStream())
