@@ -173,6 +173,7 @@
     <Target Name="Publish" DependsOnTargets="ReadVersions">
 		<Exec Command="$(NuGet) push $(OutDir)\$(ApiProjectName).$(ApiVersion)$(ApiStatus).nupkg" ContinueOnError="true" />		
 		<Exec Command="$(NuGet) push $(OutDir)\$(CoreProjectName).$(CoreVersion)$(CoreStatus).nupkg" ContinueOnError="true" />		
+		<Exec Command="$(NuGet) push $(OutDir)\$(MainProjectName).$(CoreVersion)$(CoreStatus).nupkg" ContinueOnError="true" />		
 		<Exec Command="$(NuGet) push $(OutDir)\$(ToolsProjectName).$(CoreVersion)$(CoreStatus).nupkg" ContinueOnError="true" />		
     </Target>	
 	
