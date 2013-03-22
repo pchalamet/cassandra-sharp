@@ -51,7 +51,9 @@ namespace CassandraSharp.CQLBinaryProtocol
             {
                 case ColumnType.List:
                 case ColumnType.Set:
-                    ICollection coll = (ICollection) data;
+                    var colType = columnSpec.CollectionValueType.ToType();
+                    Type typedColl = typeof(CollectionAccessor<>).MakeGenericType(colType);
+                    ICollectionAccessor coll = (ICollectionAccessor) Activator.CreateInstance(typedColl, data);
                     using (MemoryStream ms = new MemoryStream())
                     {
                         ms.WriteShort((short) coll.Count);

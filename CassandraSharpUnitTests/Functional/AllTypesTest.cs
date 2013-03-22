@@ -16,15 +16,13 @@
 namespace CassandraSharpUnitTests.Functional
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Utils;
-    using CassandraSharpUnitTests.EndpointStrategy;
-    using CassandraSharpUnitTests.Utils;
     using NUnit.Framework;
 
     [TestFixture]
@@ -51,6 +49,12 @@ namespace CassandraSharpUnitTests.Functional
             public IPAddress CInet;
 
             public int CInt;
+
+            public List<int> CList;
+
+            public Dictionary<string, int> CMap;
+
+            public HashSet<int> CSet;
 
             public string CText;
 
@@ -118,6 +122,9 @@ namespace CassandraSharpUnitTests.Functional
                                                                             cUuid uuid,
                                                                             cVarchar varchar,
                                                                             cVarint varint,
+                                                                            cList list<int>,
+                                                                            cSet set<int>,
+                                                                            cMap map<text, int>,
                                                           PRIMARY KEY (cInt))";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
@@ -127,8 +134,8 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine();
 
                 const string insertBatch = @"insert into Tests.AllTypes (cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat,
-                                                                         cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar)
-                                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                         cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap)
+                                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 var prepared = cmd.Prepare(insertBatch);
 
                 var allTypesInsert = new AllTypes
@@ -146,6 +153,9 @@ namespace CassandraSharpUnitTests.Functional
                             CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
                             CUuid = Guid.NewGuid(),
                             CVarchar = new string('x', 5000),
+                            CList = new List<int> {1, 2, 3},
+                            CSet = new HashSet<int> {1, 2, 3},
+                            CMap = new Dictionary<string, int> {{"one", 1}, {"two", 2}, {"three", 3}},
                     };
 
                 prepared.Execute(allTypesInsert).AsFuture().Wait();
@@ -168,6 +178,9 @@ namespace CassandraSharpUnitTests.Functional
                 Assert.AreEqual(allTypesInsert.CTimeuuid, allTypesSelect.CTimeuuid);
                 Assert.AreEqual(allTypesInsert.CUuid, allTypesSelect.CUuid);
                 Assert.AreEqual(allTypesInsert.CVarchar, allTypesSelect.CVarchar);
+                Assert.AreEqual(allTypesInsert.CList, allTypesSelect.CList);
+                Assert.AreEqual(allTypesInsert.CSet, allTypesSelect.CSet);
+                Assert.AreEqual(allTypesInsert.CMap, allTypesSelect.CMap);
             }
 
             ClusterManager.Shutdown();
