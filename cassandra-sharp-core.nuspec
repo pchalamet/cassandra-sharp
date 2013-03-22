@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>cassandra-sharp</id>
+    <id>cassandra-sharp-core</id>
     <version>0.0.0.0</version>
 	<title>cassandra-sharp - high performance .NET driver for Apache Cassandra</title>
     <authors>Pierre Chalamet</authors>
@@ -9,26 +9,10 @@
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/pchalamet/cassandra-sharp</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <summary>cassandra-sharp is a high performance .NET driver for Apache Cassandra, fully supporting asynchronous operations (using TPL and Rx) and CQL 3 binary protocol.</summary>
-    <description>cassandra-sharp - high performance .NET driver for Apache Cassandra.
-
-Major features ():
-* async operations (Rx / TPL) - fully compatible with C# async
-* streaming support
-* extensible rowset mapping (poco and map provided out of the box)
-* robust connection handling (with recovery)
-* multiple extension points
-
-cassandra-sharp does support:
-* .NET 4.0+ (Microsoft .NET or Mono)
-* CQL 3.0 (Binary Protocol)
-* Apache Cassandra 1.2+
-
-See https://github.com/pchalamet/cassandra-sharp for more information.
-</description>
+    <summary>Core implementation of cassandra-sharp</summary>
+    <description>Core implementation of cassandra-sharp</description>
     <tags>apache cassandra driver net40 net45 mono database nosql tpl rx reactive high performance streaming</tags>
     <references>
-		<reference file="CassandraSharp.Interfaces.dll" />
 		<reference file="CassandraSharp.dll" />
 		<reference file="System.Reactive.Core.dll" />
 		<reference file="System.Reactive.Interfaces.dll" />
@@ -37,8 +21,6 @@ See https://github.com/pchalamet/cassandra-sharp for more information.
     </references>
 	
 	<dependencies>
-		<dependency id="cassandra-sharp-interfaces" version="0.0.0" />
-		<dependency id="cassandra-sharp-core" version="0.0.0" />
 		<dependency id="Rx-Main" version="2.1.30214.0" />
 	</dependencies>
   </metadata>

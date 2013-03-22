@@ -19,6 +19,10 @@
 		<XmlQuery XmlFileName="Version.xml" XPath="/version/cassandra-sharp/@state">
 			<Output TaskParameter="Values" PropertyName="CoreStatus" />
 		</XmlQuery>
+		
+		<XmlQuery XmlFileName="Version.xml" XPath="/version/Rx/@version">
+			<Output TaskParameter="Values" PropertyName="RxVersion" />
+		</XmlQuery>		
 	</Target>
 
 	<PropertyGroup>
@@ -32,12 +36,14 @@
 		<NuGet>.nuget\NuGet.exe</NuGet>
 
 		<ApiProjectName>cassandra-sharp-interfaces</ApiProjectName>
-		<CoreProjectName>cassandra-sharp</CoreProjectName>
+		<CoreProjectName>cassandra-sharp-core</CoreProjectName>
+		<MainProjectName>cassandra-sharp</MainProjectName>
 		<ToolsProjectName>cassandra-sharp-tools</ToolsProjectName>
 
 		<NuGetRootDir>$(OutDir)\NuGet</NuGetRootDir>
 		<NuGetApiPackageDir>$(NuGetRootDir)\$(ApiProjectName)</NuGetApiPackageDir>
 		<NuGetCorePackageDir>$(NuGetRootDir)\$(CoreProjectName)</NuGetCorePackageDir>
+		<NuGetMainPackageDir>$(NuGetRootDir)\$(MainProjectName)</NuGetMainPackageDir>
 		<NuGetToolsPackageDir>$(NuGetRootDir)\$(ToolsProjectName)</NuGetToolsPackageDir>
 	</PropertyGroup>
 	
@@ -111,7 +117,7 @@
 					  AssemblyVersion="$(CoreVersion)" 
 					  AssemblyFileVersion="$(CoreVersion)"
 					  AssemblyInformationalVersion="$(CoreVersion)$(CoreStatus)"
-					  OutputFile="$(CoreProjectName)-version.cs" />
+					  OutputFile="$(MainProjectName)-version.cs" />
     </Target>
 
     <Target Name="GenerateThrift">
@@ -119,7 +125,7 @@
     </Target>
 
     <Target Name="Compile" DependsOnTargets="GenerateAssemblyInfo;GenerateThrift">
-        <MSBuild Projects="$(CoreProjectName).sln" />
+        <MSBuild Projects="$(MainProjectName).sln" />
     </Target>
 
 	<Target Name="BuildNuGetPackages" DependsOnTargets="Clean;Compile">
@@ -130,15 +136,21 @@
 		<XmlPoke XmlInputPath="$(NuGetApiPackageDir)\$(ApiProjectName).nuspec" Query="/package/metadata/version" Value="$(ApiVersion)$(ApiStatus)" />
 		<Exec Command="$(NuGet) pack $(NuGetApiPackageDir)\$(ApiProjectName).nuspec -OutputDirectory $(OutDir)" />
 
-		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetCorePackageDir)\lib\net40" />		
-		<Copy SourceFiles="@(ApiFiles-net45)" DestinationFolder="$(NuGetCorePackageDir)\lib\net45" />		
 		<Copy SourceFiles="@(CoreFiles-net40)" DestinationFolder="$(NuGetCorePackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(CoreFiles-net45)" DestinationFolder="$(NuGetCorePackageDir)\lib\net45" />		
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetCorePackageDir)" />
 		<Copy SourceFiles="$(CoreProjectName).nuspec" DestinationFolder="$(NuGetCorePackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/version" Value="$(CoreVersion)$(CoreStatus)" />
-		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='cassandra-sharp-interfaces']/@version" Value="$(ApiVersion)$(ApiStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='Rx-Main']/@version" Value="$(RxVersion)" />
 		<Exec Command="$(NuGet) pack $(NuGetCorePackageDir)\$(CoreProjectName).nuspec -OutputDirectory $(OutDir)" />
+
+		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetMainPackageDir)" />
+		<Copy SourceFiles="$(CoreProjectName).nuspec" DestinationFolder="$(NuGetMainPackageDir)" />
+		<XmlPoke XmlInputPath="$(NuGetMainPackageDir)\$(MainProjectName).nuspec" Query="/package/metadata/version" Value="$(CoreVersion)$(CoreStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetMainPackageDir)\$(MainProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='cassandra-sharp-interfaces']/@version" Value="$(ApiVersion)$(ApiStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetMainPackageDir)\$(MainProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='cassandra-sharp-core']/@version" Value="$(CoreVersion)$(CoreStatus)" />
+		<XmlPoke XmlInputPath="$(NuGetMainPackageDir)\$(MainProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='Rx-Main']/@version" Value="$(RxVersion)" />
+		<Exec Command="$(NuGet) pack $(NuGetMainPackageDir)\$(MainProjectName).nuspec -OutputDirectory $(OutDir)" />
 		
 		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
