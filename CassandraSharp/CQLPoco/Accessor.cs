@@ -17,6 +17,7 @@ namespace CassandraSharp.CQLPoco
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
@@ -39,8 +40,14 @@ namespace CassandraSharp.CQLPoco
             MethodInfo strToLower = typeof(string).GetMethod("ToLower",
                                                              BindingFlags.Instance | BindingFlags.Public,
                                                              null,
-                                                             new Type[0],
+                                                             new[] {typeof(CultureInfo)},
                                                              null);
+
+            MethodInfo getInvariantCulture = typeof(CultureInfo).GetMethod("get_InvariantCulture",
+                                                                           BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+                                                                           null,
+                                                                           new Type[0],
+                                                                           null);
 
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
             SortedDictionary<int, List<MemberInfo>> hash2Mis = new SortedDictionary<int, List<MemberInfo>>();
@@ -48,7 +55,7 @@ namespace CassandraSharp.CQLPoco
 
             foreach (MemberInfo memberInfo in memberInfos)
             {
-                string name = memberInfo.Name.ToLower();
+                string name = memberInfo.Name.ToLower(CultureInfo.InvariantCulture);
                 int hash = name.GetHashCode();
 
                 List<MemberInfo> mis;
@@ -72,6 +79,7 @@ namespace CassandraSharp.CQLPoco
 
             // get hashcode and store it in [loc 0]
             gen.Emit(OpCodes.Ldarg_1);
+            gen.Emit(OpCodes.Call, getInvariantCulture);
             gen.Emit(OpCodes.Call, strToLower);
             gen.Emit(OpCodes.Call, strGetHashCode);
             gen.Emit(OpCodes.Stloc_0);

@@ -16,6 +16,8 @@
 namespace CassandraSharpUnitTests.CQLPoco
 {
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
@@ -23,7 +25,21 @@ namespace CassandraSharpUnitTests.CQLPoco
 
     public abstract class CommonInstanceBuilderTest
     {
+        private CultureInfo _oldCulture;
+
         protected abstract IInstanceBuilder GetInstanceBuilder<T>();
+
+        [SetUp]
+        public void SetUp()
+        {
+            _oldCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("tr-TR");
+        }
+
+        public void TearDown()
+        {
+            Thread.CurrentThread.CurrentCulture = _oldCulture;
+        }
 
         private static IColumnSpec CreateColumnSpec(string name)
         {
@@ -36,7 +52,7 @@ namespace CassandraSharpUnitTests.CQLPoco
 
             foreach (KeyValuePair<string, object> datum in data)
             {
-                instanceBuilder.Set(CreateColumnSpec(datum.Key), datum.Value); 
+                instanceBuilder.Set(CreateColumnSpec(datum.Key), datum.Value);
             }
 
             Toto toto = instanceBuilder.Build() as Toto;
@@ -49,9 +65,8 @@ namespace CassandraSharpUnitTests.CQLPoco
             Assert.AreEqual(toto.Int, 1);
             Assert.AreEqual(toto.IntProperty, 2);
             Assert.AreEqual(toto.String, "String1");
-            Assert.AreEqual(toto.StringProperty, "String2");            
+            Assert.AreEqual(toto.StringProperty, "String2");
         }
-
 
         [Test]
         public void TestBuilding()
@@ -116,23 +131,23 @@ namespace CassandraSharpUnitTests.CQLPoco
 
         public class Toto
         {
+            public int Int;
+
+            public int? NullNullableInt;
+
+            public int? NullableInt;
+
+            public string String;
+
             public Toto()
             {
                 NullNullableInt = 42;
                 NullNullableIntProperty = 666;
             }
 
-            public int? NullableInt;
-
             public int? NullableIntProperty { get; set; }
 
-            public int? NullNullableInt;
-
             public int? NullNullableIntProperty { get; set; }
-
-            public int Int;
-
-            public string String;
 
             public int IntProperty { get; set; }
 

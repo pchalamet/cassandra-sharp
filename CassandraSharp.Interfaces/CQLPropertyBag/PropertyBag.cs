@@ -16,6 +16,7 @@
 namespace CassandraSharp.CQLPropertyBag
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     public class PropertyBag
@@ -26,13 +27,13 @@ namespace CassandraSharp.CQLPropertyBag
         {
             get
             {
-                string lowName = name.ToLower().Replace("_", "");
+                string lowName = name.ToLower(CultureInfo.InvariantCulture).Replace("_", "");
                 return _map[lowName];
             }
 
             set
             {
-                string lowName = name.ToLower().Replace("_", "");
+                string lowName = name.ToLower(CultureInfo.InvariantCulture).Replace("_", "");
                 _map[lowName] = value;
             }
         }

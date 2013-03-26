@@ -16,6 +16,8 @@
 namespace CassandraSharpUnitTests.CQLPoco
 {
     using System;
+    using System.Globalization;
+    using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
@@ -23,11 +25,25 @@ namespace CassandraSharpUnitTests.CQLPoco
 
     public abstract class CommonDataSourceTest
     {
+        private CultureInfo _oldCulture;
+
         protected abstract IDataSource GetDataSource<T>();
 
         private static IColumnSpec CreateColumnSpec(string name)
         {
             return new ColumnSpec(0, null, null, name, ColumnType.Custom, null, ColumnType.Custom, ColumnType.Custom);
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            _oldCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("tr-TR");
+        }
+
+        public void TearDown()
+        {
+            Thread.CurrentThread.CurrentCulture = _oldCulture;
         }
 
         [Test]
@@ -84,17 +100,17 @@ namespace CassandraSharpUnitTests.CQLPoco
 
         public class Toto
         {
-            public int? NullableInt;
-
-            public int? NullableIntProperty { get; set; }
+            public int Int;
 
             public int? NullNullableInt;
 
-            public int? NullNullableIntProperty { get; set; }
-
-            public int Int;
+            public int? NullableInt;
 
             public string String;
+
+            public int? NullableIntProperty { get; set; }
+
+            public int? NullNullableIntProperty { get; set; }
 
             public int IntProperty { get; set; }
 
