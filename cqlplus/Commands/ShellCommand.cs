@@ -31,6 +31,7 @@ namespace cqlplus.Commands
                     {"cls", typeof(ClearScreen)},
                     {"exec", typeof(Exec)},
                     {"source", typeof(Source)},
+                    {"bulkinsert", typeof(BulkInsert)},
             };
 
         private readonly string _name;

@@ -98,6 +98,7 @@ Sample client
 Thanks
 ======
 JetBrains provided a free licence of Resharper for the cassandra-sharp project. Big thanks for the awesome product.
+![ReSharper](http://www.jetbrains.com/resharper/features/rs/rs1/rs468x60_violet.gif)
 
 This projects also relies on the following third parties:
 * MSBuild Community Tasks Project (http://msbuildtasks.tigris.org/) released under BSD License
