@@ -225,9 +225,13 @@ namespace CassandraSharp.CQLBinaryProtocol
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
                     byte[] rawData = stream.ReadByteArray();
-                    object data = null != rawData
-                                          ? colSpec.Deserialize(rawData)
-                                          : null;
+
+                    object data = null;
+                    if (null != rawData)
+                    {
+                        data = colSpec.Deserialize(rawData);
+                    }
+
                     instanceBuilder.Set(colSpec, data);
                 }
 
@@ -298,8 +302,13 @@ namespace CassandraSharp.CQLBinaryProtocol
             IDataSource dataSource = factory.DataSource;
             foreach (IColumnSpec columnSpec in columnSpecs)
             {
+                byte[] rawData = null;
                 object data = dataSource.Get(columnSpec);
-                byte[] rawData = columnSpec.Serialize(data);
+                if (null != data)
+                {
+                    rawData = columnSpec.Serialize(data);
+                }
+
                 stream.WriteByteArray(rawData);
             }
 
