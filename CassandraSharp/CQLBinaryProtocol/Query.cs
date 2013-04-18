@@ -19,7 +19,6 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Collections.Generic;
     using System.Reactive.Disposables;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Instrumentation;
 
     public class Query : IObservable<object>
     {
