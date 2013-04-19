@@ -1,4 +1,4 @@
-version 3.1.5
+version 3.1.5 (NO RELEASED)
 - use culture invariant for identifier conversion
 - refactoring of query commands
 - fluent interface for queries (introduced ICqlQuery) to allow setting CL, execution flags & hints
