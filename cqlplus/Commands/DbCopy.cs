@@ -23,7 +23,7 @@ namespace cqlplus.Commands
     using CassandraSharp.CQLPropertyBag;
 
     [Description("select and insert data into a Cassandra table")]
-    internal class BulkInsert : CommandBase
+    internal class DbCopy : CommandBase
     {
         [Description("Select query", Mandatory = true)]
         public string Command { get; set; }

@@ -1,9 +1,10 @@
-version 3.1.5 (NO RELEASED)
+version 3.1.5 (NOT RELEASED)
 - use culture invariant for identifier conversion
 - refactoring of query commands
 - fluent interface for queries (introduced ICqlQuery) to allow setting CL, execution flags & hints
 - ICqlCommand.Execute & IPreparedQuery.Execute with all parameters are depreacated. Use fluent interface instead. 
   These methods will be removed in 3.2
+- data transfer tool available in cqlplus (DbCopy) from database (oledb) to Cassandra
 
 version 3.1.4
 - split cassandra-sharp in 3 NuGet packages: cassandra-sharp (main), cassandra-sharp-interfaces & cassandra-sharp-core
