@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
     using System.Linq;
-    using System.Reactive.Linq;
+    using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
 
     internal class PreparedQuery<T> : IPreparedQuery<T>
@@ -46,7 +46,13 @@ namespace CassandraSharp.CQLBinaryProtocol
             _executionFlags = executionFlags;
         }
 
-        public IObservable<T> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM, QueryHint hint = null)
+        [Obsolete("Use Execute(object) instead")]
+        public ICqlQuery<T> Execute(object dataSource, ConsistencyLevel cl, QueryHint hint = null)
+        {
+            return Execute(dataSource).WithConsistencyLevel(cl).WithExecutionFlags(_executionFlags).WithHint(hint);
+        }
+
+        public ICqlQuery<T> Execute(object dataSource)
         {
             IConnection connection;
             if (null == (connection = _connection))
@@ -58,10 +64,10 @@ namespace CassandraSharp.CQLBinaryProtocol
                         connection = _cluster.GetConnection();
                         connection.OnFailure += ConnectionOnOnFailure;
 
-                        var obsPrepare = CQLCommandHelpers.CreatePrepareQuery(connection, _cql, _executionFlags);
+                        var obsPrepare = new PrepareQuery(connection, _cql);
                         var futPrepare = obsPrepare.AsFuture();
                         futPrepare.Wait();
-                        Tuple<byte[], IColumnSpec[]> preparedInfo = (Tuple<byte[], IColumnSpec[]>) futPrepare.Result.Single();
+                        Tuple<byte[], IColumnSpec[]> preparedInfo = futPrepare.Result.Single();
 
                         _id = preparedInfo.Item1;
                         _columnSpecs = preparedInfo.Item2;
@@ -71,9 +77,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             IDataMapperFactory factory = _dataMapper.Create<T>(dataSource);
-            var query = CQLCommandHelpers.CreateExecuteQuery(connection, _id, _columnSpecs, cl, _executionFlags, _cql, factory);
-            var queryT = query.Cast<T>();
-            return queryT;
+            var query = new ExecuteQuery<T>(connection, _cql, _id, _columnSpecs, factory).WithExecutionFlags(_executionFlags);
+            return query;
         }
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)

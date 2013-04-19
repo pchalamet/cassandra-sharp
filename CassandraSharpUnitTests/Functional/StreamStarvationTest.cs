@@ -20,7 +20,6 @@ namespace CassandraSharpUnitTests.Functional
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;
@@ -52,6 +51,10 @@ namespace CassandraSharpUnitTests.Functional
             Log(format, prms);
         }
 
+        public void Dispose()
+        {
+        }
+
         public bool IsDebugEnabled()
         {
             return true;
@@ -63,10 +66,6 @@ namespace CassandraSharpUnitTests.Functional
             sb.AppendFormat("LOG   {0} [{1}] - ", DateTime.Now, Thread.CurrentThread.ManagedThreadId);
             sb.AppendFormat(format, prms);
             Console.WriteLine(sb);
-        }
-
-        public void Dispose()
-        {
         }
     }
 
@@ -95,14 +94,14 @@ namespace CassandraSharpUnitTests.Functional
                 logger.Debug("start fail update #" + i);
                 try
                 {
-                    if (0 == (i%2))
+                    if (0 == (i % 2))
                     {
-                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}, ConsistencyLevel.ONE).AsFuture().Wait();
+                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}).WithConsistencyLevel(ConsistencyLevel.ONE).AsFuture().Wait();
                         Assert.IsTrue(false, "Update should have failed");
                     }
                     else
                     {
-                        prepared.Execute(new {bar = "bar" + 1, intid = i, strid = "1"}, ConsistencyLevel.ONE).AsFuture().Wait();
+                        prepared.Execute(new {bar = "bar" + 1, intid = i, strid = "1"}).WithConsistencyLevel(ConsistencyLevel.ONE).AsFuture().Wait();
                         Console.WriteLine("Update {0} sucessful", i);
                     }
                 }

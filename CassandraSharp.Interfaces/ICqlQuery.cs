@@ -13,20 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp
 {
-    public enum RequestType
+    using System;
+
+    public interface ICqlQuery<out T> : IObservable<T>
     {
-        Ready,
+        ICqlQuery<T> WithConsistencyLevel(ConsistencyLevel cl);
 
-        Options,
+        ICqlQuery<T> WithExecutionFlags(ExecutionFlags executionFlags);
 
-        Authenticate,
-
-        Prepare,
-
-        Query,
-
-        Execute
+        ICqlQuery<T> WithHint(QueryHint hint);
     }
 }

@@ -19,6 +19,9 @@ namespace CassandraSharp
 
     public interface IPreparedQuery<out T>
     {
-        IObservable<T> Execute(object dataSource, ConsistencyLevel cl = ConsistencyLevel.QUORUM, QueryHint hint = null);
+        [Obsolete("Use Execute(object) instead")]
+        ICqlQuery<T> Execute(object dataSource, ConsistencyLevel cl, QueryHint hint = null);
+
+        ICqlQuery<T> Execute(object dataSource);
     }
 }

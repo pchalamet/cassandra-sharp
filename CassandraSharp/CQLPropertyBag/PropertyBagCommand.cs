@@ -27,11 +27,12 @@ namespace CassandraSharp.CQLPropertyBag
         {
         }
 
-        public IObservable<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                                ExecutionFlags executionFlags = ExecutionFlags.None,
-                                                QueryHint hint = null)
+        [Obsolete("Use Prepare(string) instead")]
+        public ICqlQuery<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                              ExecutionFlags executionFlags = ExecutionFlags.None,
+                                              QueryHint hint = null)
         {
-            return Execute<PropertyBag>(cql, cl, executionFlags, hint);
+            return Execute<PropertyBag>(cql).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags).WithHint(hint);
         }
 
         public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)

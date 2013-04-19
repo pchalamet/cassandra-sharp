@@ -26,6 +26,6 @@ namespace CassandraSharp
 
         event EventHandler<FailureEventArgs> OnFailure;
 
-        void Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, InstrumentationToken token, IObserver<object> observer);
+        void Execute<T>(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<T>> reader, InstrumentationToken token, IObserver<T> observer);
     }
 }

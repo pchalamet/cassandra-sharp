@@ -16,7 +16,7 @@
 namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
-    using System.Reactive.Linq;
+    using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
 
     public abstract class Command : ICqlCommand
@@ -31,13 +31,22 @@ namespace CassandraSharp.CQLBinaryProtocol
             DataMapper = dataMapper;
         }
 
-        public IObservable<T> Execute<T>(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM, ExecutionFlags executionFlags = ExecutionFlags.None,
-                                         QueryHint hint = null)
+        [Obsolete("Use Execute(string) instead")]
+        public ICqlQuery<T> Execute<T>(string cql, ConsistencyLevel cl, ExecutionFlags executionFlags = ExecutionFlags.None,
+                                       QueryHint hint = null)
         {
             IDataMapperFactory factory = DataMapper.Create<T>();
             IConnection connection = Cluster.GetConnection();
-            IObservable<object> query = CQLCommandHelpers.CreateQuery(connection, cql, cl, factory, executionFlags);
-            return query.Cast<T>();
+            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factory).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags);
+            return query;
+        }
+
+        public ICqlQuery<T> Execute<T>(string cql)
+        {
+            IDataMapperFactory factory = DataMapper.Create<T>();
+            IConnection connection = Cluster.GetConnection();
+            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factory);
+            return query;
         }
 
         public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)

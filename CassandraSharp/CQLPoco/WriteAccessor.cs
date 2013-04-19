@@ -21,9 +21,9 @@ namespace CassandraSharp.CQLPoco
 
     internal class WriteAccessor<T> : Accessor<T>
     {
-        private readonly WriteValue _writeValue;
-
         private readonly NewInstance _newInstance;
+
+        private readonly WriteValue _writeValue;
 
         public WriteAccessor()
         {
@@ -85,7 +85,7 @@ namespace CassandraSharp.CQLPoco
             }
             gen.Emit(OpCodes.Ret);
 
-            NewInstance newInstance = (NewInstance)dm.CreateDelegate(typeof(NewInstance));
+            NewInstance newInstance = (NewInstance) dm.CreateDelegate(typeof(NewInstance));
             return newInstance;
         }
 
@@ -129,8 +129,8 @@ namespace CassandraSharp.CQLPoco
             gen.Emit(OpCodes.Ret);
         }
 
-        private delegate bool WriteValue(ref T dataSource, string name, object value);
-
         private delegate T NewInstance();
+
+        private delegate bool WriteValue(ref T dataSource, string name, object value);
     }
 }

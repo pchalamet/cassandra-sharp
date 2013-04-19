@@ -65,7 +65,7 @@ namespace Samples.PreparedStatement
 
                 var data = new byte[30000];
                 // var data = (float)random.NextDouble();
-                preparedInsert.Execute(new {id = i, Baz = data}, ConsistencyLevel.ONE).AsFuture()
+                preparedInsert.Execute(new {id = i, Baz = data}).WithConsistencyLevel(ConsistencyLevel.ONE).AsFuture()
                               .ContinueWith(_ => Interlocked.Decrement(ref _running));
             }
 

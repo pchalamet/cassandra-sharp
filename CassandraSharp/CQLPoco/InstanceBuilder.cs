@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.CQLPoco
 {
-    using System;
     using System.Runtime.Serialization;
     using CassandraSharp.Extensibility;
 

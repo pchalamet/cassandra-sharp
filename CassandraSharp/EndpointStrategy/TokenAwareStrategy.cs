@@ -62,7 +62,7 @@ namespace CassandraSharp.EndpointStrategy
                 int rf = hint.ReplicationFactor;
                 while (rf > 0)
                 {
-                    idx = idx%_partitions.Length;
+                    idx = idx % _partitions.Length;
                     IPAddress endpoint = _partitions[idx].Node;
                     if (_stateEndpoints[endpoint])
                     {

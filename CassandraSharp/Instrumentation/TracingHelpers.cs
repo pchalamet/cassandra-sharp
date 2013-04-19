@@ -17,9 +17,8 @@ namespace CassandraSharp.Instrumentation
 {
     using System;
     using System.Linq;
-    using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
 
@@ -64,7 +63,10 @@ namespace CassandraSharp.Instrumentation
         {
             string queryEvents = "select * from system_traces.events where session_id=" + tracingId;
             IDataMapperFactory facEvents = new DataMapperFactory<TracingEvent>(null);
-            var obsEvents = CQLCommandHelpers.CreateQuery(connection, queryEvents, ConsistencyLevel.ONE, facEvents, ExecutionFlags.None).Cast<TracingEvent>();
+            var obsEvents =
+                    new CqlQuery<TracingEvent>(connection, queryEvents, facEvents)
+                            .WithConsistencyLevel(ConsistencyLevel.ONE)
+                            .WithExecutionFlags(ExecutionFlags.None);
             var tracingEvents = obsEvents.AsFuture().Result.ToList();
             tracingEvents.Sort(CompareTracingEvent);
             TracingEvent[] events = tracingEvents.ToArray();
@@ -73,7 +75,9 @@ namespace CassandraSharp.Instrumentation
 
             IDataMapperFactory facSession = new DataMapperFactory<TracingSession>(null);
             var obsSession =
-                    CQLCommandHelpers.CreateQuery(connection, querySession, ConsistencyLevel.ONE, facSession, ExecutionFlags.None).Cast<TracingSession>();
+                    new CqlQuery<TracingSession>(connection, querySession, facSession)
+                            .WithConsistencyLevel(ConsistencyLevel.ONE)
+                            .WithExecutionFlags(ExecutionFlags.None);
             TracingSession tracingSession = obsSession.AsFuture().Result.Single();
             tracingSession.TracingEvents = events;
 

@@ -37,7 +37,7 @@ namespace CassandraSharp.Recovery
         {
             _logger = logger;
             _toRecover = new List<RecoveryItem>();
-            _timer = new Timer(config.Interval*1000);
+            _timer = new Timer(config.Interval * 1000);
             _timer.Elapsed += (s, e) => TryRecover();
             _timer.AutoReset = false;
             _lock = new object();

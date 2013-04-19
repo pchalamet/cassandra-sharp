@@ -15,13 +15,11 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    using System;
-
     public interface IPropertyBagCommand : ICqlCommand
     {
-        IObservable<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                         ExecutionFlags executionFlags = ExecutionFlags.None,
-                                         QueryHint hint = null);
+        ICqlQuery<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
+                                       ExecutionFlags executionFlags = ExecutionFlags.None,
+                                       QueryHint hint = null);
 
         IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }

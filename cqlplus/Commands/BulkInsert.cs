@@ -70,7 +70,7 @@ namespace cqlplus.Commands
                             var bag = BuildPropertyBag(reader);
 
                             ++count;
-                            insertQuery.Execute(bag, CL).AsFuture();
+                            insertQuery.Execute(bag).WithConsistencyLevel(CL).AsFuture();
                         } while (reader.Read());
 
                         Console.WriteLine("{0} record inserted", count);

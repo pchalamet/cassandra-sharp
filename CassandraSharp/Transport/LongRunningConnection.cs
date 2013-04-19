@@ -24,7 +24,7 @@ namespace CassandraSharp.Transport
     using System.Security.Authentication;
     using System.Threading;
     using System.Threading.Tasks;
-    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Instrumentation;
@@ -100,10 +100,10 @@ namespace CassandraSharp.Transport
 
         public event EventHandler<FailureEventArgs> OnFailure;
 
-        public void Execute(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader, InstrumentationToken token,
-                            IObserver<object> observer)
+        public void Execute<T>(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<T>> reader, InstrumentationToken token,
+                               IObserver<T> observer)
         {
-            QueryInfo queryInfo = new QueryInfo(writer, reader, token, observer);
+            QueryInfo queryInfo = new QueryInfo<T>(writer, reader, token, observer);
             lock (_lock)
             {
                 Monitor.Pulse(_lock);
@@ -156,7 +156,7 @@ namespace CassandraSharp.Transport
             OperationCanceledException canceledException = new OperationCanceledException();
             foreach (QueryInfo queryInfo in _queryInfos.Where(queryInfo => null != queryInfo))
             {
-                queryInfo.Observer.OnError(canceledException);
+                queryInfo.NotifyError(canceledException);
                 _instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
             }
 
@@ -209,7 +209,7 @@ namespace CassandraSharp.Transport
                     bool tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
                     using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(tracing))
                     {
-                        queryInfo.Writer(bufferingFrameWriter);
+                        queryInfo.Write(bufferingFrameWriter);
 
                         byte streamId;
                         lock (_lock)
@@ -239,7 +239,7 @@ namespace CassandraSharp.Transport
                 }
                 catch (Exception ex)
                 {
-                    queryInfo.Observer.OnError(ex);
+                    queryInfo.NotifyError(ex);
                     if (ex is SocketException || ex is IOException)
                     {
                         throw;
@@ -277,31 +277,25 @@ namespace CassandraSharp.Transport
                         {
                             throw new OperationCanceledException();
                         }
-                        
+
                         _availableStreamIds.Push(streamId);
                     }
 
                     _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
-                    IObserver<object> observer = queryInfo.Observer;
                     try
                     {
                         if (null == frameReader.ResponseException)
                         {
-                            IEnumerable<object> data = queryInfo.Reader(frameReader);
-                            foreach (object datum in data)
-                            {
-                                observer.OnNext(datum);
-                            }
-                            observer.OnCompleted();
+                            queryInfo.Push(frameReader);
                         }
                         else
                         {
-                            observer.OnError(frameReader.ResponseException);
+                            queryInfo.NotifyError(frameReader.ResponseException);
                         }
                     }
                     catch (Exception ex)
                     {
-                        observer.OnError(ex);
+                        queryInfo.NotifyError(ex);
                         if (ex is SocketException || ex is IOException)
                         {
                             throw;
@@ -327,18 +321,16 @@ namespace CassandraSharp.Transport
 
         private void GetOptions()
         {
-            IObservable<object> obsOptions = CQLCommandHelpers.CreateOptionsQuery(this);
-            Task<IList<object>> res = obsOptions.AsFuture();
-            res.Wait();
+            var obsOptions = new CreateOptionsQuery(this).AsFuture();
+            obsOptions.Wait();
         }
 
         private void ReadifyConnection()
         {
-            IObservable<object> obsReady = CQLCommandHelpers.CreateReadyQuery(this, _config.CqlVersion);
-            Task<IList<object>> res = obsReady.AsFuture();
-            res.Wait();
+            var obsReady = new ReadyQuery(this, _config.CqlVersion).AsFuture();
+            obsReady.Wait();
 
-            bool authenticate = (bool) res.Result.Single();
+            bool authenticate = obsReady.Result.Single();
             if (authenticate)
             {
                 Authenticate();
@@ -352,28 +344,66 @@ namespace CassandraSharp.Transport
                 throw new InvalidCredentialException();
             }
 
-            IObservable<object> obsAuth = CQLCommandHelpers.CreateAuthenticateQuery(this, _config.User, _config.Password);
-            obsAuth.AsFuture().Wait();
+            var obsAuth = new AuthenticateQuery(this, _config.User, _config.Password).AsFuture();
+            obsAuth.Wait();
+            if (! obsAuth.Result.Single())
+            {
+                throw new InvalidCredentialException();
+            }
         }
 
-        private class QueryInfo
+        private abstract class QueryInfo
         {
-            public QueryInfo(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<object>> reader,
-                             InstrumentationToken token, IObserver<object> observer)
+            protected QueryInfo(InstrumentationToken token)
             {
-                Writer = writer;
-                Reader = reader;
                 Token = token;
-                Observer = observer;
             }
-
-            public Func<IFrameReader, IEnumerable<object>> Reader { get; private set; }
 
             public InstrumentationToken Token { get; private set; }
 
-            public Action<IFrameWriter> Writer { get; private set; }
+            public abstract void Write(IFrameWriter frameWriter);
 
-            public IObserver<object> Observer { get; private set; }
+            public abstract void Push(IFrameReader frameReader);
+
+            public abstract void NotifyError(Exception ex);
+        }
+
+        private class QueryInfo<T> : QueryInfo
+        {
+            public QueryInfo(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<T>> reader,
+                             InstrumentationToken token, IObserver<T> observer)
+                    : base(token)
+            {
+                Writer = writer;
+                Reader = reader;
+                Observer = observer;
+            }
+
+            private Func<IFrameReader, IEnumerable<T>> Reader { get; set; }
+
+            private Action<IFrameWriter> Writer { get; set; }
+
+            private IObserver<T> Observer { get; set; }
+
+            public override void Write(IFrameWriter frameWriter)
+            {
+                Writer(frameWriter);
+            }
+
+            public override void Push(IFrameReader frameReader)
+            {
+                IEnumerable<T> data = Reader(frameReader);
+                foreach (T datum in data)
+                {
+                    Observer.OnNext(datum);
+                }
+                Observer.OnCompleted();
+            }
+
+            public override void NotifyError(Exception ex)
+            {
+                Observer.OnError(ex);
+            }
         }
     }
 }

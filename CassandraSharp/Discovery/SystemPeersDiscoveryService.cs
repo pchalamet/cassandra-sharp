@@ -20,9 +20,8 @@ namespace CassandraSharp.Discovery
     using System.Linq;
     using System.Net;
     using System.Numerics;
-    using System.Reactive.Linq;
     using System.Timers;
-    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
@@ -45,7 +44,7 @@ namespace CassandraSharp.Discovery
 
             _logger = logger;
             _cluster = cluster;
-            _timer = new Timer(config.Interval*1000);
+            _timer = new Timer(config.Interval * 1000);
             _timer.Elapsed += (s, e) => TryDiscover();
             _timer.AutoReset = true;
 
@@ -81,12 +80,15 @@ namespace CassandraSharp.Discovery
             {
                 IConnection connection = _cluster.GetConnection();
 
-                var obsLocalPeer = CQLCommandHelpers.CreateQuery(connection, "select tokens from system.local",
-                                                                 ConsistencyLevel.ONE, _peerFactory, ExecutionFlags.None).Cast<DiscoveredPeer>();
+                var obsLocalPeer = new CqlQuery<DiscoveredPeer>(connection, "select tokens from system.local", _peerFactory)
+                        .WithConsistencyLevel(ConsistencyLevel.ONE)
+                        .WithExecutionFlags(ExecutionFlags.None);
                 obsLocalPeer.Subscribe(x => Notify(connection.Endpoint, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
 
-                var obsPeers = CQLCommandHelpers.CreateQuery(connection, "select rpc_address,tokens from system.peers",
-                                                             ConsistencyLevel.ONE, _peerFactory, ExecutionFlags.None).Cast<DiscoveredPeer>();
+                var obsPeers =
+                        new CqlQuery<DiscoveredPeer>(connection, "select rpc_address,tokens from system.peers", _peerFactory)
+                                .WithConsistencyLevel(ConsistencyLevel.ONE)
+                                .WithExecutionFlags(ExecutionFlags.None);
                 obsPeers.Subscribe(x => Notify(x.RpcAddress, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
             }
             catch (Exception ex)

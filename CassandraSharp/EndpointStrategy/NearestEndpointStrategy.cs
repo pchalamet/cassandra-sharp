@@ -39,7 +39,7 @@ namespace CassandraSharp.EndpointStrategy
             _clientAddress = NetworkFinder.Find(Dns.GetHostName());
             if (null == _clientAddress)
             {
-                throw new ArgumentException("Failed to resolve IP for client address");    
+                throw new ArgumentException("Failed to resolve IP for client address");
             }
 
             _healthyEndpoints = snitch.GetSortedListByProximity(_clientAddress, endpoints);

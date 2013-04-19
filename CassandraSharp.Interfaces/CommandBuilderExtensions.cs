@@ -13,20 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp
 {
-    public enum RequestType
+    using System;
+
+    public static class CommandBuilderExtensions
     {
-        Ready,
-
-        Options,
-
-        Authenticate,
-
-        Prepare,
-
-        Query,
-
-        Execute
+        public static ICqlCommand CreateCommand(this ICluster @this)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

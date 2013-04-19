@@ -32,10 +32,16 @@ namespace CassandraSharp
             return EnglightenmentMgr.Future().AsFuture(observable);
         }
 
-        public static IObservable<NonQuery> Execute(this ICqlCommand @this, string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                                    ExecutionFlags executionFlags = ExecutionFlags.None, object key = null)
+        [Obsolete("Use Execute(string)")]
+        public static ICqlQuery<NonQuery> Execute(this ICqlCommand @this, string cql, ConsistencyLevel cl,
+                                                  ExecutionFlags executionFlags = ExecutionFlags.None, object key = null)
         {
-            return @this.Execute<NonQuery>(cql, cl, executionFlags);
+            return @this.Execute<NonQuery>(cql).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags);
+        }
+
+        public static ICqlQuery<NonQuery> Execute(this ICqlCommand @this, string cql)
+        {
+            return @this.Execute<NonQuery>(cql);
         }
 
         public static IPreparedQuery<NonQuery> Prepare(this ICqlCommand @this, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)

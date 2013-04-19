@@ -101,7 +101,7 @@ namespace CassandraSharp.CQLPoco
                 return;
             }
 
-            int mid = (max + min)/2;
+            int mid = (max + min) / 2;
 
             Label seachLeftLabel = gen.DefineLabel();
             Label seachRightLabel = gen.DefineLabel();

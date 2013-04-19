@@ -29,6 +29,7 @@ namespace CassandraSharp.Utils
     {
 // ReSharper disable StaticFieldInGenericType
         private static readonly IServiceDescriptor _descriptor = new T();
+
 // ReSharper restore StaticFieldInGenericType
 
         public static TI Create<TI>(string customType, params object[] prms)
