@@ -17,7 +17,7 @@ namespace cqlplus.Commands
 {
     using System;
     using System.Data;
-    using System.Data.OleDb;
+    using System.Data.SqlClient;
     using System.Text;
     using CassandraSharp;
     using CassandraSharp.CQLPropertyBag;
@@ -28,7 +28,10 @@ namespace cqlplus.Commands
         [Description("Select query", Mandatory = true)]
         public string Command { get; set; }
 
-        [Description("Database connection string (OleDb)", Mandatory = true)]
+        [Description("Database server", Mandatory = true)]
+        public string DbServer { get; set; }
+
+        [Description("Database name", Mandatory = true)]
         public string Db { get; set; }
 
         [Description("Target keyspace", Mandatory = true)]
@@ -42,10 +45,11 @@ namespace cqlplus.Commands
 
         public override void Execute()
         {
-            using (IDbConnection cnx = new OleDbConnection(Db))
+            string strCnx = string.Format("Server={0}; Database={1}; Trusted_Connection=true", DbServer, Db);
+            using (IDbConnection cnx = new SqlConnection(strCnx))
             {
                 cnx.Open();
-                
+
                 using (IDbCommand cmd = cnx.CreateCommand())
                 {
                     cmd.CommandText = Command;
