@@ -20,7 +20,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using System.Reactive.Disposables;
     using CassandraSharp.Extensibility;
 
-    public abstract class Query<T> : ICqlQuery<T>
+    internal abstract class Query<T> : ICqlQuery<T>
     {
         private readonly IConnection _connection;
 
