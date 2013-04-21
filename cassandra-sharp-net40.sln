@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{220BEE49-7E3C-40D9-B58C-A5299F55419E}"
+	ProjectSection(SolutionItems) = preProject
+		cassandra-sharp.nuspec = cassandra-sharp.nuspec
+		cassandra-sharp.targets = cassandra-sharp.targets
+		CHANGES.txt = CHANGES.txt
+		LICENSE-2.0.txt = LICENSE-2.0.txt
+		README.md = README.md
+		TODO.txt = TODO.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DFC6E4A4-128B-470D-8A06-638EEBB5C31C}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp-net40", "CassandraSharp\CassandraSharp-net40.csproj", "{CCA30206-6177-416C-9303-8D57D6038C77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus-net40", "cqlplus\cqlplus-net40.csproj", "{78237ADE-F2F1-4297-8353-EF4E19F17656}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp.Interfaces-net40", "CassandraSharp.Interfaces\CassandraSharp.Interfaces-net40.csproj", "{A2114728-05BC-4D36-9B3C-327B53CCCBF4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CCA30206-6177-416C-9303-8D57D6038C77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCA30206-6177-416C-9303-8D57D6038C77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCA30206-6177-416C-9303-8D57D6038C77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCA30206-6177-416C-9303-8D57D6038C77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78237ADE-F2F1-4297-8353-EF4E19F17656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78237ADE-F2F1-4297-8353-EF4E19F17656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78237ADE-F2F1-4297-8353-EF4E19F17656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78237ADE-F2F1-4297-8353-EF4E19F17656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
