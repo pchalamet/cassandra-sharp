@@ -40,8 +40,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            var writer = CreateWriter();
-            Func<IFrameReader, IEnumerable<T>> reader = CreateReader;
+            Action<IFrameWriter> writer = WriteFrame;
+            Func<IFrameReader, IEnumerable<T>> reader = ReadFrame;
             var token = CreateToken();
 
             _connection.Execute(writer, reader, token, observer);
@@ -66,9 +66,9 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             return this;
         }
 
-        protected abstract IEnumerable<T> CreateReader(IFrameReader frameReader);
+        protected abstract IEnumerable<T> ReadFrame(IFrameReader frameReader);
 
-        protected abstract Action<IFrameWriter> CreateWriter();
+        protected abstract void WriteFrame(IFrameWriter frameWriter);
 
         protected abstract InstrumentationToken CreateToken();
     }

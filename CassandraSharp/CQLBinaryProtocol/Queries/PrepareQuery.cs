@@ -28,7 +28,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
         }
 
-        protected override IEnumerable<Tuple<byte[], IColumnSpec[]>> CreateReader(IFrameReader frameReader)
+        protected override IEnumerable<Tuple<byte[], IColumnSpec[]>> ReadFrame(IFrameReader frameReader)
         {
             if (MessageOpcodes.Result != frameReader.MessageOpcode)
             {
@@ -50,15 +50,11 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             }
         }
 
-        protected override Action<IFrameWriter> CreateWriter()
+        protected override void WriteFrame(IFrameWriter fw)
         {
-            Action<IFrameWriter> writer = fw =>
-                {
-                    Stream stream = fw.WriteOnlyStream;
-                    stream.WriteLongString(CQL);
-                    fw.SetMessageType(MessageOpcodes.Prepare);
-                };
-            return writer;
+            Stream stream = fw.WriteOnlyStream;
+            stream.WriteLongString(CQL);
+            fw.SetMessageType(MessageOpcodes.Prepare);
         }
 
         protected override InstrumentationToken CreateToken()

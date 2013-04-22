@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.CQLBinaryProtocol.Queries
 {
-    using System;
     using System.IO;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
@@ -33,31 +32,27 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             _columnSpecs = columnSpecs;
         }
 
-        protected override Action<IFrameWriter> CreateWriter()
+        protected override void WriteFrame(IFrameWriter fw)
         {
-            Action<IFrameWriter> writer = fw =>
+            Stream stream = fw.WriteOnlyStream;
+            stream.WriteShortByteArray(_id);
+            stream.WriteShort((short) _columnSpecs.Length);
+
+            IDataSource dataSource = Factory.DataSource;
+            foreach (IColumnSpec columnSpec in _columnSpecs)
+            {
+                byte[] rawData = null;
+                object data = dataSource.Get(columnSpec);
+                if (null != data)
                 {
-                    Stream stream = fw.WriteOnlyStream;
-                    stream.WriteShortByteArray(_id);
-                    stream.WriteShort((short) _columnSpecs.Length);
+                    rawData = columnSpec.Serialize(data);
+                }
 
-                    IDataSource dataSource = Factory.DataSource;
-                    foreach (IColumnSpec columnSpec in _columnSpecs)
-                    {
-                        byte[] rawData = null;
-                        object data = dataSource.Get(columnSpec);
-                        if (null != data)
-                        {
-                            rawData = columnSpec.Serialize(data);
-                        }
+                stream.WriteByteArray(rawData);
+            }
 
-                        stream.WriteByteArray(rawData);
-                    }
-
-                    stream.WriteShort((short) ConsistencyLevel);
-                    fw.SetMessageType(MessageOpcodes.Execute);
-                };
-            return writer;
+            stream.WriteShort((short) ConsistencyLevel);
+            fw.SetMessageType(MessageOpcodes.Execute);
         }
 
         protected override InstrumentationToken CreateToken()

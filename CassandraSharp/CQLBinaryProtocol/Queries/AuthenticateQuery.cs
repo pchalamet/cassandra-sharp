@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.CQLBinaryProtocol.Queries
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using CassandraSharp.Extensibility;
@@ -34,26 +33,22 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             _password = password;
         }
 
-        protected override IEnumerable<bool> CreateReader(IFrameReader frameReader)
+        protected override IEnumerable<bool> ReadFrame(IFrameReader frameReader)
         {
             bool res = frameReader.MessageOpcode == MessageOpcodes.Ready;
             yield return res;
         }
 
-        protected override Action<IFrameWriter> CreateWriter()
+        protected override void WriteFrame(IFrameWriter fw)
         {
-            Action<IFrameWriter> writer = fw =>
+            Stream stream = fw.WriteOnlyStream;
+            Dictionary<string, string> authParams = new Dictionary<string, string>
                 {
-                    Stream stream = fw.WriteOnlyStream;
-                    Dictionary<string, string> authParams = new Dictionary<string, string>
-                        {
-                                {"username", _user},
-                                {"password", _password}
-                        };
-                    stream.WriteStringMap(authParams);
-                    fw.SetMessageType(MessageOpcodes.Credentials);
+                        {"username", _user},
+                        {"password", _password}
                 };
-            return writer;
+            stream.WriteStringMap(authParams);
+            fw.SetMessageType(MessageOpcodes.Credentials);
         }
 
         protected override InstrumentationToken CreateToken()

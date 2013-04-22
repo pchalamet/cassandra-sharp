@@ -35,21 +35,17 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             Factory = factory;
         }
 
-        protected override IEnumerable<T> CreateReader(IFrameReader frameReader)
+        protected override IEnumerable<T> ReadFrame(IFrameReader frameReader)
         {
             return ReadRowSet(frameReader, Factory).Cast<T>();
         }
 
-        protected override Action<IFrameWriter> CreateWriter()
+        protected override void WriteFrame(IFrameWriter fw)
         {
-            Action<IFrameWriter> writer = fw =>
-                {
-                    Stream stream = fw.WriteOnlyStream;
-                    stream.WriteLongString(CQL);
-                    stream.WriteShort((short) ConsistencyLevel);
-                    fw.SetMessageType(MessageOpcodes.Query);
-                };
-            return writer;
+            Stream stream = fw.WriteOnlyStream;
+            stream.WriteLongString(CQL);
+            stream.WriteShort((short) ConsistencyLevel);
+            fw.SetMessageType(MessageOpcodes.Query);
         }
 
         protected override InstrumentationToken CreateToken()

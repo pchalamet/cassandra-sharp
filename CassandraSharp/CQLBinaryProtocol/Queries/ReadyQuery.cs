@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.CQLBinaryProtocol.Queries
 {
-    using System;
     using System.Collections.Generic;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
@@ -30,24 +29,20 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             _cqlVersion = cqlVersion;
         }
 
-        protected override IEnumerable<bool> CreateReader(IFrameReader frameReader)
+        protected override IEnumerable<bool> ReadFrame(IFrameReader frameReader)
         {
             bool mustAuthenticate = frameReader.MessageOpcode == MessageOpcodes.Authenticate;
             yield return mustAuthenticate;
         }
 
-        protected override Action<IFrameWriter> CreateWriter()
+        protected override void WriteFrame(IFrameWriter fw)
         {
-            Action<IFrameWriter> writer = fw =>
+            Dictionary<string, string> options = new Dictionary<string, string>
                 {
-                    Dictionary<string, string> options = new Dictionary<string, string>
-                        {
-                                {"CQL_VERSION", _cqlVersion}
-                        };
-                    fw.WriteOnlyStream.WriteStringMap(options);
-                    fw.SetMessageType(MessageOpcodes.Startup);
+                        {"CQL_VERSION", _cqlVersion}
                 };
-            return writer;
+            fw.WriteOnlyStream.WriteStringMap(options);
+            fw.SetMessageType(MessageOpcodes.Startup);
         }
 
         protected override InstrumentationToken CreateToken()

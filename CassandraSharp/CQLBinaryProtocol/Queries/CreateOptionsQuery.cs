@@ -15,7 +15,6 @@
 
 namespace CassandraSharp.CQLBinaryProtocol.Queries
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using CassandraSharp.Exceptions;
@@ -29,7 +28,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
         }
 
-        protected override IEnumerable<Dictionary<string, string[]>> CreateReader(IFrameReader frameReader)
+        protected override IEnumerable<Dictionary<string, string[]>> ReadFrame(IFrameReader frameReader)
         {
             if (frameReader.MessageOpcode != MessageOpcodes.Supported)
             {
@@ -41,10 +40,9 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             yield return res;
         }
 
-        protected override Action<IFrameWriter> CreateWriter()
+        protected override void WriteFrame(IFrameWriter fw)
         {
-            Action<IFrameWriter> writer = frameWriter => frameWriter.SetMessageType(MessageOpcodes.Options);
-            return writer;
+            fw.SetMessageType(MessageOpcodes.Options);
         }
 
         protected override InstrumentationToken CreateToken()
