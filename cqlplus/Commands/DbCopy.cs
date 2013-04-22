@@ -28,7 +28,7 @@ namespace cqlplus.Commands
         [Description("Select query", Mandatory = true)]
         public string Command { get; set; }
 
-        [Description("Database server connection string (OLEDB connection string)", Mandatory = true)]
+        [Description("OLEDB connection string to datasource", Mandatory = true)]
         public string Db { get; set; }
 
         [Description("Target keyspace", Mandatory = true)]
