@@ -28,42 +28,7 @@ namespace cqlplus.StatementReader
 
         public IEnumerable<string> Read()
         {
-            string statement = "";
-            int semiColomnIdx;
-            foreach (string line in _statementReader.Read())
-            {
-                statement += line + " ";
-                semiColomnIdx = statement.IndexOf(';');
-                while (-1 != semiColomnIdx)
-                {
-                    string singleStatement = statement.Substring(0, semiColomnIdx).Trim();
-                    if (0 < singleStatement.Length)
-                    {
-                        yield return singleStatement;
-                    }
-
-                    statement = statement.Substring(semiColomnIdx + 1).Trim();
-                    semiColomnIdx = statement.IndexOf(';');
-                }
-            }
-
-            semiColomnIdx = statement.IndexOf(';');
-            while (-1 != semiColomnIdx)
-            {
-                string singleStatement = statement.Substring(0, semiColomnIdx).Trim();
-                if (0 < singleStatement.Length)
-                {
-                    yield return singleStatement;
-                }
-
-                statement = statement.Substring(semiColomnIdx + 1).Trim();
-                semiColomnIdx = statement.IndexOf(';');
-            }
-
-            if (0 < statement.Length)
-            {
-                yield return statement;
-            }
+            return _statementReader.Read();
         }
     }
 }
