@@ -64,8 +64,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                         connection = _cluster.GetConnection();
                         connection.OnFailure += ConnectionOnOnFailure;
 
-                        var obsPrepare = new PrepareQuery(connection, _cql);
-                        var futPrepare = obsPrepare.AsFuture();
+                        var futPrepare = new PrepareQuery(connection, _cql).WithExecutionFlags(_executionFlags).AsFuture();
                         futPrepare.Wait();
                         Tuple<byte[], IColumnSpec[]> preparedInfo = futPrepare.Result.Single();
 
@@ -77,8 +76,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             IDataMapperFactory factory = _dataMapper.Create<T>(dataSource);
-            var query = new ExecuteQuery<T>(connection, _cql, _id, _columnSpecs, factory).WithExecutionFlags(_executionFlags);
-            return query;
+            var futQuery = new ExecuteQuery<T>(connection, _cql, _id, _columnSpecs, factory).WithExecutionFlags(_executionFlags);
+            return futQuery;
         }
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
