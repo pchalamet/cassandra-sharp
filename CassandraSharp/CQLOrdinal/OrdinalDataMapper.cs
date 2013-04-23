@@ -21,7 +21,10 @@ namespace CassandraSharp.CQLOrdinal
     {
         public OrdinalDataMapper(object[] dataSource)
         {
-            DataSource = new OrdinalDataSource(dataSource);
+            if (null != dataSource)
+            {
+                DataSource = new OrdinalDataSource(dataSource);
+            }
         }
 
         public IDataSource DataSource { get; private set; }
