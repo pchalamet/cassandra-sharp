@@ -17,13 +17,13 @@ namespace CassandraSharp.CQLPropertyBag
 {
     using System;
     using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
+    using CassandraSharp.Enlightenment;
 
     internal class PropertyBagCommand : Command,
                                         IPropertyBagCommand
     {
         internal PropertyBagCommand(ICluster cluster)
-                : base(cluster, new PropertyBagMapperFactory())
+                : base(cluster, new PropertyBagDataMapperFactory(), new PropertyBagDataMapperFactory())
         {
         }
 
@@ -38,15 +38,6 @@ namespace CassandraSharp.CQLPropertyBag
         public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
             return Prepare<PropertyBag>(cql, executionFlags);
-        }
-
-        private class PropertyBagMapperFactory : IDataMapper
-        {
-            public IDataMapperFactory Create<T>(object dataSource)
-            {
-                PropertyBag mapDataSource = (PropertyBag) dataSource;
-                return new DataMapperFactory(mapDataSource);
-            }
         }
     }
 }

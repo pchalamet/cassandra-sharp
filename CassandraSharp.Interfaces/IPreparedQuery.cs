@@ -19,9 +19,9 @@ namespace CassandraSharp
 
     public interface IPreparedQuery<out T>
     {
-        [Obsolete("Use Execute(object) instead")]
+        [Obsolete("Use Execute(params) instead")]
         ICqlQuery<T> Execute(object dataSource, ConsistencyLevel cl, QueryHint hint = null);
 
-        ICqlQuery<T> Execute(object dataSource);
+        ICqlQuery<T> Execute(params object[] dataSource);
     }
 }

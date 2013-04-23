@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
+namespace CassandraSharp.CQLPoco
 {
     using CassandraSharp.Extensibility;
 
-    internal class DataMapperFactory : IDataMapperFactory
+    internal class DataMapper<T> : IDataMapper
     {
-        public DataMapperFactory(PropertyBag dataSource)
+        public DataMapper(object dataSource)
         {
             if (null != dataSource)
             {
-                DataSource = new DataSource(dataSource);
+                DataSource = DataSourceFactory.Create(dataSource);
             }
         }
 
@@ -31,7 +31,7 @@ namespace CassandraSharp.CQLPropertyBag
 
         public IInstanceBuilder CreateBuilder()
         {
-            return new InstanceBuilder();
+            return new InstanceBuilder<T>();
         }
     }
 }

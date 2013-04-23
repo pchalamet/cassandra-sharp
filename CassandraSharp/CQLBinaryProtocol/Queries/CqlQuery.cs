@@ -26,18 +26,18 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     {
         protected readonly string CQL;
 
-        protected readonly IDataMapperFactory Factory;
+        private readonly IDataMapper _mapperOut;
 
-        public CqlQuery(IConnection connection, string cql, IDataMapperFactory factory)
+        public CqlQuery(IConnection connection, string cql, IDataMapper mapperOut)
                 : base(connection)
         {
             CQL = cql;
-            Factory = factory;
+            _mapperOut = mapperOut;
         }
 
         protected override IEnumerable<T> ReadFrame(IFrameReader frameReader)
         {
-            return ReadRowSet(frameReader, Factory).Cast<T>();
+            return ReadRowSet(frameReader, _mapperOut).Cast<T>();
         }
 
         protected override void WriteFrame(IFrameWriter fw)
@@ -54,7 +54,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             return token;
         }
 
-        private static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapperFactory mapperFactory)
+        private static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapper mapperFactory)
         {
             if (MessageOpcodes.Result != frameReader.MessageOpcode)
             {
@@ -92,7 +92,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             }
         }
 
-        private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapperFactory mapperFactory)
+        private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapper mapperFactory)
         {
             Stream stream = frameReader.ReadOnlyStream;
             int rowCount = stream.ReadInt();

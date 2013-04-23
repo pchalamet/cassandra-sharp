@@ -13,10 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp.CQLOrdinal
 {
-    public interface IDataMapperFactory
+    using CassandraSharp.Extensibility;
+
+    internal class OrdinalDataSource : IDataSource
     {
-        IDataMapper Create<T>(object[] dataSource = null);
+        private readonly object[] _dataSource;
+
+        public OrdinalDataSource(object[] dataSource)
+        {
+            _dataSource = dataSource;
+        }
+
+        public object Get(IColumnSpec columnSpec)
+        {
+            int idx = columnSpec.Index;
+            return _dataSource[idx];
+        }
     }
 }

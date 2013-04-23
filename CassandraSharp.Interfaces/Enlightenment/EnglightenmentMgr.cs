@@ -27,6 +27,8 @@ namespace CassandraSharp.Enlightenment
 
         private static readonly Lazy<IPropertyBagCommandFactory> _propertyBagCommand = new Lazy<IPropertyBagCommandFactory>(CreatePropertyBagCommandFactory);
 
+        private static readonly Lazy<ICommandFactory> _commandFactory = new Lazy<ICommandFactory>(CreateCommandFactory);
+
         public static IClusterManager ClusterManager()
         {
             return _clusterMgr.Value;
@@ -45,6 +47,11 @@ namespace CassandraSharp.Enlightenment
         public static IPropertyBagCommandFactory PropertyBagCommandFactory()
         {
             return _propertyBagCommand.Value;
+        }
+
+        public static ICommandFactory CommandFactory()
+        {
+            return _commandFactory.Value;
         }
 
         private static T Create<T>(string typeName)
@@ -76,6 +83,12 @@ namespace CassandraSharp.Enlightenment
         {
             const string typeName = "CassandraSharp.Enlightenment.PropertyBagCommandFactory, CassandraSharp";
             return Create<IPropertyBagCommandFactory>(typeName);
+        }
+
+        private static ICommandFactory CreateCommandFactory()
+        {
+            const string typeName = "CassandraSharp.Enlightenment.CommandFactory, CassandraSharp";
+            return Create<ICommandFactory>(typeName);
         }
     }
 }

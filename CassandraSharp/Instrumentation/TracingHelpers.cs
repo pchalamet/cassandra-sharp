@@ -62,7 +62,7 @@ namespace CassandraSharp.Instrumentation
         private static void QueryAndPushTracingSession(IConnection connection, Guid tracingId, InstrumentationToken token, IInstrumentation instrumentation)
         {
             string queryEvents = "select * from system_traces.events where session_id=" + tracingId;
-            IDataMapperFactory facEvents = new DataMapperFactory<TracingEvent>(null);
+            IDataMapper facEvents = new DataMapper<TracingEvent>(null);
             var obsEvents =
                     new CqlQuery<TracingEvent>(connection, queryEvents, facEvents)
                             .WithConsistencyLevel(ConsistencyLevel.ONE)
@@ -73,7 +73,7 @@ namespace CassandraSharp.Instrumentation
 
             string querySession = "select * from system_traces.sessions where session_id=" + tracingId;
 
-            IDataMapperFactory facSession = new DataMapperFactory<TracingSession>(null);
+            IDataMapper facSession = new DataMapper<TracingSession>(null);
             var obsSession =
                     new CqlQuery<TracingSession>(connection, querySession, facSession)
                             .WithConsistencyLevel(ConsistencyLevel.ONE)

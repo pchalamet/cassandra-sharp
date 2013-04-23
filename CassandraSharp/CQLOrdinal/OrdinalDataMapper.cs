@@ -13,10 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp.CQLOrdinal
 {
-    public interface IDataMapperFactory
+    using CassandraSharp.Extensibility;
+
+    internal class OrdinalDataMapper : IDataMapper
     {
-        IDataMapper Create<T>(object[] dataSource = null);
+        public OrdinalDataMapper(object[] dataSource)
+        {
+            DataSource = new OrdinalDataSource(dataSource);
+        }
+
+        public IDataSource DataSource { get; private set; }
+
+        public IInstanceBuilder CreateBuilder()
+        {
+            return new OrdinalInstanceBuilder();
+        }
     }
 }

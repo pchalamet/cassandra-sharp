@@ -15,13 +15,14 @@
 
 namespace CassandraSharp
 {
-    using System;
+    using CassandraSharp.Enlightenment;
+    using CassandraSharp.Extensibility;
 
     public static class CommandBuilderExtensions
     {
-        public static ICqlCommand CreateCommand(this ICluster @this)
+        public static ICqlCommand CreateCommand(this ICluster @this, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
         {
-            throw new NotImplementedException();
+            return EnglightenmentMgr.CommandFactory().Create(@this, factoryIn, factoryOut);
         }
     }
 }

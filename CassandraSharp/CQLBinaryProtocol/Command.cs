@@ -19,39 +19,42 @@ namespace CassandraSharp.CQLBinaryProtocol
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
 
-    public abstract class Command : ICqlCommand
+    public class Command : ICqlCommand
     {
-        protected readonly ICluster Cluster;
+        private readonly ICluster _cluster;
 
-        protected readonly IDataMapper DataMapper;
+        private readonly IDataMapperFactory _factoryIn;
 
-        protected Command(ICluster cluster, IDataMapper dataMapper)
+        private readonly IDataMapperFactory _factoryOut;
+
+        public Command(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
         {
-            Cluster = cluster;
-            DataMapper = dataMapper;
+            _cluster = cluster;
+            _factoryIn = factoryIn;
+            _factoryOut = factoryOut;
         }
 
         [Obsolete("Use Execute(string) instead")]
         public ICqlQuery<T> Execute<T>(string cql, ConsistencyLevel cl, ExecutionFlags executionFlags = ExecutionFlags.None,
                                        QueryHint hint = null)
         {
-            IDataMapperFactory factory = DataMapper.Create<T>();
-            IConnection connection = Cluster.GetConnection();
-            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factory).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags);
+            IDataMapper factoryOut = _factoryOut.Create<T>();
+            IConnection connection = _cluster.GetConnection();
+            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factoryOut).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags);
             return query;
         }
 
         public ICqlQuery<T> Execute<T>(string cql)
         {
-            IDataMapperFactory factory = DataMapper.Create<T>();
-            IConnection connection = Cluster.GetConnection();
-            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factory);
+            IDataMapper factoryOut = _factoryOut.Create<T>();
+            IConnection connection = _cluster.GetConnection();
+            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factoryOut);
             return query;
         }
 
         public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            return new PreparedQuery<T>(Cluster, DataMapper, cql, executionFlags);
+            return new PreparedQuery<T>(_cluster, _factoryIn, _factoryOut, cql, executionFlags);
         }
     }
 }

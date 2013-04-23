@@ -13,10 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp.Enlightenment
 {
-    public interface IDataMapperFactory
+    using System;
+    using CassandraSharp.CQLPoco;
+    using CassandraSharp.Extensibility;
+
+    public class PocoDataMapperFactory : IDataMapperFactory
     {
-        IDataMapper Create<T>(object[] dataSource = null);
+        public IDataMapper Create<T>(object[] dataSource = null)
+        {
+            object data = null;
+            if (null != dataSource)
+            {
+                if (1 != dataSource.Length)
+                {
+                    throw new ArgumentException("Single data source expected");
+                }
+
+                data = dataSource[0];
+            }
+
+            return new DataMapper<T>(data);
+        }
     }
 }

@@ -26,9 +26,11 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private readonly string _cql;
 
-        private readonly IDataMapper _dataMapper;
-
         private readonly ExecutionFlags _executionFlags;
+
+        private readonly IDataMapperFactory _factoryIn;
+
+        private readonly IDataMapperFactory _factoryOut;
 
         private readonly object _lock = new object();
 
@@ -38,21 +40,22 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private byte[] _id;
 
-        public PreparedQuery(ICluster cluster, IDataMapper dataMapper, string cql, ExecutionFlags executionFlags)
+        public PreparedQuery(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut, string cql, ExecutionFlags executionFlags)
         {
             _cluster = cluster;
-            _dataMapper = dataMapper;
+            _factoryIn = factoryIn;
+            _factoryOut = factoryOut;
             _cql = cql;
             _executionFlags = executionFlags;
         }
 
-        [Obsolete("Use Execute(object) instead")]
+        [Obsolete("Use Execute(params) instead")]
         public ICqlQuery<T> Execute(object dataSource, ConsistencyLevel cl, QueryHint hint = null)
         {
-            return Execute(dataSource).WithConsistencyLevel(cl).WithExecutionFlags(_executionFlags).WithHint(hint);
+            return Execute(new[] {dataSource}).WithConsistencyLevel(cl).WithExecutionFlags(_executionFlags).WithHint(hint);
         }
 
-        public ICqlQuery<T> Execute(object dataSource)
+        public ICqlQuery<T> Execute(params object[] dataSource)
         {
             IConnection connection;
             if (null == (connection = _connection))
@@ -75,8 +78,9 @@ namespace CassandraSharp.CQLBinaryProtocol
                 }
             }
 
-            IDataMapperFactory factory = _dataMapper.Create<T>(dataSource);
-            var futQuery = new ExecuteQuery<T>(connection, _cql, _id, _columnSpecs, factory).WithExecutionFlags(_executionFlags);
+            IDataMapper mapperIn = _factoryIn.Create<T>(dataSource);
+            IDataMapper mapperOut = _factoryOut.Create<T>();
+            var futQuery = new ExecuteQuery<T>(connection, _cql, _id, _columnSpecs, mapperIn, mapperOut).WithExecutionFlags(_executionFlags);
             return futQuery;
         }
 

@@ -23,13 +23,16 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     {
         private readonly IColumnSpec[] _columnSpecs;
 
+        private readonly IDataMapper _mapperIn;
+
         private readonly byte[] _id;
 
-        public ExecuteQuery(IConnection connection, string cql, byte[] id, IColumnSpec[] columnSpecs, IDataMapperFactory factory)
-                : base(connection, cql, factory)
+        public ExecuteQuery(IConnection connection, string cql, byte[] id, IColumnSpec[] columnSpecs, IDataMapper mapperIn, IDataMapper mapperOut)
+                : base(connection, cql, mapperOut)
         {
             _id = id;
             _columnSpecs = columnSpecs;
+            _mapperIn = mapperIn;
         }
 
         protected override void WriteFrame(IFrameWriter fw)
@@ -38,7 +41,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             stream.WriteShortByteArray(_id);
             stream.WriteShort((short) _columnSpecs.Length);
 
-            IDataSource dataSource = Factory.DataSource;
+            IDataSource dataSource = _mapperIn.DataSource;
             foreach (IColumnSpec columnSpec in _columnSpecs)
             {
                 byte[] rawData = null;

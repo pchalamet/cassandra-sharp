@@ -24,6 +24,7 @@ namespace CassandraSharp.Discovery
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
+    using CassandraSharp.Enlightenment;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -33,13 +34,13 @@ namespace CassandraSharp.Discovery
 
         private readonly ILogger _logger;
 
-        private readonly IDataMapperFactory _peerFactory;
+        private readonly IDataMapper _peerFactory;
 
         private readonly Timer _timer;
 
         public SystemPeersDiscoveryService(ILogger logger, ICluster cluster, DiscoveryConfig config)
         {
-            PocoCommand.PocoDataMapperFactory mapper = new PocoCommand.PocoDataMapperFactory();
+            PocoDataMapperFactory mapper = new PocoDataMapperFactory();
             _peerFactory = mapper.Create<DiscoveredPeer>(null);
 
             _logger = logger;

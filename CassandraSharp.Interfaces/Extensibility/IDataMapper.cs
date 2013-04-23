@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
+// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,8 @@ namespace CassandraSharp.Extensibility
 {
     public interface IDataMapper
     {
-        IDataMapperFactory Create<T>(object dataSource = null);
+        IDataSource DataSource { get; }
+
+        IInstanceBuilder CreateBuilder();
     }
 }
