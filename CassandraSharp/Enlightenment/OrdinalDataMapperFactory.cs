@@ -20,9 +20,10 @@ namespace CassandraSharp.Enlightenment
 
     public class OrdinalDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object[] dataSource = null)
+        public IDataMapper Create<T>(object dataSource = null)
         {
-            return new OrdinalDataMapper(dataSource);
+            object[] arrDataSource = (object[]) dataSource;
+            return new OrdinalDataMapper(arrDataSource);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             return Execute(new[] {dataSource}).WithConsistencyLevel(cl).WithExecutionFlags(_executionFlags).WithHint(hint);
         }
 
-        public ICqlQuery<T> Execute(params object[] dataSource)
+        public ICqlQuery<T> Execute(object dataSource)
         {
             IConnection connection;
             if (null == (connection = _connection))

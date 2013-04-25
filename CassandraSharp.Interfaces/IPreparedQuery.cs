@@ -22,6 +22,6 @@ namespace CassandraSharp
         [Obsolete("Use Execute(params) instead")]
         ICqlQuery<T> Execute(object dataSource, ConsistencyLevel cl, QueryHint hint = null);
 
-        ICqlQuery<T> Execute(params object[] dataSource);
+        ICqlQuery<T> Execute(object dataSource);
     }
 }

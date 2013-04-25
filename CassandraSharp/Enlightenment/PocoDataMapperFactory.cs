@@ -15,26 +15,14 @@
 
 namespace CassandraSharp.Enlightenment
 {
-    using System;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
 
     public class PocoDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object[] dataSource = null)
+        public IDataMapper Create<T>(object dataSource = null)
         {
-            object data = null;
-            if (null != dataSource)
-            {
-                if (1 != dataSource.Length)
-                {
-                    throw new ArgumentException("Single data source expected");
-                }
-
-                data = dataSource[0];
-            }
-
-            return new DataMapper<T>(data);
+            return new DataMapper<T>(dataSource);
         }
     }
 }

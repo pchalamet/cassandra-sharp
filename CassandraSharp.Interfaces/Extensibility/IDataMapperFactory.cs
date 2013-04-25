@@ -17,6 +17,6 @@ namespace CassandraSharp.Extensibility
 {
     public interface IDataMapperFactory
     {
-        IDataMapper Create<T>(object[] dataSource = null);
+        IDataMapper Create<T>(object dataSource = null);
     }
 }

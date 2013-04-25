@@ -15,25 +15,14 @@
 
 namespace CassandraSharp.Enlightenment
 {
-    using System;
     using CassandraSharp.CQLPropertyBag;
     using CassandraSharp.Extensibility;
 
     public class PropertyBagDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object[] dataSource = null)
+        public IDataMapper Create<T>(object dataSource = null)
         {
-            PropertyBag propertyBag = null;
-            if (null != dataSource)
-            {
-                if (1 != dataSource.Length)
-                {
-                    throw new ArgumentException("Single data source expected");
-                }
-
-                propertyBag = (PropertyBag) dataSource[0];
-            }
-
+            PropertyBag propertyBag = (PropertyBag) dataSource;
             return new DataMapper(propertyBag);
         }
     }
