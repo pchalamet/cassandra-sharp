@@ -16,6 +16,7 @@
 namespace CassandraSharp.Enlightenment
 {
     using System;
+    using CassandraSharp.Extensibility;
 
     internal class EnglightenmentMgr
     {
@@ -28,6 +29,12 @@ namespace CassandraSharp.Enlightenment
         private static readonly Lazy<IPropertyBagCommandFactory> _propertyBagCommand = new Lazy<IPropertyBagCommandFactory>(CreatePropertyBagCommandFactory);
 
         private static readonly Lazy<ICommandFactory> _commandFactory = new Lazy<ICommandFactory>(CreateCommandFactory);
+
+        private static readonly Lazy<IDataMapperFactory> _pocoDataMapperFactory = new Lazy<IDataMapperFactory>(CreatePocoDataMapperFactory);
+
+        private static readonly Lazy<IDataMapperFactory> _propertyBagDataMapperFactory = new Lazy<IDataMapperFactory>(CreatePropertyBagDataMapperFactory);
+
+        private static readonly Lazy<IDataMapperFactory> _ordinalDataMapperFactory = new Lazy<IDataMapperFactory>(CreateOrdinalDataMapperFactory);
 
         public static IClusterManager ClusterManager()
         {
@@ -52,6 +59,21 @@ namespace CassandraSharp.Enlightenment
         public static ICommandFactory CommandFactory()
         {
             return _commandFactory.Value;
+        }
+
+        public static IDataMapperFactory PocoDataMapperFactory()
+        {
+            return _pocoDataMapperFactory.Value;
+        }
+
+        public static IDataMapperFactory PropertyBagDataMapperFactory()
+        {
+            return _propertyBagDataMapperFactory.Value;
+        }
+
+        public static IDataMapperFactory OrdinalDataMapperFactory()
+        {
+            return _ordinalDataMapperFactory.Value;
         }
 
         private static T Create<T>(string typeName)
@@ -89,6 +111,24 @@ namespace CassandraSharp.Enlightenment
         {
             const string typeName = "CassandraSharp.Enlightenment.CommandFactory, CassandraSharp";
             return Create<ICommandFactory>(typeName);
+        }
+
+        private static IDataMapperFactory CreatePocoDataMapperFactory()
+        {
+            const string typeName = "CassandraSharp.Enlightenment.PocoDataMapperFactory, CassandraSharp";
+            return Create<IDataMapperFactory>(typeName);
+        }
+
+        private static IDataMapperFactory CreatePropertyBagDataMapperFactory()
+        {
+            const string typeName = "CassandraSharp.Enlightenment.PropertyBagDataMapperFactory, CassandraSharp";
+            return Create<IDataMapperFactory>(typeName);
+        }
+
+        private static IDataMapperFactory CreateOrdinalDataMapperFactory()
+        {
+            const string typeName = "CassandraSharp.Enlightenment.OrdinalDataMapperFactory, CassandraSharp";
+            return Create<IDataMapperFactory>(typeName);
         }
     }
 }

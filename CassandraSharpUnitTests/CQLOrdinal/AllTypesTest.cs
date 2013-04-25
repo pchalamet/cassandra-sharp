@@ -20,9 +20,8 @@ namespace CassandraSharpUnitTests.CQLOrdinal
     using System.Linq;
     using System.Net;
     using CassandraSharp;
-    using CassandraSharp.CQLPoco;
+    using CassandraSharp.CQLCommand;
     using CassandraSharp.Config;
-    using CassandraSharp.Enlightenment;
     using CassandraSharp.Utils;
     using NUnit.Framework;
 
@@ -74,7 +73,7 @@ namespace CassandraSharpUnitTests.CQLOrdinal
         public void TestAllTypes()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            CassandraSharp.ClusterManager.Configure(cassandraSharpConfig);
+            ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
                 {
@@ -84,9 +83,9 @@ namespace CassandraSharpUnitTests.CQLOrdinal
                             }
                 };
 
-            using (ICluster cluster = CassandraSharp.ClusterManager.GetCluster(clusterConfig))
+            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
-                ICqlCommand cmd = cluster.CreateCommand(new OrdinalDataMapperFactory(), new PocoDataMapperFactory());
+                ICqlCommand cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
 
                 const string dropFoo = "drop keyspace Tests";
 
@@ -161,27 +160,28 @@ namespace CassandraSharpUnitTests.CQLOrdinal
 
                 var param = new object[]
                     {
-                        allTypesInsert.CAscii,
-                        allTypesInsert.CBigint,
-                        allTypesInsert.CBlob,
-                        allTypesInsert.CBoolean,
-                        allTypesInsert.CDouble,
-                        allTypesInsert.CFloat,
-                        allTypesInsert.CInet,
-                        allTypesInsert.CInt,
-                        allTypesInsert.CText,
-                        allTypesInsert.CTimestamp,
-                        allTypesInsert.CTimeuuid,
-                        allTypesInsert.CUuid,
-                        allTypesInsert.CVarchar,
-                        allTypesInsert.CList,
-                        allTypesInsert.CSet,
-                        allTypesInsert.CMap,
+                            allTypesInsert.CAscii,
+                            allTypesInsert.CBigint,
+                            allTypesInsert.CBlob,
+                            allTypesInsert.CBoolean,
+                            allTypesInsert.CDouble,
+                            allTypesInsert.CFloat,
+                            allTypesInsert.CInet,
+                            allTypesInsert.CInt,
+                            allTypesInsert.CText,
+                            allTypesInsert.CTimestamp,
+                            allTypesInsert.CTimeuuid,
+                            allTypesInsert.CUuid,
+                            allTypesInsert.CVarchar,
+                            allTypesInsert.CList,
+                            allTypesInsert.CSet,
+                            allTypesInsert.CMap,
                     };
 
                 prepared.Execute(param).AsFuture().Wait();
 
-                const string selectAll = "select cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat, cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap from Tests.AllTypes";
+                const string selectAll =
+                        "select cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat, cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap from Tests.AllTypes";
                 AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).AsFuture().Result.Single();
 
                 cmd.Execute(dropFoo).AsFuture().Wait();
@@ -204,7 +204,7 @@ namespace CassandraSharpUnitTests.CQLOrdinal
                 Assert.AreEqual(allTypesInsert.CMap, allTypesSelect.CMap);
             }
 
-            CassandraSharp.ClusterManager.Shutdown();
+            ClusterManager.Shutdown();
         }
     }
 }

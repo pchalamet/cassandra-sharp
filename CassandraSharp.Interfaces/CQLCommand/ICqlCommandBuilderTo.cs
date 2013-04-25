@@ -13,16 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.CQLCommand
 {
-    using CassandraSharp.Enlightenment;
-    using CassandraSharp.Extensibility;
-
-    public static class CommandBuilderExtensions
+    public interface ICqlCommandBuilderTo
     {
-        public static ICqlCommand CreateCommand(this ICluster @this, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
-        {
-            return EnglightenmentMgr.CommandFactory().Create(@this, factoryIn, factoryOut);
-        }
+        ICqlCommandBuilderBuild ToOrdinal();
+
+        ICqlCommandBuilderBuild ToPoco();
+
+        ICqlCommandBuilderBuild ToPropertyBag();
     }
 }
