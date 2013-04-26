@@ -18,7 +18,7 @@ namespace CassandraSharp.Enlightenment
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
 
-    public class PocoDataMapperFactory : IDataMapperFactory
+    internal class PocoDataMapperFactory : IDataMapperFactory
     {
         public IDataMapper Create<T>(object dataSource = null)
         {

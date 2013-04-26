@@ -18,7 +18,7 @@ namespace CassandraSharp.Enlightenment
     using CassandraSharp.CQLOrdinal;
     using CassandraSharp.Extensibility;
 
-    public class OrdinalDataMapperFactory : IDataMapperFactory
+    internal class OrdinalDataMapperFactory : IDataMapperFactory
     {
         public IDataMapper Create<T>(object dataSource = null)
         {
