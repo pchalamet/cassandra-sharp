@@ -8,6 +8,7 @@ version 3.1.5 (NOT RELEASED)
 - no more semicolon at the end of cqlplus command
 - ordinal data mapper availability
 - fluent interface for building commands
+- timeout support for AsFuture()
 
 version 3.1.4
 - split cassandra-sharp in 3 NuGet packages: cassandra-sharp (main), cassandra-sharp-interfaces & cassandra-sharp-core

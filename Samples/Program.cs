@@ -28,8 +28,8 @@ namespace Samples
     {
         private static void Main(string[] args)
         {
-            new PocoSample().Run();
             new TimeOutSample().Run();
+            new PocoSample().Run();
             new BatchSample().Run();
             new LinqSample().Run();
             new FutureSample().Run();

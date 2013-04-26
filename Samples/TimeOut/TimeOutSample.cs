@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@ namespace Samples.TimeOut
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
 
@@ -52,37 +51,20 @@ namespace Samples.TimeOut
 
             const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
 
-            Random rnd = new Random();
             for (int i = 0; i < 10; ++i)
             {
-                DateTime dtStart = DateTime.Now;
-                DateTime dtStop = dtStart.AddSeconds(2); // 2 second max
-                int wait = rnd.Next(4*1000);
-                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture()
-                                .ContinueWith(t =>
-                                    {
-                                        // simulate an eventually long operation
-                                        Thread.Sleep(wait);
-                                        return t;
-                                    }).Unwrap().ContinueWith(t => DisplayKeyspace(t.Result, dtStop));
+                CancellationTokenSource cts = new CancellationTokenSource(2 * 1000);
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture(cts.Token).ContinueWith(t => DisplayKeyspace(t.Result));
                 futRes.Wait();
             }
         }
 
-        private static void DisplayKeyspace(IEnumerable<SchemaKeyspaces> result, DateTime dtStop)
+        private static void DisplayKeyspace(IEnumerable<SchemaKeyspaces> result)
         {
             try
             {
                 foreach (var resKeyspace in result)
                 {
-                    // if it's too late do not process the query
-                    DateTime now = DateTime.Now;
-                    if (now > dtStop)
-                    {
-                        Console.WriteLine("Query timeout {0} > {1}", now, dtStop);
-                        throw new TimeoutException();
-                    }
-
                     Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
                                       resKeyspace.DurableWrites, resKeyspace.KeyspaceName, resKeyspace.strategy_Class, resKeyspace.strategy_options);
                 }
