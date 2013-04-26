@@ -17,6 +17,7 @@ namespace CassandraSharp
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
     using CassandraSharp.Enlightenment;
 
@@ -24,12 +25,22 @@ namespace CassandraSharp
     {
         public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable)
         {
-            return EnglightenmentMgr.Future().AsFuture(observable);
+            return EnglightenmentMgr.Future().AsFuture(observable, null);
         }
 
         public static Task AsFuture(this IObservable<NonQuery> observable)
         {
-            return EnglightenmentMgr.Future().AsFuture(observable);
+            return EnglightenmentMgr.Future().AsFuture(observable, null);
+        }
+        
+        public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable, CancellationToken token)
+        {
+            return EnglightenmentMgr.Future().AsFuture(observable, token);
+        }
+
+        public static Task AsFuture(this IObservable<NonQuery> observable, CancellationToken token)
+        {
+            return EnglightenmentMgr.Future().AsFuture(observable, token);
         }
 
         [Obsolete("Use Execute(string)")]

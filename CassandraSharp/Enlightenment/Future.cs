@@ -19,11 +19,12 @@ namespace CassandraSharp.Enlightenment
     using System.Collections.Generic;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
+    using System.Threading;
     using System.Threading.Tasks;
 
     internal class Future : IFuture
     {
-        public Task<IList<T>> AsFuture<T>(IObservable<T> observable)
+        public Task<IList<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token)
         {
             var obsEnumerable = observable.Aggregate((IList<T>) new List<T>(),
                                                      (acc, v) =>
@@ -31,13 +32,19 @@ namespace CassandraSharp.Enlightenment
                                                              acc.Add(v);
                                                              return acc;
                                                          });
-            var task = obsEnumerable.ToTask();
+
+            Task<IList<T>> task = token.HasValue
+                                          ? obsEnumerable.ToTask(token.Value)
+                                          : obsEnumerable.ToTask();
             return task;
         }
 
-        public Task AsFuture(IObservable<NonQuery> observable)
+        public Task AsFuture(IObservable<NonQuery> observable, CancellationToken? token)
         {
-            Task task = observable.Count().ToTask();
+            var obsEnumerable = observable.Count();
+            Task task = token.HasValue
+                                ? obsEnumerable.ToTask(token.Value)
+                                : obsEnumerable.ToTask();
             return task;
         }
     }

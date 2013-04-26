@@ -17,12 +17,13 @@ namespace CassandraSharp.Enlightenment
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public interface IFuture
     {
-        Task<IList<T>> AsFuture<T>(IObservable<T> observable);
+        Task<IList<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token);
 
-        Task AsFuture(IObservable<NonQuery> observable);
+        Task AsFuture(IObservable<NonQuery> observable, CancellationToken? token);
     }
 }
