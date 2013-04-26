@@ -18,6 +18,7 @@ namespace Samples.TimeOut
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
 
@@ -53,17 +54,18 @@ namespace Samples.TimeOut
 
             for (int i = 0; i < 10; ++i)
             {
-                CancellationTokenSource cts = new CancellationTokenSource(2 * 1000);
-                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture(cts.Token).ContinueWith(t => DisplayKeyspace(t.Result));
+                // timeout = 10 ms
+                CancellationTokenSource cts = new CancellationTokenSource(10);
+                var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture(cts.Token).ContinueWith(DisplayKeyspace);
                 futRes.Wait();
             }
         }
 
-        private static void DisplayKeyspace(IEnumerable<SchemaKeyspaces> result)
+        private static void DisplayKeyspace(Task<IList<SchemaKeyspaces>> result)
         {
             try
             {
-                foreach (var resKeyspace in result)
+                foreach (var resKeyspace in result.Result)
                 {
                     Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
                                       resKeyspace.DurableWrites, resKeyspace.KeyspaceName, resKeyspace.strategy_Class, resKeyspace.strategy_options);
@@ -72,7 +74,7 @@ namespace Samples.TimeOut
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Command failed {0}", ex.Message);
+                Console.WriteLine("Operation canceled {0}", ex.InnerException.Message);
             }
         }
     }
