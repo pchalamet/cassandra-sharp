@@ -20,7 +20,7 @@ Features
 * ability to understand performance issues (client and server side)
 * multiple extension points
 * command line tool (cqlplus)
-* .NET 4.0+ support
+* .NET 4.0+ support (Microsoft .NET / Mono)
 
 Getting binaries
 ================

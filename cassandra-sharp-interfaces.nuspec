@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>Interfaces for cassandra-sharp</summary>
     <description>Interfaces for cassandra-sharp</description>
+	<releaseNotes />
     <tags>apache cassandra driver net40 net45 mono database nosql tpl rx reactive high performance streaming</tags>
     <references>
         <reference file="CassandraSharp.Interfaces.dll" />

@@ -12,20 +12,27 @@
     <summary>cassandra-sharp is a high performance .NET driver for Apache Cassandra, fully supporting asynchronous operations (using TPL and Rx) and CQL 3 binary protocol.</summary>
     <description>cassandra-sharp - high performance .NET driver for Apache Cassandra.
 
-Major features ():
-* async operations (Rx / TPL) - fully compatible with C# async
-* streaming support
-* extensible rowset mapping (poco and map provided out of the box)
-* robust connection handling (with recovery)
+Please note only binary protocol (cql 3) is supported - this requires Apache Cassandra 1.2.
+
+Major features:
+* async operations (TPL tasks / Rx subscriptions)
+* Rx interface (IObservable / IObserver) for result streaming
+* TPL Task (compatible with C# 5 async) for future operations
+* Linq friendly
+* extensible rowset mapping (poco, property bag, params out of the box)
+* blazing fast object marshaler (dynamic gen'ed code)
+* robust connection handling (connection recovery supported)
+* ability to understand performance issues (client and server side)
 * multiple extension points
+* timeout support
+* command line tool (cqlplus)
+* .NET 4.0+ support (Microsoft .NET / Mono)
 
-cassandra-sharp does support:
-* .NET 4.0+ (Microsoft .NET or Mono)
-* CQL 3.0 (Binary Protocol)
-* Apache Cassandra 1.2+
+Release notes: https://raw.github.com/pchalamet/cassandra-sharp/master/CHANGES.txt
 
-See https://github.com/pchalamet/cassandra-sharp for more information.
+For information, bug reports, suggestions or contributions: https://github.com/pchalamet/cassandra-sharp
 </description>
+<releaseNotes />
     <tags>apache cassandra driver net40 net45 mono database nosql tpl rx reactive high performance streaming</tags>
 
     <references />

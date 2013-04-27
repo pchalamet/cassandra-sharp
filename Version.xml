@@ -1,5 +1,263 @@
 <version>
 	<cassandra-sharp-interfaces version="3.1.6" status="" />
-	<cassandra-sharp version="3.2.0" status="" />
+	<cassandra-sharp version="3.2.1" status="" />
 	<Rx version="2.1.30214.0" />
+	
+<changes>
+<change id="3.2.1"><![CDATA[
+NOT RELEASED
+- added releaseNotes to nuget packages
+]]></change>
+
+<change id="3.2.0"><![CDATA[
+- use culture invariant for identifier conversion
+- ICqlCommand.Execute & IPreparedQuery.Execute with all parameters are depreacated. Use fluent interface instead
+- timeout support for AsFuture()
+- fluent interface for queries (introduced ICqlQuery) to allow setting CL, execution flags & hints
+  These methods will be removed in 3.3
+- fluent interface for building commands
+- data transfer tool available in cqlplus (DbCopy) from database (OLEDB) to Cassandra
+- no more semicolon at the end of cqlplus command
+- ordinal data mapper availability
+- refactoring of query commands
+]]></change>
+
+<change id="3.1.4"><![CDATA[
+- split cassandra-sharp in 3 NuGet packages: cassandra-sharp (main), cassandra-sharp-interfaces & cassandra-sharp-core
+]]></change>
+
+<change id="3.1.3"><![CDATA[
+- reference on cassandra-sharp should reference automatically CassandraSharp.dll
+]]></change>
+
+<change id="3.1.2"><![CDATA[
+- reference on cassandra-sharp should reference automatically CassandrSharp.Interfaces.dll
+]]></change>
+
+<change id="3.1.1"><![CDATA[
+- fixed deserialization of key for map
+]]></change>
+
+<change id="3.1.0"><![CDATA[
+- moved interface to separate assemblies (avoid Rx dependencies & just update the implementation without rebuilding)
+- moved tools and interfaces to separate nuget packages
+- revised the build process, using Version.xml to describe versions instead of command line
+- renamed GenerateVersion.cmd to Build.cmd
+- renamed PublishNugetVersion.cmd to Publish.cmd
+]]></change>
+
+<change id="3.0.3"><![CDATA[
+- reduce dns resolve calls
+]]></change>
+
+<change id="3.0.2"><![CDATA[
+- reduce dns lookup
+- ClusterManager now fails if no valid endpoint found
+- ClusterManager now fails if current machine ip can't be resolved
+- more env info in cqlplus !help
+- Rx binaries are now in net40
+]]></change>
+
+<change id="3.0.1"><![CDATA[
+- fixed invalid cast in cqlplus
+]]></change>
+
+<change id="3.0.0"><![CDATA[
+- total rewrite of Connection
+- expose a new interface using Rx (IObservable)
+- future are now a TPL Task returning a list of results
+- improved throughput using LongRunning connection type
+- NuGet support for net40 and net45 binaries
+- performance report is asynchronous
+- official support for nullable (NOTE: sending null in prepare statement is supported but only with C* 1.2.2+)
+- receive and send timeout support (disabled by default)
+- keep alive support (by default, using OS configuration)
+- changed the PropertyBag interface : use a typed class instead of IDictionary
+]]></change>
+
+<change id="2.3.1"><![CDATA[
+- fixed connection leak on read error
+]]></change>
+
+<change id="2.3.0"><![CDATA[
+- fixed stalled client 
+- instrumentation for performance tracing client & server side
+- configurable Cluster type (see ClusterConfig.Type)
+- break the interface (splitting ICqlCommand & IPreparedQuery) - be sure to read NEWS.txt
+]]></change>
+
+<change id="2.2.1"><![CDATA[
+- added version in Zip & NuGet
+- cqlplus is in NuGet lib folder, only CassandraSharp.dll is then referenced
+- fixed issue 26 (https://github.com/pchalamet/cassandra-sharp/issues/26)
+]]></change>
+
+<change id="2.2.0"><![CDATA[
+- POCO is now using DynamicMethod instead of Reflection
+- support for IDeserializationCallback
+- fix failure on connection when IO errors
+- merge "Cassandra-Sharp write performance Vs Thrift Client" from hjarraya
+- fix authentication issues (https://github.com/pchalamet/cassandra-sharp/issues/25)
+]]></change>
+
+<change id="2.1.2"><![CDATA[
+- fixed issue 9 (https://github.com/pchalamet/cassandra-sharp/issues/9)
+- read again asap if buffering mode 
+- fixd invalid utf8 string len when using char >= 0x80
+- prepared statements can recover from connection failure
+- fixed issue 8 (https://github.com/pchalamet/cassandra-sharp/issues/8)
+- fixed issue 10 (https://github.com/pchalamet/cassandra-sharp/issues/10)
+- fixed issue 11 (https://github.com/pchalamet/cassandra-sharp/issues/11)
+]]></change>
+
+<change id="2.1.1"><![CDATA[
+- fixed issue 5 (https://github.com/pchalamet/cassandra-sharp/issues/5
+]]></change>
+
+<change id="2.1.0.0"><![CDATA[
+- node discovery implementation
+- fixed guid serialization
+- dynamic column width
+- fixed eventually incorrect order of column in cqlplus
+- fixed connection recovery (OnFailure event)
+- use object (supporting anonyous type) instead of object[] for prepared statement
+- one less tpl task per request & waiting is done via tpl
+]]></change>
+
+<change id="2.0.7.0"><![CDATA[
+- mono compatibility (for cqlplus)
+- support for port in cqlplus
+]]></change>
+
+<change id="2.0.6.0-beta"><![CDATA[
+- renamed cqlsh to cqlplus to avoid confusion
+- cqlplus changes:
+  changed cqlplus help system
+  added source & exec
+  support for enum for cqlplus command args
+  fix source when error encountered
+]]></change>
+  
+<change id="2.0.5.0-beta"><![CDATA[
+- refactoring of cqlsh grammar - no modification required to add new commands
+- generic help based on registered commands
+]]></change>
+
+<change id="2.0.4.0-beta"><![CDATA[
+- change cqlsh value formatting
+- fixed map/set/list bin reader
+- ExecuteNonQuery for prepared statement
+- cqlsh debug logger
+- commands handling refactoring
+- login/password for cqlsh
+]]></change>
+
+<change id="2.0.3.0-beta"><![CDATA[
+- support for list, set, map
+- fixed null byte array
+- support for streaming directly from socket (default) or from memory stream
+- tabular display in cqlsh
+- created Samples project (removed CassandraClient)
+]]></change>
+
+<change id="2.0.2.0-beta"><![CDATA[
+- fix deadlock when query fails
+- expose IFrameReader and IFrameWriter instead of Stream
+- release stream id earlier
+]]></change>
+
+<change id="2.0.1.0-beta"><![CDATA[
+- full async support with both streaming and future
+- no buffering while reading
+- reliable error handling while performing async IO
+]]></change>
+
+<change id="2.0.0.0-beta"><![CDATA[
+- most part of CassandraSharp is rewritten
+- support only CQL, Thrift is dead
+- missing features will be brought again is future versions
+]]></change>
+
+<change id="1.0.0.0-beta"><![CDATA[
+- compatible with Cassandra 1.1.1
+- CassandraSharp.ObjectMapper : cql based simple object mapper (only compatible with Cassandra 1.1.1)
+- CassandraSharp.Data : ado.net implementation (IDbConnection, IDbCommand, IDbParameter). As of now, this is a work in progress.
+- CassandraSharp.MadeSimple : previously ClusterExtentions but with a bit less methods to keep it simple
+- removed log4net dependency, logging is pluggable ==> use CassandraSharpConfig/Logger to provide ILog implementation (must be thread safe)
+- recovery manager class is pluggable ==> use CassandraSharpConfig/Recovery to provide IRecoveryService implementation (must be thread safe)
+- timestamp service is pluggable ==> use EndpointsConfig/Timestamp to provide ITimestampService implementation (must be thread safe)
+- endpoint strategy is pluggable ==> EndpointsConfig/Strategy to provide your own strategy (must be thread safe)
+- endpoint snitch is pluggable ==> EndpointsConfig/Snitch to provide your own snitch (must be thread safe)
+- cql version can be requested via TransportConfig/CqlVersion
+
+- BREAKING CHANGES IN CONFIG
+  Strategies are configured via EndpointsConfig/@strategy : either Random, Nearest or your own type name
+  Snitches are configured via EndpointsConfig/@snitch : either Simple, RackInferring or your own type name
+  User and password are configured respectively with TransportConfig/@user and TransportConfig/@password
+]]></change>
+
+<change id="0.6.4.0"><![CDATA[
+- Thrift interface update (Cassandra 1.0)
+]]></change>
+
+<change id="0.6.3.0"><![CDATA[
+- custom endpoint strategy
+]]></change>
+
+<change id="0.6.1.0"><![CDATA[
+- remove NuGet for packages dependencies (unsecure)
+- using Thrift 0.8 (recompiled)
+- using log4net 1.2.11 (official bin new key)
+- Thrift is merged with cassandra-sharp.dll
+- fix NPE in authentication
+]]></change>
+
+<change id="0.6.0.0"><![CDATA[
+- support for endpoint recovery
+]]></change>
+
+<change id="0.5.4.0"><![CDATA[
+- support for NuGet. Package name is cassandra-sharp
+- log4net and Thrift are shipped with the zip package
+- Thrift is no more merge in the cassandra-sharp.dll (BREAKING CHANGE)
+]]></change>
+
+<change id="0.5.1.0"><![CDATA[
+- minor fix for user/password change when overriding cluster config
+]]></change>
+
+<change id="0.5.0.0"><![CDATA[
+- new mechanism to override a cluster configuration to handle a batch of commands (BREAKING CHANGE)
+- poolSize is moved from BehaviorConfig? to TransportConfig? (BREAKING CHANGE)
+- ICluster interface changed (BREAKING CHANGE)
+- SetKeySpace removed - this was not safe (BREAKING CHANGE)
+]]></change>
+
+<change id="0.4.0.0"><![CDATA[
+- support for authentication
+- tested against Cassandra 1.0
+- using Cassandra 1.0.3 Thrift interface
+]]></change>
+
+<change id="0.3.3.0"><![CDATA[
+- exception logging
+- counter support
+- NotFoundException specific behavior
+- TTL support
+]]></change>
+
+<change id="0.3.0.0"><![CDATA[
+- added timeout configuration
+- fixed bug when exception thrown during acquire connection
+]]></change>
+
+<change id="0.2"><![CDATA[
+- build system
+]]></change>
+
+<change id="0.1"><![CDATA[
+- initial version
+]]></change>
+
+</changes>
 </version>
