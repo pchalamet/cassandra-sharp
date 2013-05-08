@@ -19,7 +19,7 @@ namespace CassandraSharp.Enlightenment
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class CommandFactory : ICommandFactory
+    internal sealed class CommandFactory : ICommandFactory
     {
         public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
         {

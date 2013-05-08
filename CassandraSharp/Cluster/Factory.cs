@@ -19,7 +19,7 @@ namespace CassandraSharp.Cluster
     using System.Collections.Generic;
     using CassandraSharp.Utils;
 
-    internal class Factory : IServiceDescriptor
+    internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {

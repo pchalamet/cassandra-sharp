@@ -15,11 +15,10 @@
 
 namespace CassandraSharp.CQLBinaryProtocol
 {
-    using System;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
 
-    public class Command : ICqlCommand
+    internal sealed class Command : ICqlCommand
     {
         private readonly ICluster _cluster;
 
@@ -32,16 +31,6 @@ namespace CassandraSharp.CQLBinaryProtocol
             _cluster = cluster;
             _factoryIn = factoryIn;
             _factoryOut = factoryOut;
-        }
-
-        [Obsolete("Use Execute(string) instead")]
-        public ICqlQuery<T> Execute<T>(string cql, ConsistencyLevel cl, ExecutionFlags executionFlags = ExecutionFlags.None,
-                                       QueryHint hint = null)
-        {
-            IDataMapper factoryOut = _factoryOut.Create<T>();
-            IConnection connection = _cluster.GetConnection();
-            ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factoryOut).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags);
-            return query;
         }
 
         public ICqlQuery<T> Execute<T>(string cql)

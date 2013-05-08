@@ -17,7 +17,7 @@ namespace CassandraSharp.Discovery
 {
     using CassandraSharp.Extensibility;
 
-    internal class NullDiscoveryService : IDiscoveryService
+    internal sealed class NullDiscoveryService : IDiscoveryService
     {
         public void Dispose()
         {

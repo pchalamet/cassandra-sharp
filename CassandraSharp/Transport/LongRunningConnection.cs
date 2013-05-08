@@ -31,8 +31,8 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Utils;
     using CassandraSharp.Utils.Stream;
 
-    internal class LongRunningConnection : IConnection,
-                                           IDisposable
+    internal sealed class LongRunningConnection : IConnection,
+                                                  IDisposable
     {
         private const byte MAX_STREAMID = 0x80;
 
@@ -58,42 +58,52 @@ namespace CassandraSharp.Transport
 
         public LongRunningConnection(IPAddress address, TransportConfig config, ILogger logger, IInstrumentation instrumentation)
         {
-            for (byte streamId = 0; streamId < MAX_STREAMID; ++streamId)
+            try
             {
-                _availableStreamIds.Push(streamId);
-            }
-
-            _config = config;
-            _logger = logger;
-            _instrumentation = instrumentation;
-
-            Endpoint = address;
-
-            _tcpClient = new TcpClient
+                for (byte streamId = 0; streamId < MAX_STREAMID; ++streamId)
                 {
-                        ReceiveTimeout = _config.ReceiveTimeout,
-                        SendTimeout = _config.SendTimeout,
-                        NoDelay = true,
-                        LingerState = {Enabled = true, LingerTime = 0},
-                };
+                    _availableStreamIds.Push(streamId);
+                }
 
-            _tcpClient.Connect(address, _config.Port);
-            _socket = _tcpClient.Client;
+                _config = config;
+                _logger = logger;
+                _instrumentation = instrumentation;
 
-            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
-            if (_config.KeepAlive && 0 != _config.KeepAliveTime)
-            {
-                SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
+                Endpoint = address;
+
+                _tcpClient = new TcpClient
+                    {
+                            ReceiveTimeout = _config.ReceiveTimeout,
+                            SendTimeout = _config.SendTimeout,
+                            NoDelay = true,
+                            LingerState = {Enabled = true, LingerTime = 0},
+                    };
+
+                _tcpClient.Connect(address, _config.Port);
+                _socket = _tcpClient.Client;
+
+                _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
+                if (_config.KeepAlive && 0 != _config.KeepAliveTime)
+                {
+                    SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
+                }
+
+                Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
+
+                // readify the connection
+                _logger.Debug("Readyfying connection for {0}", Endpoint);
+                //GetOptions();
+                ReadifyConnection();
+                _logger.Debug("Connection to {0} is ready", Endpoint);
             }
+            catch (Exception ex)
+            {
+                Dispose();
 
-            Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
-            Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
-
-            // readify the connection
-            _logger.Debug("Readyfying connection for {0}", Endpoint);
-            //GetOptions();
-            ReadifyConnection();
-            _logger.Debug("Connection to {0} is ready", Endpoint);
+                _logger.Error("Failed building connection {0}", ex);
+                throw;
+            }
         }
 
         public IPAddress Endpoint { get; private set; }

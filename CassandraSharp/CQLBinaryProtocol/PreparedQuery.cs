@@ -20,7 +20,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
 
-    internal class PreparedQuery<T> : IPreparedQuery<T>
+    internal sealed class PreparedQuery<T> : IPreparedQuery<T>
     {
         private readonly ICluster _cluster;
 
@@ -47,12 +47,6 @@ namespace CassandraSharp.CQLBinaryProtocol
             _factoryOut = factoryOut;
             _cql = cql;
             _executionFlags = executionFlags;
-        }
-
-        [Obsolete("Use Execute(params) instead")]
-        public ICqlQuery<T> Execute(object dataSource, ConsistencyLevel cl, QueryHint hint = null)
-        {
-            return Execute(new[] {dataSource}).WithConsistencyLevel(cl).WithExecutionFlags(_executionFlags).WithHint(hint);
         }
 
         public ICqlQuery<T> Execute(object dataSource)

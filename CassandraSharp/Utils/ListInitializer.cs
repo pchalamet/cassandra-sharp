@@ -17,7 +17,7 @@ namespace CassandraSharp.Utils
 {
     using System.Collections.Generic;
 
-    internal class ListInitializer<T> : ICollectionInitializer
+    internal sealed class ListInitializer<T> : ICollectionInitializer
     {
         private readonly List<T> _collection = new List<T>();
 

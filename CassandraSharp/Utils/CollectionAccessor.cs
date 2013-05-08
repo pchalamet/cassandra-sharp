@@ -18,7 +18,7 @@ namespace CassandraSharp.Utils
     using System.Collections;
     using System.Collections.Generic;
 
-    internal class CollectionAccessor<T> : ICollectionAccessor
+    internal sealed class CollectionAccessor<T> : ICollectionAccessor
     {
         private readonly ICollection<T> _collection;
 

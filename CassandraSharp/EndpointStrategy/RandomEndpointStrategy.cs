@@ -20,7 +20,7 @@ namespace CassandraSharp.EndpointStrategy
     using System.Net;
     using CassandraSharp.Extensibility;
 
-    internal class RandomEndpointStrategy : IEndpointStrategy
+    internal sealed class RandomEndpointStrategy : IEndpointStrategy
     {
         private readonly List<IPAddress> _bannedEndpoints;
 

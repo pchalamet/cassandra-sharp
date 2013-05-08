@@ -18,7 +18,7 @@ namespace CassandraSharp.Instrumentation
     using System.Net;
     using CassandraSharp.Extensibility;
 
-    internal class NullInstrumentation : IInstrumentation
+    internal sealed class NullInstrumentation : IInstrumentation
     {
         public void ClientQuery(InstrumentationToken token)
         {

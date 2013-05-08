@@ -22,7 +22,7 @@ namespace CassandraSharp.EndpointStrategy
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class TokenAwareStrategy : IEndpointStrategy
+    internal sealed class TokenAwareStrategy : IEndpointStrategy
     {
         private readonly IComparer<Partition> _comparer = new TokenComparer();
 

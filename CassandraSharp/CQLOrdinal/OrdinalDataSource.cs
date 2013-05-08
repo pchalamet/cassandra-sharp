@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLOrdinal
 {
     using CassandraSharp.Extensibility;
 
-    internal class OrdinalDataSource : IDataSource
+    internal sealed class OrdinalDataSource : IDataSource
     {
         private readonly object[] _dataSource;
 

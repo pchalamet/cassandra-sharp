@@ -24,7 +24,7 @@ namespace CassandraSharp.Enlightenment
     using CassandraSharp.Snitch;
     using CassandraSharp.Utils;
 
-    internal class ClusterManager : IClusterManager
+    internal sealed class ClusterManager : IClusterManager
     {
         private readonly object _lock = new object();
 

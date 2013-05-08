@@ -18,7 +18,7 @@ namespace CassandraSharp.CQLPoco
     using System;
     using CassandraSharp.Extensibility;
 
-    internal class DataSourceFactory
+    internal sealed class DataSourceFactory
     {
         public static IDataSource Create(object dataSource)
         {

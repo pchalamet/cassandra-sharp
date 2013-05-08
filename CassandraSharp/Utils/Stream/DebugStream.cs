@@ -18,7 +18,7 @@ namespace CassandraSharp.Utils.Stream
     using System;
     using System.IO;
 
-    internal class DebugStream : Stream
+    internal sealed class DebugStream : Stream
     {
         private OperationState _opeState = OperationState.Unknown;
 

@@ -19,7 +19,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
 
-    internal class ReadyQuery : Query<bool>
+    internal sealed class ReadyQuery : Query<bool>
     {
         private readonly string _cqlVersion;
 

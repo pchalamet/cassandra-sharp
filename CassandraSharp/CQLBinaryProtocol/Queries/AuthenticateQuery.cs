@@ -20,7 +20,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
 
-    internal class AuthenticateQuery : Query<bool>
+    internal sealed class AuthenticateQuery : Query<bool>
     {
         private readonly string _password;
 

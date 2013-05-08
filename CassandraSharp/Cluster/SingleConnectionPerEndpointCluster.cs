@@ -21,7 +21,7 @@ namespace CassandraSharp.Cluster
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class SingleConnectionPerEndpointCluster : ICluster
+    internal sealed class SingleConnectionPerEndpointCluster : ICluster
     {
         private readonly IConnectionFactory _connectionFactory;
 
@@ -60,6 +60,7 @@ namespace CassandraSharp.Cluster
                 if (null != OnClosed)
                 {
                     OnClosed();
+                    OnClosed = null;
                 }
             }
         }

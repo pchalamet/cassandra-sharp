@@ -22,7 +22,7 @@ namespace CassandraSharp.Enlightenment
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal class Future : IFuture
+    internal sealed class Future : IFuture
     {
         public Task<IList<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token)
         {

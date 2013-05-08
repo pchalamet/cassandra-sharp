@@ -1,9 +1,14 @@
 <version>
-	<cassandra-sharp-interfaces version="3.1.6" status="" />
-	<cassandra-sharp version="3.2.1" status="" />
+	<cassandra-sharp-interfaces version="3.3.0" status="" />
+	<cassandra-sharp version="3.3.0" status="" />
 	<Rx version="2.1.30214.0" />
 	
 <changes>
+<change id="3.3.0"><![CDATA[
+NOT RELEASED
+- removed obsolete operations (fluent interface is the way to go)
+]]></change>
+
 <change id="3.2.1"><![CDATA[
 NOT RELEASED
 - added releaseNotes to nuget packages

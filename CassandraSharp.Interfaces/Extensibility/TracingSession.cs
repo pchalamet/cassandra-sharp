@@ -19,7 +19,7 @@ namespace CassandraSharp.Extensibility
     using System.Collections.Generic;
     using System.Net;
 
-    public class TracingSession
+    public sealed class TracingSession
     {
         public IPAddress Coordinator { get; internal set; }
 

@@ -13,16 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
+namespace CassandraSharp.CQLOrdinal
 {
-    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.CQLCommand;
     using CassandraSharp.Enlightenment;
 
-    internal class PocoCommand : Command
+    public static class CQLOrdinalExtensions
     {
-        internal PocoCommand(ICluster cluster)
-                : base(cluster, new PocoDataMapperFactory(), new PocoDataMapperFactory())
+        public static ICqlCommandBuilderTo FromOrdinal(this ICqlCommandBuilderFrom @this)
         {
+            var factory = EnglightenmentMgr.OrdinalDataMapperFactory();
+            return @this.SetFactory(factory);
+        }
+
+        public static ICqlCommandBuilderBuild ToOrdinal(this ICqlCommandBuilderTo @this)
+        {
+            var factory = EnglightenmentMgr.OrdinalDataMapperFactory();
+            return @this.SetFactory(factory);
+        }
+
+        public static ICqlCommand CreateOrdinalCommand(this ICluster @this)
+        {
+            return @this.CreateCommand().FromOrdinal().ToOrdinal().Build();
         }
     }
 }

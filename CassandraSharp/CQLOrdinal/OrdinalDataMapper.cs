@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLOrdinal
 {
     using CassandraSharp.Extensibility;
 
-    internal class OrdinalDataMapper : IDataMapper
+    internal sealed class OrdinalDataMapper : IDataMapper
     {
         public OrdinalDataMapper(object[] dataSource)
         {

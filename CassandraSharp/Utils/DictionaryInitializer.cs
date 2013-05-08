@@ -17,7 +17,7 @@ namespace CassandraSharp.Utils
 {
     using System.Collections.Generic;
 
-    internal class DictionaryInitializer<K, V> : IDictionaryInitializer
+    internal sealed class DictionaryInitializer<K, V> : IDictionaryInitializer
     {
         private readonly Dictionary<K, V> _collection = new Dictionary<K, V>();
 

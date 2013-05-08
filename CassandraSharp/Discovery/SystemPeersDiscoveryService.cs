@@ -22,13 +22,12 @@ namespace CassandraSharp.Discovery
     using System.Numerics;
     using System.Timers;
     using CassandraSharp.CQLBinaryProtocol.Queries;
-    using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Enlightenment;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class SystemPeersDiscoveryService : IDiscoveryService
+    internal sealed class SystemPeersDiscoveryService : IDiscoveryService
     {
         private readonly ICluster _cluster;
 

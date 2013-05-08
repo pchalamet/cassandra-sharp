@@ -33,13 +33,6 @@ namespace CassandraSharp
             return EnglightenmentMgr.Future().AsFuture(observable, token);
         }
 
-        [Obsolete("Use Execute(string)")]
-        public static ICqlQuery<NonQuery> Execute(this ICqlCommand @this, string cql, ConsistencyLevel cl,
-                                                  ExecutionFlags executionFlags = ExecutionFlags.None, object key = null)
-        {
-            return @this.Execute<NonQuery>(cql).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags);
-        }
-
         public static ICqlQuery<NonQuery> Execute(this ICqlCommand @this, string cql)
         {
             return @this.Execute<NonQuery>(cql);

@@ -21,7 +21,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
 
-    internal class PrepareQuery : CqlQuery<Tuple<byte[], IColumnSpec[]>>
+    internal sealed class PrepareQuery : CqlQuery<Tuple<byte[], IColumnSpec[]>>
     {
         public PrepareQuery(IConnection connection, string cql)
                 : base(connection, cql, null)

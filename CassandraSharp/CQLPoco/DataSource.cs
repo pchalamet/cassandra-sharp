@@ -18,7 +18,7 @@ namespace CassandraSharp.CQLPoco
     using System;
     using CassandraSharp.Extensibility;
 
-    internal class DataSource<T> : IDataSource
+    internal sealed class DataSource<T> : IDataSource
     {
         private static readonly ReadAccessor<T> _accessor = new ReadAccessor<T>();
 

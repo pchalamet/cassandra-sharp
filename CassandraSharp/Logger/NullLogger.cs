@@ -17,7 +17,7 @@ namespace CassandraSharp.Logger
 {
     using CassandraSharp.Extensibility;
 
-    internal class NullLogger : ILogger
+    internal sealed class NullLogger : ILogger
     {
         public void Debug(string format, params object[] prms)
         {

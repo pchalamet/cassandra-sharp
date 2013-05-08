@@ -19,7 +19,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
 
-    internal class ExecuteQuery<T> : CqlQuery<T>
+    internal sealed class ExecuteQuery<T> : CqlQuery<T>
     {
         private readonly IColumnSpec[] _columnSpecs;
 

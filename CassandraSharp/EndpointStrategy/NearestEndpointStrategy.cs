@@ -21,7 +21,7 @@ namespace CassandraSharp.EndpointStrategy
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class NearestEndpointStrategy : IEndpointStrategy
+    internal sealed class NearestEndpointStrategy : IEndpointStrategy
     {
         private readonly List<IPAddress> _bannedEndpoints;
 

@@ -18,61 +18,35 @@ namespace CassandraSharp.CQLCommand
     using CassandraSharp.Enlightenment;
     using CassandraSharp.Extensibility;
 
-    internal class CqlCommandBuilder : ICqlCommandBuilderFrom,
-                                       ICqlCommandBuilderTo,
-                                       ICqlCommandBuilderBuild
+    internal sealed class CqlCommandBuilder : ICqlCommandBuilderFrom,
+                                              ICqlCommandBuilderTo,
+                                              ICqlCommandBuilderBuild
     {
         private readonly ICluster _cluster;
 
-        private IDataMapperFactory _factoryIn;
+        private IDataMapperFactory _factoryFrom;
 
-        private IDataMapperFactory _factoryOut;
+        private IDataMapperFactory _factoryTo;
 
         internal CqlCommandBuilder(ICluster cluster)
         {
             _cluster = cluster;
-            _factoryIn = null;
-            _factoryOut = null;
         }
 
         public ICqlCommand Build()
         {
-            return EnglightenmentMgr.CommandFactory().Create(_cluster, _factoryIn, _factoryOut);
+            return EnglightenmentMgr.CommandFactory().Create(_cluster, _factoryFrom, _factoryTo);
         }
 
-        public ICqlCommandBuilderTo FromOrdinal()
+        ICqlCommandBuilderTo ICqlCommandBuilderFrom.SetFactory(IDataMapperFactory factory)
         {
-            _factoryIn = EnglightenmentMgr.OrdinalDataMapperFactory();
+            _factoryFrom = factory;
             return this;
         }
 
-        public ICqlCommandBuilderTo FromPoco()
+        ICqlCommandBuilderBuild ICqlCommandBuilderTo.SetFactory(IDataMapperFactory factory)
         {
-            _factoryIn = EnglightenmentMgr.PocoDataMapperFactory();
-            return this;
-        }
-
-        public ICqlCommandBuilderTo FromPropertyBag()
-        {
-            _factoryIn = EnglightenmentMgr.PropertyBagDataMapperFactory();
-            return this;
-        }
-
-        public ICqlCommandBuilderBuild ToOrdinal()
-        {
-            _factoryOut = EnglightenmentMgr.OrdinalDataMapperFactory();
-            return this;
-        }
-
-        public ICqlCommandBuilderBuild ToPoco()
-        {
-            _factoryOut = EnglightenmentMgr.PocoDataMapperFactory();
-            return this;
-        }
-
-        public ICqlCommandBuilderBuild ToPropertyBag()
-        {
-            _factoryOut = EnglightenmentMgr.PropertyBagDataMapperFactory();
+            _factoryTo = factory;
             return this;
         }
     }

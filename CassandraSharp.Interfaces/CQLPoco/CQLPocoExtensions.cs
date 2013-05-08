@@ -15,13 +15,26 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using CassandraSharp.CQLCommand;
     using CassandraSharp.Enlightenment;
 
     public static class CQLPocoExtensions
     {
+        public static ICqlCommandBuilderTo FromPoco(this ICqlCommandBuilderFrom @this)
+        {
+            var factory = EnglightenmentMgr.PocoDataMapperFactory();
+            return @this.SetFactory(factory);
+        }
+
+        public static ICqlCommandBuilderBuild ToPoco(this ICqlCommandBuilderTo @this)
+        {
+            var factory = EnglightenmentMgr.PocoDataMapperFactory();
+            return @this.SetFactory(factory);
+        }
+
         public static ICqlCommand CreatePocoCommand(this ICluster @this)
         {
-            return EnglightenmentMgr.PocoCommandFactory().Create(@this);
+            return @this.CreateCommand().FromPoco().ToPoco().Build();
         }
     }
 }

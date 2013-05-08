@@ -23,7 +23,7 @@ namespace CassandraSharp.Recovery
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
-    internal class AttemptConnectRecoveryService : IRecoveryService
+    internal sealed class AttemptConnectRecoveryService : IRecoveryService
     {
         private readonly object _lock;
 

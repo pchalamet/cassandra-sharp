@@ -21,6 +21,8 @@ namespace CassandraSharpUnitTests.CQLOrdinal
     using System.Net;
     using CassandraSharp;
     using CassandraSharp.CQLCommand;
+    using CassandraSharp.CQLOrdinal;
+    using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Utils;
     using NUnit.Framework;

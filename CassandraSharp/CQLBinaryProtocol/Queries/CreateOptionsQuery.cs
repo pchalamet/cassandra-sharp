@@ -21,7 +21,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
 
-    internal class CreateOptionsQuery : Query<Dictionary<string, string[]>>
+    internal sealed class CreateOptionsQuery : Query<Dictionary<string, string[]>>
     {
         public CreateOptionsQuery(IConnection connection)
                 : base(connection)

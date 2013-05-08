@@ -21,8 +21,8 @@ namespace CassandraSharp.Utils.Stream
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
 
-    internal class BufferingFrameWriter : IFrameWriter,
-                                          IDisposable
+    internal sealed class BufferingFrameWriter : IFrameWriter,
+                                                 IDisposable
     {
         private readonly MemoryStream _ms;
 

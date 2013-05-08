@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPropertyBag
 {
     using CassandraSharp.Extensibility;
 
-    internal class DataSource : IDataSource
+    internal sealed class DataSource : IDataSource
     {
         private readonly PropertyBag _dataSource;
 

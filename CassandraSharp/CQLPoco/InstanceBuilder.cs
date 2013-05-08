@@ -18,7 +18,7 @@ namespace CassandraSharp.CQLPoco
     using System.Runtime.Serialization;
     using CassandraSharp.Extensibility;
 
-    internal class InstanceBuilder<T> : IInstanceBuilder
+    internal sealed class InstanceBuilder<T> : IInstanceBuilder
     {
         private static readonly WriteAccessor<T> _accessor = new WriteAccessor<T>();
 

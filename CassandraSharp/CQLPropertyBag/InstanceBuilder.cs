@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPropertyBag
 {
     using CassandraSharp.Extensibility;
 
-    internal class InstanceBuilder : IInstanceBuilder
+    internal sealed class InstanceBuilder : IInstanceBuilder
     {
         private readonly PropertyBag _data = new PropertyBag();
 

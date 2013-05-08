@@ -110,7 +110,7 @@ namespace CassandraSharpUnitTests.Performance
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
             {
-                ICqlCommand cmd = new PocoCommand(cluster);
+                ICqlCommand cmd = cluster.CreatePocoCommand();
 
                 const string dropFoo = "drop keyspace Tests";
                 try

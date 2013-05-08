@@ -19,7 +19,7 @@ namespace CassandraSharp.Snitch
     using System.Net;
     using CassandraSharp.Extensibility;
 
-    internal class SimpleSnitch : IEndpointSnitch
+    internal sealed class SimpleSnitch : IEndpointSnitch
     {
         public string GetRack(IPAddress endpoint)
         {

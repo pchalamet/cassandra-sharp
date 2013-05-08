@@ -15,29 +15,33 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    using System;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Enlightenment;
-
-    internal class PropertyBagCommand : Command,
-                                        IPropertyBagCommand
+    public sealed class PropertyBagCommand : IPropertyBagCommand
     {
-        internal PropertyBagCommand(ICluster cluster)
-                : base(cluster, new PropertyBagDataMapperFactory(), new PropertyBagDataMapperFactory())
+        private readonly ICqlCommand _command;
+
+        public PropertyBagCommand(ICqlCommand command)
         {
+            _command = command;
         }
 
-        [Obsolete("Use Prepare(string) instead")]
-        public ICqlQuery<PropertyBag> Execute(string cql, ConsistencyLevel cl = ConsistencyLevel.QUORUM,
-                                              ExecutionFlags executionFlags = ExecutionFlags.None,
-                                              QueryHint hint = null)
+        public ICqlQuery<T> Execute<T>(string cql)
         {
-            return Execute<PropertyBag>(cql).WithConsistencyLevel(cl).WithExecutionFlags(executionFlags).WithHint(hint);
+            return _command.Execute<T>(cql);
+        }
+
+        public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        {
+            return _command.Prepare<T>(cql, executionFlags);
+        }
+
+        public ICqlQuery<PropertyBag> Execute(string cql)
+        {
+            return _command.Execute<PropertyBag>(cql);
         }
 
         public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
         {
-            return Prepare<PropertyBag>(cql, executionFlags);
+            return _command.Prepare<PropertyBag>(cql, executionFlags);
         }
     }
 }

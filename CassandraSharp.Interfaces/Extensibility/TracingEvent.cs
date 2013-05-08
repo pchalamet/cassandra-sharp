@@ -18,7 +18,7 @@ namespace CassandraSharp.Extensibility
     using System;
     using System.Net;
 
-    public class TracingEvent
+    public sealed class TracingEvent
     {
         public string Activity { get; internal set; }
 

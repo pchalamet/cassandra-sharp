@@ -1,4 +1,11 @@
-﻿version 3.2.1
+﻿version 3.3.0
+NOT RELEASED
+- removed obsolete operations (fluent interface is the way to go)
+- log connection building error, avoid GC TcpClient if building goes bad
+- simplified command builder extensions - decoupled builder & mapper
+
+version 3.2.1
+NOT RELEASED
 - added releaseNotes to nuget packages
 
 version 3.2.0

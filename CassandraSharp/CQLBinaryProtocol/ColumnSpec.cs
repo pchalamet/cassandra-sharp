@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 {
     using CassandraSharp.Extensibility;
 
-    internal class ColumnSpec : IColumnSpec
+    internal sealed class ColumnSpec : IColumnSpec
     {
         public ColumnSpec(int index, string keyspace, string table, string name, ColumnType columnType, string customData, ColumnType collectionKeyType,
                           ColumnType collectionValueType)

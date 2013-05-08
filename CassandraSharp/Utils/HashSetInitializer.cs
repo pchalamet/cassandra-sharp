@@ -17,7 +17,7 @@ namespace CassandraSharp.Utils
 {
     using System.Collections.Generic;
 
-    internal class HashSetInitializer<T> : ICollectionInitializer
+    internal sealed class HashSetInitializer<T> : ICollectionInitializer
     {
         private readonly HashSet<T> _collection = new HashSet<T>();
 

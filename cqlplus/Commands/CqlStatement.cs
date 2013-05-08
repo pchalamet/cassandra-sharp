@@ -36,7 +36,7 @@ namespace cqlplus.Commands
             }
 
             var cmd = CommandContext.Cluster.CreatePropertyBagCommand();
-            var res = cmd.Execute(_statement, CommandContext.CL, executionFlags).AsFuture();
+            var res = cmd.Execute(_statement).WithConsistencyLevel(CommandContext.CL).WithExecutionFlags(executionFlags).AsFuture();
 
             CommandContext.ResultWriter.Write(CommandContext.TextWriter, res.Result);
         }

@@ -19,7 +19,7 @@ namespace CassandraSharp.CQLPoco
     using System.Reflection;
     using System.Reflection.Emit;
 
-    internal class ReadAccessor<T> : Accessor<T>
+    internal sealed class ReadAccessor<T> : Accessor<T>
     {
         private readonly ReadValue _accessor;
 

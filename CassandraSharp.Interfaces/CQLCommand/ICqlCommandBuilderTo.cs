@@ -15,12 +15,10 @@
 
 namespace CassandraSharp.CQLCommand
 {
+    using CassandraSharp.Extensibility;
+
     public interface ICqlCommandBuilderTo
     {
-        ICqlCommandBuilderBuild ToOrdinal();
-
-        ICqlCommandBuilderBuild ToPoco();
-
-        ICqlCommandBuilderBuild ToPropertyBag();
+        ICqlCommandBuilderBuild SetFactory(IDataMapperFactory factory);
     }
 }

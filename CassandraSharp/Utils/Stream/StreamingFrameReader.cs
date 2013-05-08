@@ -24,8 +24,6 @@ namespace CassandraSharp.Utils.Stream
 
     internal class StreamingFrameReader : IFrameReader
     {
-        private readonly Stream _stream;
-
         private readonly byte[] _tempBuffer = new byte[16];
 
         public StreamingFrameReader(Socket socket)
@@ -58,11 +56,11 @@ namespace CassandraSharp.Utils.Stream
                 TraceId = _tempBuffer.ToGuid();
             }
 
-            _stream = new SocketReadOnlyStream(socket, frameBytesLeft);
+            ReadOnlyStream = new SocketReadOnlyStream(socket, frameBytesLeft);
 
             if (MessageOpcodes.Error == MessageOpcode)
             {
-                ResponseException = CreateExceptionFromError(_stream);
+                ResponseException = CreateExceptionFromError(ReadOnlyStream);
             }
         }
 
@@ -79,10 +77,7 @@ namespace CassandraSharp.Utils.Stream
 
         public Exception ResponseException { get; private set; }
 
-        public Stream ReadOnlyStream
-        {
-            get { return _stream; }
-        }
+        public Stream ReadOnlyStream { get; private set; }
 
         private static Exception CreateExceptionFromError(Stream stream)
         {

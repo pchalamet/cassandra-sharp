@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPropertyBag
 {
     using CassandraSharp.Extensibility;
 
-    internal class DataMapper : IDataMapper
+    internal sealed class DataMapper : IDataMapper
     {
         public DataMapper(PropertyBag dataSource)
         {

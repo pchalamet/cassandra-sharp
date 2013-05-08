@@ -18,7 +18,7 @@ namespace CassandraSharp.Enlightenment
     using CassandraSharp.CQLPropertyBag;
     using CassandraSharp.Extensibility;
 
-    internal class PropertyBagDataMapperFactory : IDataMapperFactory
+    internal sealed class PropertyBagDataMapperFactory : IDataMapperFactory
     {
         public IDataMapper Create<T>(object dataSource = null)
         {

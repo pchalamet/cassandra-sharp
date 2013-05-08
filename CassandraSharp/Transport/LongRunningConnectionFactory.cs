@@ -20,7 +20,7 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
 
-    internal class LongRunningConnectionFactory : IConnectionFactory
+    internal sealed class LongRunningConnectionFactory : IConnectionFactory
     {
         private readonly TransportConfig _config;
 

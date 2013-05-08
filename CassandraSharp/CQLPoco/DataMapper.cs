@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPoco
 {
     using CassandraSharp.Extensibility;
 
-    internal class DataMapper<T> : IDataMapper
+    internal sealed class DataMapper<T> : IDataMapper
     {
         public DataMapper(object dataSource)
         {

@@ -133,7 +133,7 @@ namespace CassandraSharpUnitTests.Functional
                 };
 
             ICluster cluster = ClusterManager.GetCluster(clusterConfig);
-            ICqlCommand cmd = new PocoCommand(cluster);
+            ICqlCommand cmd = cluster.CreatePocoCommand();
 
             const string dropKeySpace = "drop keyspace Tests";
             try

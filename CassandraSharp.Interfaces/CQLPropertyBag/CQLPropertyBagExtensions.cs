@@ -15,11 +15,28 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using CassandraSharp.CQLCommand;
+    using CassandraSharp.Enlightenment;
+
     public static class CQLPropertyBagExtensions
     {
+        public static ICqlCommandBuilderTo FromPropertyBag(this ICqlCommandBuilderFrom @this)
+        {
+            var factory = EnglightenmentMgr.PropertyBagDataMapperFactory();
+            return @this.SetFactory(factory);
+        }
+
+        public static ICqlCommandBuilderBuild ToPropertyBag(this ICqlCommandBuilderTo @this)
+        {
+            var factory = EnglightenmentMgr.PropertyBagDataMapperFactory();
+            return @this.SetFactory(factory);
+        }
+
         public static IPropertyBagCommand CreatePropertyBagCommand(this ICluster @this)
         {
-            return Enlightenment.EnglightenmentMgr.PropertyBagCommandFactory().Create(@this);
+            var cmd = @this.CreateCommand().FromPropertyBag().ToPropertyBag().Build();
+            var pbCmd = new PropertyBagCommand(cmd);
+            return pbCmd;
         }
     }
 }

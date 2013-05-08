@@ -15,13 +15,8 @@
 
 namespace CassandraSharp
 {
-    using System;
-
     public interface ICqlCommand
     {
-        [Obsolete("Use Execute<T>(string) instead")]
-        ICqlQuery<T> Execute<T>(string cql, ConsistencyLevel cl, ExecutionFlags executionFlags = ExecutionFlags.None, QueryHint hint = null);
-
         ICqlQuery<T> Execute<T>(string cql);
 
         IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);

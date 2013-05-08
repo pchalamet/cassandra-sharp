@@ -18,7 +18,7 @@ namespace CassandraSharp.Extensibility
     using System.Net;
     using System.Numerics;
 
-    public class Peer
+    public sealed class Peer
     {
         public IPAddress RpcAddress { get; internal set; }
 

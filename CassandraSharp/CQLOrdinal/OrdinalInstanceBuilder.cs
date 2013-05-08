@@ -19,7 +19,7 @@ namespace CassandraSharp.CQLOrdinal
     using System.Linq;
     using CassandraSharp.Extensibility;
 
-    internal class OrdinalInstanceBuilder : IInstanceBuilder
+    internal sealed class OrdinalInstanceBuilder : IInstanceBuilder
     {
         private readonly SortedDictionary<int, object> _instance = new SortedDictionary<int, object>();
 

@@ -25,7 +25,7 @@ namespace CassandraSharp.Utils
         IDictionary<string, Type> Definition { get; }
     }
 
-    internal class ServiceActivator<T> where T : IServiceDescriptor, new()
+    internal sealed class ServiceActivator<T> where T : IServiceDescriptor, new()
     {
 // ReSharper disable StaticFieldInGenericType
         private static readonly IServiceDescriptor _descriptor = new T();

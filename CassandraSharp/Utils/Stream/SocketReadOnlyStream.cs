@@ -19,7 +19,7 @@ namespace CassandraSharp.Utils.Stream
     using System.IO;
     using System.Net.Sockets;
 
-    internal class SocketReadOnlyStream : Stream
+    internal sealed class SocketReadOnlyStream : Stream
     {
         private readonly Socket _socket;
 

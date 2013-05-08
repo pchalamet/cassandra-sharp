@@ -1,4 +1,4 @@
-﻿// cassandra-sharp - the high performance .NET CQL 3 binary protocol client for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,24 +16,17 @@
 namespace Samples.Stress
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
-    using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
 
     public class DisconnectingProxy
     {
-        private readonly double _probaDisconnect;
-
-        private readonly double _probaSlowness;
-
         private readonly int _source;
 
         private readonly int _target;
@@ -42,12 +35,10 @@ namespace Samples.Stress
 
         private volatile bool _stop;
 
-        public DisconnectingProxy(int source, int target, double probaDisconnect, double probaSlowness)
+        public DisconnectingProxy(int source, int target)
         {
             _source = source;
             _target = target;
-            _probaDisconnect = probaDisconnect;
-            _probaSlowness = probaSlowness;
         }
 
         public void Start()
@@ -77,22 +68,17 @@ namespace Samples.Stress
             {
                 EndPoint targetEndpoint = new IPEndPoint(ipAddress, _target);
                 Socket targetSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                targetSocket.ReceiveTimeout = 10000;
-                targetSocket.SendTimeout = 10000;
                 targetSocket.Connect(targetEndpoint);
 
                 Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                listenSocket.ReceiveTimeout = 10000;
-                listenSocket.SendTimeout = 10000;
                 listenSocket.Bind(listenEndpoint);
                 listenSocket.Listen(10);
 
                 Socket clientSocket = listenSocket.Accept();
-                clientSocket.ReceiveTimeout = 10000;
-                clientSocket.SendTimeout = 10000;
                 ThreadPool.QueueUserWorkItem(_ => Transmit(clientSocket, targetSocket));
                 ThreadPool.QueueUserWorkItem(_ => Transmit(targetSocket, clientSocket));
-                Killer(targetSocket, listenSocket);
+                Killer(targetSocket, clientSocket, listenSocket);
+                Thread.Sleep(3000);
             }
         }
 
@@ -103,35 +89,29 @@ namespace Samples.Stress
             {
                 Thread.Sleep(rnd.Next(500));
 
-                double proba = rnd.NextDouble();
-                if (_enableKiller && proba < _probaDisconnect)
+                int proba = rnd.Next(1000);
+                if (_enableKiller && 900 < proba)
                 {
                     break;
                 }
             }
 
-            if (!_stop)
-            {
-                Console.WriteLine("******* Killing connection");
-            }
+            Console.WriteLine("Killing connection");
 
             foreach (Socket socket in sockets)
             {
                 try
                 {
-                    // socket.Disconnect(false);
                     socket.Dispose();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine("Failure while shutdown {0}", ex);
                 }
             }
         }
 
-        private void Transmit(Socket source, Socket target)
+        private static void Transmit(Socket source, Socket target)
         {
-            Random rnd = new Random();
             try
             {
                 byte[] buffer = new byte[1024];
@@ -141,13 +121,6 @@ namespace Samples.Stress
                     int write = 0;
                     while (write != count)
                     {
-                        double proba = rnd.NextDouble();
-                        if (_enableKiller && proba < _probaSlowness)
-                        {
-                            Console.WriteLine("******* Introducing slowness");
-                            Thread.Sleep(100*1000);
-                        }
-
                         write += target.Send(buffer, write, count - write, SocketFlags.None);
                     }
                 }
@@ -160,97 +133,6 @@ namespace Samples.Stress
 
     public class ResilienceTest
     {
-        public void RecoveryTest()
-        {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
-                {
-                        Recovery = new RecoveryConfig {Type = "Default", Interval = 2},
-                        Logger = new LoggerConfig {Type = typeof(ResilienceLogger).AssemblyQualifiedName},
-                };
-            ClusterManager.Configure(cassandraSharpConfig);
-
-            ClusterConfig clusterConfig = new ClusterConfig
-                {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] {"localhost"},
-                            },
-                        Transport = new TransportConfig
-                            {
-                                    Port = 666,
-                                    Type = "ShortRunning",
-                                    ReceiveTimeout = 10000,
-                                    SendTimeout = 10000,
-                            }
-                };
-
-            DisconnectingProxy proxy = new DisconnectingProxy(666, 9042, 0.05, 0.0);
-            proxy.Start();
-
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
-            {
-                ICqlCommand cmd = cluster.CreatePocoCommand();
-
-                const string dropFoo = "drop keyspace data";
-                try
-                {
-                    cmd.Execute(dropFoo).AsFuture().Wait();
-                }
-                catch
-                {
-                }
-
-                const string createFoo = "CREATE KEYSPACE data WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                cmd.Execute(createFoo).AsFuture().Wait();
-
-                const string createBar = "CREATE TABLE data.test (time text PRIMARY KEY)";
-                cmd.Execute(createBar).AsFuture().Wait();
-
-                proxy.EnableKiller();
-
-                List<Task> tasks = new List<Task>();
-                for (int taskId = 0; taskId < 5; ++taskId)
-                {
-                    int tmpTaskId = taskId;
-                    Task task = Task.Factory.StartNew(() => Worker(tmpTaskId, cmd), TaskCreationOptions.LongRunning);
-                    tasks.Add(task);
-                }
-
-                foreach (Task task in tasks)
-                {
-                    task.Wait();
-                }
-
-                ClusterManager.Shutdown();
-            }
-
-            proxy.Stop();
-        }
-
-        private static void Worker(int taskId, ICqlCommand cmd)
-        {
-            for (int reqId = 0; reqId < 10000; ++reqId)
-            {
-                int attempt = 0;
-                while (true)
-                {
-                    try
-                    {
-                        var now = DateTime.Now;
-                        string insert = String.Format("insert into data.test(time) values ('{0}');", now);
-                        cmd.Execute(insert).AsFuture().Wait();
-                        Console.WriteLine("Task {0} RequestId {1} Try {2} ==> {3}", taskId, reqId, ++attempt, insert);
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("FAILED Task {0} RequestId {1} Try {2} ==> {3}", taskId, reqId, ++attempt, ex.Message);
-                        Thread.Sleep(5*1000);
-                    }
-                }
-            }
-        }
-
         public class ResilienceLogger : ILogger
         {
             public void Debug(string format, params object[] prms)
@@ -286,6 +168,82 @@ namespace Samples.Stress
             public void Dispose()
             {
             }
+        }
+
+        public void RecoveryTest()
+        {
+            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
+            {
+                Logger = new LoggerConfig { Type = typeof(ResilienceLogger).AssemblyQualifiedName },
+                Recovery = new RecoveryConfig { Interval = 2 }
+            };
+            ClusterManager.Configure(cassandraSharpConfig);
+
+            ClusterConfig clusterConfig = new ClusterConfig
+            {
+                Endpoints = new EndpointsConfig
+                {
+                    Servers = new[] { "localhost" },
+                },
+                Transport = new TransportConfig
+                {
+                    Port = 666,
+                    ReceiveTimeout = 10 * 1000,
+                }
+            };
+
+            DisconnectingProxy proxy = new DisconnectingProxy(666, 9042);
+            proxy.Start();
+
+            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
+            {
+                ICqlCommand cmd = cluster.CreatePocoCommand();
+
+                const string dropFoo = "drop keyspace data";
+                try
+                {
+                    cmd.Execute(dropFoo).AsFuture().Wait();
+                }
+                catch
+                {
+                }
+
+                const string createFoo = "CREATE KEYSPACE data WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                cmd.Execute(createFoo).AsFuture().Wait();
+
+                const string createBar = "CREATE TABLE data.test (time text PRIMARY KEY)";
+                cmd.Execute(createBar).AsFuture().Wait();
+
+                proxy.EnableKiller();
+
+                for (int i = 0; i < 100000; ++i)
+                {
+                    int attempt = 0;
+                    while (true)
+                    {
+                        var now = DateTime.Now;
+                        string insert = String.Format("insert into data.test(time) values ('{0}');", now);
+                        Console.WriteLine("{0}.{1}) {2}", i, ++attempt, insert);
+
+                        try
+                        {
+                            cmd.Execute(insert).AsFuture().Wait();
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Failed with error {0}", ex.Message);
+                            Thread.Sleep(1000);
+                        }
+                    }
+                }
+
+                Console.WriteLine("Stress test done");
+
+                ClusterManager.Shutdown();
+            }
+
+            proxy.Stop();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace CassandraSharp.Recovery
     using System.Net;
     using CassandraSharp.Extensibility;
 
-    internal class NullRecoveryService : IRecoveryService
+    internal sealed class NullRecoveryService : IRecoveryService
     {
         public void Dispose()
         {

@@ -19,7 +19,7 @@ namespace CassandraSharp.CQLPropertyBag
     using System.Globalization;
     using System.Linq;
 
-    public class PropertyBag
+    public sealed class PropertyBag
     {
         private readonly Dictionary<string, object> _map = new Dictionary<string, object>();
 

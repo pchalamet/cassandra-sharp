@@ -19,7 +19,7 @@ namespace CassandraSharp.Utils
     using System.Net;
     using System.Net.Sockets;
 
-    internal class NetworkFinder
+    internal sealed class NetworkFinder
     {
         public static IPAddress Find(string hostname)
         {
