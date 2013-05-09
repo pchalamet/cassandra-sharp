@@ -111,8 +111,8 @@ namespace CassandraSharp.Utils.Stream
             {
                 int tmpRead = socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
 
-                // consider 0 as a peer graceful disconnection
-                if (0 == tmpRead && socket.Poll(1, SelectMode.SelectRead))
+                // always consider 0 as a peer graceful disconnection
+                if (0 == tmpRead)
                 {
                     return read;
                 }
