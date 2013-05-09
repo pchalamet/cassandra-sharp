@@ -3,6 +3,7 @@ NOT RELEASED
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
 - simplified command builder extensions - decoupled builder & mapper
+- fixed 100% cpu when linux hosted server disconnect
 
 version 3.2.1
 NOT RELEASED

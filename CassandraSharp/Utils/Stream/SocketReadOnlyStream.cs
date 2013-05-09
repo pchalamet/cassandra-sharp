@@ -96,7 +96,6 @@ namespace CassandraSharp.Utils.Stream
             }
 
             int read = SocketReceiveBuffer(_socket, buffer, offset, count);
-
             if (read != count)
             {
                 throw new IOException("Failed to read requested count");
@@ -110,7 +109,15 @@ namespace CassandraSharp.Utils.Stream
             int read = 0;
             while (read != len)
             {
-                read += socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
+                int tmpRead = socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
+
+                // always consider 0 as a peer graceful disconnection
+                if (0 == tmpRead)
+                {
+                    return read;
+                }
+
+                read += tmpRead;
             }
 
             return read;
