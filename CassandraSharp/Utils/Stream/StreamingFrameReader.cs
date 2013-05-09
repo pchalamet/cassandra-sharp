@@ -28,43 +28,51 @@ namespace CassandraSharp.Utils.Stream
 
         public StreamingFrameReader(Socket socket)
         {
-            SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 8);
-
-            FrameType version = (FrameType) _tempBuffer[0];
-            if (0 == (version & FrameType.Response))
+            try
             {
-                throw new ArgumentException("Expecting response frame");
+                SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 8);
+
+                FrameType version = (FrameType) _tempBuffer[0];
+                if (0 == (version & FrameType.Response))
+                {
+                    throw new ArgumentException("Expecting response frame");
+                }
+                if (FrameType.ProtocolVersion != (version & FrameType.ProtocolVersionMask))
+                {
+                    throw new ArgumentException("Unknown protocol version");
+                }
+
+                FrameHeaderFlags flags = (FrameHeaderFlags) _tempBuffer[1];
+
+                StreamId = _tempBuffer[2];
+
+                MessageOpcode = (MessageOpcodes) _tempBuffer[3];
+                int frameBytesLeft = _tempBuffer.ToInt(4);
+
+                bool tracing = 0 != (flags & FrameHeaderFlags.Tracing);
+                if (tracing)
+                {
+                    SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 16);
+                    frameBytesLeft -= 16;
+
+                    TraceId = _tempBuffer.ToGuid();
+                }
+
+                ReadOnlyStream = new SocketReadOnlyStream(socket, frameBytesLeft);
+
+                if (MessageOpcodes.Error == MessageOpcode)
+                {
+                    ResponseException = CreateExceptionFromError(ReadOnlyStream);
+                }
             }
-            if (FrameType.ProtocolVersion != (version & FrameType.ProtocolVersionMask))
+            catch
             {
-                throw new ArgumentException("Unknown protocol version");
-            }
-
-            FrameHeaderFlags flags = (FrameHeaderFlags) _tempBuffer[1];
-
-            StreamId = _tempBuffer[2];
-
-            MessageOpcode = (MessageOpcodes) _tempBuffer[3];
-            int frameBytesLeft = _tempBuffer.ToInt(4);
-
-            bool tracing = 0 != (flags & FrameHeaderFlags.Tracing);
-            if (tracing)
-            {
-                SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 16);
-                frameBytesLeft -= 16;
-
-                TraceId = _tempBuffer.ToGuid();
-            }
-
-            ReadOnlyStream = new SocketReadOnlyStream(socket, frameBytesLeft);
-
-            if (MessageOpcodes.Error == MessageOpcode)
-            {
-                ResponseException = CreateExceptionFromError(ReadOnlyStream);
+                Dispose();
+                throw;
             }
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
             ReadOnlyStream.SafeDispose();
         }
