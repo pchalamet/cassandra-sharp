@@ -13,13 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Stream
+namespace CassandraSharp.Transport
 {
     using System;
     using System.IO;
     using System.Net.Sockets;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
+    using CassandraSharp.Utils.Stream;
 
     internal sealed class BufferingFrameWriter : IFrameWriter,
                                                  IDisposable

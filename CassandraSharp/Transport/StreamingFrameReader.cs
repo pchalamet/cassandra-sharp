@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Stream
+namespace CassandraSharp.Transport
 {
     using System;
     using System.IO;
@@ -21,6 +21,8 @@ namespace CassandraSharp.Utils.Stream
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
+    using CassandraSharp.Utils.Stream;
 
     internal class StreamingFrameReader : IFrameReader
     {
