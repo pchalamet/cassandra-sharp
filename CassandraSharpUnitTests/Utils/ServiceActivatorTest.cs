@@ -73,8 +73,7 @@ namespace CassandraSharpUnitTests.Utils
             const string key = "tralala";
             const int value = 42;
 
-            ITestService testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
-            Assert.IsNull(testService);
+            Assert.Throws<ArgumentException>(() => ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value));
         }
 
         [Test]
@@ -84,8 +83,7 @@ namespace CassandraSharpUnitTests.Utils
             const string key = "tralala";
             const int value = 42;
 
-            ITestService testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
-            Assert.IsNull(testService);
+            Assert.Throws<ArgumentException>(() => ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value));
         }
     }
 }

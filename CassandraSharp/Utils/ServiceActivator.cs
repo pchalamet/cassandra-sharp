@@ -36,7 +36,8 @@ namespace CassandraSharp.Utils
         {
             if (string.IsNullOrEmpty(customType))
             {
-                return default(TI);
+                string emptyTypeMsg = string.Format("Expecting nickname or qualified class name for '{0}'", typeof(TI).AssemblyQualifiedName);
+                throw new ArgumentException(emptyTypeMsg);
             }
 
             Type type;
