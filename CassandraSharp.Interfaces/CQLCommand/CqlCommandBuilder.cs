@@ -38,13 +38,13 @@ namespace CassandraSharp.CQLCommand
             return EnglightenmentMgr.CommandFactory().Create(_cluster, _factoryFrom, _factoryTo);
         }
 
-        ICqlCommandBuilderTo ICqlCommandBuilderFrom.SetFactory(IDataMapperFactory factory)
+        ICqlCommandBuilderTo ICqlCommandBuilderFrom.Set(IDataMapperFactory factory)
         {
             _factoryFrom = factory;
             return this;
         }
 
-        ICqlCommandBuilderBuild ICqlCommandBuilderTo.SetFactory(IDataMapperFactory factory)
+        ICqlCommandBuilderBuild ICqlCommandBuilderTo.Set(IDataMapperFactory factory)
         {
             _factoryTo = factory;
             return this;

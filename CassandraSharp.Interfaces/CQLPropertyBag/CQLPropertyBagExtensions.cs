@@ -23,13 +23,13 @@ namespace CassandraSharp.CQLPropertyBag
         public static ICqlCommandBuilderTo FromPropertyBag(this ICqlCommandBuilderFrom @this)
         {
             var factory = EnglightenmentMgr.PropertyBagDataMapperFactory();
-            return @this.SetFactory(factory);
+            return @this.Set(factory);
         }
 
         public static ICqlCommandBuilderBuild ToPropertyBag(this ICqlCommandBuilderTo @this)
         {
             var factory = EnglightenmentMgr.PropertyBagDataMapperFactory();
-            return @this.SetFactory(factory);
+            return @this.Set(factory);
         }
 
         public static IPropertyBagCommand CreatePropertyBagCommand(this ICluster @this)

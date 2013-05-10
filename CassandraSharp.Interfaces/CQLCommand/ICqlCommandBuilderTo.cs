@@ -19,6 +19,6 @@ namespace CassandraSharp.CQLCommand
 
     public interface ICqlCommandBuilderTo
     {
-        ICqlCommandBuilderBuild SetFactory(IDataMapperFactory factory);
+        ICqlCommandBuilderBuild Set(IDataMapperFactory factory);
     }
 }
