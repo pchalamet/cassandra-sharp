@@ -1,4 +1,4 @@
-﻿version 3.3.0
+version 3.3.0
 NOT RELEASED
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
@@ -8,6 +8,9 @@ NOT RELEASED
 version 3.2.1
 NOT RELEASED
 - added releaseNotes to nuget packages
+
+version 3.2.1
+- fixed issue 49 (https://github.com/pchalamet/cassandra-sharp/issues/49)
 
 version 3.2.0
 - use culture invariant for identifier conversion
