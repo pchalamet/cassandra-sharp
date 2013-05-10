@@ -17,14 +17,14 @@ namespace CassandraSharp.Utils
 {
     using System.Collections.Generic;
 
-    internal sealed class DictionaryInitializer<K, V> : IDictionaryInitializer
+    internal sealed class DictionaryInitializer<TK, TV> : IDictionaryInitializer
     {
-        private readonly Dictionary<K, V> _collection = new Dictionary<K, V>();
+        private readonly Dictionary<TK, TV> _collection = new Dictionary<TK, TV>();
 
         public void Add(object key, object value)
         {
-            K tkey = (K) key;
-            V vvalue = (V) value;
+            TK tkey = (TK) key;
+            TV vvalue = (TV) value;
             _collection.Add(tkey, vvalue);
         }
 

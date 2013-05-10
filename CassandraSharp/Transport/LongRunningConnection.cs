@@ -188,7 +188,7 @@ namespace CassandraSharp.Transport
             catch (Exception ex)
             {
                 _logger.Fatal("Error while trying to send query : {0}", ex);
-                HandleError(ex);
+                HandleError();
             }
         }
 
@@ -267,7 +267,7 @@ namespace CassandraSharp.Transport
             catch (Exception ex)
             {
                 _logger.Fatal("Error while trying to receive response: {0}", ex);
-                HandleError(ex);
+                HandleError();
             }
         }
 
@@ -324,7 +324,7 @@ namespace CassandraSharp.Transport
             }
         }
 
-        private void HandleError(Exception ex)
+        private void HandleError()
         {
             Close(true);
         }

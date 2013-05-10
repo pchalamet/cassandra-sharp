@@ -19,6 +19,12 @@ namespace CassandraSharp.Config
 
     public class TransportConfig
     {
+        [XmlAttribute("keepAlive")]
+        public bool KeepAlive;
+
+        [XmlAttribute("keepAliveTime")]
+        public int KeepAliveTime;
+
         public TransportConfig()
         {
             Type = "Default";
@@ -40,12 +46,6 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("sndTimeout")]
         public int SendTimeout { get; set; }
-
-        [XmlAttribute("keepAlive")]
-        public bool KeepAlive;
-
-        [XmlAttribute("keepAliveTime")]
-        public int KeepAliveTime;
 
         [XmlAttribute("recoverable")]
         public bool Recoverable { get; set; }

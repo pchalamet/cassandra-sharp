@@ -16,6 +16,7 @@
 namespace CassandraSharp.Snitch
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Net;
     using CassandraSharp.Extensibility;
 
@@ -24,14 +25,14 @@ namespace CassandraSharp.Snitch
         public string GetRack(IPAddress endpoint)
         {
             byte[] addrBytes = endpoint.GetAddressBytes();
-            string dc = addrBytes[2].ToString();
+            string dc = addrBytes[2].ToString(CultureInfo.InvariantCulture);
             return dc;
         }
 
         public string GetDatacenter(IPAddress endpoint)
         {
             byte[] addrBytes = endpoint.GetAddressBytes();
-            string dc = addrBytes[1].ToString();
+            string dc = addrBytes[1].ToString(CultureInfo.InvariantCulture);
             return dc;
         }
 
@@ -45,12 +46,12 @@ namespace CassandraSharp.Snitch
         public int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2)
         {
             // compare address first
-            if (address == a1 && address != a2)
+            if (Equals(address, a1) && !Equals(address, a2))
             {
                 return -1;
             }
 
-            if (address == a2 && address != a1)
+            if (Equals(address, a2) && !Equals(address, a1))
             {
                 return 1;
             }

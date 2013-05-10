@@ -96,7 +96,7 @@ namespace CassandraSharp.Utils
             long ticks = (dateTime - _gregorianCalendarStart).Ticks;
 
             byte[] guid = new byte[BYTE_ARRAY_SIZE];
-            byte[] clockSequenceBytes = BitConverter.GetBytes(Convert.ToInt16(Environment.TickCount%Int16.MaxValue));
+            byte[] clockSequenceBytes = BitConverter.GetBytes(Convert.ToInt16(Environment.TickCount % Int16.MaxValue));
             byte[] timestamp = BitConverter.GetBytes(ticks);
 
             // copy node

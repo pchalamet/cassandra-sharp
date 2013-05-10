@@ -23,9 +23,9 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     {
         private readonly IColumnSpec[] _columnSpecs;
 
-        private readonly IDataMapper _mapperIn;
-
         private readonly byte[] _id;
+
+        private readonly IDataMapper _mapperIn;
 
         public ExecuteQuery(IConnection connection, string cql, byte[] id, IColumnSpec[] columnSpecs, IDataMapper mapperIn, IDataMapper mapperOut)
                 : base(connection, cql, mapperOut)
