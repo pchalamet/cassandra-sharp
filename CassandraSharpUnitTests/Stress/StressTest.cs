@@ -22,7 +22,6 @@ namespace CassandraSharpUnitTests.Stress
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;
@@ -163,13 +162,13 @@ namespace CassandraSharpUnitTests.Stress
                 Console.WriteLine(format, prms);
             }
 
+            public void Dispose()
+            {
+            }
+
             public bool IsDebugEnabled()
             {
                 return true;
-            }
-
-            public void Dispose()
-            {
             }
         }
 
@@ -192,7 +191,7 @@ namespace CassandraSharpUnitTests.Stress
                         Transport = new TransportConfig
                             {
                                     Port = 666,
-                                    ReceiveTimeout = 10*1000,
+                                    ReceiveTimeout = 10 * 1000,
                             }
                 };
 

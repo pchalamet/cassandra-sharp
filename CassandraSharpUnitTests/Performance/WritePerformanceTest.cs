@@ -26,10 +26,8 @@ namespace CassandraSharpUnitTests.Performance
     using Apache.Cassandra;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Instrumentation;
     using NUnit.Framework;
     using Thrift.Protocol;
     using Thrift.Transport;
@@ -43,9 +41,9 @@ namespace CassandraSharpUnitTests.Performance
 
         public class PerformanceInstrumentation : IInstrumentation
         {
-            private readonly object _lock = new object();
-
             public static string RootFolder;
+
+            private readonly object _lock = new object();
 
             private TextWriter _txtWriter;
 
@@ -157,7 +155,7 @@ namespace CassandraSharpUnitTests.Performance
                     }
 
                     timer.Stop();
-                    double rate = (1000.0*NUM_WRITES_PER_ROUND)/timer.ElapsedMilliseconds;
+                    double rate = (1000.0 * NUM_WRITES_PER_ROUND) / timer.ElapsedMilliseconds;
                     Console.WriteLine("[Cassandra-Sharp] Time : " + timer.ElapsedMilliseconds + " (rate: " + rate + " qps)");
                     n++;
                 }
@@ -170,7 +168,7 @@ namespace CassandraSharpUnitTests.Performance
                 resCount.AsFuture().Wait();
             }
 
-            Thread.Sleep(10*1000);
+            Thread.Sleep(10 * 1000);
 
             ClusterManager.Shutdown();
         }
@@ -232,13 +230,13 @@ namespace CassandraSharpUnitTests.Performance
                                                                        new List<byte[]>
                                                                            {
                                                                                    BitConverter.GetBytes(i).Reverse().ToArray(),
-                                                                                   Encoding.ASCII.GetBytes(i.ToString("X"))
+                                                                                   Encoding.UTF8.GetBytes(i.ToString("X"))
                                                                            },
                                                                        Apache.Cassandra.ConsistencyLevel.QUORUM);
                 }
 
                 timer.Stop();
-                double rate = (1000.0*NUM_WRITES_PER_ROUND)/timer.ElapsedMilliseconds;
+                double rate = (1000.0 * NUM_WRITES_PER_ROUND) / timer.ElapsedMilliseconds;
                 Console.WriteLine("[Cassandra-Thrift] Time : " + timer.ElapsedMilliseconds + " (rate: " + rate + " qps)");
                 n++;
             }

@@ -19,7 +19,6 @@ namespace CassandraSharpUnitTests.Performance
     using System.Diagnostics;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using NUnit.Framework;
 
@@ -47,7 +46,7 @@ namespace CassandraSharpUnitTests.Performance
             }
             totalwatch.Stop();
             Console.WriteLine("Total inserts time ms: {0}", totalwatch.ElapsedMilliseconds);
-            Console.WriteLine("Total inserts/s: {0}", (1000.0*nbQueries)/totalwatch.ElapsedMilliseconds);
+            Console.WriteLine("Total inserts/s: {0}", (1000.0 * nbQueries) / totalwatch.ElapsedMilliseconds);
 
             return totalwatch.ElapsedMilliseconds;
         }
@@ -122,7 +121,7 @@ namespace CassandraSharpUnitTests.Performance
 
             long delta = Math.Abs(time1424 - time1423);
             long min = Math.Max(time1423, time1424);
-            double percent = delta/(double) min;
+            double percent = delta / (double) min;
             Assert.IsTrue(percent < 1.0);
         }
     }

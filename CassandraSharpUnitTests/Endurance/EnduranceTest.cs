@@ -87,7 +87,7 @@ namespace CassandraSharpUnitTests.Endurance
                 int running = 0;
                 for (int i = 0; i < 100000; i++)
                 {
-                    if (0 == i%1000)
+                    if (0 == i % 1000)
                     {
                         Console.WriteLine("Sent {0} requests - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
                     }
@@ -99,7 +99,7 @@ namespace CassandraSharpUnitTests.Endurance
                 while (0 != Interlocked.CompareExchange(ref running, 0, 0))
                 {
                     Console.WriteLine("{0} requests still running", running);
-                    Thread.Sleep(1*1000);
+                    Thread.Sleep(1 * 1000);
                 }
                 timer.Stop();
                 Console.WriteLine("Endurance ran in {0} ms", timer.ElapsedMilliseconds);
