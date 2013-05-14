@@ -13,19 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharpUnitTests.Performance
 {
     using System;
-    using System.Net;
+    using CassandraSharp.Extensibility;
 
-    public interface IInstrumentation : IDisposable
+    public abstract class ProtocolWrapper : IDisposable
     {
-        void ClientQuery(InstrumentationToken token);
+        public abstract string Name { get; }
 
-        void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId);
+        public abstract void Dispose();
 
-        void ClientTrace(InstrumentationToken token, EventType eventType);
+        public abstract void Open(string hostname);
 
-        void ServerTrace(InstrumentationToken token, Guid tracingId);
+        public abstract void Query(string cmd);
+
+        public abstract void Prepare(string cmd);
+
+        public abstract void Execute(params object[] prms);
+
+        public abstract TracingSession QueryTracingInfo(Guid tracingId);
     }
 }

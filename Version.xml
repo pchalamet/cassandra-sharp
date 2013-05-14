@@ -7,6 +7,11 @@
 <change id="3.3.0"><![CDATA[
 NOT RELEASED
 - removed obsolete operations (fluent interface is the way to go)
+- log connection building error, avoid GC TcpClient if building goes bad
+- simplified command builder extensions - decoupled builder and mapper
+- fixed 100% cpu when linux hosted server disconnect
+- modified instrumentation interface: TracingSession is now no more available - use ICluster::QueryTracingInfo()
+  when required
 ]]></change>
 
 <change id="3.2.1"><![CDATA[

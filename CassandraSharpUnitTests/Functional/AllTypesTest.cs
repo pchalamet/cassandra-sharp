@@ -148,7 +148,7 @@ namespace CassandraSharpUnitTests.Functional
                             CFloat = 234.567f,
                             CInet = new IPAddress(new byte[] {0x01, 0x02, 0x03, 0x04}),
                             CInt = 42,
-                            CText = new string('x', 3000),
+                            CText = new string('x', 100000),
                             CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
                             CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
                             CUuid = Guid.NewGuid(),

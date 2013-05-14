@@ -58,25 +58,27 @@ namespace cqlplus
             }
         }
 
-        public void ServerTrace(InstrumentationToken token, TracingSession tracingSession)
+        public void ServerTrace(InstrumentationToken token, Guid traceId)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("INSTR {0} [{1}] - ",
-                            DateTime.Now, Thread.CurrentThread.ManagedThreadId);
-            int len = sb.Length;
-            string offset = new string(' ', len);
+            //TracingSession tracingSession = tracingSessionFunc();
 
-            sb.AppendFormat("sessionId:{0} startedAt:{1} coordinator:{2} duration:{3} request:{4}",
-                            tracingSession.SessionId, tracingSession.StartedAt, tracingSession.Coordinator, tracingSession.Duration,
-                            tracingSession.Parameters["query"]);
-            foreach (TracingEvent tracingEvent in tracingSession.TracingEvents)
-            {
-                sb.AppendLine();
-                sb.Append(offset);
-                sb.AppendFormat("sourceElapsed:{0} activity:{1} thread:{2}", tracingEvent.SourceElapsed, tracingEvent.Activity, tracingEvent.Thread);
-            }
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat("INSTR {0} [{1}] - ",
+            //                DateTime.Now, Thread.CurrentThread.ManagedThreadId);
+            //int len = sb.Length;
+            //string offset = new string(' ', len);
 
-            Console.WriteLine(sb);
+            //sb.AppendFormat("sessionId:{0} startedAt:{1} coordinator:{2} duration:{3} request:{4}",
+            //                tracingSession.SessionId, tracingSession.StartedAt, tracingSession.Coordinator, tracingSession.Duration,
+            //                tracingSession.Parameters["query"]);
+            //foreach (TracingEvent tracingEvent in tracingSession.TracingEvents)
+            //{
+            //    sb.AppendLine();
+            //    sb.Append(offset);
+            //    sb.AppendFormat("sourceElapsed:{0} activity:{1} stage:{2} thread:{3}", tracingEvent.SourceElapsed, tracingEvent.Activity, tracingEvent.Stage, tracingEvent.Thread);
+            //}
+
+            //Console.WriteLine(sb);
         }
 
         public void Dispose()

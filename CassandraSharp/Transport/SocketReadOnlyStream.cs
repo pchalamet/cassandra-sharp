@@ -112,7 +112,7 @@ namespace CassandraSharp.Transport
                 int tmpRead = socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
 
                 // always consider 0 as a peer graceful disconnection
-                if (0 == tmpRead)
+                if (0 == tmpRead && socket.Poll(1, SelectMode.SelectRead))
                 {
                     return read;
                 }

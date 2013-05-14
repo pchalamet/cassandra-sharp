@@ -99,9 +99,16 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
                 IInstanceBuilder instanceBuilder = mapperFactory.CreateBuilder();
+
+                byte[][] rawDatas = new byte[columnSpecs.Length][];
                 foreach (ColumnSpec colSpec in columnSpecs)
                 {
-                    byte[] rawData = stream.ReadByteArray();
+                    rawDatas[colSpec.Index] = stream.ReadByteArray();
+                }
+
+                foreach (ColumnSpec colSpec in columnSpecs)
+                {
+                    byte[] rawData = rawDatas[colSpec.Index];
 
                     object data = null;
                     if (null != rawData)

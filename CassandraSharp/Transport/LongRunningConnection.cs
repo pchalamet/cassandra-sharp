@@ -27,7 +27,6 @@ namespace CassandraSharp.Transport
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Instrumentation;
     using CassandraSharp.Utils;
 
     internal sealed class LongRunningConnection : IConnection,
@@ -127,7 +126,7 @@ namespace CassandraSharp.Transport
 
         public void Dispose()
         {
-            Close(false);
+            Close(false, null);
         }
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
@@ -146,7 +145,7 @@ namespace CassandraSharp.Transport
             socket.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
         }
 
-        private void Close(bool notifyFailure)
+        private void Close(bool notifyFailure, Exception ex)
         {
             // already in close state ?
             lock (_lock)
@@ -171,6 +170,11 @@ namespace CassandraSharp.Transport
 
             if (notifyFailure && null != OnFailure)
             {
+                if (null != ex)
+                {
+                    _logger.Fatal("Failed with error : {0}", ex);
+                }
+
                 FailureEventArgs failureEventArgs = new FailureEventArgs(null);
                 OnFailure(this, failureEventArgs);
             }
@@ -186,8 +190,7 @@ namespace CassandraSharp.Transport
             }
             catch (Exception ex)
             {
-                _logger.Fatal("Error while trying to send query : {0}", ex);
-                HandleError();
+                HandleError(ex);
             }
         }
 
@@ -265,8 +268,7 @@ namespace CassandraSharp.Transport
             }
             catch (Exception ex)
             {
-                _logger.Fatal("Error while trying to receive response: {0}", ex);
-                HandleError();
+                HandleError(ex);
             }
         }
 
@@ -316,16 +318,15 @@ namespace CassandraSharp.Transport
                     InstrumentationToken token = queryInfo.Token;
                     if (0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing))
                     {
-                        _logger.Debug("Requesting tracing info for query {0}", frameReader.TraceId);
-                        TracingHelpers.AsyncQueryAndPushTracingSession(this, frameReader.TraceId, token, _instrumentation, _logger);
+                        _instrumentation.ServerTrace(token, frameReader.TraceId);
                     }
                 }
             }
         }
 
-        private void HandleError()
+        private void HandleError(Exception ex)
         {
-            Close(true);
+            Close(true, ex);
         }
 
         private void GetOptions()
@@ -337,8 +338,6 @@ namespace CassandraSharp.Transport
         private void ReadifyConnection()
         {
             var obsReady = new ReadyQuery(this, _config.CqlVersion).AsFuture();
-            obsReady.Wait();
-
             bool authenticate = obsReady.Result.Single();
             if (authenticate)
             {
@@ -354,7 +353,6 @@ namespace CassandraSharp.Transport
             }
 
             var obsAuth = new AuthenticateQuery(this, _config.User, _config.Password).AsFuture();
-            obsAuth.Wait();
             if (! obsAuth.Result.Single())
             {
                 throw new InvalidCredentialException();

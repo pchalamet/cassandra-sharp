@@ -78,7 +78,9 @@ namespace CassandraSharpUnitTests.Performance
                 {
                     cmd.Execute(dropFoo).AsFuture().Wait();
                 }
+// ReSharper disable EmptyGeneralCatchClause
                 catch
+// ReSharper restore EmptyGeneralCatchClause
                 {
                 }
 
@@ -87,8 +89,8 @@ namespace CassandraSharpUnitTests.Performance
                 Console.WriteLine(createFoo);
                 Console.WriteLine("============================================================");
 
-                var resCount = cmd.Execute(createFoo);
-                resCount.AsFuture().Wait();
+                var resCount = cmd.Execute(createFoo).AsFuture();
+                resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -96,8 +98,8 @@ namespace CassandraSharpUnitTests.Performance
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
                 Console.WriteLine("============================================================");
-                resCount = cmd.Execute(createBar);
-                resCount.AsFuture().Wait();
+                resCount = cmd.Execute(createBar).AsFuture();
+                resCount.Wait();
                 Console.WriteLine();
                 Console.WriteLine();
 
@@ -113,8 +115,8 @@ namespace CassandraSharpUnitTests.Performance
                 Console.WriteLine(dropFoo);
                 Console.WriteLine("============================================================");
 
-                resCount = cmd.Execute(dropFoo);
-                resCount.AsFuture().Wait();
+                resCount = cmd.Execute(dropFoo).AsFuture();
+                resCount.Wait();
             }
 
             ClusterManager.Shutdown();

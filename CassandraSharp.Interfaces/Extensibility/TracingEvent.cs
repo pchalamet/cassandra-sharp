@@ -28,6 +28,8 @@ namespace CassandraSharp.Extensibility
 
         public int SourceElapsed { get; internal set; }
 
+        public string Stage { get; internal set; }
+
         public string Thread { get; internal set; }
     }
 }
