@@ -23,7 +23,6 @@ namespace CassandraSharp.Transport
     using System.Net.Sockets;
     using System.Security.Authentication;
     using System.Threading;
-    using System.Threading.Tasks;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
@@ -47,6 +46,10 @@ namespace CassandraSharp.Transport
         private readonly Queue<QueryInfo> _pendingQueries = new Queue<QueryInfo>();
 
         private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
+
+        private readonly Thread _queryWorker;
+
+        private readonly Thread _responseWorker;
 
         private readonly Socket _socket;
 
@@ -86,8 +89,10 @@ namespace CassandraSharp.Transport
                     SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
                 }
 
-                Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
-                Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
+                _responseWorker = new Thread(ReadResponseWorker) {IsBackground = true};
+                _queryWorker = new Thread(SendQueryWorker) {IsBackground = true};
+                _responseWorker.Start();
+                _queryWorker.Start();
 
                 // readify the connection
                 _logger.Debug("Readyfying connection for {0}", Endpoint);
@@ -126,7 +131,7 @@ namespace CassandraSharp.Transport
 
         public void Dispose()
         {
-            Close(false, null);
+            Close(null);
         }
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
@@ -145,7 +150,7 @@ namespace CassandraSharp.Transport
             socket.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
         }
 
-        private void Close(bool notifyFailure, Exception ex)
+        private void Close(Exception ex)
         {
             // already in close state ?
             lock (_lock)
@@ -156,30 +161,38 @@ namespace CassandraSharp.Transport
                     return;
                 }
 
+                // abort all pending queries
+                OperationCanceledException canceledException = new OperationCanceledException();
+                for (int i = 0; i < _queryInfos.Length; ++i)
+                {
+                    var queryInfo = _queryInfos[i];
+                    if (null != queryInfo)
+                    {
+                        queryInfo.NotifyError(canceledException);
+                        _instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
+
+                        _queryInfos[i] = null;
+                    }
+                }
+
                 _isClosed = true;
             }
 
+            // we have now the guarantee this instance is destroyed once
             _tcpClient.SafeDispose();
 
-            OperationCanceledException canceledException = new OperationCanceledException();
-            foreach (QueryInfo queryInfo in _queryInfos.Where(queryInfo => null != queryInfo))
+            if (null != ex && null != OnFailure)
             {
-                queryInfo.NotifyError(canceledException);
-                _instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
-            }
-
-            if (notifyFailure && null != OnFailure)
-            {
-                if (null != ex)
-                {
-                    _logger.Fatal("Failed with error : {0}", ex);
-                }
+                _logger.Fatal("Failed with error : {0}", ex);
 
                 FailureEventArgs failureEventArgs = new FailureEventArgs(null);
                 OnFailure(this, failureEventArgs);
+                OnFailure = null;
             }
 
-            OnFailure = null;
+            // wait for worker threads to gracefully shutdown
+            _responseWorker.Join();
+            _queryWorker.Join();
         }
 
         private void SendQueryWorker()
@@ -279,8 +292,7 @@ namespace CassandraSharp.Transport
                 using (IFrameReader frameReader = new StreamingFrameReader(_socket))
                 {
                     byte streamId = frameReader.StreamId;
-                    QueryInfo queryInfo = _queryInfos[streamId];
-                    _queryInfos[streamId] = null;
+                    QueryInfo queryInfo;
                     lock (_lock)
                     {
                         Monitor.Pulse(_lock);
@@ -289,6 +301,8 @@ namespace CassandraSharp.Transport
                             throw new OperationCanceledException();
                         }
 
+                        queryInfo = _queryInfos[streamId];
+                        _queryInfos[streamId] = null;
                         _availableStreamIds.Push(streamId);
                     }
 
@@ -326,7 +340,7 @@ namespace CassandraSharp.Transport
 
         private void HandleError(Exception ex)
         {
-            Close(true, ex);
+            Close(ex);
         }
 
         private void GetOptions()
