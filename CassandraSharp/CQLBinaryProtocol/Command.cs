@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.CQLBinaryProtocol
 {
+    using System;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
 
@@ -33,15 +34,20 @@ namespace CassandraSharp.CQLBinaryProtocol
             _factoryOut = factoryOut;
         }
 
-        public ICqlQuery<T> Execute<T>(string cql)
+        public ICqlQuery<T> Execute<T>(string cql, object dataSource)
         {
+            if (null != dataSource)
+            {
+                throw new ArgumentException("Binary protocol v2 is not implemented");
+            }
+
             IDataMapper factoryOut = _factoryOut.Create<T>();
             IConnection connection = _cluster.GetConnection();
             ICqlQuery<T> query = new CqlQuery<T>(connection, cql, factoryOut);
             return query;
         }
 
-        public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags)
         {
             return new PreparedQuery<T>(_cluster, _factoryIn, _factoryOut, cql, executionFlags);
         }

@@ -7,6 +7,7 @@ NOT RELEASED
 - modified instrumentation interface: TracingSession is now no more available - use ICluster::QueryTracingSession
   when required
 - fixed unsigned short problem with map (and other serialization chunks requiring a ushort)
+- interface (non prepared query with params) is ready for binary protocol v2 (but no implementation)
 
 version 3.2.1
 NOT RELEASED

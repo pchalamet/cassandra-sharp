@@ -39,7 +39,7 @@ namespace CassandraSharp.Discovery
 
         public SystemPeersDiscoveryService(ILogger logger, ICluster cluster, DiscoveryConfig config)
         {
-            PocoDataMapperFactory mapper = new PocoDataMapperFactory();
+            IDataMapperFactory mapper = new PocoDataMapperFactory();
             _peerFactory = mapper.Create<DiscoveredPeer>();
 
             _logger = logger;

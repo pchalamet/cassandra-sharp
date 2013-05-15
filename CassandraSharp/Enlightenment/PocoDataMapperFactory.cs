@@ -20,7 +20,7 @@ namespace CassandraSharp.Enlightenment
 
     internal sealed class PocoDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object dataSource = null)
+        public IDataMapper Create<T>(object dataSource)
         {
             return new DataMapper<T>(dataSource);
         }

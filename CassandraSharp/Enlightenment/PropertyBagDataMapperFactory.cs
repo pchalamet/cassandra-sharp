@@ -20,7 +20,7 @@ namespace CassandraSharp.Enlightenment
 
     internal sealed class PropertyBagDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object dataSource = null)
+        public IDataMapper Create<T>(object dataSource)
         {
             PropertyBag propertyBag = (PropertyBag) dataSource;
             return new DataMapper(propertyBag);

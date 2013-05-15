@@ -17,7 +17,7 @@ namespace CassandraSharp
 {
     public interface ICqlCommand
     {
-        ICqlQuery<T> Execute<T>(string cql);
+        ICqlQuery<T> Execute<T>(string cql, object dataSource = null);
 
         IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }

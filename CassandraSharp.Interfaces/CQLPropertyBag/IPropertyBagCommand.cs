@@ -17,7 +17,7 @@ namespace CassandraSharp.CQLPropertyBag
 {
     public interface IPropertyBagCommand : ICqlCommand
     {
-        ICqlQuery<PropertyBag> Execute(string cql);
+        ICqlQuery<PropertyBag> Execute(string cql, object dataSource = null);
 
         IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
     }

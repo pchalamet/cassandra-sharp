@@ -15,7 +15,7 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    public sealed class PropertyBagCommand : IPropertyBagCommand
+    internal sealed class PropertyBagCommand : IPropertyBagCommand
     {
         private readonly ICqlCommand _command;
 
@@ -24,22 +24,22 @@ namespace CassandraSharp.CQLPropertyBag
             _command = command;
         }
 
-        public ICqlQuery<T> Execute<T>(string cql)
+        public ICqlQuery<T> Execute<T>(string cql, object dataSource)
         {
             return _command.Execute<T>(cql);
         }
 
-        public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags)
         {
             return _command.Prepare<T>(cql, executionFlags);
         }
 
-        public ICqlQuery<PropertyBag> Execute(string cql)
+        public ICqlQuery<PropertyBag> Execute(string cql, object dataSource)
         {
             return _command.Execute<PropertyBag>(cql);
         }
 
-        public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags)
         {
             return _command.Prepare<PropertyBag>(cql, executionFlags);
         }
