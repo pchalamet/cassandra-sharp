@@ -33,5 +33,18 @@ namespace CassandraSharp.Utils
             _preserveInternalException(@this);
             throw @this;
         }
+
+        public static void SafeExecute(Action action)
+        {
+            try
+            {
+                action();
+            }
+// ReSharper disable EmptyGeneralCatchClause
+            catch
+// ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+        }
     }
 }

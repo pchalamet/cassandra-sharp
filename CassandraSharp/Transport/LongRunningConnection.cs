@@ -23,6 +23,7 @@ namespace CassandraSharp.Transport
     using System.Net.Sockets;
     using System.Security.Authentication;
     using System.Threading;
+    using System.Threading.Tasks;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
@@ -47,9 +48,9 @@ namespace CassandraSharp.Transport
 
         private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
 
-        private readonly Thread _queryWorker;
+        private readonly Task _queryWorker;
 
-        private readonly Thread _responseWorker;
+        private readonly Task _responseWorker;
 
         private readonly Socket _socket;
 
@@ -89,10 +90,8 @@ namespace CassandraSharp.Transport
                     SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
                 }
 
-                _responseWorker = new Thread(ReadResponseWorker) {IsBackground = true};
-                _queryWorker = new Thread(SendQueryWorker) {IsBackground = true};
-                _responseWorker.Start();
-                _queryWorker.Start();
+                _responseWorker = Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
+                _queryWorker = Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
 
                 // readify the connection
                 _logger.Debug("Readyfying connection for {0}", Endpoint);
@@ -191,8 +190,8 @@ namespace CassandraSharp.Transport
             }
 
             // wait for worker threads to gracefully shutdown
-            _responseWorker.Join();
-            _queryWorker.Join();
+            ExceptionExtensions.SafeExecute(() => _responseWorker.Wait());
+            ExceptionExtensions.SafeExecute(() => _queryWorker.Wait());
         }
 
         private void SendQueryWorker()
