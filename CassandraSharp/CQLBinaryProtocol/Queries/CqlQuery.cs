@@ -44,7 +44,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
             Stream stream = fw.WriteOnlyStream;
             stream.WriteLongString(CQL);
-            stream.WriteShort((short) ConsistencyLevel);
+            stream.WriteUShort((ushort) ConsistencyLevel);
             fw.SetMessageType(MessageOpcodes.Query);
         }
 
@@ -143,7 +143,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                     colTable = stream.ReadString();
                 }
                 string colName = stream.ReadString();
-                ColumnType colType = (ColumnType) stream.ReadShort();
+                ColumnType colType = (ColumnType)stream.ReadUShort();
                 string colCustom = null;
                 ColumnType colKeyType = ColumnType.Custom;
                 ColumnType colValueType = ColumnType.Custom;
@@ -155,12 +155,12 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
                     case ColumnType.List:
                     case ColumnType.Set:
-                        colValueType = (ColumnType) stream.ReadShort();
+                        colValueType = (ColumnType) stream.ReadUShort();
                         break;
 
                     case ColumnType.Map:
-                        colKeyType = (ColumnType) stream.ReadShort();
-                        colValueType = (ColumnType) stream.ReadShort();
+                        colKeyType = (ColumnType) stream.ReadUShort();
+                        colValueType = (ColumnType) stream.ReadUShort();
                         break;
                 }
 

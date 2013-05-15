@@ -22,7 +22,7 @@ namespace CassandraSharp.Utils.Stream
 
     internal static class BigEndianStreamExtensions
     {
-        public static void WriteShort(this Stream stream, short data)
+        public static void WriteUShort(this Stream stream, ushort data)
         {
             byte[] buffer = BitConverter.GetBytes(data);
             buffer.ReverseIfLittleEndian();
@@ -39,14 +39,14 @@ namespace CassandraSharp.Utils.Stream
         public static void WriteString(this Stream stream, string data)
         {
             byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            short len = (short) bufStr.Length;
-            stream.WriteShort(len);
+            ushort len = (ushort) bufStr.Length;
+            stream.WriteUShort(len);
             stream.Write(bufStr, 0, len);
         }
 
         public static void WriteStringList(this Stream stream, string[] data)
         {
-            stream.WriteShort((short) data.Length);
+            stream.WriteUShort((ushort) data.Length);
             foreach (string s in data)
             {
                 stream.WriteString(s);
@@ -63,7 +63,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static void WriteStringMap(this Stream stream, Dictionary<string, string> dic)
         {
-            stream.WriteShort((short) dic.Count);
+            stream.WriteUShort((ushort) dic.Count);
             foreach (var kvp in dic)
             {
                 stream.WriteString(kvp.Key);
@@ -73,8 +73,8 @@ namespace CassandraSharp.Utils.Stream
 
         public static void WriteShortByteArray(this Stream stream, byte[] data)
         {
-            short len = (short) data.Length;
-            stream.WriteShort(len);
+            ushort len = (ushort) data.Length;
+            stream.WriteUShort(len);
             stream.Write(data, 0, len);
         }
 
@@ -102,13 +102,13 @@ namespace CassandraSharp.Utils.Stream
             }
         }
 
-        public static short ReadShort(this Stream stream)
+        public static ushort ReadUShort(this Stream stream)
         {
             byte[] buffer = new byte[2];
             stream.ReadBuffer(buffer);
             buffer.ReverseIfLittleEndian();
 
-            short data = BitConverter.ToInt16(buffer, 0);
+            ushort data = BitConverter.ToUInt16(buffer, 0);
             return data;
         }
 
@@ -124,7 +124,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static string ReadString(this Stream stream)
         {
-            short len = stream.ReadShort();
+            ushort len = stream.ReadUShort();
             if (0 != len)
             {
                 byte[] bufStr = new byte[len];
@@ -151,7 +151,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static byte[] ReadShortBytes(this Stream stream)
         {
-            short len = stream.ReadShort();
+            ushort len = stream.ReadUShort();
             byte[] data = new byte[len];
             stream.ReadBuffer(data);
             return data;
@@ -159,7 +159,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static string[] ReadStringList(this Stream stream)
         {
-            short len = stream.ReadShort();
+            ushort len = stream.ReadUShort();
             string[] data = new string[len];
             for (int i = 0; i < len; ++i)
             {
@@ -170,7 +170,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static Dictionary<string, string[]> ReadStringMultimap(this Stream stream)
         {
-            short len = stream.ReadShort();
+            ushort len = stream.ReadUShort();
             Dictionary<string, string[]> data = new Dictionary<string, string[]>(len);
             for (int i = 0; i < len; ++i)
             {

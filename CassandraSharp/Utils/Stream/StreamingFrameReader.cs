@@ -93,7 +93,7 @@ namespace CassandraSharp.Utils.Stream
             {
                 case ErrorCodes.Unavailable:
                     {
-                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadShort();
+                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadUShort();
                         int required = stream.ReadInt();
                         int alive = stream.ReadInt();
                         return new UnavailableException(msg, cl, required, alive);
@@ -101,7 +101,7 @@ namespace CassandraSharp.Utils.Stream
 
                 case ErrorCodes.WriteTimeout:
                     {
-                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadShort();
+                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadUShort();
                         int received = stream.ReadInt();
                         int blockFor = stream.ReadInt();
                         string writeType = stream.ReadString();
@@ -110,7 +110,7 @@ namespace CassandraSharp.Utils.Stream
 
                 case ErrorCodes.ReadTimeout:
                     {
-                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadShort();
+                        ConsistencyLevel cl = (ConsistencyLevel)stream.ReadUShort();
                         int received = stream.ReadInt();
                         int blockFor = stream.ReadInt();
                         bool dataPresent = 0 != stream.ReadByte();

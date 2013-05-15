@@ -69,7 +69,7 @@ namespace CassandraSharp.Utils.Stream
             return buffer;
         }
 
-        public static byte[] GetBytes(this short data)
+        public static byte[] GetBytes(this ushort data)
         {
             byte[] buffer = BitConverter.GetBytes(data);
             buffer.ReverseIfLittleEndian();
@@ -138,9 +138,9 @@ namespace CassandraSharp.Utils.Stream
             return data;
         }
 
-        public static short ToShort(this byte[] buffer, int offset)
+        public static short ToUShort(this byte[] buffer, int offset)
         {
-            buffer.ReverseIfLittleEndian(offset, sizeof (short));
+            buffer.ReverseIfLittleEndian(offset, sizeof (ushort));
             return BitConverter.ToInt16(buffer, offset);
         }
 
