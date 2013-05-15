@@ -142,7 +142,7 @@ namespace CassandraSharpUnitTests.Functional
                     {
                             CAscii = new string('x', 8000),
                             CBigint = 0x0102030405060708,
-                            CBlob = Enumerable.Repeat((byte) 42, 7142).ToArray(),
+                            CBlob = Enumerable.Repeat((byte) 42, 33000).ToArray(),
                             CBoolean = true,
                             CDouble = 1234.5678,
                             CFloat = 234.567f,
@@ -155,7 +155,7 @@ namespace CassandraSharpUnitTests.Functional
                             CVarchar = new string('x', 5000),
                             CList = new List<int> {1, 2, 3},
                             CSet = new HashSet<int> {1, 2, 3},
-                            CMap = new Dictionary<string, int> {{"one", 1}, {"two", 2}, {"three", 3}},
+                            CMap = new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { new string('x', 65525), 3 } },
                     };
 
                 prepared.Execute(allTypesInsert).AsFuture().Wait();

@@ -27,7 +27,7 @@ namespace CassandraSharpUnitTests.Performance
     {
         public const int NUM_ROUND = 5;
 
-        public const int NUM_WRITES_PER_ROUND = 500;
+        public const int NUM_WRITES_PER_ROUND = 10000;
 
         private static void RunWritePerformanceSingleThread<TP>() where TP : ProtocolWrapper, new()
         {
@@ -36,22 +36,28 @@ namespace CassandraSharpUnitTests.Performance
                 protocol.Open("localhost");
 
                 const string dropKeyspace = "drop keyspace Tests";
+                const string truncateTable = "truncate Tests.stresstest";
+                const string truncateEvents = "truncate system_traces.events";
+                const string truncateSessions = "truncate system_traces.sessions";
                 const string createKeyspace = "create keyspace Tests with replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
                 const string createTable = "create table Tests.stresstest (strid varchar,intid int, primary key (strid))";
-                const string insertPerf = "update Tests.stresstest set intid = ? where strid = ?";
+                const string insertPerf = "insert into Tests.stresstest (intid, strid) values (?, ?)";
 
                 try
                 {
                     protocol.Query(dropKeyspace);
                 }
-// ReSharper disable EmptyGeneralCatchClause
+                // ReSharper disable EmptyGeneralCatchClause
                 catch
-// ReSharper restore EmptyGeneralCatchClause
+                // ReSharper restore EmptyGeneralCatchClause
                 {
                 }
 
                 protocol.Query(createKeyspace);
                 protocol.Query(createTable);
+                protocol.Query(truncateTable);
+                protocol.Query(truncateSessions);
+                protocol.Query(truncateEvents);
                 protocol.Prepare(insertPerf);
 
                 PerformanceInstrumentation.Initialize();
@@ -74,7 +80,8 @@ namespace CassandraSharpUnitTests.Performance
 
                 for (int i = 0; i < NUM_WRITES_PER_ROUND; ++i)
                 {
-                    object[] prms = new object[] {i, i.ToString("X")};
+                    int key = n * NUM_WRITES_PER_ROUND + i;
+                    object[] prms = new object[] { key, key.ToString("X") };
                     protocol.Execute(prms);
                 }
 

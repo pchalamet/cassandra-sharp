@@ -3,13 +3,15 @@ NOT RELEASED
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
 - simplified command builder extensions - decoupled builder and mapper
-- fixed 100% cpu when linux hosted server disconnect
+- fixed (again) 100% cpu when linux hosted server disconnect
 - modified instrumentation interface: TracingSession is now no more available - use ICluster::QueryTracingSession
   when required
+- fixed unsigned short problem with map (and other serialization chunks requiring a ushort)
 
 version 3.2.1
 NOT RELEASED
 - added releaseNotes to nuget packages
+- fixed 100% cpu when linux hosted server disconnect
 
 version 3.2.0
 - use culture invariant for identifier conversion

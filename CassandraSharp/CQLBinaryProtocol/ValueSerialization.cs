@@ -56,7 +56,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     ICollectionAccessor coll = (ICollectionAccessor) Activator.CreateInstance(typedColl, data);
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        ms.WriteShort((short) coll.Count);
+                        ms.WriteUShort((ushort) coll.Count);
                         foreach (object elem in coll)
                         {
                             byte[] rawDataElem = Serialize(columnSpec.CollectionValueType, elem);
@@ -70,7 +70,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     IDictionary map = (IDictionary) data;
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        ms.WriteShort((short) map.Count);
+                        ms.WriteUShort((ushort) map.Count);
                         foreach (DictionaryEntry de in map)
                         {
                             byte[] rawDataKey = Serialize(columnSpec.CollectionKeyType, de.Key);
@@ -162,7 +162,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     ICollectionInitializer list = (ICollectionInitializer) Activator.CreateInstance(typedColl);
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
-                        short nbElem = ms.ReadShort();
+                        ushort nbElem = ms.ReadUShort();
                         while (0 < nbElem)
                         {
                             byte[] elemRawData = ms.ReadShortBytes();
@@ -181,7 +181,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     IDictionaryInitializer dic = (IDictionaryInitializer) Activator.CreateInstance(typedDic);
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
-                        short nbElem = ms.ReadShort();
+                        ushort nbElem = ms.ReadUShort();
                         while (0 < nbElem)
                         {
                             byte[] elemRawKey = ms.ReadShortBytes();
@@ -201,7 +201,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     ICollectionInitializer set = (ICollectionInitializer) Activator.CreateInstance(typedSet);
                     using (MemoryStream ms = new MemoryStream(rawData))
                     {
-                        short nbElem = ms.ReadShort();
+                        ushort nbElem = ms.ReadUShort();
                         while (0 < nbElem)
                         {
                             byte[] elemRawData = ms.ReadShortBytes();

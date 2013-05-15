@@ -39,7 +39,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
             Stream stream = fw.WriteOnlyStream;
             stream.WriteShortByteArray(_id);
-            stream.WriteShort((short) _columnSpecs.Length);
+            stream.WriteUShort((ushort) _columnSpecs.Length);
 
             IDataSource dataSource = _mapperIn.DataSource;
             foreach (IColumnSpec columnSpec in _columnSpecs)
@@ -54,7 +54,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                 stream.WriteByteArray(rawData);
             }
 
-            stream.WriteShort((short) ConsistencyLevel);
+            stream.WriteUShort((ushort) ConsistencyLevel);
             fw.SetMessageType(MessageOpcodes.Execute);
         }
 
