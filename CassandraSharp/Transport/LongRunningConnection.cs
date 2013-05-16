@@ -72,6 +72,8 @@ namespace CassandraSharp.Transport
                 _instrumentation = instrumentation;
 
                 Endpoint = address;
+                DefaultConsistencyLevel = config.DefaultConsistencyLevel;
+                DefaultExecutionFlags = config.DefaultExecutionFlags;
 
                 _tcpClient = new TcpClient
                     {
@@ -109,6 +111,10 @@ namespace CassandraSharp.Transport
         }
 
         public IPAddress Endpoint { get; private set; }
+
+        public ConsistencyLevel DefaultConsistencyLevel { get; private set; }
+
+        public ExecutionFlags DefaultExecutionFlags { get; private set; }
 
         public event EventHandler<FailureEventArgs> OnFailure;
 

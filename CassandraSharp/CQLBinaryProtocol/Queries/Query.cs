@@ -27,8 +27,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         protected Query(IConnection connection)
         {
             _connection = connection;
-            ConsistencyLevel = ConsistencyLevel.QUORUM;
-            ExecutionFlags = ExecutionFlags.None;
+            ConsistencyLevel = connection.DefaultConsistencyLevel;
+            ExecutionFlags = connection.DefaultExecutionFlags;
             QueryHint = null;
         }
 

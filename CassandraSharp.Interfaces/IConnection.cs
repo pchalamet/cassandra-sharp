@@ -24,6 +24,10 @@ namespace CassandraSharp
     {
         IPAddress Endpoint { get; }
 
+        ConsistencyLevel DefaultConsistencyLevel { get; }
+
+        ExecutionFlags DefaultExecutionFlags { get; }
+
         event EventHandler<FailureEventArgs> OnFailure;
 
         void Execute<T>(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<T>> reader, InstrumentationToken token, IObserver<T> observer);

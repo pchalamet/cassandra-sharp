@@ -31,7 +31,8 @@ namespace CassandraSharp.Config
             Port = 9042;
             Recoverable = true;
             CqlVersion = "3.0.0";
-
+            DefaultConsistencyLevel = ConsistencyLevel.QUORUM;
+            DefaultExecutionFlags = ExecutionFlags.None;
             KeepAlive = true;
         }
 
@@ -58,5 +59,11 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("cqlver")]
         public string CqlVersion { get; set; }
+
+        [XmlAttribute("cl")]
+        public ConsistencyLevel DefaultConsistencyLevel { get; set; }
+
+        [XmlAttribute]
+        public ExecutionFlags DefaultExecutionFlags { get; set; }
     }
 }
