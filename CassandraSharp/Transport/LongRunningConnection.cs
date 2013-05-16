@@ -31,8 +31,8 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Utils;
     using CassandraSharp.Utils.Stream;
 
-    internal class LongRunningConnection : IConnection,
-                                           IDisposable
+    internal sealed class LongRunningConnection : IConnection,
+                                                  IDisposable
     {
         private const byte MAX_STREAMID = 0x80;
 
@@ -50,6 +50,10 @@ namespace CassandraSharp.Transport
 
         private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
 
+        private readonly Task _queryWorker;
+
+        private readonly Task _responseWorker;
+
         private readonly Socket _socket;
 
         private readonly TcpClient _tcpClient;
@@ -58,42 +62,52 @@ namespace CassandraSharp.Transport
 
         public LongRunningConnection(IPAddress address, TransportConfig config, ILogger logger, IInstrumentation instrumentation)
         {
-            for (byte streamId = 0; streamId < MAX_STREAMID; ++streamId)
+            try
             {
-                _availableStreamIds.Push(streamId);
-            }
-
-            _config = config;
-            _logger = logger;
-            _instrumentation = instrumentation;
-
-            Endpoint = address;
-
-            _tcpClient = new TcpClient
+                for (byte streamId = 0; streamId < MAX_STREAMID; ++streamId)
                 {
-                        ReceiveTimeout = _config.ReceiveTimeout,
-                        SendTimeout = _config.SendTimeout,
-                        NoDelay = true,
-                        LingerState = {Enabled = true, LingerTime = 0},
-                };
+                    _availableStreamIds.Push(streamId);
+                }
 
-            _tcpClient.Connect(address, _config.Port);
-            _socket = _tcpClient.Client;
+                _config = config;
+                _logger = logger;
+                _instrumentation = instrumentation;
 
-            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
-            if (_config.KeepAlive && 0 != _config.KeepAliveTime)
-            {
-                SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
+                Endpoint = address;
+
+                _tcpClient = new TcpClient
+                    {
+                            ReceiveTimeout = _config.ReceiveTimeout,
+                            SendTimeout = _config.SendTimeout,
+                            NoDelay = true,
+                            LingerState = {Enabled = true, LingerTime = 0},
+                    };
+
+                _tcpClient.Connect(address, _config.Port);
+                _socket = _tcpClient.Client;
+
+                _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
+                if (_config.KeepAlive && 0 != _config.KeepAliveTime)
+                {
+                    SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
+                }
+
+                _responseWorker = Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
+                _queryWorker = Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
+
+                // readify the connection
+                _logger.Debug("Readyfying connection for {0}", Endpoint);
+                //GetOptions();
+                ReadifyConnection();
+                _logger.Debug("Connection to {0} is ready", Endpoint);
             }
+            catch (Exception ex)
+            {
+                Dispose();
 
-            Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
-            Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
-
-            // readify the connection
-            _logger.Debug("Readyfying connection for {0}", Endpoint);
-            //GetOptions();
-            ReadifyConnection();
-            _logger.Debug("Connection to {0} is ready", Endpoint);
+                _logger.Error("Failed building connection {0}", ex);
+                throw;
+            }
         }
 
         public IPAddress Endpoint { get; private set; }
@@ -118,7 +132,7 @@ namespace CassandraSharp.Transport
 
         public void Dispose()
         {
-            Close(false);
+            Close(null);
         }
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
@@ -137,7 +151,7 @@ namespace CassandraSharp.Transport
             socket.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
         }
 
-        private void Close(bool notifyFailure)
+        private void Close(Exception ex)
         {
             // already in close state ?
             lock (_lock)
@@ -148,25 +162,38 @@ namespace CassandraSharp.Transport
                     return;
                 }
 
+                // abort all pending queries
+                OperationCanceledException canceledException = new OperationCanceledException();
+                for (int i = 0; i < _queryInfos.Length; ++i)
+                {
+                    var queryInfo = _queryInfos[i];
+                    if (null != queryInfo)
+                    {
+                        queryInfo.NotifyError(canceledException);
+                        _instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
+
+                        _queryInfos[i] = null;
+                    }
+                }
+
                 _isClosed = true;
             }
 
+            // we have now the guarantee this instance is destroyed once
             _tcpClient.SafeDispose();
 
-            OperationCanceledException canceledException = new OperationCanceledException();
-            foreach (QueryInfo queryInfo in _queryInfos.Where(queryInfo => null != queryInfo))
+            if (null != ex && null != OnFailure)
             {
-                queryInfo.NotifyError(canceledException);
-                _instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
-            }
+                _logger.Fatal("Failed with error : {0}", ex);
 
-            if (notifyFailure && null != OnFailure)
-            {
                 FailureEventArgs failureEventArgs = new FailureEventArgs(null);
                 OnFailure(this, failureEventArgs);
+                OnFailure = null;
             }
 
-            OnFailure = null;
+            // wait for worker threads to gracefully shutdown
+            ExceptionExtensions.SafeExecute(() => _responseWorker.Wait());
+            ExceptionExtensions.SafeExecute(() => _queryWorker.Wait());
         }
 
         private void SendQueryWorker()
@@ -177,7 +204,6 @@ namespace CassandraSharp.Transport
             }
             catch (Exception ex)
             {
-                _logger.Fatal("Error while trying to send query : {0}", ex);
                 HandleError(ex);
             }
         }
@@ -256,7 +282,6 @@ namespace CassandraSharp.Transport
             }
             catch (Exception ex)
             {
-                _logger.Fatal("Error while trying to receive response: {0}", ex);
                 HandleError(ex);
             }
         }
@@ -268,8 +293,7 @@ namespace CassandraSharp.Transport
                 using (IFrameReader frameReader = new StreamingFrameReader(_socket))
                 {
                     byte streamId = frameReader.StreamId;
-                    QueryInfo queryInfo = _queryInfos[streamId];
-                    _queryInfos[streamId] = null;
+                    QueryInfo queryInfo;
                     lock (_lock)
                     {
                         Monitor.Pulse(_lock);
@@ -278,6 +302,8 @@ namespace CassandraSharp.Transport
                             throw new OperationCanceledException();
                         }
 
+                        queryInfo = _queryInfos[streamId];
+                        _queryInfos[streamId] = null;
                         _availableStreamIds.Push(streamId);
                     }
 
@@ -316,7 +342,7 @@ namespace CassandraSharp.Transport
 
         private void HandleError(Exception ex)
         {
-            Close(true);
+            Close(ex);
         }
 
         private void GetOptions()
@@ -328,8 +354,6 @@ namespace CassandraSharp.Transport
         private void ReadifyConnection()
         {
             var obsReady = new ReadyQuery(this, _config.CqlVersion).AsFuture();
-            obsReady.Wait();
-
             bool authenticate = obsReady.Result.Single();
             if (authenticate)
             {
@@ -345,7 +369,6 @@ namespace CassandraSharp.Transport
             }
 
             var obsAuth = new AuthenticateQuery(this, _config.User, _config.Password).AsFuture();
-            obsAuth.Wait();
             if (! obsAuth.Result.Single())
             {
                 throw new InvalidCredentialException();
