@@ -12,10 +12,14 @@ NOT RELEASED
 - default consistency level (see TransportConfig.DefaultConsistencyLevel)
 - log error when recovery fails
 
+version 3.2.2
+- fixed issue 49 (https://github.com/pchalamet/cassandra-sharp/issues/49)
+- fixed issue 52 (https://github.com/pchalamet/cassandra-sharp/issues/52)
+- fixed issue 53 (https://github.com/pchalamet/cassandra-sharp/issues/53)
+
 version 3.2.1
 NOT RELEASED
 - added releaseNotes to nuget packages
-- fixed 100% cpu when linux hosted server disconnect
 
 version 3.2.0
 - use culture invariant for identifier conversion
