@@ -63,7 +63,7 @@ namespace CassandraSharp.Config
         [XmlAttribute("cl")]
         public ConsistencyLevel DefaultConsistencyLevel { get; set; }
 
-        [XmlAttribute]
+        [XmlAttribute("execFlags")]
         public ExecutionFlags DefaultExecutionFlags { get; set; }
     }
 }
