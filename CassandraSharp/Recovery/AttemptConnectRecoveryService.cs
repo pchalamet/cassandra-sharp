@@ -83,9 +83,9 @@ namespace CassandraSharp.Recovery
 
                     recoveryItem.ClientRecoveredCallback(client);
                 }
-                catch
+                catch(Exception ex)
                 {
-                    _logger.Debug("Failed to recover endpoint {0}", recoveryItem.Endpoint);
+                    _logger.Debug("Failed to recover endpoint {0} with error {1}", recoveryItem.Endpoint, ex);
                 }
             }
 

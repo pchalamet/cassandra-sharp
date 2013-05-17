@@ -10,6 +10,7 @@ NOT RELEASED
 - interface (non prepared query with params) is ready for binary protocol v2 (but no implementation)
 - fixed asynchronous worker shutdown in connection
 - default consistency level (see TransportConfig.DefaultConsistencyLevel)
+- log error when recovery fails
 
 version 3.2.1
 NOT RELEASED
