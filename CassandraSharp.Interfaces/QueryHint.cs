@@ -15,6 +15,8 @@
 
 namespace CassandraSharp
 {
+    using System.Numerics;
+
     public class QueryHint
     {
         public QueryHint()
@@ -22,7 +24,7 @@ namespace CassandraSharp
             ReplicationFactor = 1;
         }
 
-        public object Key { get; set; }
+        public BigInteger Key { get; set; }
 
         public int ReplicationFactor { get; set; }
     }

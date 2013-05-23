@@ -27,6 +27,8 @@ namespace CassandraSharp.EndpointStrategy
                     {"Random", typeof(RandomEndpointStrategy)},
                     {"Nearest", typeof(NearestEndpointStrategy)},
                     {"TokenAware", typeof(TokenAwareStrategy)},
+                    {"RoundRobin", typeof(RoundRobinEndpointStrategy)},
+                    {"TokenRing", typeof(TokenRingEndpointStrategy)},
             };
 
         public IDictionary<string, Type> Definition
