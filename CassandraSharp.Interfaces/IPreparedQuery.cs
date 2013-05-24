@@ -17,6 +17,6 @@ namespace CassandraSharp
 {
     public interface IPreparedQuery<out T>
     {
-        ICqlQuery<T> Execute(object dataSource);
+        IQuery<T> Execute(object dataSource);
     }
 }

@@ -51,7 +51,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             return this;
         }
 
-        public ICqlQuery<T> Execute<T>(string cql, object dataSource, object[] placementKey)
+        public IQuery<T> Execute<T>(string cql, object dataSource, object[] placementKey)
         {
             if (null != dataSource)
             {
@@ -69,7 +69,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             // out to spit out results
             IDataMapper factoryOut = _factoryOut.Create<T>();
 
-            ICqlQuery<T> query = new CqlQuery<T>(connection, cl, executionFlags, cql, factoryOut);
+            IQuery<T> query = new CqlQuery<T>(connection, cl, executionFlags, cql, factoryOut);
             return query;
         }
 

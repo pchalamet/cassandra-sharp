@@ -53,7 +53,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             _cql = cql;
         }
 
-        public ICqlQuery<T> Execute(object dataSource)
+        public IQuery<T> Execute(object dataSource)
         {
             ConsistencyLevel cl;
             ExecutionFlags executionFlags;

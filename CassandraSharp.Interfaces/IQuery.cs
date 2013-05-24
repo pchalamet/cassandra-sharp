@@ -17,8 +17,7 @@ namespace CassandraSharp
 {
     using System;
 
-    public interface IQuery : IDisposable
+    public interface IQuery<out T> : IObservable<T>
     {
-        void Schedule(IObserver<object> observer);
     }
 }

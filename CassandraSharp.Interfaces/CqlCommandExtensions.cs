@@ -33,7 +33,7 @@ namespace CassandraSharp
             return EnglightenmentMgr.Future().AsFuture(observable, token);
         }
 
-        public static ICqlQuery<NonQuery> Execute(this ICqlCommand @this, string cql)
+        public static IQuery<NonQuery> Execute(this ICqlCommand @this, string cql)
         {
             return @this.Execute<NonQuery>(cql);
         }
