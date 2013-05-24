@@ -17,6 +17,7 @@ namespace CassandraSharp.EndpointStrategy
 {
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -62,17 +63,17 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-        public IPAddress Pick(QueryHint hint)
+        public IPAddress Pick(BigInteger? token)
         {
             IPAddress endpoint = null;
             if (0 < _healthyEndpoints.Count)
             {
-                if (hint != null && hint.Key.HasValue && 0 < _ring.RingSize())
+                if (token.HasValue && 0 < _ring.RingSize())
                 {
                     //Attempt to binary search for key in token ring
                     lock (_lock)
                     {
-                        endpoint = _ring.FindReplica(hint.Key.Value);
+                        endpoint = _ring.FindReplica(token.Value);
                     }
                 }
                 else

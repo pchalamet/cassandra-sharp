@@ -26,7 +26,7 @@ namespace CassandraSharp.Enlightenment
             factoryIn.CheckArgumentNotNull("factoryIn");
             factoryOut.CheckArgumentNotNull("factoryOut");
 
-            return new Command(cluster, factoryIn, factoryOut);
+            return new CqlCommand(cluster, factoryIn, factoryOut);
         }
     }
 }

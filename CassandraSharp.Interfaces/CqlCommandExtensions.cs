@@ -38,9 +38,9 @@ namespace CassandraSharp
             return @this.Execute<NonQuery>(cql);
         }
 
-        public static IPreparedQuery<NonQuery> Prepare(this ICqlCommand @this, string cql, ExecutionFlags executionFlags = ExecutionFlags.None)
+        public static IPreparedQuery<NonQuery> Prepare(this ICqlCommand @this, string cql)
         {
-            return @this.Prepare<NonQuery>(cql, executionFlags);
+            return @this.Prepare<NonQuery>(cql);
         }
     }
 }

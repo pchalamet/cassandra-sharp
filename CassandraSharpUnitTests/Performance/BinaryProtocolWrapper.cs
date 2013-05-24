@@ -63,17 +63,17 @@ namespace CassandraSharpUnitTests.Performance
 
         public override void Query(string cmd)
         {
-            _cmd.Execute(cmd).WithExecutionFlags(ExecutionFlags.ServerTracing).AsFuture().Wait();
+            _cmd.WithExecutionFlags(ExecutionFlags.ServerTracing).Execute(cmd).AsFuture().Wait();
         }
 
         public override void Prepare(string cmd)
         {
-            _prepared = _cmd.Prepare(cmd, ExecutionFlags.ServerTracing);
+            _prepared = _cmd.WithExecutionFlags(ExecutionFlags.ServerTracing).Prepare(cmd);
         }
 
         public override void Execute(params object[] prms)
         {
-            _prepared.Execute(prms).WithExecutionFlags(ExecutionFlags.ServerTracing).AsFuture().Wait();
+            _prepared.Execute(prms).AsFuture().Wait();
         }
 
         public override TracingSession QueryTracingInfo(Guid tracingId)

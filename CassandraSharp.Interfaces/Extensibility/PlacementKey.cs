@@ -13,19 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Extensibility
 {
-    using System.Numerics;
-
-    public class QueryHint
+    public class PlacementKey
     {
-        public QueryHint()
+        public PlacementKey(object[] key)
         {
-            ReplicationFactor = 1;
+            Key = key;
         }
 
-        public BigInteger? Key { get; set; }
-
-        public int ReplicationFactor { get; set; }
+        public object[] Key { get; private set; }
     }
 }

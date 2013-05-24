@@ -17,6 +17,7 @@ namespace CassandraSharp.EndpointStrategy
 {
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Extensibility;
 
     /// <summary>
@@ -61,14 +62,14 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-        public IPAddress Pick(QueryHint hint)
+        public IPAddress Pick(BigInteger? token)
         {
             lock (_lock)
             {
                 IPAddress endpoint = null;
                 if (0 < _healthyEndpoints.Count)
                 {
-                    _nextCandidate = (_nextCandidate+1) % _healthyEndpoints.Count;
+                    _nextCandidate = (_nextCandidate + 1) % _healthyEndpoints.Count;
                     endpoint = _healthyEndpoints[_nextCandidate];
                 }
 

@@ -23,8 +23,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
     internal sealed class CreateOptionsQuery : Query<Dictionary<string, string[]>>
     {
-        public CreateOptionsQuery(IConnection connection)
-                : base(connection)
+        public CreateOptionsQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags)
+                : base(connection, consistencyLevel, executionFlags)
         {
         }
 
@@ -45,7 +45,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             fw.SetMessageType(MessageOpcodes.Options);
         }
 
-        protected override InstrumentationToken CreateToken()
+        protected override InstrumentationToken CreateInstrumentationToken()
         {
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Options, ExecutionFlags.None);
             return token;

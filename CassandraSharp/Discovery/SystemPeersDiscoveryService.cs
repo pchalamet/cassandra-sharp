@@ -80,15 +80,13 @@ namespace CassandraSharp.Discovery
             {
                 IConnection connection = _cluster.GetConnection();
 
-                var obsLocalPeer = new CqlQuery<DiscoveredPeer>(connection, "select tokens from system.local", _peerFactory)
-                        .WithConsistencyLevel(ConsistencyLevel.ONE)
-                        .WithExecutionFlags(ExecutionFlags.None);
+                var obsLocalPeer = new CqlQuery<DiscoveredPeer>(connection, ConsistencyLevel.ONE, ExecutionFlags.None, "select tokens from system.local",
+                                                                _peerFactory);
                 obsLocalPeer.Subscribe(x => Notify(connection.Endpoint, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
 
                 var obsPeers =
-                        new CqlQuery<DiscoveredPeer>(connection, "select rpc_address,tokens from system.peers", _peerFactory)
-                                .WithConsistencyLevel(ConsistencyLevel.ONE)
-                                .WithExecutionFlags(ExecutionFlags.None);
+                        new CqlQuery<DiscoveredPeer>(connection, ConsistencyLevel.ONE, ExecutionFlags.None, "select rpc_address,tokens from system.peers",
+                                                     _peerFactory);
                 obsPeers.Subscribe(x => Notify(x.RpcAddress, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
             }
             catch (Exception ex)

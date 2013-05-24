@@ -24,9 +24,11 @@ namespace CassandraSharp.CQLBinaryProtocol
     {
         private readonly ICluster _cluster;
 
+        private readonly ConsistencyLevel? _consistencyLevel;
+
         private readonly string _cql;
 
-        private readonly ExecutionFlags _executionFlags;
+        private readonly ExecutionFlags? _executionFlags;
 
         private readonly IDataMapperFactory _factoryIn;
 
@@ -40,17 +42,21 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private byte[] _id;
 
-        public PreparedQuery(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut, string cql, ExecutionFlags executionFlags)
+        public PreparedQuery(ICluster cluster, ConsistencyLevel? consistencyLevel, ExecutionFlags? executionFlags, IDataMapperFactory factoryIn,
+                             IDataMapperFactory factoryOut, string cql)
         {
             _cluster = cluster;
+            _consistencyLevel = consistencyLevel;
+            _executionFlags = executionFlags;
             _factoryIn = factoryIn;
             _factoryOut = factoryOut;
             _cql = cql;
-            _executionFlags = executionFlags;
         }
 
         public ICqlQuery<T> Execute(object dataSource)
         {
+            ConsistencyLevel cl;
+            ExecutionFlags executionFlags;
             IConnection connection;
             if (null == (connection = _connection))
             {
@@ -61,7 +67,10 @@ namespace CassandraSharp.CQLBinaryProtocol
                         connection = _cluster.GetConnection();
                         connection.OnFailure += ConnectionOnOnFailure;
 
-                        var futPrepare = new PrepareQuery(connection, _cql).WithExecutionFlags(_executionFlags).AsFuture();
+                        cl = _consistencyLevel ?? connection.DefaultConsistencyLevel;
+                        executionFlags = _executionFlags ?? connection.DefaultExecutionFlags;
+
+                        var futPrepare = new PrepareQuery(connection, cl, executionFlags, _cql).AsFuture();
                         futPrepare.Wait();
                         Tuple<byte[], IColumnSpec[]> preparedInfo = futPrepare.Result.Single();
 
@@ -72,9 +81,11 @@ namespace CassandraSharp.CQLBinaryProtocol
                 }
             }
 
+            cl = _consistencyLevel ?? connection.DefaultConsistencyLevel;
+            executionFlags = _executionFlags ?? connection.DefaultExecutionFlags;
             IDataMapper mapperIn = _factoryIn.Create<T>(dataSource);
             IDataMapper mapperOut = _factoryOut.Create<T>();
-            var futQuery = new ExecuteQuery<T>(connection, _cql, _id, _columnSpecs, mapperIn, mapperOut).WithExecutionFlags(_executionFlags);
+            var futQuery = new ExecuteQuery<T>(connection, cl, executionFlags, _cql, _id, _columnSpecs, mapperIn, mapperOut);
             return futQuery;
         }
 

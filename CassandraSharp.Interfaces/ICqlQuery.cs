@@ -19,10 +19,5 @@ namespace CassandraSharp
 
     public interface ICqlQuery<out T> : IObservable<T>
     {
-        ICqlQuery<T> WithConsistencyLevel(ConsistencyLevel cl);
-
-        ICqlQuery<T> WithExecutionFlags(ExecutionFlags executionFlags);
-
-        ICqlQuery<T> WithHint(QueryHint hint);
     }
 }

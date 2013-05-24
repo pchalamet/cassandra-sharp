@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
+namespace CassandraSharp
 {
-    public interface IPropertyBagCommand : IFluentCqlCommand<IPropertyBagCommand>
+    public interface IFluentCqlCommand<out TC> where TC : IFluentCqlCommand<TC>
     {
-        ICqlQuery<PropertyBag> Execute(string cql, object dataSource = null, object[] placementKey = null);
+        TC WithConsistencyLevel(ConsistencyLevel cl);
 
-        IPreparedQuery<PropertyBag> Prepare(string cql);
+        TC WithExecutionFlags(ExecutionFlags executionFlags);
     }
 }

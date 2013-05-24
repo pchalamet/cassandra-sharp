@@ -27,8 +27,10 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         private readonly IDataMapper _mapperIn;
 
-        public ExecuteQuery(IConnection connection, string cql, byte[] id, IColumnSpec[] columnSpecs, IDataMapper mapperIn, IDataMapper mapperOut)
-                : base(connection, cql, mapperOut)
+        public ExecuteQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, byte[] id,
+                            IColumnSpec[] columnSpecs,
+                            IDataMapper mapperIn, IDataMapper mapperOut)
+                : base(connection, consistencyLevel, executionFlags, cql, mapperOut)
         {
             _id = id;
             _columnSpecs = columnSpecs;
@@ -58,7 +60,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             fw.SetMessageType(MessageOpcodes.Execute);
         }
 
-        protected override InstrumentationToken CreateToken()
+        protected override InstrumentationToken CreateInstrumentationToken()
         {
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Prepare, ExecutionFlags, CQL);
             return token;

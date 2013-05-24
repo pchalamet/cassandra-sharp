@@ -18,6 +18,7 @@ namespace CassandraSharp.Cluster
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -65,7 +66,7 @@ namespace CassandraSharp.Cluster
             }
         }
 
-        public IConnection GetConnection(QueryHint hint = null)
+        public IConnection GetConnection(BigInteger? token)
         {
             lock (_globalLock)
             {
@@ -75,7 +76,7 @@ namespace CassandraSharp.Cluster
                     while (null == connection)
                     {
                         // pick and initialize a new endpoint connection
-                        IPAddress endpoint = _endpointStrategy.Pick(hint);
+                        IPAddress endpoint = _endpointStrategy.Pick(token);
                         if (null == endpoint)
                         {
                             throw new ArgumentException("Can't find any valid endpoint");

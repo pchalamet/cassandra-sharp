@@ -16,6 +16,7 @@
 namespace CassandraSharp
 {
     using System;
+    using System.Numerics;
 
     public delegate void ClusterClosed();
 
@@ -23,6 +24,6 @@ namespace CassandraSharp
     {
         event ClusterClosed OnClosed;
 
-        IConnection GetConnection(QueryHint hint = null);
+        IConnection GetConnection(BigInteger? token = null);
     }
 }

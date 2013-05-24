@@ -11,6 +11,9 @@ NOT RELEASED
 - fixed asynchronous worker shutdown in connection
 - default consistency level (see TransportConfig.DefaultConsistencyLevel)
 - log error when recovery fails
+- moved fluent operations (WithXXX) to ICqlCommand (breaking change)
+- strongly typed ICqlCommand and IPropertyBagCommand to avoid misleading operation calls
+- placement key only available on non prepared statement on Execute()
 
 version 3.2.2
 - fixed issue 49 (https://github.com/pchalamet/cassandra-sharp/issues/49)
