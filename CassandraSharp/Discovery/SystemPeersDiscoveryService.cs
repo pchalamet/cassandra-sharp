@@ -58,8 +58,28 @@ namespace CassandraSharp.Discovery
 
         public event TopologyUpdate OnTopologyUpdate;
 
+        private static bool IsValidIPAddress(IPAddress rpcAddress)
+        {
+            try
+            {
+                byte[] addrBytes = rpcAddress.GetAddressBytes();
+                bool isValid = 0 != addrBytes.Max();
+                return isValid;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void Notify(IPAddress rpcAddress, IEnumerable<string> tokens)
         {
+            if (!IsValidIPAddress(rpcAddress))
+            {
+                _logger.Warn("Discovered invalid endpoint {0}", rpcAddress);
+                return;
+            }
+
             if (null != OnTopologyUpdate)
             {
                 Peer peer = new Peer

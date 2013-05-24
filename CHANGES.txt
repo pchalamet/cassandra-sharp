@@ -11,6 +11,7 @@ NOT RELEASED
 - fixed asynchronous worker shutdown in connection
 - default consistency level (see TransportConfig.DefaultConsistencyLevel)
 - log error when recovery fails
+- filtrer invalid rpc address (0.0.0.0) in discovery service SystemPeers
 
 version 3.2.2
 - fixed issue 49 (https://github.com/pchalamet/cassandra-sharp/issues/49)
