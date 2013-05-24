@@ -21,7 +21,6 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.IO;
     using System.Net;
     using System.Text;
-    using System.Linq;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
     using CassandraSharp.Utils.Stream;
@@ -283,69 +282,6 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             throw new ArgumentException("Unsupported type");
-        }
-
-
-
-        /// <summary>
-        /// Gets murmur hash based on a provided value.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static long getMurmur3Hash(ColumnType type, Object value)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            byte[] partitionKey = Serialize(type, value);
-            return MurmurHash.Hash3_x64_128(partitionKey, 0, partitionKey.Length, 0)[0];
-        }
-
-        /// <summary>
-        /// Gets murmur hash based on the provided values. Use this when composite partition keys are used
-        /// </summary>
-        /// <param name="types"></param>
-        /// <param name="values">The values must be given in the same order as the partition key is defined.</param>
-        /// <returns></returns>
-        public static long getCompositeMurmur3Hash(ColumnType[] types, Object[] values)
-        {
-            if (types == null)
-                throw new ArgumentNullException("types");
-
-            if (values == null)
-                throw new ArgumentNullException("values");
-
-
-            if (types.Length != values.Length)
-                throw new ArgumentException("types and values are not of equal length");
-
-            var rawValues = new byte[types.Length][];
-            for (int i = 0; i < types.Length; i++)
-            {
-                rawValues[i] = Serialize(types[i], values[i]);
-            }
-
-            int length = types.Length * 3 + rawValues.Sum(val => val.Length);
-            using (var stream = new MemoryStream(length))
-            {
-                foreach (var rawValue in rawValues)
-                {
-                    //write length of composite key part as short
-                    var len = (short)rawValue.Length;
-                    stream.WriteByte((byte)(len >> 8));
-                    stream.WriteByte((byte)(len));
-
-                    //write value
-                    stream.Write(rawValue, 0, len);
-
-                    //write terminator byte
-                    stream.WriteByte(0);
-                }
-
-                byte[] partitionKey = stream.ToArray();
-                return MurmurHash.Hash3_x64_128(partitionKey, 0, partitionKey.Length, 0)[0];
-            }
         }
     }
 }

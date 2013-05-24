@@ -24,7 +24,7 @@ namespace CassandraSharp
             ReplicationFactor = 1;
         }
 
-        public BigInteger Key { get; set; }
+        public BigInteger? Key { get; set; }
 
         public int ReplicationFactor { get; set; }
     }

@@ -15,35 +15,29 @@
 
 namespace CassandraSharp.EndpointStrategy
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
-    using System.Numerics;
-    using System.Text;
-    using System.Threading.Tasks;
-    using CassandraSharp;
     using CassandraSharp.Extensibility;
 
     /// <summary>
-    /// Will loop through nodes to perfectly evenly spread load.
+    ///     Will loop through nodes to perfectly evenly spread load.
     /// </summary>
     internal sealed class RoundRobinEndpointStrategy : IEndpointStrategy
     {
         private readonly List<IPAddress> _bannedEndpoints;
+
         private readonly List<IPAddress> _healthyEndpoints;
+
         private readonly object _lock = new object();
+
         private int _nextCandidate;
 
-        
         public RoundRobinEndpointStrategy(IEnumerable<IPAddress> endpoints)
         {
             _healthyEndpoints = new List<IPAddress>(endpoints);
             _bannedEndpoints = new List<IPAddress>();
             _nextCandidate = 0;
         }
-
-
 
         public void Ban(IPAddress endpoint)
         {
@@ -56,8 +50,6 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-
-
         public void Permit(IPAddress endpoint)
         {
             lock (_lock)
@@ -69,8 +61,6 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-
-
         public IPAddress Pick(QueryHint hint)
         {
             lock (_lock)
@@ -78,14 +68,13 @@ namespace CassandraSharp.EndpointStrategy
                 IPAddress endpoint = null;
                 if (0 < _healthyEndpoints.Count)
                 {
-                    endpoint = _healthyEndpoints[_nextCandidate++];
-                    _nextCandidate %= _healthyEndpoints.Count;
+                    _nextCandidate = (_nextCandidate+1) % _healthyEndpoints.Count;
+                    endpoint = _healthyEndpoints[_nextCandidate];
                 }
 
                 return endpoint;
             }
         }
-
 
         public void Update(NotificationKind kind, Peer peer)
         {
@@ -97,11 +86,15 @@ namespace CassandraSharp.EndpointStrategy
                     case NotificationKind.Add:
                     case NotificationKind.Update:
                         if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                        {
                             _healthyEndpoints.Add(endpoint);
+                        }
                         break;
                     case NotificationKind.Remove:
                         if (_healthyEndpoints.Contains(endpoint))
+                        {
                             _healthyEndpoints.Remove(endpoint);
+                        }
                         break;
                 }
             }
