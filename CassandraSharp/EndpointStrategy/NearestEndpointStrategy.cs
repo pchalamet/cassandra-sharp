@@ -36,7 +36,7 @@ namespace CassandraSharp.EndpointStrategy
         public NearestEndpointStrategy(IEnumerable<IPAddress> endpoints, IEndpointSnitch snitch)
         {
             _snitch = snitch;
-            _clientAddress = NetworkFinder.Find(Dns.GetHostName());
+            _clientAddress = Network.Find(Dns.GetHostName());
             if (null == _clientAddress)
             {
                 throw new ArgumentException("Failed to resolve IP for client address");

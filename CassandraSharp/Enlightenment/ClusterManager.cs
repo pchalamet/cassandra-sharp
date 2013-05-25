@@ -59,7 +59,7 @@ namespace CassandraSharp.Enlightenment
 
             // create endpoints
             IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
-            IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(NetworkFinder.Find).Where(x => null != x).ToArray();
+            IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(Network.Find).Where(x => null != x).ToArray();
             if (!endpoints.Any())
             {
                 throw new ArgumentException("Expecting at least one valid endpoint");

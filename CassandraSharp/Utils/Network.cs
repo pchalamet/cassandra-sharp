@@ -19,8 +19,22 @@ namespace CassandraSharp.Utils
     using System.Net;
     using System.Net.Sockets;
 
-    internal sealed class NetworkFinder
+    internal sealed class Network
     {
+        public static bool IsValidEndpoint(IPAddress rpcAddress)
+        {
+            try
+            {
+                byte[] addrBytes = rpcAddress.GetAddressBytes();
+                bool isValid = 0 != addrBytes.Max();
+                return isValid;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static IPAddress Find(string hostname)
         {
             IPAddress ipAddress;
