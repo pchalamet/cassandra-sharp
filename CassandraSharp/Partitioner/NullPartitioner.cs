@@ -13,28 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Partitioner
 {
-    using System.Collections;
-    using System.Collections.Generic;
+    using System.Numerics;
+    using CassandraSharp.Extensibility;
 
-    internal sealed class CollectionAccessor<T> : ICollectionAccessor
+    internal class NullPartitioner : IPartitioner
     {
-        private readonly ICollection<T> _collection;
-
-        public CollectionAccessor(object collection)
+        public BigInteger? ComputeToken(object[] partitionKey)
         {
-            _collection = (ICollection<T>) collection;
-        }
-
-        public int Count
-        {
-            get { return _collection.Count; }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return _collection.GetEnumerator();
+            return null;
         }
     }
 }

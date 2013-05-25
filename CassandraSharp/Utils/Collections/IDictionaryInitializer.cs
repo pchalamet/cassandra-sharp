@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Utils.Collections
 {
-    public interface IFluentCqlCommand<out T> where T : IFluentCqlCommand<T>
+    internal interface IDictionaryInitializer
     {
-        T WithConsistencyLevel(ConsistencyLevel cl);
+        object Collection { get; }
 
-        T WithExecutionFlags(ExecutionFlags executionFlags);
+        void Add(object key, object value);
     }
 }

@@ -17,11 +17,14 @@ namespace CassandraSharp
 {
     using System;
     using System.Numerics;
+    using CassandraSharp.Extensibility;
 
     public delegate void ClusterClosed();
 
     public interface ICluster : IDisposable
     {
+        IPartitioner Partitioner { get; }
+
         event ClusterClosed OnClosed;
 
         IConnection GetConnection(BigInteger? token = null);

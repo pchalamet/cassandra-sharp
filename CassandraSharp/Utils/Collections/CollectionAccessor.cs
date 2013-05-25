@@ -13,12 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Utils.Collections
 {
     using System.Collections;
+    using System.Collections.Generic;
 
-    internal interface ICollectionAccessor : IEnumerable
+    internal sealed class CollectionAccessor<T> : ICollectionAccessor
     {
-        int Count { get; }
+        private readonly ICollection<T> _collection;
+
+        public CollectionAccessor(object collection)
+        {
+            _collection = (ICollection<T>) collection;
+        }
+
+        public int Count
+        {
+            get { return _collection.Count; }
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return _collection.GetEnumerator();
+        }
     }
 }

@@ -13,23 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Utils.Collections
 {
-    using System.Collections.Generic;
+    using System.Collections;
 
-    internal sealed class HashSetInitializer<T> : ICollectionInitializer
+    internal interface ICollectionAccessor : IEnumerable
     {
-        private readonly HashSet<T> _collection = new HashSet<T>();
-
-        public void Add(object value)
-        {
-            T t = (T) value;
-            _collection.Add(t);
-        }
-
-        public object Collection
-        {
-            get { return _collection; }
-        }
+        int Count { get; }
     }
 }

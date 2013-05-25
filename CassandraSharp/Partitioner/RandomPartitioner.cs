@@ -13,12 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Partitioner
 {
-    public interface IFluentCqlCommand<out T> where T : IFluentCqlCommand<T>
-    {
-        T WithConsistencyLevel(ConsistencyLevel cl);
+    using System.Numerics;
+    using System.Security.Cryptography;
 
-        T WithExecutionFlags(ExecutionFlags executionFlags);
+    internal class RandomPartitioner : PartitionerBase
+    {
+        protected override BigInteger? Hash(byte[] buffer, int offset, int len)
+        {
+            HashAlgorithm md5 = new MD5CryptoServiceProvider();
+            byte[] hash = md5.ComputeHash(buffer, offset, len);
+            BigInteger token = new BigInteger(hash);
+            return token;
+        }
     }
 }

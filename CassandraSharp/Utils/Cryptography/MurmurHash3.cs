@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Utils.Cryptography
 {
     /// <summary>
     ///     This is a very fast, non-cryptographic hash suitable for general hash-based
@@ -23,7 +23,7 @@ namespace CassandraSharp.Utils
     /// <remarks>
     ///     Copied from https://github.com/datastax/csharp-driver/blob/master/Cassandra/MurmurHash.cs
     /// </remarks>
-    public class MurmurHash3
+    public class MurmurHash
     {
         private static long GetBlock(byte[] key, int offset, int index)
         {
@@ -155,7 +155,6 @@ namespace CassandraSharp.Utils
                         h1 ^= k1;
                         break;
                 }
-                ;
             }
             //----------
             // finalization

@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Utils.Collections
 {
-    internal interface IDictionaryInitializer
+    internal interface ICollectionInitializer
     {
         object Collection { get; }
 
-        void Add(object key, object value);
+        void Add(object t);
     }
 }

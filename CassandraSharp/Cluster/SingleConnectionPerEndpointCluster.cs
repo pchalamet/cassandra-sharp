@@ -37,14 +37,17 @@ namespace CassandraSharp.Cluster
         private readonly IRecoveryService _recoveryService;
 
         public SingleConnectionPerEndpointCluster(IEndpointStrategy endpointStrategy, ILogger logger,
-                                                  IConnectionFactory connectionFactory, IRecoveryService recoveryService)
+                                                  IConnectionFactory connectionFactory, IRecoveryService recoveryService, IPartitioner partitioner)
         {
             _ip2Connection = new Dictionary<IPAddress, IConnection>();
             _endpointStrategy = endpointStrategy;
             _logger = logger;
             _connectionFactory = connectionFactory;
             _recoveryService = recoveryService;
+            Partitioner = partitioner;
         }
+
+        public IPartitioner Partitioner { get; private set; }
 
         public event ClusterClosed OnClosed;
 

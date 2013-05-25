@@ -13,23 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Partitioner
 {
+    using System;
     using System.Collections.Generic;
+    using CassandraSharp.Utils;
 
-    internal sealed class ListInitializer<T> : ICollectionInitializer
+    internal sealed class Factory : IServiceDescriptor
     {
-        private readonly List<T> _collection = new List<T>();
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
+            {
+                    {"Default", typeof(NullPartitioner)},
+                    {"Null", typeof(NullPartitioner)},
+                    {"Random", typeof(RandomPartitioner)},
+                    {"Murmur3", typeof(Murmur3Partitioner)},
+            };
 
-        public void Add(object value)
+        public IDictionary<string, Type> Definition
         {
-            T t = (T) value;
-            _collection.Add(t);
-        }
-
-        public object Collection
-        {
-            get { return _collection; }
+            get { return _def; }
         }
     }
 }

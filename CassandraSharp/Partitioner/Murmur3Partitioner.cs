@@ -13,12 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Partitioner
 {
-    public interface IFluentCqlCommand<out T> where T : IFluentCqlCommand<T>
-    {
-        T WithConsistencyLevel(ConsistencyLevel cl);
+    using System.Numerics;
+    using CassandraSharp.Utils.Cryptography;
 
-        T WithExecutionFlags(ExecutionFlags executionFlags);
+    internal class Murmur3Partitioner : PartitionerBase
+    {
+        protected override BigInteger? Hash(byte[] buffer, int offset, int len)
+        {
+            long hash = MurmurHash.Hash3_x64_128(buffer, 0, buffer.Length, 0)[0];
+
+            // hash normalization  (minimum value is excluded)
+            if (hash == long.MinValue)
+            {
+                hash = long.MaxValue;
+            }
+
+            return hash;
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             // grab a connection
-            BigInteger? token = ComputeToken(_cluster, placementKey);
+            BigInteger? token = _cluster.Partitioner.ComputeToken(placementKey);
             IConnection connection = _cluster.GetConnection(token);
 
             // define execution context
@@ -76,11 +76,6 @@ namespace CassandraSharp.CQLBinaryProtocol
         public IPreparedQuery<T> Prepare<T>(string cql)
         {
             return new PreparedQuery<T>(_cluster, _consistencyLevel, _executionFlags, _factoryIn, _factoryOut, cql);
-        }
-
-        private static BigInteger? ComputeToken(ICluster executionContext, object[] placementKey)
-        {
-            return null;
         }
     }
 }

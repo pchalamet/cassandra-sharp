@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Extensibility
 {
-    internal interface ICollectionInitializer
-    {
-        object Collection { get; }
+    using System.Numerics;
 
-        void Add(object t);
+    public interface IPartitioner
+    {
+        BigInteger? ComputeToken(object[] partitionKey);
     }
 }
