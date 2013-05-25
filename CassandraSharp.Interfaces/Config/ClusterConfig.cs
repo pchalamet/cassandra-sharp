@@ -23,7 +23,7 @@ namespace CassandraSharp.Config
         public ClusterConfig()
         {
             Type = "Default";
-            Partioner = "Default";
+            Partitioner = "Default";
         }
 
         [XmlElement("Endpoints")]
@@ -35,8 +35,8 @@ namespace CassandraSharp.Config
         [XmlAttribute("type")]
         public string Type { get; set; }
 
-        [XmlAttribute("partioner")]
-        public string Partioner { get; set; }
+        [XmlAttribute("partitioner")]
+        public string Partitioner { get; set; }
 
         [XmlElement("Transport")]
         public TransportConfig Transport { get; set; }

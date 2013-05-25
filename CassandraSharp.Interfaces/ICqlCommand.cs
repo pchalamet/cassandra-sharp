@@ -17,7 +17,7 @@ namespace CassandraSharp
 {
     public interface ICqlCommand : IFluentCqlCommand<ICqlCommand>
     {
-        IQuery<T> Execute<T>(string cql, object dataSource = null, object[] placementKey = null);
+        IQuery<T> Execute<T>(string cql, object dataSource = null, PartitionKey partitionKey = null);
 
         IPreparedQuery<T> Prepare<T>(string cql);
     }

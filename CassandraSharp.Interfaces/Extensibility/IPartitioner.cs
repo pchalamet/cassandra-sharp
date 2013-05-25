@@ -19,6 +19,6 @@ namespace CassandraSharp.Extensibility
 
     public interface IPartitioner
     {
-        BigInteger? ComputeToken(object[] partitionKey);
+        BigInteger? ComputeToken(PartitionKey partitionKey);
     }
 }

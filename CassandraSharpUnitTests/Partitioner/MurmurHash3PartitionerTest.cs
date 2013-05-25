@@ -16,6 +16,7 @@
 namespace CassandraSharpUnitTests.Partitioner
 {
     using System.Numerics;
+    using CassandraSharp;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Partitioner;
     using NUnit.Framework;
@@ -24,29 +25,10 @@ namespace CassandraSharpUnitTests.Partitioner
     public class MurmurHash3PartitionerTest
     {
         [Test]
-        public void CheckRoutingEmpty()
-        {
-            IPartitioner partitioner = new Murmur3Partitioner();
-            BigInteger? token = partitioner.ComputeToken(new object[0]);
-            Assert.IsNull(token);
-        }
-
-        [Test]
-        public void CheckRoutingNull()
-        {
-            IPartitioner partitioner = new Murmur3Partitioner();
-            BigInteger? token = partitioner.ComputeToken(null);
-            Assert.IsNull(token);
-
-            token = partitioner.ComputeToken(new object[0]);
-            Assert.IsNull(token);
-        }
-
-        [Test]
         public void CheckRoutingSingleKey()
         {
             IPartitioner partitioner = new Murmur3Partitioner();
-            BigInteger? token = partitioner.ComputeToken(new object[] {0x12345678});
+            BigInteger? token = partitioner.ComputeToken(PartitionKey.From(0x12345678));
             Assert.IsTrue(token.HasValue);
             Assert.IsTrue(token.Value == new BigInteger(-8827056344306985898));
         }

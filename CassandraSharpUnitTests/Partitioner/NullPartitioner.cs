@@ -16,6 +16,7 @@
 namespace CassandraSharpUnitTests.Partitioner
 {
     using System.Numerics;
+    using CassandraSharp;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Partitioner;
     using NUnit.Framework;
@@ -28,10 +29,12 @@ namespace CassandraSharpUnitTests.Partitioner
         {
             IPartitioner partitioner = new NullPartitioner();
 
-            BigInteger? token = partitioner.ComputeToken(new object[] {1});
+            PartitionKey key = PartitionKey.From(1);
+            BigInteger? token = partitioner.ComputeToken(key);
             Assert.IsNull(token);
 
-            token = partitioner.ComputeToken(new object[] {"toto", 42});
+            key = PartitionKey.From("toto", 42);
+            token = partitioner.ComputeToken(key);
             Assert.IsNull(token);
         }
     }

@@ -1,4 +1,5 @@
 ﻿version 3.3.0
+    
 NOT RELEASED
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
@@ -14,6 +15,9 @@ NOT RELEASED
 - moved fluent operations (WithXXX) to ICqlCommand (breaking change)
 - strongly typed ICqlCommand and IPropertyBagCommand to avoid misleading operation calls
 - placement key only available on non prepared statement on Execute()
+- placement key can be construct with PlacementKey.From()
+- IPartitioner is a new interface allowing pluggin custom partitioner (see ClusterConfig.Partitioner)
+- MurmurHash3, Random and Null (default) partitioners are available
 
 version 3.2.2
 - fixed issue 49 (https://github.com/pchalamet/cassandra-sharp/issues/49)

@@ -13,15 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp
 {
-    public class PlacementKey
+    using System;
+
+    public class PartitionKey
     {
-        public PlacementKey(object[] key)
+        private PartitionKey(object[] keys)
         {
-            Key = key;
+            Keys = keys;
         }
 
-        public object[] Key { get; private set; }
+        public object[] Keys { get; set; }
+
+        public static PartitionKey From(params object[] keys)
+        {
+            if (null == keys || 0 == keys.Length)
+            {
+                throw new ArgumentException("Keys array must contain at least one element", "keys");
+            }
+
+            return new PartitionKey(keys);
+        }
     }
 }

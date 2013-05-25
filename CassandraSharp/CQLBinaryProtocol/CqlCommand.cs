@@ -51,7 +51,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             return this;
         }
 
-        public IQuery<T> Execute<T>(string cql, object dataSource, object[] placementKey)
+        public IQuery<T> Execute<T>(string cql, object dataSource, PartitionKey partitionKey)
         {
             if (null != dataSource)
             {
@@ -59,7 +59,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             // grab a connection
-            BigInteger? token = _cluster.Partitioner.ComputeToken(placementKey);
+            BigInteger? token = _cluster.Partitioner.ComputeToken(partitionKey);
             IConnection connection = _cluster.GetConnection(token);
 
             // define execution context

@@ -23,28 +23,25 @@ namespace CassandraSharp.Partitioner
 
     internal abstract class PartitionerBase : IPartitioner
     {
-        public BigInteger? ComputeToken(object[] partitionKey)
+        public BigInteger? ComputeToken(PartitionKey partitionKey)
         {
-            if (null == partitionKey || 0 == partitionKey.Length)
-            {
-                return null;
-            }
+            object[] keys = partitionKey.Keys;
 
-            if (1 == partitionKey.Length)
+            if (1 == keys.Length)
             {
-                ColumnType colType = partitionKey[0].GetType().ToColumnType();
-                byte[] buffer = ValueSerialization.Serialize(colType, partitionKey[0]);
+                ColumnType colType = keys[0].GetType().ToColumnType();
+                byte[] buffer = ValueSerialization.Serialize(colType, keys[0]);
                 return Hash(buffer, 0, buffer.Length);
             }
 
-            var rawValues = new byte[partitionKey.Length][];
-            for (int i = 0; i < partitionKey.Length; i++)
+            var rawValues = new byte[keys.Length][];
+            for (int i = 0; i < keys.Length; i++)
             {
-                ColumnType colType = partitionKey[i].GetType().ToColumnType();
-                rawValues[i] = ValueSerialization.Serialize(colType, partitionKey[i]);
+                ColumnType colType = keys[i].GetType().ToColumnType();
+                rawValues[i] = ValueSerialization.Serialize(colType, keys[i]);
             }
 
-            int length = partitionKey.Length * 3 + rawValues.Sum(val => val.Length);
+            int length = keys.Length * 3 + rawValues.Sum(val => val.Length);
             using (var stream = new MemoryStream(length))
             {
                 foreach (var rawValue in rawValues)

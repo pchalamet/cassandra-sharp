@@ -36,9 +36,9 @@ namespace CassandraSharp.CQLPropertyBag
             return this;
         }
 
-        public IQuery<PropertyBag> Execute(string cql, object dataSource, object[] placementKey)
+        public IQuery<PropertyBag> Execute(string cql, object dataSource, PartitionKey partitionKey)
         {
-            return _command.Execute<PropertyBag>(cql, dataSource, placementKey);
+            return _command.Execute<PropertyBag>(cql, dataSource, partitionKey);
         }
 
         public IPreparedQuery<PropertyBag> Prepare(string cql)
