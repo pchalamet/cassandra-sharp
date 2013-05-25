@@ -15,13 +15,15 @@
 
 namespace CassandraSharp.EndpointStrategy
 {
-    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Numerics;
     using CassandraSharp.Extensibility;
 
-    internal sealed class RandomEndpointStrategy : IEndpointStrategy
+    /// <summary>
+    ///     Will loop through nodes to perfectly evenly spread load.
+    /// </summary>
+    internal sealed class RoundRobinEndpointStrategy : IEndpointStrategy
     {
         private readonly List<IPAddress> _bannedEndpoints;
 
@@ -29,28 +31,13 @@ namespace CassandraSharp.EndpointStrategy
 
         private readonly object _lock = new object();
 
-        private readonly Random _rnd;
+        private int _nextCandidate;
 
-        public RandomEndpointStrategy(IEnumerable<IPAddress> endpoints)
+        public RoundRobinEndpointStrategy(IEnumerable<IPAddress> endpoints)
         {
             _healthyEndpoints = new List<IPAddress>(endpoints);
             _bannedEndpoints = new List<IPAddress>();
-            _rnd = new Random();
-        }
-
-        public IPAddress Pick(BigInteger? token)
-        {
-            lock (_lock)
-            {
-                IPAddress endpoint = null;
-                if (0 < _healthyEndpoints.Count)
-                {
-                    int candidate = _rnd.Next(_healthyEndpoints.Count);
-                    endpoint = _healthyEndpoints[candidate];
-                }
-
-                return endpoint;
-            }
+            _nextCandidate = 0;
         }
 
         public void Ban(IPAddress endpoint)
@@ -75,14 +62,41 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
+        public IPAddress Pick(BigInteger? token)
+        {
+            lock (_lock)
+            {
+                IPAddress endpoint = null;
+                if (0 < _healthyEndpoints.Count)
+                {
+                    _nextCandidate = (_nextCandidate + 1) % _healthyEndpoints.Count;
+                    endpoint = _healthyEndpoints[_nextCandidate];
+                }
+
+                return endpoint;
+            }
+        }
+
         public void Update(NotificationKind kind, Peer peer)
         {
             lock (_lock)
             {
                 IPAddress endpoint = peer.RpcAddress;
-                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                switch (kind)
                 {
-                    _healthyEndpoints.Add(endpoint);
+                    case NotificationKind.Add:
+                    case NotificationKind.Update:
+                        if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
+                        {
+                            _healthyEndpoints.Add(endpoint);
+                        }
+                        break;
+                    case NotificationKind.Remove:
+                        if (_healthyEndpoints.Contains(endpoint))
+                        {
+                            _healthyEndpoints.Remove(endpoint);
+                        }
+                        break;
                 }
             }
         }

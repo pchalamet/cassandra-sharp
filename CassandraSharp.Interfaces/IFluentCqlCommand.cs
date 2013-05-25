@@ -13,28 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp
 {
-    using System.Collections;
-    using System.Collections.Generic;
-
-    internal sealed class CollectionAccessor<T> : ICollectionAccessor
+    public interface IFluentCqlCommand<out T> where T : IFluentCqlCommand<T>
     {
-        private readonly ICollection<T> _collection;
+        T WithConsistencyLevel(ConsistencyLevel cl);
 
-        public CollectionAccessor(object collection)
-        {
-            _collection = (ICollection<T>) collection;
-        }
-
-        public int Count
-        {
-            get { return _collection.Count; }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return _collection.GetEnumerator();
-        }
+        T WithExecutionFlags(ExecutionFlags executionFlags);
     }
 }

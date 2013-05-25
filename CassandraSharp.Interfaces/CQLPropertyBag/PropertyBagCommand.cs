@@ -24,24 +24,26 @@ namespace CassandraSharp.CQLPropertyBag
             _command = command;
         }
 
-        public ICqlQuery<T> Execute<T>(string cql, object dataSource)
+        public IPropertyBagCommand WithConsistencyLevel(ConsistencyLevel cl)
         {
-            return _command.Execute<T>(cql);
+            _command.WithConsistencyLevel(cl);
+            return this;
         }
 
-        public IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags)
+        public IPropertyBagCommand WithExecutionFlags(ExecutionFlags executionFlags)
         {
-            return _command.Prepare<T>(cql, executionFlags);
+            _command.WithExecutionFlags(executionFlags);
+            return this;
         }
 
-        public ICqlQuery<PropertyBag> Execute(string cql, object dataSource)
+        public IQuery<PropertyBag> Execute(string cql, object dataSource, PartitionKey partitionKey)
         {
-            return _command.Execute<PropertyBag>(cql);
+            return _command.Execute<PropertyBag>(cql, dataSource, partitionKey);
         }
 
-        public IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags)
+        public IPreparedQuery<PropertyBag> Prepare(string cql)
         {
-            return _command.Prepare<PropertyBag>(cql, executionFlags);
+            return _command.Prepare<PropertyBag>(cql);
         }
     }
 }

@@ -23,6 +23,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Text;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
+    using CassandraSharp.Utils.Collections;
     using CassandraSharp.Utils.Stream;
 
     internal static class ValueSerialization
@@ -42,6 +43,19 @@ namespace CassandraSharp.CQLBinaryProtocol
                     {ColumnType.Uuid, typeof(Guid)},
                     {ColumnType.Timeuuid, typeof(Guid)},
                     {ColumnType.Inet, typeof(IPAddress)},
+            };
+
+        private static readonly Dictionary<Type, ColumnType> _type2ColType = new Dictionary<Type, ColumnType>
+            {
+                    {typeof(string), ColumnType.Varchar},
+                    {typeof(byte[]), ColumnType.Blob},
+                    {typeof(double), ColumnType.Double},
+                    {typeof(float), ColumnType.Float},
+                    {typeof(long), ColumnType.Bigint},
+                    {typeof(int), ColumnType.Int},
+                    {typeof(bool), ColumnType.Boolean},
+                    {typeof(Guid), ColumnType.Uuid},
+                    {typeof(IPAddress), ColumnType.Inet},
             };
 
         public static byte[] Serialize(this IColumnSpec columnSpec, object data)
@@ -90,7 +104,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             return rawData;
         }
 
-        private static byte[] Serialize(ColumnType colType, object data)
+        internal static byte[] Serialize(ColumnType colType, object data)
         {
             byte[] rawData;
             switch (colType)
@@ -279,6 +293,17 @@ namespace CassandraSharp.CQLBinaryProtocol
             if (_colType2Type.TryGetValue(colType, out type))
             {
                 return type;
+            }
+
+            throw new ArgumentException("Unsupported type");
+        }
+
+        public static ColumnType ToColumnType(this Type type)
+        {
+            ColumnType colType;
+            if (_type2ColType.TryGetValue(type, out colType))
+            {
+                return colType;
             }
 
             throw new ArgumentException("Unsupported type");

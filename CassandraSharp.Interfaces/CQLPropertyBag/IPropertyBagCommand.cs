@@ -15,10 +15,10 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
-    public interface IPropertyBagCommand : ICqlCommand
+    public interface IPropertyBagCommand : IFluentCqlCommand<IPropertyBagCommand>
     {
-        ICqlQuery<PropertyBag> Execute(string cql, object dataSource = null);
+        IQuery<PropertyBag> Execute(string cql, object dataSource = null, PartitionKey partitionKey = null);
 
-        IPreparedQuery<PropertyBag> Prepare(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
+        IPreparedQuery<PropertyBag> Prepare(string cql);
     }
 }

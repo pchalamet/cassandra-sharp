@@ -13,24 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Partitioner
 {
-    using System.Collections.Generic;
+    using System.Numerics;
+    using CassandraSharp.Extensibility;
 
-    internal sealed class DictionaryInitializer<TK, TV> : IDictionaryInitializer
+    internal class NullPartitioner : IPartitioner
     {
-        private readonly Dictionary<TK, TV> _collection = new Dictionary<TK, TV>();
-
-        public void Add(object key, object value)
+        public BigInteger? ComputeToken(PartitionKey partitionKey)
         {
-            TK tkey = (TK) key;
-            TV vvalue = (TV) value;
-            _collection.Add(tkey, vvalue);
-        }
-
-        public object Collection
-        {
-            get { return _collection; }
+            return null;
         }
     }
 }

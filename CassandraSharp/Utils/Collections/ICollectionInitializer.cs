@@ -13,23 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Utils.Collections
 {
-    using System.Collections.Generic;
-
-    internal sealed class ListInitializer<T> : ICollectionInitializer
+    internal interface ICollectionInitializer
     {
-        private readonly List<T> _collection = new List<T>();
+        object Collection { get; }
 
-        public void Add(object value)
-        {
-            T t = (T) value;
-            _collection.Add(t);
-        }
-
-        public object Collection
-        {
-            get { return _collection; }
-        }
+        void Add(object t);
     }
 }

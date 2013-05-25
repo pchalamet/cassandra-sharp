@@ -13,20 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp.Extensibility
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+    using System.Numerics;
 
-    internal sealed class CommandFactory : ICommandFactory
+    public interface IPartitioner
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
-        {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
-
-            return new CqlCommand(cluster, factoryIn, factoryOut);
-        }
+        BigInteger? ComputeToken(PartitionKey partitionKey);
     }
 }

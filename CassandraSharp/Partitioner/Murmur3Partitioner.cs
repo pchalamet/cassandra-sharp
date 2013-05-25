@@ -13,20 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp.Partitioner
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+    using System.Numerics;
+    using CassandraSharp.Utils.Cryptography;
 
-    internal sealed class CommandFactory : ICommandFactory
+    internal class Murmur3Partitioner : PartitionerBase
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
+        protected override BigInteger? Hash(byte[] buffer, int offset, int len)
         {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
+            long hash = MurmurHash.Hash3_x64_128(buffer, 0, buffer.Length, 0)[0];
 
-            return new CqlCommand(cluster, factoryIn, factoryOut);
+            // hash normalization  (minimum value is excluded)
+            if (hash == long.MinValue)
+            {
+                hash = long.MaxValue;
+            }
+
+            return hash;
         }
     }
 }

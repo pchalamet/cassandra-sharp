@@ -16,13 +16,14 @@
 namespace CassandraSharp.Extensibility
 {
     using System.Net;
+    using System.Numerics;
 
     /// <summary>
     ///     IEndpointStrategy helps choosing a server to connect to Implementation must be thread safe
     /// </summary>
     public interface IEndpointStrategy
     {
-        IPAddress Pick(QueryHint hint);
+        IPAddress Pick(BigInteger? token = null);
 
         void Ban(IPAddress endpoint);
 

@@ -20,56 +20,35 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using System.Reactive.Disposables;
     using CassandraSharp.Extensibility;
 
-    internal abstract class Query<T> : ICqlQuery<T>
+    internal abstract class Query<T> : IQuery<T>
     {
         private readonly IConnection _connection;
 
-        protected Query(IConnection connection)
+        protected Query(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags)
         {
             _connection = connection;
-            ConsistencyLevel = connection.DefaultConsistencyLevel;
-            ExecutionFlags = connection.DefaultExecutionFlags;
-            QueryHint = null;
+            ConsistencyLevel = consistencyLevel;
+            ExecutionFlags = executionFlags;
         }
 
         protected ConsistencyLevel ConsistencyLevel { get; private set; }
 
         protected ExecutionFlags ExecutionFlags { get; private set; }
 
-        protected QueryHint QueryHint { get; private set; }
-
         public IDisposable Subscribe(IObserver<T> observer)
         {
             Action<IFrameWriter> writer = WriteFrame;
             Func<IFrameReader, IEnumerable<T>> reader = ReadFrame;
-            var token = CreateToken();
+            var token = CreateInstrumentationToken();
 
             _connection.Execute(writer, reader, token, observer);
             return Disposable.Empty;
-        }
-
-        public ICqlQuery<T> WithConsistencyLevel(ConsistencyLevel cl)
-        {
-            ConsistencyLevel = cl;
-            return this;
-        }
-
-        public ICqlQuery<T> WithExecutionFlags(ExecutionFlags executionFlags)
-        {
-            ExecutionFlags = executionFlags;
-            return this;
-        }
-
-        public ICqlQuery<T> WithHint(QueryHint hint)
-        {
-            QueryHint = hint;
-            return this;
         }
 
         protected abstract IEnumerable<T> ReadFrame(IFrameReader frameReader);
 
         protected abstract void WriteFrame(IFrameWriter frameWriter);
 
-        protected abstract InstrumentationToken CreateToken();
+        protected abstract InstrumentationToken CreateInstrumentationToken();
     }
 }

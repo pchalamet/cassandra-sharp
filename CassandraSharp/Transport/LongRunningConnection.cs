@@ -350,13 +350,13 @@ namespace CassandraSharp.Transport
 
         private void GetOptions()
         {
-            var obsOptions = new CreateOptionsQuery(this).AsFuture();
+            var obsOptions = new CreateOptionsQuery(this, ConsistencyLevel.ONE, ExecutionFlags.None).AsFuture();
             obsOptions.Wait();
         }
 
         private void ReadifyConnection()
         {
-            var obsReady = new ReadyQuery(this, _config.CqlVersion).AsFuture();
+            var obsReady = new ReadyQuery(this, ConsistencyLevel.ONE, ExecutionFlags.None, _config.CqlVersion).AsFuture();
             bool authenticate = obsReady.Result.Single();
             if (authenticate)
             {
@@ -371,7 +371,7 @@ namespace CassandraSharp.Transport
                 throw new InvalidCredentialException();
             }
 
-            var obsAuth = new AuthenticateQuery(this, _config.User, _config.Password).AsFuture();
+            var obsAuth = new AuthenticateQuery(this, ConsistencyLevel.ONE, ExecutionFlags.None, _config.User, _config.Password).AsFuture();
             if (! obsAuth.Result.Single())
             {
                 throw new InvalidCredentialException();

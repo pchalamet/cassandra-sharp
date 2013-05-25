@@ -13,20 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp.Partitioner
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+    using System.Numerics;
+    using System.Security.Cryptography;
 
-    internal sealed class CommandFactory : ICommandFactory
+    internal class RandomPartitioner : PartitionerBase
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
+        protected override BigInteger? Hash(byte[] buffer, int offset, int len)
         {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
-
-            return new CqlCommand(cluster, factoryIn, factoryOut);
+            HashAlgorithm md5 = new MD5CryptoServiceProvider();
+            byte[] hash = md5.ComputeHash(buffer, offset, len);
+            BigInteger token = new BigInteger(hash);
+            return token;
         }
     }
 }

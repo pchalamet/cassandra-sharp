@@ -13,20 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp.Utils.Collections
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
-
-    internal sealed class CommandFactory : ICommandFactory
+    internal interface IDictionaryInitializer
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
-        {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
+        object Collection { get; }
 
-            return new CqlCommand(cluster, factoryIn, factoryOut);
-        }
+        void Add(object key, object value);
     }
 }

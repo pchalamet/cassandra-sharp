@@ -23,8 +23,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
     internal sealed class PrepareQuery : CqlQuery<Tuple<byte[], IColumnSpec[]>>
     {
-        public PrepareQuery(IConnection connection, string cql)
-                : base(connection, cql, null)
+        public PrepareQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql)
+                : base(connection, consistencyLevel, executionFlags, cql, null)
         {
         }
 
@@ -57,7 +57,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             fw.SetMessageType(MessageOpcodes.Prepare);
         }
 
-        protected override InstrumentationToken CreateToken()
+        protected override InstrumentationToken CreateInstrumentationToken()
         {
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Prepare, ExecutionFlags, CQL);
             return token;

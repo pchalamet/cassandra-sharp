@@ -72,9 +72,11 @@ namespace CassandraSharp.Enlightenment
             IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, _logger,
                                                                                                                   _instrumentation);
 
+            IPartitioner partitioner = ServiceActivator<Partitioner.Factory>.Create<IPartitioner>(clusterConfig.Partitioner);
+            
             // create the cluster now
             ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
-                                                                                  recoveryService);
+                                                                                  recoveryService, partitioner);
 
             IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
                                                                                                                clusterConfig.Endpoints.Discovery,

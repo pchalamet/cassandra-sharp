@@ -115,7 +115,7 @@ namespace CassandraSharp.Transport
 
                 case ErrorCodes.ReadTimeout:
                     {
-                        ConsistencyLevel cl = (ConsistencyLevel)stream.ReadUShort();
+                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadUShort();
                         int received = stream.ReadInt();
                         int blockFor = stream.ReadInt();
                         bool dataPresent = 0 != stream.ReadByte();

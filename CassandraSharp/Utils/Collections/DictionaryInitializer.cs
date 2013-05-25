@@ -13,12 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharp.Utils.Collections
 {
-    internal interface ICollectionInitializer
-    {
-        object Collection { get; }
+    using System.Collections.Generic;
 
-        void Add(object t);
+    internal sealed class DictionaryInitializer<TK, TV> : IDictionaryInitializer
+    {
+        private readonly Dictionary<TK, TV> _collection = new Dictionary<TK, TV>();
+
+        public void Add(object key, object value)
+        {
+            TK tkey = (TK) key;
+            TV vvalue = (TV) value;
+            _collection.Add(tkey, vvalue);
+        }
+
+        public object Collection
+        {
+            get { return _collection; }
+        }
     }
 }

@@ -70,7 +70,7 @@ namespace cqlplus.Commands
                             var bag = BuildPropertyBag(reader);
 
                             ++count;
-                            insertQuery.Execute(bag).WithConsistencyLevel(CL).AsFuture();
+                            insertQuery.Execute(bag).AsFuture();
                         } while (reader.Read());
 
                         Console.WriteLine("{0} record inserted", count);
@@ -105,7 +105,7 @@ namespace cqlplus.Commands
             }
 
             string cqlInsert = string.Format("insert into {0}.{1} ({2}) values ({3})", Keyspace, Table, sbCols, sbJokers);
-            var ccmd = CommandContext.Cluster.CreatePropertyBagCommand();
+            var ccmd = CommandContext.Cluster.CreatePropertyBagCommand().WithConsistencyLevel(CL);
             IPreparedQuery<PropertyBag> insertQuery = ccmd.Prepare(cqlInsert);
             return insertQuery;
         }

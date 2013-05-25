@@ -13,20 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+    using System;
 
-    internal sealed class CommandFactory : ICommandFactory
+    public class PartitionKey
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
+        private PartitionKey(object[] keys)
         {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
+            Keys = keys;
+        }
 
-            return new CqlCommand(cluster, factoryIn, factoryOut);
+        public object[] Keys { get; set; }
+
+        public static PartitionKey From(params object[] keys)
+        {
+            if (null == keys || 0 == keys.Length)
+            {
+                throw new ArgumentException("Keys array must contain at least one element", "keys");
+            }
+
+            return new PartitionKey(keys);
         }
     }
 }

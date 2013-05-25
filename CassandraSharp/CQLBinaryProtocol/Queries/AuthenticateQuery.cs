@@ -26,8 +26,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         private readonly string _user;
 
-        public AuthenticateQuery(IConnection connection, string user, string password)
-                : base(connection)
+        public AuthenticateQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string user, string password)
+                : base(connection, consistencyLevel, executionFlags)
         {
             _user = user;
             _password = password;
@@ -51,7 +51,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             fw.SetMessageType(MessageOpcodes.Credentials);
         }
 
-        protected override InstrumentationToken CreateToken()
+        protected override InstrumentationToken CreateInstrumentationToken()
         {
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Authenticate, ExecutionFlags.None);
             return token;

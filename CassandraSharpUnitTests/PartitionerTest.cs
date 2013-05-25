@@ -13,20 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharpUnitTests
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+    using System;
+    using CassandraSharp;
+    using NUnit.Framework;
 
-    internal sealed class CommandFactory : ICommandFactory
+    [TestFixture]
+    public class PartitionerTest
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
+        [Test]
+        public void CheckBuilder()
         {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
+            PartitionKey key = PartitionKey.From(42, "toto");
+            Assert.IsNotNull(key);
+            Assert.IsNotNull(key.Keys);
+            Assert.AreEqual(new object[] {42, "toto"}, key.Keys);
+        }
 
-            return new CqlCommand(cluster, factoryIn, factoryOut);
+        [Test]
+        public void FailIfEmptyParam()
+        {
+            Assert.Throws<ArgumentException>(() => PartitionKey.From());
+        }
+
+        [Test]
+        public void FailIfNullParam()
+        {
+            Assert.Throws<ArgumentException>(() => PartitionKey.From(null));
         }
     }
 }

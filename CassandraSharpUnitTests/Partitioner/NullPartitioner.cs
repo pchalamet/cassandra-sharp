@@ -13,16 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharpUnitTests.Partitioner
 {
-    using System;
+    using System.Numerics;
+    using CassandraSharp;
+    using CassandraSharp.Extensibility;
+    using CassandraSharp.Partitioner;
+    using NUnit.Framework;
 
-    public interface ICqlQuery<out T> : IObservable<T>
+    [TestFixture]
+    public class NullPartitionerTest
     {
-        ICqlQuery<T> WithConsistencyLevel(ConsistencyLevel cl);
+        [Test]
+        public void CheckNoToken()
+        {
+            IPartitioner partitioner = new NullPartitioner();
 
-        ICqlQuery<T> WithExecutionFlags(ExecutionFlags executionFlags);
+            PartitionKey key = PartitionKey.From(1);
+            BigInteger? token = partitioner.ComputeToken(key);
+            Assert.IsNull(token);
 
-        ICqlQuery<T> WithHint(QueryHint hint);
+            key = PartitionKey.From("toto", 42);
+            token = partitioner.ComputeToken(key);
+            Assert.IsNull(token);
+        }
     }
 }

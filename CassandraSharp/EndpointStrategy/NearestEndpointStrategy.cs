@@ -18,6 +18,7 @@ namespace CassandraSharp.EndpointStrategy
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Numerics;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -46,7 +47,7 @@ namespace CassandraSharp.EndpointStrategy
             _bannedEndpoints = new List<IPAddress>();
         }
 
-        public IPAddress Pick(QueryHint hint)
+        public IPAddress Pick(BigInteger? token)
         {
             lock (_lock)
             {

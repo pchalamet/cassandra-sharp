@@ -96,12 +96,12 @@ namespace CassandraSharpUnitTests.Functional
                 {
                     if (0 == (i % 2))
                     {
-                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}).WithConsistencyLevel(ConsistencyLevel.ONE).AsFuture().Wait();
+                        prepared.Execute(new { bar = "bar" + 1, strid = "1" }).AsFuture().Wait();
                         Assert.IsTrue(false, "Update should have failed");
                     }
                     else
                     {
-                        prepared.Execute(new {bar = "bar" + 1, intid = i, strid = "1"}).WithConsistencyLevel(ConsistencyLevel.ONE).AsFuture().Wait();
+                        prepared.Execute(new {bar = "bar" + 1, intid = i, strid = "1"}).AsFuture().Wait();
                         Console.WriteLine("Update {0} sucessful", i);
                     }
                 }
@@ -166,7 +166,7 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine(" Cassandra-Sharp Driver reproducing stream starvation ");
             Console.WriteLine("============================================================");
 
-            var prepared = cmd.Prepare(insertPerf);
+            var prepared = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertPerf);
             Thread[] failsThreads = new Thread[NUM_THREADS];
 
             for (int i = 0; i < NUM_THREADS; i++)

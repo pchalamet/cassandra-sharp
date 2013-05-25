@@ -28,8 +28,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         private readonly IDataMapper _mapperOut;
 
-        public CqlQuery(IConnection connection, string cql, IDataMapper mapperOut)
-                : base(connection)
+        public CqlQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, IDataMapper mapperOut)
+                : base(connection, consistencyLevel, executionFlags)
         {
             CQL = cql;
             _mapperOut = mapperOut;
@@ -48,7 +48,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             fw.SetMessageType(MessageOpcodes.Query);
         }
 
-        protected override InstrumentationToken CreateToken()
+        protected override InstrumentationToken CreateInstrumentationToken()
         {
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Query, ExecutionFlags, CQL);
             return token;
@@ -150,7 +150,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                     colTable = stream.ReadString();
                 }
                 string colName = stream.ReadString();
-                ColumnType colType = (ColumnType)stream.ReadUShort();
+                ColumnType colType = (ColumnType) stream.ReadUShort();
                 string colCustom = null;
                 ColumnType colKeyType = ColumnType.Custom;
                 ColumnType colValueType = ColumnType.Custom;

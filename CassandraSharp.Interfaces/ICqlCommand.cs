@@ -15,10 +15,10 @@
 
 namespace CassandraSharp
 {
-    public interface ICqlCommand
+    public interface ICqlCommand : IFluentCqlCommand<ICqlCommand>
     {
-        ICqlQuery<T> Execute<T>(string cql, object dataSource = null);
+        IQuery<T> Execute<T>(string cql, object dataSource = null, PartitionKey partitionKey = null);
 
-        IPreparedQuery<T> Prepare<T>(string cql, ExecutionFlags executionFlags = ExecutionFlags.None);
+        IPreparedQuery<T> Prepare<T>(string cql);
     }
 }

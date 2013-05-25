@@ -23,8 +23,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     {
         private readonly string _cqlVersion;
 
-        public ReadyQuery(IConnection connection, string cqlVersion)
-                : base(connection)
+        public ReadyQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cqlVersion)
+                : base(connection, consistencyLevel, executionFlags)
         {
             _cqlVersion = cqlVersion;
         }
@@ -45,7 +45,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             fw.SetMessageType(MessageOpcodes.Startup);
         }
 
-        protected override InstrumentationToken CreateToken()
+        protected override InstrumentationToken CreateInstrumentationToken()
         {
             InstrumentationToken token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
             return token;

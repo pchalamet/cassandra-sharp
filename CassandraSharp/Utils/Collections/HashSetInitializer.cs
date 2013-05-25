@@ -13,20 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp.Utils.Collections
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+    using System.Collections.Generic;
 
-    internal sealed class CommandFactory : ICommandFactory
+    internal sealed class HashSetInitializer<T> : ICollectionInitializer
     {
-        public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)
-        {
-            factoryIn.CheckArgumentNotNull("factoryIn");
-            factoryOut.CheckArgumentNotNull("factoryOut");
+        private readonly HashSet<T> _collection = new HashSet<T>();
 
-            return new CqlCommand(cluster, factoryIn, factoryOut);
+        public void Add(object value)
+        {
+            T t = (T) value;
+            _collection.Add(t);
+        }
+
+        public object Collection
+        {
+            get { return _collection; }
         }
     }
 }

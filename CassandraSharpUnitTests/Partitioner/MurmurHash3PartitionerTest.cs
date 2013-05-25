@@ -13,12 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
+namespace CassandraSharpUnitTests.Partitioner
 {
-    internal interface IDictionaryInitializer
-    {
-        object Collection { get; }
+    using System.Numerics;
+    using CassandraSharp;
+    using CassandraSharp.Extensibility;
+    using CassandraSharp.Partitioner;
+    using NUnit.Framework;
 
-        void Add(object key, object value);
+    [TestFixture]
+    public class MurmurHash3PartitionerTest
+    {
+        [Test]
+        public void CheckRoutingSingleKey()
+        {
+            IPartitioner partitioner = new Murmur3Partitioner();
+            BigInteger? token = partitioner.ComputeToken(PartitionKey.From(0x12345678));
+            Assert.IsTrue(token.HasValue);
+            Assert.IsTrue(token.Value == new BigInteger(-8827056344306985898));
+        }
     }
 }

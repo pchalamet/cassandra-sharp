@@ -6,8 +6,7 @@
     <Rx version="2.1.30214.0" />
 
     <changes>
-        <change id="3.3.0"><![CDATA[
-NOT RELEASED
+        <change id="3.3.0"><![CDATA[NOT RELEASED
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
 - simplified command builder extensions - decoupled builder and mapper
@@ -19,6 +18,13 @@ NOT RELEASED
 - fixed asynchronous worker shutdown in connection
 - default consistency level (see TransportConfig.DefaultConsistencyLevel)
 - log error when recovery fails
+- filtrer invalid rpc address (0.0.0.0) in discovery service SystemPeers
+- moved fluent operations (WithXXX) to ICqlCommand (breaking change)
+- strongly typed ICqlCommand and IPropertyBagCommand to avoid misleading operation calls
+- placement key only available on non prepared statement on Execute()
+- placement key can be construct with PlacementKey.From()
+- IPartitioner is a new interface allowing pluggin custom partitioner (see ClusterConfig.Partitioner)
+- MurmurHash3, Random and Null (default) partitioners are available
 ]]></change>
 
         <change id="3.2.2"><![CDATA[

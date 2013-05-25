@@ -13,17 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp
+namespace CassandraSharp.Partitioner
 {
-    public class QueryHint
+    using System;
+    using System.Collections.Generic;
+    using CassandraSharp.Utils;
+
+    internal sealed class Factory : IServiceDescriptor
     {
-        public QueryHint()
+        private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
+            {
+                    {"Default", typeof(NullPartitioner)},
+                    {"Null", typeof(NullPartitioner)},
+                    {"Random", typeof(RandomPartitioner)},
+                    {"Murmur3", typeof(Murmur3Partitioner)},
+            };
+
+        public IDictionary<string, Type> Definition
         {
-            ReplicationFactor = 1;
+            get { return _def; }
         }
-
-        public object Key { get; set; }
-
-        public int ReplicationFactor { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace Samples.PreparedStatement
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
             const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
-            var preparedInsert = cmd.Prepare(insertBatch);
+            var preparedInsert = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertBatch);
 
             const int times = 10;
 
@@ -65,7 +65,7 @@ namespace Samples.PreparedStatement
 
                 var data = new byte[30000];
                 // var data = (float)random.NextDouble();
-                preparedInsert.Execute(new {id = i, Baz = data}).WithConsistencyLevel(ConsistencyLevel.ONE).AsFuture()
+                preparedInsert.Execute(new {id = i, Baz = data}).AsFuture()
                               .ContinueWith(_ => Interlocked.Decrement(ref _running));
             }
 
