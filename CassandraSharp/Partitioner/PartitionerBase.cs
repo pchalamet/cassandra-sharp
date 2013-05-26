@@ -59,7 +59,7 @@ namespace CassandraSharp.Partitioner
                 }
 
                 byte[] buffer = stream.GetBuffer();
-                return Hash(buffer, 0, (int) stream.Length);
+                return Hash(buffer, 0, length);
             }
         }
 

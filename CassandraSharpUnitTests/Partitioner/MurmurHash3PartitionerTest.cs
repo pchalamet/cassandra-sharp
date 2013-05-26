@@ -25,10 +25,31 @@ namespace CassandraSharpUnitTests.Partitioner
     public class MurmurHash3PartitionerTest
     {
         [Test]
-        public void CheckRoutingSingleKey()
+        public void CheckCompositeKey1()
         {
             IPartitioner partitioner = new Murmur3Partitioner();
-            BigInteger? token = partitioner.ComputeToken(PartitionKey.From(0x12345678));
+            PartitionKey partitionKey = PartitionKey.From(1, 1, 200301);
+            BigInteger? token = partitioner.ComputeToken(partitionKey);
+            Assert.IsTrue(token.HasValue);
+            Assert.IsTrue(token.Value == new BigInteger(470466698873626083));
+        }
+
+        [Test]
+        public void CheckCompositeKey2()
+        {
+            IPartitioner partitioner = new Murmur3Partitioner();
+            PartitionKey partitionKey = PartitionKey.From(18653, 1, 200711);
+            BigInteger? token = partitioner.ComputeToken(partitionKey);
+            Assert.IsTrue(token.HasValue);
+            Assert.IsTrue(token.Value == new BigInteger(-1934257741304192960));
+        }
+
+        [Test]
+        public void CheckSingleKey()
+        {
+            IPartitioner partitioner = new Murmur3Partitioner();
+            PartitionKey partitionKey = PartitionKey.From(0x12345678);
+            BigInteger? token = partitioner.ComputeToken(partitionKey);
             Assert.IsTrue(token.HasValue);
             Assert.IsTrue(token.Value == new BigInteger(-8827056344306985898));
         }
