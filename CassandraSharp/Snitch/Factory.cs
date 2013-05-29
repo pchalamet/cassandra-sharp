@@ -26,6 +26,7 @@ namespace CassandraSharp.Snitch
                     {"Default", typeof(RackInferringSnitch)},
                     {"Simple", typeof(SimpleSnitch)},
                     {"RackInferring", typeof(RackInferringSnitch)},
+                    {"PropertyFile", typeof(PropertyFileSnitch)}
             };
 
         public IDictionary<string, Type> Definition

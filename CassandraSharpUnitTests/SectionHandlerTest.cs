@@ -29,7 +29,7 @@ namespace CassandraSharpUnitTests
 
             Assert.IsNotNull(cassandraSharpConfig);
             Assert.AreEqual("TestClient.Logger4Log4Net, TestClient", cassandraSharpConfig.Logger.Type);
-            Assert.AreEqual(4, cassandraSharpConfig.Clusters.Length);
+            Assert.AreEqual(5, cassandraSharpConfig.Clusters.Length);
             Assert.IsNotNull(cassandraSharpConfig.Clusters[1]);
 //            Assert.IsNotNull(cassandraSharpConfig.Clusters[1].BehaviorConfig);
             Assert.IsNotNull(cassandraSharpConfig.Clusters[1].Endpoints);
@@ -40,6 +40,26 @@ namespace CassandraSharpUnitTests
             //Assert.AreEqual(ConsistencyLevel.ONE, cassandraSharpConfig.Clusters[1].BehaviorConfig.DefaultReadCL);
             //Assert.AreEqual(ConsistencyLevel.QUORUM, cassandraSharpConfig.Clusters[1].BehaviorConfig.DefaultWriteCL);
             //Assert.AreEqual(null, cassandraSharpConfig.Clusters[1].BehaviorConfig.DefaultTTL);
+
+
+            Assert.AreEqual("PropertyFileSnitch", cassandraSharpConfig.Clusters[4].Name);
+            Assert.IsNotNull(cassandraSharpConfig.Clusters[4].Endpoints);
+
+            Assert.IsNotNull(cassandraSharpConfig.Clusters[4].Endpoints.Servers[0]);
+            Assert.IsNotNull(cassandraSharpConfig.Clusters[4].Endpoints.Servers[1]);
+            Assert.IsNotNull(cassandraSharpConfig.Clusters[4].Endpoints.Servers[2]);
+
+            Assert.AreEqual("DC1", cassandraSharpConfig.Clusters[4].Endpoints.Servers[0].DataCentre);
+            Assert.AreEqual("DC2", cassandraSharpConfig.Clusters[4].Endpoints.Servers[1].DataCentre);
+            Assert.AreEqual("DC3", cassandraSharpConfig.Clusters[4].Endpoints.Servers[2].DataCentre);
+
+            Assert.AreEqual("RAC3", cassandraSharpConfig.Clusters[4].Endpoints.Servers[0].Rack);
+            Assert.AreEqual("RAC2", cassandraSharpConfig.Clusters[4].Endpoints.Servers[1].Rack);
+            Assert.AreEqual("RAC1", cassandraSharpConfig.Clusters[4].Endpoints.Servers[2].Rack);
+
+            Assert.AreEqual("127.0.0.1", cassandraSharpConfig.Clusters[4].Endpoints.Servers[0].Server);
+            Assert.AreEqual("127.0.0.10", cassandraSharpConfig.Clusters[4].Endpoints.Servers[1].Server);
+            Assert.AreEqual("127.0.0.100", cassandraSharpConfig.Clusters[4].Endpoints.Servers[2].Server);
         }
     }
 }

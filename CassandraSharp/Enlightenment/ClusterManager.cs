@@ -58,16 +58,21 @@ namespace CassandraSharp.Enlightenment
             IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
-            IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(Network.Find).Where(x => null != x).ToArray();
+            IEnumerable<Tuple<IPAddress,string,string>> endpoints = clusterConfig.Endpoints.Servers
+                .Select(server => Tuple.Create(Network.Find(server.Server), server.DataCentre, server.Rack))
+                .Where(server => null != server.Item1);
+
             if (!endpoints.Any())
             {
                 throw new ArgumentException("Expecting at least one valid endpoint");
             }
 
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, endpoints, _logger);
+            
             // create required services
             IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
-                                                                                                                      endpoints, snitch,
+                                                                                                                      endpoints.Select(server => server.Item1),
+                                                                                                                      snitch,
                                                                                                                       _logger);
             IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, _logger,
                                                                                                                   _instrumentation);

@@ -27,7 +27,7 @@ namespace CassandraSharp.Config
         }
 
         [XmlElement("Server")]
-        public string[] Servers { get; set; }
+        public ServerConfig[] Servers { get; set; }
 
         [XmlAttribute("snitch")]
         public string Snitch { get; set; }
