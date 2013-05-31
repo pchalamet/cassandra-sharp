@@ -76,11 +76,7 @@ namespace cqlplus
                             },
                         Endpoints = new EndpointsConfig
                             {
-                                    Servers = new[] {
-                                        new ServerConfig() {
-                                            Server = _cliArgs.Hostname
-                                        }
-                                    }
+                                    Servers = new[] {_cliArgs.Hostname},
                             }
                 };
             if (! _cliArgs.Discovery)

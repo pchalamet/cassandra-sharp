@@ -8,4 +8,3 @@ cassandra-sharp-interface-version.cs
 bin/
 obj/
 Resharper.DotSettings
-.nuget/packages.config

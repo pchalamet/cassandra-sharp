@@ -70,18 +70,5 @@ namespace CassandraSharpUnitTests.Snitch
             IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>("Simple");
             Assert.IsTrue(snitch is SimpleSnitch);
         }
-
-        [Test]
-        public void TestCreatePropertyFile()
-        {
-            var endpoints = new List<Tuple<IPAddress, string, string>>()
-                {
-                    Tuple.Create(IPAddress.Loopback, "DC1", "RAC1"),
-                    Tuple.Create(IPAddress.Parse("1.2.3.4"), "DC1", "RAC2"),
-                    Tuple.Create(IPAddress.Parse("2.3.4.5"), "DC2", "RAC1")
-                };
-            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>("PropertyFile", endpoints);
-            Assert.IsTrue(snitch is PropertyFileSnitch);
-        }
     }
 }
