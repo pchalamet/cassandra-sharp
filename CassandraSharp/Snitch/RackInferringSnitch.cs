@@ -36,6 +36,11 @@ namespace CassandraSharp.Snitch
             return dc;
         }
 
+        public bool IsPrimaryDatacenter(IPAddress endpoint)
+        {
+            return true;
+        }
+
         public List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress)
         {
             List<IPAddress> sortedAddress = new List<IPAddress>(unsortedAddress);
@@ -86,6 +91,13 @@ namespace CassandraSharp.Snitch
             }
 
             return 0;
+        }
+
+
+        public void Update(NotificationKind kind, Peer peer)
+        {
+            //nothing to do
+            return;
         }
     }
 }

@@ -47,6 +47,17 @@ namespace CassandraSharpUnitTests.Snitch
             {
                 throw new NotImplementedException();
             }
+
+            public void Update(NotificationKind kind, Peer peer)
+            {
+                throw new NotImplementedException();
+            }
+
+
+            public bool IsPrimaryDatacenter(IPAddress endpoint)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [Test]
@@ -69,6 +80,13 @@ namespace CassandraSharpUnitTests.Snitch
         {
             IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>("Simple");
             Assert.IsTrue(snitch is SimpleSnitch);
+        }
+
+        [Test]
+        public void TestCreateDiscovery()
+        {
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>("Discovery");
+            Assert.IsTrue(snitch is DiscoverySnitch);
         }
     }
 }

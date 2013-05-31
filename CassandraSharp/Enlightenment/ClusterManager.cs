@@ -58,7 +58,7 @@ namespace CassandraSharp.Enlightenment
             IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
 
             // create endpoints
-            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
+            IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, clusterConfig.Endpoints.PrimaryDataCenter, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(Network.Find).Where(x => null != x).ToArray();
             if (!endpoints.Any())
             {
@@ -82,7 +82,10 @@ namespace CassandraSharp.Enlightenment
                                                                                                                clusterConfig.Endpoints.Discovery,
                                                                                                                _logger,
                                                                                                                cluster);
+            //must be called in this order for failover endpoint update sanity
+            discoveryService.OnTopologyUpdate += snitch.Update;
             discoveryService.OnTopologyUpdate += endpointsManager.Update;
+            
             cluster.OnClosed += discoveryService.SafeDispose;
 
             return cluster;

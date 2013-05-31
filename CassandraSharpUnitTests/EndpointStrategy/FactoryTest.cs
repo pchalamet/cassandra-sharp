@@ -96,5 +96,35 @@ namespace CassandraSharpUnitTests.EndpointStrategy
                                                                                                                                      new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is RandomEndpointStrategy);
         }
+
+        [Test]
+        public void TestCreateRoundRobin()
+        {
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("RoundRobin",
+                                                                                                                                     Enumerable.Empty<IPAddress>
+                                                                                                                                             (),
+                                                                                                                                     new SimpleSnitch());
+            Assert.IsTrue(endpointStrategy is RoundRobinEndpointStrategy);
+        }
+
+        [Test]
+        public void TestCreateRoundRobinFailover()
+        {
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("RoundRobinFailover",
+                                                                                                                                     Enumerable.Empty<IPAddress>
+                                                                                                                                             (),
+                                                                                                                                     new SimpleSnitch());
+            Assert.IsTrue(endpointStrategy is RoundRobinFailoverEndpointStrategy);
+        }
+
+        [Test]
+        public void TestCreateTokenRing()
+        {
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("TokenRing",
+                                                                                                                                     Enumerable.Empty<IPAddress>
+                                                                                                                                             (),
+                                                                                                                                     new SimpleSnitch());
+            Assert.IsTrue(endpointStrategy is TokenRingEndpointStrategy);
+        }
     }
 }

@@ -32,6 +32,9 @@ namespace CassandraSharp.Config
         [XmlAttribute("snitch")]
         public string Snitch { get; set; }
 
+        [XmlAttribute("primarydc")]
+        public string PrimaryDataCenter { get; set; }
+
         [XmlAttribute("strategy")]
         public string Strategy { get; set; }
 

@@ -27,6 +27,7 @@ namespace CassandraSharp.EndpointStrategy
                     {"Random", typeof(RandomEndpointStrategy)},
                     {"Nearest", typeof(NearestEndpointStrategy)},
                     {"RoundRobin", typeof(RoundRobinEndpointStrategy)},
+                    {"RoundRobinFailover", typeof(RoundRobinFailoverEndpointStrategy)},
                     {"TokenRing", typeof(TokenRingEndpointStrategy)},
             };
 

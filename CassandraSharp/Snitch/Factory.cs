@@ -23,9 +23,10 @@ namespace CassandraSharp.Snitch
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
             {
-                    {"Default", typeof(RackInferringSnitch)},
+                    {"Default", typeof(DiscoverySnitch)},
                     {"Simple", typeof(SimpleSnitch)},
                     {"RackInferring", typeof(RackInferringSnitch)},
+                    {"Discovery", typeof(DiscoverySnitch)},
             };
 
         public IDictionary<string, Type> Definition

@@ -23,15 +23,15 @@ namespace CassandraSharp.EndpointStrategy
     /// <summary>
     ///     Will loop through nodes to perfectly evenly spread load.
     /// </summary>
-    internal sealed class RoundRobinEndpointStrategy : IEndpointStrategy
+    internal class RoundRobinEndpointStrategy : IEndpointStrategy
     {
-        private readonly List<IPAddress> _bannedEndpoints;
+        protected List<IPAddress> _bannedEndpoints;
 
-        private readonly List<IPAddress> _healthyEndpoints;
+        protected List<IPAddress> _healthyEndpoints;
 
-        private readonly object _lock = new object();
+        protected readonly object _lock = new object();
 
-        private int _nextCandidate;
+        protected int _nextCandidate;
 
         public RoundRobinEndpointStrategy(IEnumerable<IPAddress> endpoints)
         {
@@ -40,7 +40,7 @@ namespace CassandraSharp.EndpointStrategy
             _nextCandidate = 0;
         }
 
-        public void Ban(IPAddress endpoint)
+        virtual public void Ban(IPAddress endpoint)
         {
             lock (_lock)
             {
@@ -51,7 +51,7 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-        public void Permit(IPAddress endpoint)
+        virtual public void Permit(IPAddress endpoint)
         {
             lock (_lock)
             {
@@ -77,7 +77,7 @@ namespace CassandraSharp.EndpointStrategy
             }
         }
 
-        public void Update(NotificationKind kind, Peer peer)
+        virtual public void Update(NotificationKind kind, Peer peer)
         {
             lock (_lock)
             {
@@ -95,6 +95,10 @@ namespace CassandraSharp.EndpointStrategy
                         if (_healthyEndpoints.Contains(endpoint))
                         {
                             _healthyEndpoints.Remove(endpoint);
+                        }
+                        else if (_bannedEndpoints.Contains(endpoint))
+                        {
+                            _bannedEndpoints.Remove(endpoint);
                         }
                         break;
                 }
