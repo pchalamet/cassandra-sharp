@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Config
 {
+    using System.Xml;
     using System.Xml.Serialization;
 
     public class EndpointsConfig
@@ -37,5 +38,8 @@ namespace CassandraSharp.Config
 
         [XmlElement("Discovery")]
         public DiscoveryConfig Discovery { get; set; }
+
+        [XmlAnyAttribute]
+        public XmlAttribute[] Extensions { get; set; }
     }
 }

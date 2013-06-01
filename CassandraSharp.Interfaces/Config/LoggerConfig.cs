@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Config
 {
+    using System.Xml;
     using System.Xml.Serialization;
 
     [XmlRoot("LoggerConfig")]
@@ -27,5 +28,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("type")]
         public string Type { get; set; }
+
+        [XmlAnyAttribute]
+        public XmlAttribute[] Extensions { get; set; }
     }
 }

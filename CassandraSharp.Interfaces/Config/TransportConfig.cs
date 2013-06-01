@@ -15,15 +15,16 @@
 
 namespace CassandraSharp.Config
 {
+    using System.Xml;
     using System.Xml.Serialization;
 
     public class TransportConfig
     {
         [XmlAttribute("keepAlive")]
-        public bool KeepAlive;
+        public bool KeepAlive { get; set; }
 
         [XmlAttribute("keepAliveTime")]
-        public int KeepAliveTime;
+        public int KeepAliveTime { get; set; }
 
         public TransportConfig()
         {
@@ -65,5 +66,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("execFlags")]
         public ExecutionFlags DefaultExecutionFlags { get; set; }
+
+        [XmlAnyAttribute]
+        public XmlAttribute[] Extensions { get; set; }
     }
 }

@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Config
 {
+    using System.Xml;
     using System.Xml.Serialization;
 
     [XmlRoot("ClusterConfig")]
@@ -40,5 +41,8 @@ namespace CassandraSharp.Config
 
         [XmlElement("Transport")]
         public TransportConfig Transport { get; set; }
+
+        [XmlAnyAttribute]
+        public XmlAttribute[] Extensions { get; set; }
     }
 }

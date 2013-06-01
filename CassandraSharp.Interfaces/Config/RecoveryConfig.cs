@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Config
 {
+    using System.Xml;
     using System.Xml.Serialization;
 
     [XmlRoot("Recovery")]
@@ -31,5 +32,8 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("interval")]
         public int Interval { get; set; }
+
+        [XmlAnyAttribute]
+        public XmlAttribute[] Extensions { get; set; }
     }
 }
