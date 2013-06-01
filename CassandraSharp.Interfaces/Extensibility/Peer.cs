@@ -22,6 +22,10 @@ namespace CassandraSharp.Extensibility
     {
         public IPAddress RpcAddress { get; internal set; }
 
+        public string Datacenter { get; internal set; }
+
+        public string Rack { get; internal set; }
+
         public BigInteger[] Tokens { get; internal set; }
     }
 }

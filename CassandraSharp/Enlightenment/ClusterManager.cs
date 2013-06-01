@@ -68,7 +68,7 @@ namespace CassandraSharp.Enlightenment
             // create required services
             IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
                                                                                                                       endpoints, snitch,
-                                                                                                                      _logger);
+                                                                                                                      _logger, clusterConfig.Endpoints);
             IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, _logger,
                                                                                                                   _instrumentation);
 
@@ -76,7 +76,7 @@ namespace CassandraSharp.Enlightenment
             
             // create the cluster now
             ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
-                                                                                  recoveryService, partitioner);
+                                                                                  recoveryService, partitioner, clusterConfig);
 
             IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
                                                                                                                clusterConfig.Endpoints.Discovery,
