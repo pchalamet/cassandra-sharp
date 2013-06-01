@@ -24,8 +24,12 @@ namespace CassandraSharp.Extensibility
 
         string GetDatacenter(IPAddress endpoint);
 
+        bool IsPrimaryDatacenter(IPAddress endpoint);
+
         List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress);
 
         int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2);
+
+        void Update(NotificationKind kind, Peer peer);
     }
 }
