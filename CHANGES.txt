@@ -17,7 +17,7 @@
 - placement key can be construct with PlacementKey.From()
 - IPartitioner is a new interface allowing pluggin custom partitioner (see ClusterConfig.Partitioner)
 - MurmurHash3, Random and Null (default) partitioners are available
-- Extensions attributes in configuration
+- fixed utf8 string deserialization
 
 version 3.2.2
 - fixed issue 49 (https://github.com/pchalamet/cassandra-sharp/issues/49)
