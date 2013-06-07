@@ -46,6 +46,7 @@ namespace CassandraSharp.Utils
     // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     // OTHER DEALINGS IN THE SOFTWARE.
 
+
     /// <summary>
     ///     A class for managing a weak event.
     /// </summary>
@@ -84,7 +85,7 @@ namespace CassandraSharp.Utils
         {
             if (eh != null)
             {
-                Delegate d = (Delegate) (object) eh;
+                Delegate d = (Delegate)(object)eh;
                 if (eventEntries.Count == eventEntries.Capacity)
                 {
                     RemoveDeadEntries();
@@ -100,14 +101,14 @@ namespace CassandraSharp.Utils
 
         private void RemoveDeadEntries()
         {
-            eventEntries.RemoveAll(ee => ee.TargetReference != null && !ee.TargetReference.IsAlive);
+            eventEntries.RemoveAll(ee => !ee.TargetReference.IsAlive);
         }
 
         public void Remove(T eh)
         {
             if (eh != null)
             {
-                Delegate d = (Delegate) (object) eh;
+                Delegate d = (Delegate)(object)eh;
                 object targetInstance = d.Target;
                 MethodInfo targetMethod = d.Method;
                 for (int i = eventEntries.Count - 1; i >= 0; i--)
