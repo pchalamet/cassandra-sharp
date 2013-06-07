@@ -67,6 +67,7 @@ namespace CassandraSharp.Transport
                     _availableStreamIds.Push(streamId);
                 }
 
+                _onFailure = new FastSmartWeakEvent<EventHandler<FailureEventArgs>>();
                 _config = config;
                 _logger = logger;
                 _instrumentation = instrumentation;
@@ -116,7 +117,20 @@ namespace CassandraSharp.Transport
 
         public ExecutionFlags DefaultExecutionFlags { get; private set; }
 
-        public event EventHandler<FailureEventArgs> OnFailure;
+        private FastSmartWeakEvent<EventHandler<FailureEventArgs>> _onFailure;
+
+        public event EventHandler<FailureEventArgs> OnFailure
+        {
+            add
+            {
+                _onFailure.Add(value);
+            }
+
+            remove
+            {
+                _onFailure.Remove(value);
+            }
+        }
 
         public void Execute<T>(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<T>> reader, InstrumentationToken token,
                                IObserver<T> observer)
@@ -186,13 +200,13 @@ namespace CassandraSharp.Transport
             // we have now the guarantee this instance is destroyed once
             _tcpClient.SafeDispose();
 
-            if (null != ex && null != OnFailure)
+            if (null != ex && null != _onFailure)
             {
                 _logger.Fatal("Failed with error : {0}", ex);
 
                 FailureEventArgs failureEventArgs = new FailureEventArgs(null);
-                OnFailure(this, failureEventArgs);
-                OnFailure = null;
+                _onFailure.Raise(this, failureEventArgs);
+                _onFailure = null;
             }
 
             // wait for worker threads to gracefully shutdown
