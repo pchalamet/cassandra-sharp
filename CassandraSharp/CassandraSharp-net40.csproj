@@ -22,7 +22,7 @@
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)\bin\net40\Debug\</OutputPath>
     <BaseIntermediateOutputPath>$(SolutionDir)\obj\net40\Debug\</BaseIntermediateOutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,7 +31,7 @@
     <Optimize>true</Optimize>
     <OutputPath>$(SolutionDir)\bin\net40\Release\</OutputPath>
     <BaseIntermediateOutputPath>$(SolutionDir)\obj\net40\Release\</BaseIntermediateOutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

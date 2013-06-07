@@ -19,10 +19,13 @@ namespace CassandraSharp.CQLBinaryProtocol
     using System.Linq;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.Utils;
 
     internal sealed class PreparedQuery<T> : IPreparedQuery<T>
     {
         private readonly ICluster _cluster;
+
+        private readonly WeakReference<IConnection> _connection;
 
         private readonly ConsistencyLevel? _consistencyLevel;
 
@@ -38,8 +41,6 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private IColumnSpec[] _columnSpecs;
 
-        private volatile IConnection _connection;
-
         private byte[] _id;
 
         public PreparedQuery(ICluster cluster, ConsistencyLevel? consistencyLevel, ExecutionFlags? executionFlags, IDataMapperFactory factoryIn,
@@ -51,6 +52,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             _factoryIn = factoryIn;
             _factoryOut = factoryOut;
             _cql = cql;
+            _connection = new WeakReference<IConnection>(null);
         }
 
         public IQuery<T> Execute(object dataSource)
@@ -58,11 +60,11 @@ namespace CassandraSharp.CQLBinaryProtocol
             ConsistencyLevel cl;
             ExecutionFlags executionFlags;
             IConnection connection;
-            if (null == (connection = _connection))
+            if (!_connection.TryGetTarget(out connection))
             {
                 lock (_lock)
                 {
-                    if (null == (connection = _connection))
+                    if (!_connection.TryGetTarget(out connection))
                     {
                         connection = _cluster.GetConnection();
                         connection.OnFailure += ConnectionOnOnFailure;
@@ -76,7 +78,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                         _id = preparedInfo.Item1;
                         _columnSpecs = preparedInfo.Item2;
-                        _connection = connection;
+                        _connection.SetTarget(connection);
                     }
                 }
             }
@@ -91,7 +93,7 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
         {
-            _connection = null;
+            _connection.SetTarget(null);
         }
     }
 }
