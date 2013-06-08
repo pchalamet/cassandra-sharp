@@ -90,7 +90,7 @@ namespace CassandraSharp.Utils.Stream
             return buffer;
         }
 
-        public static string ToString(this byte[] buffer)
+        public static string ToUtf8String(this byte[] buffer)
         {
             string data = Encoding.UTF8.GetString(buffer);
             return data;

@@ -225,7 +225,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 case ColumnType.Ascii:
                 case ColumnType.Text:
                 case ColumnType.Varchar:
-                    data = Encoding.ASCII.GetString(rawData);
+                    data = rawData.ToUtf8String();
                     break;
 
                 case ColumnType.Blob:
