@@ -101,7 +101,7 @@ namespace CassandraSharp.Utils
 
         private void RemoveDeadEntries()
         {
-            eventEntries.RemoveAll(ee => !ee.TargetReference.IsAlive);
+            eventEntries.RemoveAll(ee => ee.TargetReference != null && !ee.TargetReference.IsAlive);
         }
 
         public void Remove(T eh)
