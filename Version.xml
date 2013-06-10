@@ -27,6 +27,7 @@
 - MurmurHash3, Random and Null (default) partitioners are available
 - fixed utf8 string deserialization
 - fixed issue 59 (https://github.com/pchalamet/cassandra-sharp/issues/59) - release of prepared query is now possible
+- Prepared queries are now disposable
 ]]></change>
 
         <change id="3.2.2"><![CDATA[

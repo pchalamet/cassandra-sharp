@@ -90,8 +90,23 @@ namespace CassandraSharp.CQLBinaryProtocol
             return futQuery;
         }
 
+        public void Dispose()
+        {
+            IConnection connection = _connection;
+            if (null != connection)
+            {
+                connection.OnFailure -= ConnectionOnOnFailure;
+            }
+        }
+
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
         {
+            IConnection connection = _connection;
+            if (null != connection)
+            {
+                connection.OnFailure -= ConnectionOnOnFailure;
+            }
+
             _connection = null;
         }
     }

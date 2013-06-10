@@ -15,7 +15,9 @@
 
 namespace CassandraSharp
 {
-    public interface IPreparedQuery<out T>
+    using System;
+
+    public interface IPreparedQuery<out T> : IDisposable
     {
         IQuery<T> Execute(object dataSource);
     }
