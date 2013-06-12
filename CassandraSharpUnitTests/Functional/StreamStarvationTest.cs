@@ -96,7 +96,7 @@ namespace CassandraSharpUnitTests.Functional
                 {
                     if (0 == (i % 2))
                     {
-                        prepared.Execute(new { bar = "bar" + 1, strid = "1" }).AsFuture().Wait();
+                        prepared.Execute(new {bar = "bar" + 1, strid = "1"}).AsFuture().Wait();
                         Assert.IsTrue(false, "Update should have failed");
                     }
                     else
@@ -166,19 +166,21 @@ namespace CassandraSharpUnitTests.Functional
             Console.WriteLine(" Cassandra-Sharp Driver reproducing stream starvation ");
             Console.WriteLine("============================================================");
 
-            var prepared = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertPerf);
-            Thread[] failsThreads = new Thread[NUM_THREADS];
-
-            for (int i = 0; i < NUM_THREADS; i++)
+            using (var prepared = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertPerf))
             {
-                failsThreads[i] = new Thread(() => FailingThread(prepared));
-                failsThreads[i].Start();
-                //Thread.Sleep(5000);
-            }
+                Thread[] failsThreads = new Thread[NUM_THREADS];
 
-            foreach (Thread thread in failsThreads)
-            {
-                thread.Join();
+                for (int i = 0; i < NUM_THREADS; i++)
+                {
+                    failsThreads[i] = new Thread(() => FailingThread(prepared));
+                    failsThreads[i].Start();
+                    //Thread.Sleep(5000);
+                }
+
+                foreach (Thread thread in failsThreads)
+                {
+                    thread.Join();
+                }
             }
 
             ClusterManager.Shutdown();

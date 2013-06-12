@@ -103,13 +103,14 @@ namespace CassandraSharpUnitTests.Performance
                 Console.WriteLine();
                 Console.WriteLine();
 
-                var preparedQuery = cmd.Prepare("insert into Tests.tbl (x, y) values (?, ?)");
+                using (var preparedQuery = cmd.Prepare("insert into Tests.tbl (x, y) values (?, ?)"))
+                {
+                    time1423 = InsertData(new string('x', 1423), preparedQuery);
+                    Console.WriteLine();
 
-                time1423 = InsertData(new string('x', 1423), preparedQuery);
-                Console.WriteLine();
-
-                time1424 = InsertData(new string('x', 1424), preparedQuery);
-                Console.WriteLine();
+                    time1424 = InsertData(new string('x', 1424), preparedQuery);
+                    Console.WriteLine();
+                }
 
                 Console.WriteLine("============================================================");
                 Console.WriteLine(dropFoo);

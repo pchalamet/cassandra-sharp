@@ -57,6 +57,11 @@ namespace CassandraSharpUnitTests.Performance
 
         public override void Dispose()
         {
+            if (null != _prepared)
+            {
+                _prepared.Dispose();
+            }
+
             _cluster.Dispose();
             ClusterManager.Shutdown();
         }

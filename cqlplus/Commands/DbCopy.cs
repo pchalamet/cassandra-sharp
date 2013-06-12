@@ -61,19 +61,20 @@ namespace cqlplus.Commands
                         }
 
                         // create the insert query first
-                        var insertQuery = BuildInsertQuery(reader);
-
-                        // iterate on records
-                        int count = 0;
-                        do
+                        using (var insertQuery = BuildInsertQuery(reader))
                         {
-                            var bag = BuildPropertyBag(reader);
+                            // iterate on records
+                            int count = 0;
+                            do
+                            {
+                                var bag = BuildPropertyBag(reader);
 
-                            ++count;
-                            insertQuery.Execute(bag).AsFuture();
-                        } while (reader.Read());
+                                ++count;
+                                insertQuery.Execute(bag).AsFuture();
+                            } while (reader.Read());
 
-                        Console.WriteLine("{0} record inserted", count);
+                            Console.WriteLine("{0} record inserted", count);
+                        }
                     }
                 }
             }
