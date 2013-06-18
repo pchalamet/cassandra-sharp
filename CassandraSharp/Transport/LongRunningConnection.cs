@@ -26,6 +26,7 @@ namespace CassandraSharp.Transport
     using System.Threading.Tasks;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Config;
+    using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 
@@ -270,7 +271,8 @@ namespace CassandraSharp.Transport
                 catch (Exception ex)
                 {
                     queryInfo.NotifyError(ex);
-                    if (ex is SocketException || ex is IOException)
+
+                    if (IsStreamInBadState(ex))
                     {
                         throw;
                     }
@@ -314,19 +316,18 @@ namespace CassandraSharp.Transport
                     _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
                     try
                     {
-                        if (null == frameReader.ResponseException)
+                        if (null != frameReader.ResponseException)
                         {
-                            queryInfo.Push(frameReader);
+                            throw frameReader.ResponseException;
                         }
-                        else
-                        {
-                            queryInfo.NotifyError(frameReader.ResponseException);
-                        }
+
+                        queryInfo.Push(frameReader);
                     }
                     catch (Exception ex)
                     {
                         queryInfo.NotifyError(ex);
-                        if (ex is SocketException || ex is IOException)
+
+                        if (IsStreamInBadState(ex))
                         {
                             throw;
                         }
@@ -341,6 +342,12 @@ namespace CassandraSharp.Transport
                     }
                 }
             }
+        }
+
+        private bool IsStreamInBadState(Exception ex)
+        {
+            bool isFatal = ex is SocketException || ex is IOException || ex is TimeOutException;
+            return isFatal;
         }
 
         private void HandleError(Exception ex)
