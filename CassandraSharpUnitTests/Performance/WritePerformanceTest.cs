@@ -19,6 +19,7 @@ namespace CassandraSharpUnitTests.Performance
     using System.Diagnostics;
     using System.IO;
     using System.Text;
+    using System.Threading;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;
 
@@ -27,7 +28,7 @@ namespace CassandraSharpUnitTests.Performance
     {
         public const int NUM_ROUND = 5;
 
-        public const int NUM_WRITES_PER_ROUND = 10000;
+        public const int NUM_WRITES_PER_ROUND = 1000;
 
         private static void RunWritePerformanceSingleThread<TP>() where TP : ProtocolWrapper, new()
         {
@@ -62,38 +63,42 @@ namespace CassandraSharpUnitTests.Performance
 
                 PerformanceInstrumentation.Initialize();
 
-                ExecuteStressTest(protocol);
+                long totalTime = ExecuteStressTest(protocol);
 
-                ExportTracingInfo(protocol);
+                ExportTracingInfo(protocol, totalTime);
 
                 protocol.Query(dropKeyspace);
             }
         }
 
-        private static void ExecuteStressTest(ProtocolWrapper protocol)
+        private static long ExecuteStressTest(ProtocolWrapper protocol)
         {
+            var timer = new Stopwatch();
+
             int n = 0;
             while (n < NUM_ROUND)
             {
-                var timer = new Stopwatch();
-                timer.Start();
-
                 for (int i = 0; i < NUM_WRITES_PER_ROUND; ++i)
                 {
                     int key = n * NUM_WRITES_PER_ROUND + i;
                     object[] prms = new object[] { key, key.ToString("X") };
+                    timer.Start();
                     protocol.Execute(prms);
+                    timer.Stop();
+
+                    Thread.Sleep(10);
                 }
 
-                timer.Stop();
                 double rate = (1000.0 * NUM_WRITES_PER_ROUND) / timer.ElapsedMilliseconds;
 
                 Console.WriteLine("[{0} Time: {1} ms (rate: {2})", protocol.Name, timer.ElapsedMilliseconds, rate);
                 ++n;
             }
+
+            return timer.ElapsedMilliseconds;
         }
 
-        private static void ExportTracingInfo(ProtocolWrapper protocol)
+        private static void ExportTracingInfo(ProtocolWrapper protocol, long totalTime)
         {
             Console.WriteLine("Exporting performance for {0}", protocol.Name);
             Guid guid = Guid.NewGuid();
@@ -103,12 +108,13 @@ namespace CassandraSharpUnitTests.Performance
                 txtWriter.WriteLine("SessionId,Activity,EventId,Source,SourceElapsed,Stage,Thread");
 
                 int count = 0;
+                StringBuilder sb;
                 foreach (Guid tracingId in PerformanceInstrumentation.TracingIds)
                 {
                     Console.WriteLine("Query tracing info {0}", tracingId);
                     var tracingSession = protocol.QueryTracingInfo(tracingId);
 
-                    StringBuilder sb = new StringBuilder();
+                    sb = new StringBuilder();
                     foreach (TracingEvent te in tracingSession.TracingEvents)
                     {
                         sb.AppendFormat("{0},\"{1}\",{2},{3},{4},{5},{6}", tracingSession.SessionId, te.Activity, te.EventId, te.Source,
@@ -120,6 +126,24 @@ namespace CassandraSharpUnitTests.Performance
                     txtWriter.Write(sb);
                     ++count;
                 }
+                sb = new StringBuilder();
+
+                sb.AppendFormat("{0},\"{1}\",{2},{3},{4},{5},{6}", Guid.Empty, "Write elapsed", Guid.Empty, "",
+                                PerformanceInstrumentation.TotalWrite,
+                                "ClientWrite", 0);
+                sb.AppendLine();
+
+                sb.AppendFormat("{0},\"{1}\",{2},{3},{4},{5},{6}", Guid.Empty, "Read elapsed", Guid.Empty, "",
+                                PerformanceInstrumentation.TotalRead,
+                                "ClientRead", 0);
+                sb.AppendLine();
+
+                sb.AppendFormat("{0},\"{1}\",{2},{3},{4},{5},{6}", Guid.Empty, "Total elapsed", Guid.Empty, "",
+                                totalTime,
+                                "ClientElapsed", 0);
+
+                sb.AppendLine();
+                txtWriter.Write(sb);
             }
         }
 

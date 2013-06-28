@@ -17,6 +17,7 @@ namespace CassandraSharpUnitTests.Performance
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Net;
     using CassandraSharp.Extensibility;
 
@@ -25,6 +26,20 @@ namespace CassandraSharpUnitTests.Performance
         private static readonly object _lock = new object();
 
         private static readonly List<Guid> _tracingIds = new List<Guid>();
+
+        private static Stopwatch _readWatch = new Stopwatch();
+
+        private static Stopwatch _writeWatch = new Stopwatch();
+
+        public static long TotalRead
+        {
+            get { return _readWatch.ElapsedMilliseconds; }
+        }
+
+        public static long TotalWrite
+        {
+            get { return _writeWatch.ElapsedMilliseconds; }
+        }
 
         public static List<Guid> TracingIds
         {
@@ -41,6 +56,24 @@ namespace CassandraSharpUnitTests.Performance
 
         public void ClientTrace(InstrumentationToken token, EventType eventType)
         {
+            switch (eventType)
+            {
+                case EventType.BeginRead:
+                    _readWatch.Start();
+                    break;
+
+                case EventType.EndRead:
+                    _readWatch.Stop();
+                    break;
+
+                case EventType.BeginWrite:
+                    _writeWatch.Start();
+                    break;
+
+                case EventType.EndWrite:
+                    _writeWatch.Stop();
+                    break;
+            }
         }
 
         public void ServerTrace(InstrumentationToken token, Guid traceId)
@@ -58,6 +91,8 @@ namespace CassandraSharpUnitTests.Performance
         public static void Initialize()
         {
             _tracingIds.Clear();
+            _writeWatch = new Stopwatch();
+            _readWatch = new Stopwatch();
         }
     }
 }

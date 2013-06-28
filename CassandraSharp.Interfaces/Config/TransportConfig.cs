@@ -20,12 +20,6 @@ namespace CassandraSharp.Config
 
     public class TransportConfig
     {
-        [XmlAttribute("keepAlive")]
-        public bool KeepAlive { get; set; }
-
-        [XmlAttribute("keepAliveTime")]
-        public int KeepAliveTime { get; set; }
-
         public TransportConfig()
         {
             Type = "Default";
@@ -36,6 +30,12 @@ namespace CassandraSharp.Config
             DefaultExecutionFlags = ExecutionFlags.None;
             KeepAlive = true;
         }
+
+        [XmlAttribute("keepAlive")]
+        public bool KeepAlive { get; set; }
+
+        [XmlAttribute("keepAliveTime")]
+        public int KeepAliveTime { get; set; }
 
         [XmlAttribute("port")]
         public int Port { get; set; }
