@@ -1,4 +1,4 @@
-﻿version 3.3.0NOT RELEASED
+﻿version 3.3.0
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
 - simplified command builder extensions - decoupled builder and mapper
