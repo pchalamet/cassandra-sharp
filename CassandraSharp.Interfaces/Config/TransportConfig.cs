@@ -29,6 +29,7 @@ namespace CassandraSharp.Config
             DefaultConsistencyLevel = ConsistencyLevel.QUORUM;
             DefaultExecutionFlags = ExecutionFlags.None;
             KeepAlive = true;
+            ReceiveBuffering = true;
         }
 
         [XmlAttribute("keepAlive")]
@@ -60,6 +61,9 @@ namespace CassandraSharp.Config
 
         [XmlAttribute("cqlver")]
         public string CqlVersion { get; set; }
+
+        [XmlAttribute("rcvBuffering")]
+        public bool ReceiveBuffering { get; set; }
 
         [XmlAttribute("cl")]
         public ConsistencyLevel DefaultConsistencyLevel { get; set; }

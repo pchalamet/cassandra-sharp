@@ -60,7 +60,9 @@ namespace CassandraSharp.Transport
                     TraceId = _tempBuffer.ToGuid();
                 }
 
-                ReadOnlyStream = new SocketReadOnlyStream(socket, frameBytesLeft);
+// ReSharper disable DoNotCallOverridableMethodsInConstructor
+                ReadOnlyStream = CreateStream(socket, frameBytesLeft);
+// ReSharper restore DoNotCallOverridableMethodsInConstructor
 
                 if (MessageOpcodes.Error == MessageOpcode)
                 {
@@ -72,6 +74,11 @@ namespace CassandraSharp.Transport
                 Dispose();
                 throw;
             }
+        }
+
+        protected virtual Stream CreateStream(Socket socket, int frameBytesLeft)
+        {
+            return new SocketReadOnlyStream(socket, frameBytesLeft);
         }
 
         public void Dispose()
@@ -87,7 +94,7 @@ namespace CassandraSharp.Transport
 
         public Exception ResponseException { get; private set; }
 
-        public Stream ReadOnlyStream { get; private set; }
+        public Stream ReadOnlyStream { get; protected set; }
 
         private static Exception CreateExceptionFromError(Stream stream)
         {

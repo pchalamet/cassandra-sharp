@@ -292,11 +292,21 @@ namespace CassandraSharp.Transport
             }
         }
 
+        private IFrameReader CreateFrameReader(Socket socket)
+        {
+            if (_config.ReceiveBuffering)
+            {
+                return new BufferingFrameReader(socket);
+            }
+
+            return new StreamingFrameReader(socket);
+        }
+
         private void ReadResponse()
         {
             while (true)
             {
-                using (IFrameReader frameReader = new StreamingFrameReader(_socket))
+                using (IFrameReader frameReader = CreateFrameReader(_socket))
                 {
                     byte streamId = frameReader.StreamId;
                     QueryInfo queryInfo;

@@ -6,6 +6,10 @@
     <Rx version="2.1.30214.0" />
 
     <changes>
+		<change id="3.3.1"><![CDATA[
+- fixed issue 62 (https://github.com/pchalamet/cassandra-sharp/issues/62)
+]]></change>
+	
         <change id="3.3.0"><![CDATA[
 - removed obsolete operations (fluent interface is the way to go)
 - log connection building error, avoid GC TcpClient if building goes bad
