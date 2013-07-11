@@ -1,5 +1,6 @@
 ﻿version 3.3.1
 - fixed issue 62 (https://github.com/pchalamet/cassandra-sharp/issues/62)
+- allow asynchronous push of results when buffered reads are enabled (related to issue 62)
 
 version 3.3.0
 - removed obsolete operations (fluent interface is the way to go)

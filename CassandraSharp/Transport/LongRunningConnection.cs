@@ -47,6 +47,8 @@ namespace CassandraSharp.Transport
 
         private readonly Queue<QueryInfo> _pendingQueries = new Queue<QueryInfo>();
 
+        private readonly Action<QueryInfo, IFrameReader, bool> _pushResult;
+
         private readonly QueryInfo[] _queryInfos = new QueryInfo[MAX_STREAMID];
 
         private readonly Task _queryWorker;
@@ -93,6 +95,9 @@ namespace CassandraSharp.Transport
                     SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
                 }
 
+                _pushResult = _config.ReceiveBuffering
+                                      ? (Action<QueryInfo, IFrameReader, bool>) ((qi, fr, a) => Task.Factory.StartNew(() => PushResult(qi, fr, a)))
+                                      : PushResult;
                 _responseWorker = Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
                 _queryWorker = Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
 
@@ -292,69 +297,97 @@ namespace CassandraSharp.Transport
             }
         }
 
-        private IFrameReader CreateFrameReader(Socket socket)
-        {
-            if (_config.ReceiveBuffering)
-            {
-                return new BufferingFrameReader(socket);
-            }
-
-            return new StreamingFrameReader(socket);
-        }
-
         private void ReadResponse()
         {
             while (true)
             {
-                using (IFrameReader frameReader = CreateFrameReader(_socket))
+                IFrameReader frameReader = null;
+                try
                 {
-                    byte streamId = frameReader.StreamId;
-                    QueryInfo queryInfo;
-                    lock (_lock)
-                    {
-                        Monitor.Pulse(_lock);
-                        if (_isClosed)
-                        {
-                            throw new OperationCanceledException();
-                        }
+                    frameReader = _config.ReceiveBuffering
+                                          ? new BufferingFrameReader(_socket)
+                                          : new StreamingFrameReader(_socket);
 
-                        queryInfo = _queryInfos[streamId];
-                        _queryInfos[streamId] = null;
-                        _availableStreamIds.Push(streamId);
-                    }
+                    QueryInfo queryInfo = GetAndReleaseQueryInfo(frameReader);
 
-                    _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
-                    try
-                    {
-                        if (null != frameReader.ResponseException)
-                        {
-                            throw frameReader.ResponseException;
-                        }
-
-                        queryInfo.Push(frameReader);
-                    }
-                    catch (Exception ex)
-                    {
-                        queryInfo.NotifyError(ex);
-
-                        if (IsStreamInBadState(ex))
-                        {
-                            throw;
-                        }
-                    }
-
-                    _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
-
-                    InstrumentationToken token = queryInfo.Token;
-                    if (0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing))
-                    {
-                        _instrumentation.ServerTrace(token, frameReader.TraceId);
-                    }
+                    _pushResult(queryInfo, frameReader, _config.ReceiveBuffering);
+                }
+                catch (Exception)
+                {
+                    frameReader.SafeDispose();
+                    throw;
                 }
             }
         }
 
-        private bool IsStreamInBadState(Exception ex)
+        private QueryInfo GetAndReleaseQueryInfo(IFrameReader frameReader)
+        {
+            QueryInfo queryInfo;
+            byte streamId = frameReader.StreamId;
+            lock (_lock)
+            {
+                Monitor.Pulse(_lock);
+                if (_isClosed)
+                {
+                    throw new OperationCanceledException();
+                }
+
+                queryInfo = _queryInfos[streamId];
+                _queryInfos[streamId] = null;
+                _availableStreamIds.Push(streamId);
+            }
+            return queryInfo;
+        }
+
+        private void PushResult(QueryInfo queryInfo, IFrameReader frameReader, bool isAsync)
+        {
+            try
+            {
+                _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
+                try
+                {
+                    if (null != frameReader.ResponseException)
+                    {
+                        throw frameReader.ResponseException;
+                    }
+
+                    queryInfo.Push(frameReader);
+                }
+                catch (Exception ex)
+                {
+                    queryInfo.NotifyError(ex);
+
+                    if (IsStreamInBadState(ex))
+                    {
+                        throw;
+                    }
+                }
+
+                _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
+
+                InstrumentationToken token = queryInfo.Token;
+                if (0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing))
+                {
+                    _instrumentation.ServerTrace(token, frameReader.TraceId);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (isAsync)
+                {
+                    HandleError(ex);
+                }
+            }
+            finally
+            {
+                if (isAsync)
+                {
+                    frameReader.SafeDispose();
+                }
+            }
+        }
+
+        private static bool IsStreamInBadState(Exception ex)
         {
             bool isFatal = ex is SocketException || ex is IOException || ex is TimeOutException;
             return isFatal;
