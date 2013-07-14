@@ -8,6 +8,12 @@ cassandra-sharp supports async operations exposed as Rx subscriptions or TPL tas
 
 A command line tool is also available (cqlplus) to access a Cassandra cluster. It's also a great tool to understand what's happening under the cover.
 
+Getting binaries
+================
+Binaries are available through NuGet : http://www.nuget.org/packages/cassandra-sharp
+
+Zip archive are also available at Google Code (since GitHub removed binaries uploads) : http://code.google.com/p/cassandra-sharp/downloads/list
+
 Copyright & License
 ===================
 	cassandra-sharp - high performance .NET driver for Apache Cassandra
@@ -38,12 +44,6 @@ Features
 * multiple extension points
 * command line tool (cqlplus)
 * .NET 4.0+ support (Microsoft .NET / Mono)
-
-Getting binaries
-================
-Binaries are available through NuGet : http://www.nuget.org/packages/cassandra-sharp
-
-Zip archive are also available at Google Code (since GitHub removed binaries uploads) : http://code.google.com/p/cassandra-sharp/downloads/list
 
 How to build
 ============
