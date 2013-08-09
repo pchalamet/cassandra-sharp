@@ -1,11 +1,15 @@
 <version>
-    <cassandra-sharp-interfaces version="3.3.0"
+    <cassandra-sharp-interfaces version="3.3.1"
                                 status="" />
-    <cassandra-sharp version="3.3.1"
+    <cassandra-sharp version="3.3.2"
                      status="" />
     <Rx version="2.1.30214.0" />
 
     <changes>
+		<change id="3.3.2"><![CDATA[
+- fixed issue 65 (https://github.com/pchalamet/cassandra-sharp/issues/65)
+]]></change>
+
 		<change id="3.3.1"><![CDATA[
 - fixed issue 62 (https://github.com/pchalamet/cassandra-sharp/issues/62)
 - allow asynchronous push of results when buffered reads are enabled (related to issue 62)
