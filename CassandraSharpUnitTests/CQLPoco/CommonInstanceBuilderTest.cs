@@ -22,6 +22,7 @@ namespace CassandraSharpUnitTests.CQLPoco
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;
+    using System;
 
     public abstract class CommonInstanceBuilderTest
     {
@@ -152,6 +153,27 @@ namespace CassandraSharpUnitTests.CQLPoco
             public int IntProperty { get; set; }
 
             public string StringProperty { get; set; }
+        }
+
+        [Test]
+        public void TestErrorOnReadonlyProperty()
+        {
+            try
+            {
+                GetInstanceBuilder<BadToto>();
+                Assert.Fail("BadToto should be readonly");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.ToString().Contains("BadToto.ReadOnly has no setter"));
+            }
+        }
+
+        public class BadToto
+        {
+            public int Key;
+
+            public string ReadOnly { get { return "Error"; } }
         }
     }
 }

@@ -106,8 +106,13 @@ namespace CassandraSharp.CQLPoco
                 gen.Emit(propertyInfo.PropertyType.IsClass
                                  ? OpCodes.Castclass
                                  : OpCodes.Unbox_Any, propertyInfo.PropertyType);
-
-                gen.Emit(OpCodes.Call, propertyInfo.GetSetMethod(true));
+                
+                MethodInfo set = propertyInfo.GetSetMethod(true);
+                if (set == null)
+                {
+                    throw new InvalidOperationException(string.Format("{0}.{1} has no setter", propertyInfo.DeclaringType.FullName, propertyInfo.Name));
+                }
+                gen.Emit(OpCodes.Call, set);
             }
             else
             {
