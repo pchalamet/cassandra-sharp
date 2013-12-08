@@ -20,6 +20,7 @@ namespace CassandraSharpUnitTests.Stress
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
+	using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
@@ -44,7 +45,7 @@ namespace CassandraSharpUnitTests.Stress
 
         public void Start()
         {
-            ThreadPool.QueueUserWorkItem(_ => Worker());
+            Task.Run(() => Worker());
             Thread.Sleep(3000);
             Console.WriteLine("Proxy is started");
         }
@@ -76,8 +77,8 @@ namespace CassandraSharpUnitTests.Stress
                 listenSocket.Listen(10);
 
                 Socket clientSocket = listenSocket.Accept();
-                ThreadPool.QueueUserWorkItem(_ => Transmit(clientSocket, targetSocket));
-                ThreadPool.QueueUserWorkItem(_ => Transmit(targetSocket, clientSocket));
+                Task.Run(() => Transmit(clientSocket, targetSocket));
+                Task.Run(() => Transmit(targetSocket, clientSocket));
                 Killer(targetSocket, clientSocket, listenSocket);
                 Thread.Sleep(3000);
             }
