@@ -22,6 +22,7 @@ namespace CassandraSharpUnitTests.CQLPoco
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
     using NUnit.Framework;
+    using CassandraSharp.CQLPoco;
 
     public abstract class CommonDataSourceTest
     {
@@ -98,6 +99,21 @@ namespace CassandraSharpUnitTests.CQLPoco
             Assert.Throws(typeof(ArgumentException), () => dataSource.Get(CreateColumnSpec("boubou")));
         }
 
+        [Test]
+        public void TestReadingIgnored()
+        {
+            IDataSource dataSource = GetDataSource<Toto>();
+            Assert.Throws<ArgumentException>(() => dataSource.Get(CreateColumnSpec("IgnoredField")));
+        }
+
+        [Test]
+        public void TestReadingCustomNamed()
+        {
+            IDataSource dataSource = GetDataSource<Toto>();
+            Assert.Throws<ArgumentException>(() => dataSource.Get(CreateColumnSpec("CustomName")));
+            Assert.AreEqual(dataSource.Get(CreateColumnSpec("OtherName")), "Value");
+        }
+
         public class Toto
         {
             public int Int;
@@ -115,6 +131,12 @@ namespace CassandraSharpUnitTests.CQLPoco
             public int IntProperty { get; set; }
 
             public string StringProperty { get; set; }
+
+            [CqlIgnore]
+            public bool IgnoredField;
+
+            [CqlColumn("OtherName")]
+            public string CustomName { get; set; }
         }
     }
 }

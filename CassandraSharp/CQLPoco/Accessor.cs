@@ -55,7 +55,7 @@ namespace CassandraSharp.CQLPoco
 
             foreach (MemberInfo memberInfo in memberInfos)
             {
-                string name = memberInfo.Name.ToLower(CultureInfo.InvariantCulture);
+                string name = GetName(memberInfo).ToLower(CultureInfo.InvariantCulture);
                 int hash = name.GetHashCode();
 
                 List<MemberInfo> mis;
@@ -146,8 +146,13 @@ namespace CassandraSharp.CQLPoco
             Label nextLabel = gen.DefineLabel();
             foreach (MemberInfo mi in hashWithMemberInfo.MemberInfos)
             {
+                if (IsIgnored(mi))
+                {
+                    continue;
+                }
+
                 gen.Emit(OpCodes.Ldarg_1);
-                gen.Emit(OpCodes.Ldstr, mi.Name);
+                gen.Emit(OpCodes.Ldstr, GetName(mi));
                 gen.Emit(OpCodes.Ldc_I4_3);
                 gen.Emit(OpCodes.Call, strCompare);
                 gen.Emit(OpCodes.Brtrue_S, nextLabel);
@@ -157,6 +162,23 @@ namespace CassandraSharp.CQLPoco
                 gen.MarkLabel(nextLabel);
                 nextLabel = gen.DefineLabel();
             }
+        }
+
+        private bool IsIgnored(MemberInfo mi)
+        {
+            var ignoreAttribute = mi.GetCustomAttributes(typeof(CqlIgnoreAttribute), true).FirstOrDefault() as CqlIgnoreAttribute;
+            return ignoreAttribute != null;
+        }
+
+        private string GetName(MemberInfo mi)
+        {
+            var customColumn = mi.GetCustomAttributes(typeof(CqlColumnAttribute), true).FirstOrDefault() as CqlColumnAttribute;
+            if (customColumn != null)
+            {
+                return customColumn.Name;
+            }
+
+            return mi.Name;
         }
 
         protected abstract void GenerateMemberAccess(ILGenerator gen, MemberInfo mi);
