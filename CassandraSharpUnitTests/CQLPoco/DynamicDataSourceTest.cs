@@ -31,7 +31,8 @@ namespace CassandraSharpUnitTests.CQLPoco
                         Int = 1,
                         IntProperty = 2,
                         String = "String1",
-                        StringProperty = "String2"
+                        StringProperty = "String2",
+                        CustomName = "Value"
                 };
 
             return new DataSource<Toto>(toto);
