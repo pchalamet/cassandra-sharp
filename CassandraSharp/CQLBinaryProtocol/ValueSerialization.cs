@@ -59,7 +59,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             };
 
         public static byte[] Serialize(this IColumnSpec columnSpec, object data)
-        {            
+        {
             byte[] rawData;
             switch (columnSpec.ColumnType)
             {
@@ -68,20 +68,13 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.Set:
                     var colType = columnSpec.CollectionValueType.ToType();
-                    Type typedColl = typeof(CollectionAccessor<>).MakeGenericType(colType);
-                    ICollectionAccessor coll = (ICollectionAccessor)Activator.CreateInstance(typedColl, data);                    
 
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ms.WriteUShort((ushort)coll.Count);
-                        foreach (object elem in coll)
-                        {
-                            byte[] rawDataElem = Serialize(columnSpec.CollectionValueType, elem);
-                            ms.WriteShortByteArray(rawDataElem);
-                        }
-                        rawData = ms.ToArray();
-                    }
-                    break;
+                    Type typedSet = typeof(HashSet<>).MakeGenericType(colType);
+                    object hashSet = Activator.CreateInstance(typedSet);
+                    Type accessorType = typeof(HashSetAccessor<>).MakeGenericType(colType);
+                    var setAccessor = (IHashSetAccessor)Activator.CreateInstance(accessorType, hashSet);
+
+                    return SerializeSet(setAccessor, value => Serialize(columnSpec.CollectionValueType, value));
 
                 case ColumnType.Map:
                     return SerializeMap((IDictionary)data, key => Serialize(columnSpec.CollectionKeyType, key), value => Serialize(columnSpec.CollectionValueType, value));
