@@ -64,23 +64,69 @@ namespace CassandraSharpUnitTests.Functional
 
             //public string CVarint;
 
+            public TestEnum CEnum;
+
             public Guid CUuid;
 
             public string CVarchar;
+
+            public Point CPoint;
+        }
+
+        [CassandraTypeSerializer(typeof(PointSerializer))]
+        public class Point
+        {
+            public int X { get; set; }
+
+            public int Y { get; set; }
+        }
+
+        public class PointSerializer : ICassandraTypeSerializer
+        {
+            public byte[] Serialize(object value)
+            {
+                var val = value as Point;
+                if (val == null)
+                {
+                    return null;
+                }
+
+                return BitConverter.GetBytes(val.X).Concat(BitConverter.GetBytes(val.Y)).ToArray();
+            }
+
+            public object Deserialize(byte[] data)
+            {
+                if (data == null || data.Length != 8)
+                {
+                    return null;
+                }
+
+                var val = new Point();
+                val.X = BitConverter.ToInt32(data, 0);
+                val.Y = BitConverter.ToInt32(data, 4);
+                return val;
+            }
+        }
+
+        public enum TestEnum
+        {
+            ValueA,
+            ValueB
         }
 
         [Test]
         public void TestAllTypes()
         {
+            ClusterManager.Shutdown();
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
             ClusterManager.Configure(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] {"localhost"}
-                            }
+                    Endpoints = new EndpointsConfig
+                        {
+                            Servers = new[] { "dev.cassandra.yousend.com" }
+                        }
                 };
 
             using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
@@ -111,7 +157,7 @@ namespace CassandraSharpUnitTests.Functional
                                                                             cBigint bigint,
                                                                             cBlob blob,
                                                                             cBoolean boolean,
-                                                                            cDecimal decimal,
+                                                                            
                                                                             cDouble double,
                                                                             cFloat float,
                                                                             cInet inet,
@@ -121,10 +167,13 @@ namespace CassandraSharpUnitTests.Functional
                                                                             cTimeuuid timeuuid,
                                                                             cUuid uuid,
                                                                             cVarchar varchar,
-                                                                            cVarint varint,
+                                                                           
                                                                             cList list<int>,
                                                                             cSet set<int>,
                                                                             cMap map<text, int>,
+                                                                            cEnum int,
+                                                                            
+                                                                            cPoint blob,
                                                           PRIMARY KEY (cInt))";
                 Console.WriteLine("============================================================");
                 Console.WriteLine(createBar);
@@ -134,28 +183,30 @@ namespace CassandraSharpUnitTests.Functional
                 Console.WriteLine();
 
                 const string insertBatch = @"insert into Tests.AllTypes (cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat,
-                                                                         cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap)
-                                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                         cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap, cEnum, cPoint)
+                                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 var prepared = cmd.Prepare(insertBatch);
 
                 var allTypesInsert = new AllTypes
                     {
-                            CAscii = new string('x', 8000),
-                            CBigint = 0x0102030405060708,
-                            CBlob = Enumerable.Repeat((byte) 42, 33000).ToArray(),
-                            CBoolean = true,
-                            CDouble = 1234.5678,
-                            CFloat = 234.567f,
-                            CInet = new IPAddress(new byte[] {0x01, 0x02, 0x03, 0x04}),
-                            CInt = 42,
-                            CText = new string('x', 100000),
-                            CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
-                            CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
-                            CUuid = Guid.NewGuid(),
-                            CVarchar = new string('x', 5000),
-                            CList = new List<int> {1, 2, 3},
-                            CSet = new HashSet<int> {1, 2, 3},
-                            CMap = new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { new string('x', 65525), 3 } },
+                        CAscii = new string('x', 8000),
+                        CBigint = 0x0102030405060708,
+                        CBlob = Enumerable.Repeat((byte)42, 33000).ToArray(),
+                        CBoolean = true,
+                        CDouble = 1234.5678,
+                        CFloat = 234.567f,
+                        CInet = new IPAddress(new byte[] { 0x01, 0x02, 0x03, 0x04 }),
+                        CInt = 42,
+                        CText = new string('x', 100000),
+                        CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
+                        CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
+                        CUuid = Guid.NewGuid(),
+                        CVarchar = new string('x', 5000),
+                        CList = new List<int> { 1, 2, 3 },
+                        CSet = new HashSet<int> { 1, 2, 3 },
+                        CMap = new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { new string('x', 65525), 3 } },
+                        CEnum = TestEnum.ValueB,
+                        CPoint = new Point { X = 1, Y = 3 }
                     };
 
                 prepared.Execute(allTypesInsert).AsFuture().Wait();
@@ -181,6 +232,10 @@ namespace CassandraSharpUnitTests.Functional
                 Assert.AreEqual(allTypesInsert.CList, allTypesSelect.CList);
                 Assert.AreEqual(allTypesInsert.CSet, allTypesSelect.CSet);
                 Assert.AreEqual(allTypesInsert.CMap, allTypesSelect.CMap);
+                Assert.AreEqual(allTypesInsert.CEnum, allTypesSelect.CEnum);
+
+                Assert.AreEqual(allTypesInsert.CPoint.X, allTypesSelect.CPoint.X);
+                Assert.AreEqual(allTypesInsert.CPoint.Y, allTypesSelect.CPoint.Y);
             }
 
             ClusterManager.Shutdown();

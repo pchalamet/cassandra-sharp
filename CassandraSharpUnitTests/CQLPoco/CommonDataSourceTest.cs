@@ -16,6 +16,7 @@
 namespace CassandraSharpUnitTests.CQLPoco
 {
     using System;
+    using System.Linq;
     using System.Globalization;
     using System.Threading;
     using CassandraSharp;
@@ -23,6 +24,7 @@ namespace CassandraSharpUnitTests.CQLPoco
     using CassandraSharp.Extensibility;
     using NUnit.Framework;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Exceptions;
 
     public abstract class CommonDataSourceTest
     {
@@ -96,22 +98,22 @@ namespace CassandraSharpUnitTests.CQLPoco
         public void TestErrorOnUnknownMember()
         {
             IDataSource dataSource = GetDataSource<Toto>();
-            Assert.Throws(typeof(ArgumentException), () => dataSource.Get(CreateColumnSpec("boubou")));
+            Assert.Throws<DataMappingException>(() => dataSource.Get(CreateColumnSpec("boubou")));
         }
 
         [Test]
         public void TestReadingIgnored()
         {
             IDataSource dataSource = GetDataSource<Toto>();
-            Assert.Throws<ArgumentException>(() => dataSource.Get(CreateColumnSpec("IgnoredField")));
+            Assert.Throws<DataMappingException>(() => dataSource.Get(CreateColumnSpec("IgnoredField")));
         }
 
         [Test]
         public void TestReadingCustomNamed()
         {
             IDataSource dataSource = GetDataSource<Toto>();
-            Assert.Throws<ArgumentException>(() => dataSource.Get(CreateColumnSpec("CustomName")));
-            Assert.AreEqual(dataSource.Get(CreateColumnSpec("OtherName")), "Value");
+            Assert.Throws<DataMappingException>(() => dataSource.Get(CreateColumnSpec("CustomName")));
+            Assert.AreEqual("Value", dataSource.Get(CreateColumnSpec("OtherName")));
         }
 
         public class Toto
@@ -137,6 +139,43 @@ namespace CassandraSharpUnitTests.CQLPoco
 
             [CqlColumn("OtherName")]
             public string CustomName { get; set; }
+
+            public Point CustomType { get; set; }
+        }
+
+        [CassandraTypeSerializer(typeof(PointSerializer))]
+        public class Point
+        {
+            public int X { get; set; }
+
+            public int Y { get; set; }
+        }
+
+        public class PointSerializer : ICassandraTypeSerializer
+        {
+            public byte[] Serialize(object value)
+            {
+                var val = value as Point;
+                if (val == null)
+                {
+                    return null;
+                }
+
+                return BitConverter.GetBytes(val.X).Concat(BitConverter.GetBytes(val.Y)).ToArray();
+            }
+
+            public object Deserialize(byte[] data)
+            {
+                if (data == null || data.Length != 8)
+                {
+                    return null;
+                }
+
+                var val = new Point();
+                val.X = BitConverter.ToInt32(data, 0);
+                val.Y = BitConverter.ToInt32(data, 4);
+                return val;
+            }
         }
     }
 }

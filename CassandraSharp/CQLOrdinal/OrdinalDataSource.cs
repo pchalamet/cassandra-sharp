@@ -15,7 +15,9 @@
 
 namespace CassandraSharp.CQLOrdinal
 {
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
 
     internal sealed class OrdinalDataSource : IDataSource
     {
@@ -30,6 +32,21 @@ namespace CassandraSharp.CQLOrdinal
         {
             int idx = columnSpec.Index;
             return _dataSource[idx];
+        }
+
+        public IEnumerable<byte[]> GetColumnData(IEnumerable<IColumnSpec> columns)
+        {
+            foreach (var column in columns)
+            {
+                var value = Get(column);
+                if (value == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                yield return ValueSerialization.Serialize(column, value);
+            }
         }
     }
 }

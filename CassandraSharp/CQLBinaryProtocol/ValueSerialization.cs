@@ -59,18 +59,21 @@ namespace CassandraSharp.CQLBinaryProtocol
             };
 
         public static byte[] Serialize(this IColumnSpec columnSpec, object data)
-        {
+        {            
             byte[] rawData;
             switch (columnSpec.ColumnType)
             {
                 case ColumnType.List:
+                    return SerializeList((IList)data, value => Serialize(columnSpec.CollectionValueType, value));
+
                 case ColumnType.Set:
                     var colType = columnSpec.CollectionValueType.ToType();
                     Type typedColl = typeof(CollectionAccessor<>).MakeGenericType(colType);
-                    ICollectionAccessor coll = (ICollectionAccessor) Activator.CreateInstance(typedColl, data);
+                    ICollectionAccessor coll = (ICollectionAccessor)Activator.CreateInstance(typedColl, data);                    
+
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        ms.WriteUShort((ushort) coll.Count);
+                        ms.WriteUShort((ushort)coll.Count);
                         foreach (object elem in coll)
                         {
                             byte[] rawDataElem = Serialize(columnSpec.CollectionValueType, elem);
@@ -81,20 +84,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 case ColumnType.Map:
-                    IDictionary map = (IDictionary) data;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ms.WriteUShort((ushort) map.Count);
-                        foreach (DictionaryEntry de in map)
-                        {
-                            byte[] rawDataKey = Serialize(columnSpec.CollectionKeyType, de.Key);
-                            ms.WriteShortByteArray(rawDataKey);
-                            byte[] rawDataValue = Serialize(columnSpec.CollectionValueType, de.Value);
-                            ms.WriteShortByteArray(rawDataValue);
-                        }
-                        rawData = ms.ToArray();
-                    }
-                    break;
+                    return SerializeMap((IDictionary)data, key => Serialize(columnSpec.CollectionKeyType, key), value => Serialize(columnSpec.CollectionValueType, value));
 
                 default:
                     rawData = Serialize(columnSpec.ColumnType, data);
@@ -102,6 +92,102 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             return rawData;
+        }
+
+        public static object DeserializeMap(byte[] rawData, IDictionary destMap, Func<byte[], object> keyDeserializer, Func<byte[], object> valueDeserializer)
+        {
+            using (MemoryStream ms = new MemoryStream(rawData))
+            {
+                ushort nbElem = ms.ReadUShort();
+                while (0 < nbElem)
+                {
+                    byte[] elemRawKey = ms.ReadShortBytes();
+                    byte[] elemRawValue = ms.ReadShortBytes();
+                    object key = keyDeserializer(elemRawKey);
+                    object value = valueDeserializer(elemRawValue);
+                    destMap.Add(key, value);
+                    --nbElem;
+                }
+
+                return destMap;
+            }
+        }
+
+        public static object DeserializeList(byte[] rawData, IList destList, Func<byte[], object> valueDeserializer)
+        {
+            using (MemoryStream ms = new MemoryStream(rawData))
+            {
+                ushort nbElem = ms.ReadUShort();
+                while (0 < nbElem)
+                {
+                    byte[] elemRawData = ms.ReadShortBytes();
+                    object elem = valueDeserializer(elemRawData);
+                    destList.Add(elem);
+                    --nbElem;
+                }
+
+                return destList;
+            }
+        }
+
+        public static object DeserializeSet(byte[] rawData, IHashSetAccessor destSet, Func<byte[], object> valueDeserializer)
+        {
+            using (MemoryStream ms = new MemoryStream(rawData))
+            {
+                ushort nbElem = ms.ReadUShort();
+                while (0 < nbElem)
+                {
+                    byte[] elemRawData = ms.ReadShortBytes();
+                    object elem = valueDeserializer(elemRawData);
+                    destSet.AddItem(elem);
+                    --nbElem;
+                }
+
+                return destSet;
+            }
+        }
+
+        public static byte[] SerializeMap(IDictionary data, Func<object, byte[]> keySerializer, Func<object, byte[]> valueSerializer)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.WriteUShort((ushort)data.Count);
+                foreach (DictionaryEntry de in data)
+                {
+                    ms.WriteShortByteArray(keySerializer(de.Key));
+                    ms.WriteShortByteArray(valueSerializer(de.Value));
+                }
+
+                return ms.ToArray();
+            }
+        }
+
+        public static byte[] SerializeList(IList data, Func<object, byte[]> valueSerializer)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.WriteUShort((ushort)data.Count);
+                foreach (object elem in data)
+                {
+                    ms.WriteShortByteArray(valueSerializer(elem));
+                }
+
+                return ms.ToArray();
+            }
+        }
+
+        public static byte[] SerializeSet(IHashSetAccessor data, Func<object, byte[]> valueSerializer)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.WriteUShort((ushort)data.Count);
+                foreach (object elem in data)
+                {
+                    ms.WriteShortByteArray(valueSerializer(elem));
+                }
+
+                return ms.ToArray();
+            }
         }
 
         internal static byte[] Serialize(ColumnType colType, object data)
@@ -112,45 +198,45 @@ namespace CassandraSharp.CQLBinaryProtocol
                 case ColumnType.Ascii:
                 case ColumnType.Text:
                 case ColumnType.Varchar:
-                    rawData = ((string) data).GetBytes();
+                    rawData = ((string)data).GetBytes();
                     break;
 
                 case ColumnType.Blob:
-                    rawData = (byte[]) data;
+                    rawData = (byte[])data;
                     break;
 
                 case ColumnType.Double:
-                    rawData = ((double) data).GetBytes();
+                    rawData = ((double)data).GetBytes();
                     break;
 
                 case ColumnType.Float:
-                    rawData = ((float) data).GetBytes();
+                    rawData = ((float)data).GetBytes();
                     break;
 
                 case ColumnType.Timestamp:
-                    rawData = ((DateTime) data).GetBytes();
+                    rawData = ((DateTime)data).GetBytes();
                     break;
 
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
-                    rawData = ((long) data).GetBytes();
+                    rawData = ((long)data).GetBytes();
                     break;
 
                 case ColumnType.Int:
-                    rawData = ((int) data).GetBytes();
+                    rawData = ((int)data).GetBytes();
                     break;
 
                 case ColumnType.Boolean:
-                    rawData = ((bool) data).GetBytes();
+                    rawData = ((bool)data).GetBytes();
                     break;
 
                 case ColumnType.Uuid:
                 case ColumnType.Timeuuid:
-                    rawData = ((Guid) data).GetBytes();
+                    rawData = ((Guid)data).GetBytes();
                     break;
 
                 case ColumnType.Inet:
-                    rawData = ((IPAddress) data).GetBytes();
+                    rawData = ((IPAddress)data).GetBytes();
                     break;
 
                 default:
@@ -172,66 +258,37 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.List:
                     colType = columnSpec.CollectionValueType.ToType();
-                    Type typedColl = typeof(ListInitializer<>).MakeGenericType(colType);
-                    ICollectionInitializer list = (ICollectionInitializer) Activator.CreateInstance(typedColl);
-                    using (MemoryStream ms = new MemoryStream(rawData))
-                    {
-                        ushort nbElem = ms.ReadUShort();
-                        while (0 < nbElem)
-                        {
-                            byte[] elemRawData = ms.ReadShortBytes();
-                            object elem = Deserialize(columnSpec.CollectionValueType, elemRawData);
-                            list.Add(elem);
-                            --nbElem;
-                        }
-                        data = list.Collection;
-                    }
-                    break;
+
+                    Type typedColl = typeof(List<>).MakeGenericType(columnSpec.CollectionValueType.ToType());
+                    IList list = (IList)Activator.CreateInstance(typedColl);
+
+                    return DeserializeList(rawData, list, value => Deserialize(columnSpec.CollectionValueType, value));
 
                 case ColumnType.Map:
-                    Type keyType = columnSpec.CollectionKeyType.ToType();
                     colType = columnSpec.CollectionValueType.ToType();
-                    Type typedDic = typeof(DictionaryInitializer<,>).MakeGenericType(keyType, colType);
-                    IDictionaryInitializer dic = (IDictionaryInitializer) Activator.CreateInstance(typedDic);
-                    using (MemoryStream ms = new MemoryStream(rawData))
-                    {
-                        ushort nbElem = ms.ReadUShort();
-                        while (0 < nbElem)
-                        {
-                            byte[] elemRawKey = ms.ReadShortBytes();
-                            byte[] elemRawValue = ms.ReadShortBytes();
-                            object key = Deserialize(columnSpec.CollectionKeyType, elemRawKey);
-                            object value = Deserialize(columnSpec.CollectionValueType, elemRawValue);
-                            dic.Add(key, value);
-                            --nbElem;
-                        }
-                        data = dic.Collection;
-                    }
-                    break;
+                    var colKeyType = columnSpec.CollectionKeyType.ToType();
+
+                    Type typedDic = typeof(Dictionary<,>).MakeGenericType(colKeyType, colType);
+                    IDictionary dic = (IDictionary)Activator.CreateInstance(typedDic);
+
+                    return DeserializeMap(rawData, dic, key => Deserialize(columnSpec.CollectionKeyType, key), val => Deserialize(columnSpec.CollectionValueType, val));
 
                 case ColumnType.Set:
                     colType = columnSpec.CollectionValueType.ToType();
-                    Type typedSet = typeof(HashSetInitializer<>).MakeGenericType(colType);
-                    ICollectionInitializer set = (ICollectionInitializer) Activator.CreateInstance(typedSet);
-                    using (MemoryStream ms = new MemoryStream(rawData))
-                    {
-                        ushort nbElem = ms.ReadUShort();
-                        while (0 < nbElem)
-                        {
-                            byte[] elemRawData = ms.ReadShortBytes();
-                            object elem = Deserialize(columnSpec.CollectionValueType, elemRawData);
-                            set.Add(elem);
-                            --nbElem;
-                        }
-                        data = set.Collection;
-                    }
-                    break;
+
+                    Type typedSet = typeof(HashSet<>).MakeGenericType(colType);
+                    object hashSet = Activator.CreateInstance(typedSet);
+
+                    Type accessorType = typeof(HashSetAccessor<>).MakeGenericType(colType);
+                    var setAccessor = (IHashSetAccessor)Activator.CreateInstance(accessorType, hashSet);
+                    DeserializeSet(rawData, setAccessor, val => Deserialize(columnSpec.CollectionValueType, val));
+                    return hashSet;
             }
 
             return data;
         }
 
-        private static object Deserialize(ColumnType colType, byte[] rawData)
+        internal static object Deserialize(ColumnType colType, byte[] rawData)
         {
             object data;
             switch (colType)
@@ -281,7 +338,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 default:
-                    throw new ArgumentException("Unsupported type");
+                    throw new ArgumentException("Unsupported type: " + colType);
             }
 
             return data;

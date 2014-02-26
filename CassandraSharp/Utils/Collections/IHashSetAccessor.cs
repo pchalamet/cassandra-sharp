@@ -1,4 +1,4 @@
-// cassandra-sharp - high performance .NET driver for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+
+namespace CassandraSharp.Utils.Collections
 {
-    using System.Collections.Generic;
+    using System.Collections;
 
-    public interface IDataSource
+    public interface IHashSetAccessor
     {
-        object Get(IColumnSpec columnSpec);
+        int Count { get; }
 
-        IEnumerable<byte[]> GetColumnData(IEnumerable<IColumnSpec> columns);
+        IEnumerator GetEnumerator();
+
+        void AddItem(object item);
     }
 }

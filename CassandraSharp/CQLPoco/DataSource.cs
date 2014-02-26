@@ -17,10 +17,13 @@ namespace CassandraSharp.CQLPoco
 {
     using System;
     using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
+    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.Exceptions;
 
     internal sealed class DataSource<T> : IDataSource
     {
-        private static readonly ReadAccessor<T> _accessor = new ReadAccessor<T>();
+        private static readonly ClassMap _classMap = ClassMap.GetClassMap<T>();
 
         private T _dataSource;
 
@@ -32,18 +35,40 @@ namespace CassandraSharp.CQLPoco
         public object Get(IColumnSpec columnSpec)
         {
             string colName = columnSpec.Name;
-            try
+
+            var member = _classMap.GetMember(colName) ??
+                         _classMap.GetMember(colName.Replace("_", string.Empty));
+
+            if (member == null)
             {
-                return _accessor.Get(ref _dataSource, colName);
+                throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
             }
-            catch (ArgumentException)
+
+            return member.GetValue(_dataSource);
+        }
+
+        public IEnumerable<byte[]> GetColumnData(IEnumerable<IColumnSpec> columns)
+        {
+            foreach (var column in columns)
             {
-                if (colName.Contains("_"))
+                string colName = column.Name;
+
+                var member = _classMap.GetMember(colName) ??
+                             _classMap.GetMember(colName.Replace("_", string.Empty));
+
+                if (member == null)
                 {
-                    colName = colName.Replace("_", "");
+                    throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
                 }
 
-                return _accessor.Get(ref _dataSource, colName);
+                var value = member.GetValue(_dataSource);
+                if (value == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                yield return member.ValueSerializer.Serialize(value);
             }
         }
     }

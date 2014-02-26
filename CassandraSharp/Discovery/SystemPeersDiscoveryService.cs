@@ -107,7 +107,7 @@ namespace CassandraSharp.Discovery
         {
             public IPAddress RpcAddress { get; internal set; }
 
-            public ISet<string> Tokens { get; internal set; }
+            public HashSet<string> Tokens { get; internal set; }
 
             public string Rack { get; internal set; }
 

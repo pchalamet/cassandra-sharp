@@ -15,7 +15,10 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
+    using System;
+    using System.Collections.Generic;
 
     internal sealed class InstanceBuilder : IInstanceBuilder
     {
@@ -30,6 +33,20 @@ namespace CassandraSharp.CQLPropertyBag
         public object Build()
         {
             return _data;
+        }
+
+        public object BuildObjectInstance(IEnumerable<KeyValuePair<IColumnSpec, byte[]>> rowData)
+        {
+            foreach (var column in rowData)
+            {
+                var data = column.Value != null ?
+                    ValueSerialization.Deserialize(column.Key, column.Value) :
+                    null;
+
+                Set(column.Key, data);
+            }
+
+            return Build();
         }
     }
 }

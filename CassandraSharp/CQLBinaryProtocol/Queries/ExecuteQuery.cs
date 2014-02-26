@@ -18,6 +18,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using System.IO;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
+    using System;
 
     internal sealed class ExecuteQuery<T> : CqlQuery<T>
     {
@@ -30,7 +31,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         public ExecuteQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, byte[] id,
                             IColumnSpec[] columnSpecs,
                             IDataMapper mapperIn, IDataMapper mapperOut)
-                : base(connection, consistencyLevel, executionFlags, cql, mapperOut)
+            : base(connection, consistencyLevel, executionFlags, cql, mapperOut)
         {
             _id = id;
             _columnSpecs = columnSpecs;
@@ -41,22 +42,15 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
             Stream stream = fw.WriteOnlyStream;
             stream.WriteShortByteArray(_id);
-            stream.WriteUShort((ushort) _columnSpecs.Length);
+            stream.WriteUShort((ushort)_columnSpecs.Length);
 
             IDataSource dataSource = _mapperIn.DataSource;
-            foreach (IColumnSpec columnSpec in _columnSpecs)
-            {
-                byte[] rawData = null;
-                object data = dataSource.Get(columnSpec);
-                if (null != data)
-                {
-                    rawData = columnSpec.Serialize(data);
-                }
-
-                stream.WriteByteArray(rawData);
+            foreach (var data in dataSource.GetColumnData(_columnSpecs))
+            {                
+                stream.WriteByteArray(data);
             }
 
-            stream.WriteUShort((ushort) ConsistencyLevel);
+            stream.WriteUShort((ushort)ConsistencyLevel);
             fw.SetMessageType(MessageOpcodes.Execute);
         }
 

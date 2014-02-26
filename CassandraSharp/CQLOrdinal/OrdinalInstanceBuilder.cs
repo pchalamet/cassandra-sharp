@@ -18,6 +18,7 @@ namespace CassandraSharp.CQLOrdinal
     using System.Collections.Generic;
     using System.Linq;
     using CassandraSharp.Extensibility;
+    using CassandraSharp.CQLBinaryProtocol;
 
     internal sealed class OrdinalInstanceBuilder : IInstanceBuilder
     {
@@ -48,6 +49,17 @@ namespace CassandraSharp.CQLOrdinal
             }
 
             return instance;
+        }
+
+        public object BuildObjectInstance(IEnumerable<KeyValuePair<IColumnSpec, byte[]>> rowData)
+        {
+            foreach (var column in rowData)
+            {
+                var data = ValueSerialization.Deserialize(column.Key, column.Value);
+                Set(column.Key, data);
+            }
+
+            return Build();
         }
     }
 }

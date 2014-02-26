@@ -16,6 +16,7 @@
 namespace CassandraSharp.CQLPoco
 {
     using CassandraSharp.Extensibility;
+    using System;
 
     internal sealed class DataMapper<T> : IDataMapper
     {
@@ -30,7 +31,7 @@ namespace CassandraSharp.CQLPoco
         public IDataSource DataSource { get; private set; }
 
         public IInstanceBuilder CreateBuilder()
-        {
+        {            
             return new InstanceBuilder<T>();
         }
     }

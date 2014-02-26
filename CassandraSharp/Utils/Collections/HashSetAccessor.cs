@@ -13,29 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+
+namespace CassandraSharp.Utils.Collections
 {
+    using System.Collections;
     using System.Collections.Generic;
 
-    public interface IInstanceBuilder
+    internal sealed class HashSetAccessor<T> : IHashSetAccessor
     {
-        // data type can be:
-        //   * string
-        //   * byte[]
-        //   * double / double?
-        //   * float / float?
-        //   * long / long?
-        //   * int / int?
-        //   * DateTime / DateTime?
-        //   * Guid / Guid?
-        //   * IPAddress
-        //   * IList<V> with V same as data type
-        //   * ISet<V> with V same as data type
-        //   * IDictionary<K, V> with K, V same as data type
-        bool Set(IColumnSpec columnSpec, object data);
+        private readonly ISet<T> _hashSet;
 
-        object Build();
+        public HashSetAccessor(object hashSet)
+        {
+            _hashSet = (ISet<T>)hashSet;
+        }
 
-        object BuildObjectInstance(IEnumerable<KeyValuePair<IColumnSpec, byte[]>> rowData);
+        public int Count
+        {
+            get { return _hashSet.Count; }
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return _hashSet.GetEnumerator();
+        }
+
+        public void AddItem(object item)
+        {
+            _hashSet.Add((T)item);
+        }
     }
 }

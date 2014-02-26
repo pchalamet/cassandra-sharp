@@ -15,7 +15,10 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
+    using System;
+    using System.Collections.Generic;
 
     internal sealed class DataSource : IDataSource
     {
@@ -29,6 +32,21 @@ namespace CassandraSharp.CQLPropertyBag
         public object Get(IColumnSpec columnSpec)
         {
             return _dataSource[columnSpec.Name];
+        }
+
+        public IEnumerable<byte[]> GetColumnData(IEnumerable<IColumnSpec> columns)
+        {
+            foreach (var column in columns)
+            {
+                var value = Get(column);
+                if (value == null)
+                {                    
+                    yield return null;
+                    continue;
+                }
+                
+                yield return ValueSerialization.Serialize(column, value);
+            }
         }
     }
 }

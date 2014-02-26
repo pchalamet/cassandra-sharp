@@ -17,33 +17,50 @@ namespace CassandraSharp.CQLPoco
 {
     using System.Runtime.Serialization;
     using CassandraSharp.Extensibility;
+    using System.Collections;
+    using System.Collections.Generic;
+    using CassandraSharp.Utils.Stream;
+    using CassandraSharp.CQLBinaryProtocol;
+    using System;
+    using CassandraSharp.Exceptions;
 
     internal sealed class InstanceBuilder<T> : IInstanceBuilder
     {
-        private static readonly WriteAccessor<T> _accessor = new WriteAccessor<T>();
+        private static readonly ClassMap<T> _classMap = ClassMap.GetClassMap<T>();
 
         private T _instance;
 
         public InstanceBuilder()
         {
-            _instance = _accessor.CreateInstance();
+            _instance = _classMap.CreateNewInstance();
+        }
+
+        public bool SetRaw(IColumnSpec columnSpec, byte[] rawData)
+        {
+            if (rawData != null)
+            {
+                var data = columnSpec.Deserialize(rawData);
+                Set(columnSpec, data);
+            }
+
+            return false;
         }
 
         public bool Set(IColumnSpec columnSpec, object data)
         {
             string colName = columnSpec.Name;
-            if (_accessor.Set(ref _instance, colName, data))
-            {
-                return true;
-            }
 
-            if (colName.Contains("_"))
-            {
-                colName = colName.Replace("_", "");
-                return _accessor.Set(ref _instance, colName, data);
-            }
+            var member = _classMap.GetMember(colName) ??
+                         _classMap.GetMember(colName.Replace("_", string.Empty));
 
-            return false;
+            if (member == null)
+            {
+                return false;
+            }
+            
+            member.SetValue(_instance, data);
+
+            return true;
         }
 
         public object Build()
@@ -55,6 +72,29 @@ namespace CassandraSharp.CQLPoco
             }
 
             return _instance;
+        }
+
+        public object BuildObjectInstance(IEnumerable<KeyValuePair<IColumnSpec, byte[]>> rowData)
+        {
+            _instance = _classMap.CreateNewInstance();
+
+            foreach (var column in rowData)
+            {                
+                string colName = column.Key.Name;
+
+                var member = _classMap.GetMember(colName) ??
+                             _classMap.GetMember(colName.Replace("_", string.Empty));
+
+                if (member == null)
+                {
+                    throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
+                }
+
+                var data = member.ValueSerializer.Deserialize(column.Value);
+                member.SetValue(_instance, data);
+            }
+
+            return Build();
         }
     }
 }
