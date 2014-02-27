@@ -100,7 +100,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
                 var rowData = columnSpecs.Select(spec => new ColumnData(spec, stream.ReadByteArray()));
-                yield return (T)mapperFactory.BuildObjectInstance(rowData);
+                yield return (T)mapperFactory.MapToObject(rowData);
             }
         }
 

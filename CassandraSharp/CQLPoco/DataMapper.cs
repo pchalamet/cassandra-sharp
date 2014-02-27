@@ -26,7 +26,7 @@ namespace CassandraSharp.CQLPoco
     {
         private static readonly ClassMap<T> _classMap = ClassMap.GetClassMap<T>();
 
-        public IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns)
+        public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
         {            
             foreach (var column in columns)
             {
@@ -51,7 +51,7 @@ namespace CassandraSharp.CQLPoco
             }
         }
 
-        public object BuildObjectInstance(IEnumerable<IColumnData> rowData)
+        public object MapToObject(IEnumerable<IColumnData> rowData)
         {
             var instance = _classMap.CreateNewInstance();
 

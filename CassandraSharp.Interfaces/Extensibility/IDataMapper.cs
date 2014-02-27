@@ -19,8 +19,8 @@ namespace CassandraSharp.Extensibility
 
     public interface IDataMapper
     {
-        IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns);
+        IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns);
 
-        object BuildObjectInstance(IEnumerable<IColumnData> rowData);
+        object MapToObject(IEnumerable<IColumnData> rowData);
     }
 }

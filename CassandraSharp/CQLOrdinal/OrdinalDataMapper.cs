@@ -22,7 +22,7 @@ namespace CassandraSharp.CQLOrdinal
 
     internal sealed class OrdinalDataMapper : IDataMapper
     {
-        public IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns)
+        public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
         {
             object[] data = (object[])dataSource;
 
@@ -40,7 +40,7 @@ namespace CassandraSharp.CQLOrdinal
             }
         }
 
-        public object BuildObjectInstance(IEnumerable<IColumnData> rowData)
+        public object MapToObject(IEnumerable<IColumnData> rowData)
         {
             var rows = rowData.ToList();
 

@@ -48,7 +48,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             stream.WriteShortByteArray(_id);
             stream.WriteUShort((ushort)_columnSpecs.Length);
 
-            foreach (var columnData in _mapperIn.GetColumnData(_dataSource, _columnSpecs))
+            foreach (var columnData in _mapperIn.MapToColumns(_dataSource, _columnSpecs))
             {
                 stream.WriteByteArray(columnData.RawData);
             }

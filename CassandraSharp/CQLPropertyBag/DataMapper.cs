@@ -21,7 +21,7 @@ namespace CassandraSharp.CQLPropertyBag
 
     internal sealed class DataMapper : IDataMapper
     {                
-        public IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns)
+        public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
         {
             var data = (PropertyBag)dataSource;
 
@@ -39,7 +39,7 @@ namespace CassandraSharp.CQLPropertyBag
             }
         }
 
-        public object BuildObjectInstance(IEnumerable<IColumnData> rowData)
+        public object MapToObject(IEnumerable<IColumnData> rowData)
         {
             var instance = new PropertyBag();
 
