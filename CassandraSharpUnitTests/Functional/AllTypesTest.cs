@@ -125,7 +125,7 @@ namespace CassandraSharpUnitTests.Functional
                 {
                     Endpoints = new EndpointsConfig
                         {
-                            Servers = new[] { "dev.cassandra.yousend.com" }
+                            Servers = new[] { "localhost" }
                         }
                 };
 
