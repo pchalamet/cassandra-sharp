@@ -15,23 +15,44 @@
 
 namespace CassandraSharp.CQLPropertyBag
 {
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
 
     internal sealed class DataMapper : IDataMapper
-    {
-        public DataMapper(PropertyBag dataSource)
+    {                
+        public IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns)
         {
-            if (null != dataSource)
+            var data = (PropertyBag)dataSource;
+
+            foreach (var column in columns)
             {
-                DataSource = new DataSource(dataSource);
+                var value = data[column.Name];
+
+                byte[] rawData = null;
+                if (value != null)
+                {
+                    rawData = ValueSerialization.Serialize(column, value);
+                }
+
+                yield return new ColumnData(column, rawData);
             }
         }
 
-        public IDataSource DataSource { get; private set; }
-
-        public IInstanceBuilder CreateBuilder()
+        public object BuildObjectInstance(IEnumerable<IColumnData> rowData)
         {
-            return new InstanceBuilder();
+            var instance = new PropertyBag();
+
+            foreach (var column in rowData)
+            {
+                var data = column.RawData != null ?
+                    ValueSerialization.Deserialize(column.ColumnSpec, column.RawData) :
+                    null;
+
+                instance[column.ColumnSpec.Name] = data;
+            }
+
+            return instance;
         }
     }
 }

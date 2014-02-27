@@ -13,10 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 namespace CassandraSharp.Extensibility
 {
     public interface IDataMapperFactory
     {
-        IDataMapper Create<T>(object dataSource = null);
+        IDataMapper Create(Type type);
+
+        IDataMapper Create<T>();
     }
 }

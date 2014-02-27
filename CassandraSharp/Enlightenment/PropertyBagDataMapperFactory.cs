@@ -17,13 +17,18 @@ namespace CassandraSharp.Enlightenment
 {
     using CassandraSharp.CQLPropertyBag;
     using CassandraSharp.Extensibility;
+    using System;
 
     internal sealed class PropertyBagDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object dataSource)
+        public IDataMapper Create(Type type)
         {
-            PropertyBag propertyBag = (PropertyBag) dataSource;
-            return new DataMapper(propertyBag);
+            return new DataMapper();
+        }
+
+        public IDataMapper Create<T>()
+        {
+            return new DataMapper();
         }
     }
 }

@@ -67,12 +67,9 @@ namespace CassandraSharp.CQLBinaryProtocol
                     return SerializeList((IList)data, value => Serialize(columnSpec.CollectionValueType, value));
 
                 case ColumnType.Set:
-                    var colType = columnSpec.CollectionValueType.ToType();
-
-                    Type typedSet = typeof(HashSet<>).MakeGenericType(colType);
-                    object hashSet = Activator.CreateInstance(typedSet);
+                    var colType = columnSpec.CollectionValueType.ToType();                    
                     Type accessorType = typeof(HashSetAccessor<>).MakeGenericType(colType);
-                    var setAccessor = (IHashSetAccessor)Activator.CreateInstance(accessorType, hashSet);
+                    var setAccessor = (IHashSetAccessor)Activator.CreateInstance(accessorType, data);                    
 
                     return SerializeSet(setAccessor, value => Serialize(columnSpec.CollectionValueType, value));
 
@@ -176,8 +173,11 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteUShort((ushort)data.Count);
                 foreach (object elem in data)
                 {
-                    ms.WriteShortByteArray(valueSerializer(elem));
+                    Console.WriteLine(elem);
+                    ms.WriteShortByteArray(valueSerializer(elem));                    
                 }
+
+                Console.WriteLine(ms.Length);
 
                 return ms.ToArray();
             }

@@ -99,10 +99,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             int rowCount = stream.ReadInt();
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
-                IInstanceBuilder instanceBuilder = mapperFactory.CreateBuilder();
-
-                var rowData = columnSpecs.Select(x => new KeyValuePair<IColumnSpec, byte[]>(x, stream.ReadByteArray()));
-                yield return (T)instanceBuilder.BuildObjectInstance(rowData);
+                var rowData = columnSpecs.Select(spec => new ColumnData(spec, stream.ReadByteArray()));
+                yield return (T)mapperFactory.BuildObjectInstance(rowData);
             }
         }
 

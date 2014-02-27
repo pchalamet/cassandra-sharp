@@ -15,10 +15,12 @@
 
 namespace CassandraSharp.Extensibility
 {
+    using System.Collections.Generic;
+
     public interface IDataMapper
     {
-        IDataSource DataSource { get; }
+        IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns);
 
-        IInstanceBuilder CreateBuilder();
+        object BuildObjectInstance(IEnumerable<IColumnData> rowData);
     }
 }

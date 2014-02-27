@@ -15,24 +15,71 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
     using System;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
     internal sealed class DataMapper<T> : IDataMapper
     {
-        public DataMapper(object dataSource)
-        {
-            if (null != dataSource)
+        private static readonly ClassMap<T> _classMap = ClassMap.GetClassMap<T>();
+
+        public IEnumerable<IColumnData> GetColumnData(object dataSource, IEnumerable<IColumnSpec> columns)
+        {            
+            foreach (var column in columns)
             {
-                DataSource = DataSourceFactory.Create(dataSource);
+                string colName = column.Name;
+
+                var member = _classMap.GetMember(colName) ??
+                             _classMap.GetMember(colName.Replace("_", string.Empty));
+
+                if (member == null)
+                {
+                    throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
+                }
+
+                var value = member.GetValue(dataSource);
+                byte[] rawData = null;
+                if (value != null)
+                {
+                    rawData = member.ValueSerializer.Serialize(value);
+                }
+
+                yield return new ColumnData(column, rawData);
             }
         }
 
-        public IDataSource DataSource { get; private set; }
+        public object BuildObjectInstance(IEnumerable<IColumnData> rowData)
+        {
+            var instance = _classMap.CreateNewInstance();
 
-        public IInstanceBuilder CreateBuilder()
-        {            
-            return new InstanceBuilder<T>();
+            foreach (var column in rowData)
+            {
+                string colName = column.ColumnSpec.Name;
+
+                var member = _classMap.GetMember(colName) ??
+                             _classMap.GetMember(colName.Replace("_", string.Empty));
+
+                if (member == null)
+                {
+                    throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
+                }
+
+                var data = column.RawData != null ?
+                    member.ValueSerializer.Deserialize(column.RawData) :
+                    null;
+
+                member.SetValue(instance, data);
+            }
+
+            if (instance is IDeserializationCallback)
+            {
+                (instance as IDeserializationCallback).OnDeserialization(null);
+            }
+
+            return instance;
         }
     }
 }
