@@ -18,34 +18,22 @@ namespace CassandraSharp.Config
     using System.Xml;
     using System.Xml.Serialization;
 
-    [XmlRoot("ClusterConfig")]
-    public class ClusterConfig
+    [XmlRoot("DefaultKeyspace")]
+    public class KeyspaceConfig
     {
-        public ClusterConfig()
+        public KeyspaceConfig()
         {
-            Type = "Default";
-            Partitioner = "Default";
+            DurableWrites = true;
+            Replication = Replication ?? new ReplicationConfig();
         }
-
-        [XmlElement("Endpoints")]
-        public EndpointsConfig Endpoints { get; set; }
 
         [XmlAttribute("name")]
         public string Name { get; set; }
 
-        [XmlAttribute("type")]
-        public string Type { get; set; }
+        [XmlAttribute("durableWrites")]
+        public bool DurableWrites { get; set; }
 
-        [XmlAttribute("partitioner")]
-        public string Partitioner { get; set; }
-
-        [XmlElement("Transport")]
-        public TransportConfig Transport { get; set; }
-
-        [XmlElement("DefaultKeyspace")]
-        public KeyspaceConfig DefaultKeyspace { get; set; }
-
-        [XmlAnyAttribute]
-        public XmlAttribute[] Extensions { get; set; }
+        [XmlElement("Replication")]
+        public ReplicationConfig Replication { get; set; }
     }
 }

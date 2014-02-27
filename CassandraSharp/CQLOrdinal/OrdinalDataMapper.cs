@@ -44,9 +44,8 @@ namespace CassandraSharp.CQLOrdinal
         {
             var rows = rowData.ToList();
 
-            object[] instance = new object[rows.Count];
-
-            foreach (var column in rowData.OrderBy(x => x.ColumnSpec.Index))
+            var instance = new object[rows.Count];
+            foreach (var column in rows.OrderBy(x => x.ColumnSpec.Index))
             {
                 var data = column.RawData != null ?
                     ValueSerialization.Deserialize(column.ColumnSpec, column.RawData) :
