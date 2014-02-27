@@ -13,23 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
+namespace CassandraSharp.Extensibility
 {
-    using CassandraSharp.Extensibility;
-
-    internal sealed class InstanceBuilder : IInstanceBuilder
+    public interface IColumnData
     {
-        private readonly PropertyBag _data = new PropertyBag();
+        IColumnSpec ColumnSpec { get; }
 
-        public bool Set(IColumnSpec columnSpec, object data)
-        {
-            _data[columnSpec.Name] = data;
-            return true;
-        }
-
-        public object Build()
-        {
-            return _data;
-        }
+        byte[] RawData { get; }
     }
 }

@@ -18,6 +18,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using System.IO;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
+    using System;
 
     internal sealed class ExecuteQuery<T> : CqlQuery<T>
     {
@@ -27,36 +28,32 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         private readonly IDataMapper _mapperIn;
 
+        private readonly object _dataSource;
+
         public ExecuteQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, byte[] id,
                             IColumnSpec[] columnSpecs,
+                            object dataSource,
                             IDataMapper mapperIn, IDataMapper mapperOut)
-                : base(connection, consistencyLevel, executionFlags, cql, mapperOut)
+            : base(connection, consistencyLevel, executionFlags, cql, mapperOut)
         {
             _id = id;
             _columnSpecs = columnSpecs;
             _mapperIn = mapperIn;
+            _dataSource = dataSource;
         }
 
         protected override void WriteFrame(IFrameWriter fw)
         {
             Stream stream = fw.WriteOnlyStream;
             stream.WriteShortByteArray(_id);
-            stream.WriteUShort((ushort) _columnSpecs.Length);
+            stream.WriteUShort((ushort)_columnSpecs.Length);
 
-            IDataSource dataSource = _mapperIn.DataSource;
-            foreach (IColumnSpec columnSpec in _columnSpecs)
+            foreach (var columnData in _mapperIn.MapToColumns(_dataSource, _columnSpecs))
             {
-                byte[] rawData = null;
-                object data = dataSource.Get(columnSpec);
-                if (null != data)
-                {
-                    rawData = columnSpec.Serialize(data);
-                }
-
-                stream.WriteByteArray(rawData);
+                stream.WriteByteArray(columnData.RawData);
             }
 
-            stream.WriteUShort((ushort) ConsistencyLevel);
+            stream.WriteUShort((ushort)ConsistencyLevel);
             fw.SetMessageType(MessageOpcodes.Execute);
         }
 

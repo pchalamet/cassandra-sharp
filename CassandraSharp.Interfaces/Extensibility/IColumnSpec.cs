@@ -32,5 +32,5 @@ namespace CassandraSharp.Extensibility
         ColumnType CollectionKeyType { get; }
 
         ColumnType CollectionValueType { get; }
-    }
+    }    
 }

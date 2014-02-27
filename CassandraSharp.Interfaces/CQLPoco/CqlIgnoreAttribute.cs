@@ -13,25 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Extensibility
+namespace CassandraSharp.CQLPoco
 {
-    public interface IInstanceBuilder
-    {
-        // data type can be:
-        //   * string
-        //   * byte[]
-        //   * double / double?
-        //   * float / float?
-        //   * long / long?
-        //   * int / int?
-        //   * DateTime / DateTime?
-        //   * Guid / Guid?
-        //   * IPAddress
-        //   * IList<V> with V same as data type
-        //   * ISet<V> with V same as data type
-        //   * IDictionary<K, V> with K, V same as data type
-        bool Set(IColumnSpec columnSpec, object data);
+    using System;
 
-        object Build();
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public sealed class CqlIgnoreAttribute : Attribute
+    {
     }
 }

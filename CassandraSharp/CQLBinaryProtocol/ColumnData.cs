@@ -13,28 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.CQLPoco
+namespace CassandraSharp.CQLBinaryProtocol
 {
-    using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
-    using NUnit.Framework;
+    using System;
 
-    [TestFixture]
-    public class DynamicDataSourceTest : CommonDataSourceTest
+    public class ColumnData: IColumnData
     {
-        protected override IDataSource GetDataSource<T>()
-        {
-            Toto toto = new Toto
-                {
-                        NullableInt = 42,
-                        NullableIntProperty = 666,
-                        Int = 1,
-                        IntProperty = 2,
-                        String = "String1",
-                        StringProperty = "String2"
-                };
+        public IColumnSpec ColumnSpec { get; private set; }
 
-            return new DataSource<Toto>(toto);
+        public byte[] RawData { get; private set; }
+
+        public ColumnData(IColumnSpec spec, byte[] rawData)
+        {
+            ColumnSpec = spec;
+            RawData = rawData;
         }
     }
 }

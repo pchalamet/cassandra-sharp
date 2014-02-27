@@ -21,6 +21,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     using System.Linq;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils.Stream;
+    using CassandraSharp.CQLPoco;
 
     internal class CqlQuery<T> : Query<T>
     {
@@ -29,7 +30,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         private readonly IDataMapper _mapperOut;
 
         public CqlQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, IDataMapper mapperOut)
-                : base(connection, consistencyLevel, executionFlags)
+            : base(connection, consistencyLevel, executionFlags)
         {
             CQL = cql;
             _mapperOut = mapperOut;
@@ -37,14 +38,14 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override IEnumerable<T> ReadFrame(IFrameReader frameReader)
         {
-            return ReadRowSet(frameReader, _mapperOut).Cast<T>();
+            return ReadRowSet(frameReader, _mapperOut);
         }
 
         protected override void WriteFrame(IFrameWriter fw)
         {
             Stream stream = fw.WriteOnlyStream;
             stream.WriteLongString(CQL);
-            stream.WriteUShort((ushort) ConsistencyLevel);
+            stream.WriteUShort((ushort)ConsistencyLevel);
             fw.SetMessageType(MessageOpcodes.Query);
         }
 
@@ -54,7 +55,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             return token;
         }
 
-        private static IEnumerable<object> ReadRowSet(IFrameReader frameReader, IDataMapper mapperFactory)
+        private static IEnumerable<T> ReadRowSet(IFrameReader frameReader, IDataMapper mapperFactory)
         {
             if (MessageOpcodes.Result != frameReader.MessageOpcode)
             {
@@ -67,7 +68,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             }
 
             Stream stream = frameReader.ReadOnlyStream;
-            ResultOpcode resultOpcode = (ResultOpcode) stream.ReadInt();
+            ResultOpcode resultOpcode = (ResultOpcode)stream.ReadInt();
             switch (resultOpcode)
             {
                 case ResultOpcode.Void:
@@ -75,7 +76,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
                 case ResultOpcode.Rows:
                     IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
-                    foreach (object row in ReadRows(frameReader, columnSpecs, mapperFactory))
+                    foreach (T row in ReadRows(frameReader, columnSpecs, mapperFactory))
                     {
                         yield return row;
                     }
@@ -92,41 +93,21 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             }
         }
 
-        private static IEnumerable<object> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapper mapperFactory)
+        private static IEnumerable<T> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapper mapperFactory)
         {
             Stream stream = frameReader.ReadOnlyStream;
             int rowCount = stream.ReadInt();
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
-                IInstanceBuilder instanceBuilder = mapperFactory.CreateBuilder();
-
-                byte[][] rawDatas = new byte[columnSpecs.Length][];
-                foreach (ColumnSpec colSpec in columnSpecs)
-                {
-                    rawDatas[colSpec.Index] = stream.ReadByteArray();
-                }
-
-                foreach (ColumnSpec colSpec in columnSpecs)
-                {
-                    byte[] rawData = rawDatas[colSpec.Index];
-
-                    object data = null;
-                    if (null != rawData)
-                    {
-                        data = colSpec.Deserialize(rawData);
-                    }
-
-                    instanceBuilder.Set(colSpec, data);
-                }
-
-                yield return instanceBuilder.Build();
+                var rowData = columnSpecs.Select(spec => new ColumnData(spec, stream.ReadByteArray()));
+                yield return (T)mapperFactory.MapToObject(rowData);
             }
         }
 
         protected static IColumnSpec[] ReadColumnSpec(IFrameReader frameReader)
         {
             Stream stream = frameReader.ReadOnlyStream;
-            MetadataFlags flags = (MetadataFlags) stream.ReadInt();
+            MetadataFlags flags = (MetadataFlags)stream.ReadInt();
             bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
 
             int colCount = stream.ReadInt();
@@ -150,7 +131,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                     colTable = stream.ReadString();
                 }
                 string colName = stream.ReadString();
-                ColumnType colType = (ColumnType) stream.ReadUShort();
+                ColumnType colType = (ColumnType)stream.ReadUShort();
                 string colCustom = null;
                 ColumnType colKeyType = ColumnType.Custom;
                 ColumnType colValueType = ColumnType.Custom;
@@ -162,12 +143,12 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
                     case ColumnType.List:
                     case ColumnType.Set:
-                        colValueType = (ColumnType) stream.ReadUShort();
+                        colValueType = (ColumnType)stream.ReadUShort();
                         break;
 
                     case ColumnType.Map:
-                        colKeyType = (ColumnType) stream.ReadUShort();
-                        colValueType = (ColumnType) stream.ReadUShort();
+                        colKeyType = (ColumnType)stream.ReadUShort();
+                        colValueType = (ColumnType)stream.ReadUShort();
                         break;
                 }
 

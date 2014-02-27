@@ -65,7 +65,7 @@ namespace CassandraSharpUnitTests.Performance
 
                 long totalTime = ExecuteStressTest(protocol);
 
-                ExportTracingInfo(protocol, totalTime);
+               // ExportTracingInfo(protocol, totalTime);
 
                 protocol.Query(dropKeyspace);
             }

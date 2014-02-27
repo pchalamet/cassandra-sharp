@@ -29,7 +29,7 @@ namespace CassandraSharpUnitTests
 
             Assert.IsNotNull(cassandraSharpConfig);
             Assert.AreEqual("TestClient.Logger4Log4Net, TestClient", cassandraSharpConfig.Logger.Type);
-            Assert.AreEqual(4, cassandraSharpConfig.Clusters.Length);
+            Assert.AreEqual(5, cassandraSharpConfig.Clusters.Length);
             Assert.IsNotNull(cassandraSharpConfig.Clusters[1]);
 //            Assert.IsNotNull(cassandraSharpConfig.Clusters[1].BehaviorConfig);
             Assert.IsNotNull(cassandraSharpConfig.Clusters[1].Endpoints);
@@ -40,6 +40,12 @@ namespace CassandraSharpUnitTests
             //Assert.AreEqual(ConsistencyLevel.ONE, cassandraSharpConfig.Clusters[1].BehaviorConfig.DefaultReadCL);
             //Assert.AreEqual(ConsistencyLevel.QUORUM, cassandraSharpConfig.Clusters[1].BehaviorConfig.DefaultWriteCL);
             //Assert.AreEqual(null, cassandraSharpConfig.Clusters[1].BehaviorConfig.DefaultTTL);
+
+            Assert.IsNull(cassandraSharpConfig.Clusters[0].DefaultKeyspace);
+            Assert.IsNotNull(cassandraSharpConfig.Clusters[4].DefaultKeyspace);
+            Assert.AreEqual("Test", cassandraSharpConfig.Clusters[4].DefaultKeyspace.Name);
+            Assert.AreEqual("2", cassandraSharpConfig.Clusters[4].DefaultKeyspace.Replication.Options["replication_factor"]);
+            Assert.AreEqual("SimpleStrategy", cassandraSharpConfig.Clusters[4].DefaultKeyspace.Replication.Options["class"]);
         }
     }
 }

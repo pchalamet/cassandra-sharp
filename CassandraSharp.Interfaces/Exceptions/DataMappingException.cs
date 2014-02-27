@@ -13,12 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Collections
+namespace CassandraSharp.Exceptions
 {
-    internal interface ICollectionInitializer
-    {
-        object Collection { get; }
+    using System;
 
-        void Add(object t);
+    [Serializable]
+    public class DataMappingException : Exception
+    {
+        internal DataMappingException(string message)
+            : base(message)
+        {
+        }
     }
 }
