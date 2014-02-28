@@ -42,6 +42,9 @@ namespace CassandraSharp.Config
         [XmlElement("Transport")]
         public TransportConfig Transport { get; set; }
 
+        [XmlElement("DefaultKeyspace")]
+        public KeyspaceConfig DefaultKeyspace { get; set; }
+
         [XmlAnyAttribute]
         public XmlAttribute[] Extensions { get; set; }
     }

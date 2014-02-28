@@ -13,28 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Collections
+namespace CassandraSharp.Config
 {
-    using System.Collections;
-    using System.Collections.Generic;
+    using System.Xml;
+    using System.Xml.Serialization;
 
-    internal sealed class CollectionAccessor<T> : ICollectionAccessor
+    [XmlRoot("DefaultKeyspace")]
+    public class KeyspaceConfig
     {
-        private readonly ICollection<T> _collection;
-
-        public CollectionAccessor(object collection)
+        public KeyspaceConfig()
         {
-            _collection = (ICollection<T>) collection;
+            DurableWrites = true;
+            Replication = Replication ?? new ReplicationConfig();
         }
 
-        public int Count
-        {
-            get { return _collection.Count; }
-        }
+        [XmlAttribute("name")]
+        public string Name { get; set; }
 
-        public IEnumerator GetEnumerator()
-        {
-            return _collection.GetEnumerator();
-        }
+        [XmlAttribute("durableWrites")]
+        public bool DurableWrites { get; set; }
+
+        [XmlElement("Replication")]
+        public ReplicationConfig Replication { get; set; }
     }
 }

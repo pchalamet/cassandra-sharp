@@ -17,12 +17,20 @@ namespace CassandraSharp.Enlightenment
 {
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
+    using System;
 
     internal sealed class PocoDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create<T>(object dataSource)
+        public IDataMapper Create(Type type)
         {
-            return new DataMapper<T>(dataSource);
+            Type genericDataMapper = typeof(DataMapper<>);
+            Type typedDataMapper = genericDataMapper.MakeGenericType(type);
+            return (IDataMapper)Activator.CreateInstance(typedDataMapper);
+        }
+
+        public IDataMapper Create<T>()
+        {
+            return new DataMapper<T>();
         }
     }
 }

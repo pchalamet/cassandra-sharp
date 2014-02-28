@@ -39,6 +39,8 @@ namespace CassandraSharp.Transport
 
         private readonly TransportConfig _config;
 
+        private readonly KeyspaceConfig _keyspaceConfig;
+
         private readonly IInstrumentation _instrumentation;
 
         private readonly object _lock = new object();
@@ -61,7 +63,7 @@ namespace CassandraSharp.Transport
 
         private bool _isClosed;
 
-        public LongRunningConnection(IPAddress address, TransportConfig config, ILogger logger, IInstrumentation instrumentation)
+        public LongRunningConnection(IPAddress address, TransportConfig config, KeyspaceConfig keyspaceConfig, ILogger logger, IInstrumentation instrumentation)
         {
             try
             {
@@ -71,6 +73,7 @@ namespace CassandraSharp.Transport
                 }
 
                 _config = config;
+                _keyspaceConfig = keyspaceConfig;
                 _logger = logger;
                 _instrumentation = instrumentation;
 
@@ -412,6 +415,11 @@ namespace CassandraSharp.Transport
             {
                 Authenticate();
             }
+
+            if (!string.IsNullOrWhiteSpace(_keyspaceConfig.Name))
+            {
+                SetupKeyspace();
+            }
         }
 
         private void Authenticate()
@@ -426,6 +434,27 @@ namespace CassandraSharp.Transport
             {
                 throw new InvalidCredentialException();
             }
+        }
+
+        private void SetupKeyspace()
+        {
+            var setKeyspaceQuery = new SetKeyspaceQuery(this, _keyspaceConfig.Name);
+
+            try
+            {
+                setKeyspaceQuery.AsFuture().Wait();
+            }
+            catch
+            {
+                new CreateKeyspaceQuery(
+                        this,
+                        _keyspaceConfig.Name,
+                        _keyspaceConfig.Replication.Options,
+                        _keyspaceConfig.DurableWrites).AsFuture().Wait();
+                setKeyspaceQuery.AsFuture().Wait();
+            }
+
+            _logger.Debug("Set default keyspace to {0}", _keyspaceConfig.Name);
         }
 
         private abstract class QueryInfo

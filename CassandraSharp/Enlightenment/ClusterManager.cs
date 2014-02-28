@@ -56,6 +56,7 @@ namespace CassandraSharp.Enlightenment
 
             TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
             IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
+            KeyspaceConfig keyspaceConfig = clusterConfig.DefaultKeyspace ?? new KeyspaceConfig();
 
             // create endpoints
             IEndpointSnitch snitch = ServiceActivator<Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
@@ -69,7 +70,7 @@ namespace CassandraSharp.Enlightenment
             IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
                                                                                                                       endpoints, snitch,
                                                                                                                       _logger, clusterConfig.Endpoints);
-            IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, _logger,
+            IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, keyspaceConfig, _logger,
                                                                                                                   _instrumentation);
 
             IPartitioner partitioner = ServiceActivator<Partitioner.Factory>.Create<IPartitioner>(clusterConfig.Partitioner);

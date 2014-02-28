@@ -13,18 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharpUnitTests.CQLPoco
+namespace CassandraSharp.CQLPoco
 {
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
+    using System;
 
-    [TestFixture]
-    public class DynamicInstanceBuilderTest : CommonInstanceBuilderTest
+    [AttributeUsageAttribute(AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public sealed class CqlColumnAttribute : Attribute
     {
-        protected override IInstanceBuilder GetInstanceBuilder<T>()
+        public string Name { get; private set; }
+
+        public CqlColumnAttribute(string name)
         {
-            return new InstanceBuilder<T>();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Column name cannot be null or empty.");
+            }
+
+            Name = name;
         }
     }
 }

@@ -13,37 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
+namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
-    using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
 
-    internal sealed class DataSource<T> : IDataSource
+    public static class ValueSerializerProvider
     {
-        private static readonly ReadAccessor<T> _accessor = new ReadAccessor<T>();
+        private static readonly Dictionary<Type, IValueSerializer> _valueSerializers = new Dictionary<Type, IValueSerializer>();
 
-        private T _dataSource;
-
-        public DataSource(T dataSource)
+        public static IValueSerializer GetSerializer(Type type)
         {
-            _dataSource = dataSource;
-        }
-
-        public object Get(IColumnSpec columnSpec)
-        {
-            string colName = columnSpec.Name;
-            try
+            lock (_valueSerializers)
             {
-                return _accessor.Get(ref _dataSource, colName);
-            }
-            catch (ArgumentException)
-            {
-                if (colName.Contains("_"))
+                IValueSerializer serializer;
+                if (!_valueSerializers.TryGetValue(type, out serializer))
                 {
-                    colName = colName.Replace("_", "");
+                    Type serializerType = typeof(ValueSerializer<>).MakeGenericType(type);
+                    serializer = (IValueSerializer)Activator.CreateInstance(serializerType);
+
+                    _valueSerializers[type] = serializer;
                 }
 
-                return _accessor.Get(ref _dataSource, colName);
+                return serializer;
             }
         }
     }

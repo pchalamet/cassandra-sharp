@@ -13,22 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
+namespace CassandraSharp.CQLPoco
 {
-    using CassandraSharp.Extensibility;
-
-    internal sealed class DataSource : IDataSource
+    public interface ICassandraTypeSerializer
     {
-        private readonly PropertyBag _dataSource;
+        byte[] Serialize(object value);
 
-        public DataSource(PropertyBag dataSource)
-        {
-            _dataSource = dataSource;
-        }
-
-        public object Get(IColumnSpec columnSpec)
-        {
-            return _dataSource[columnSpec.Name];
-        }
+        object Deserialize(byte[] data);
     }
 }

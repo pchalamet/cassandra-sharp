@@ -15,23 +15,46 @@
 
 namespace CassandraSharp.CQLOrdinal
 {
+    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Extensibility;
+    using System.Collections.Generic;
+    using System.Linq;
 
     internal sealed class OrdinalDataMapper : IDataMapper
     {
-        public OrdinalDataMapper(object[] dataSource)
+        public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
         {
-            if (null != dataSource)
+            object[] data = (object[])dataSource;
+
+            foreach (var column in columns)
             {
-                DataSource = new OrdinalDataSource(dataSource);
+                var value = data[column.Index];
+
+                byte[] rawData = null;
+                if (value != null)
+                {
+                    rawData = ValueSerialization.Serialize(column, value);
+                }
+
+                yield return new ColumnData(column, rawData);
             }
         }
 
-        public IDataSource DataSource { get; private set; }
-
-        public IInstanceBuilder CreateBuilder()
+        public object MapToObject(IEnumerable<IColumnData> rowData)
         {
-            return new OrdinalInstanceBuilder();
+            var rows = rowData.ToList();
+
+            var instance = new object[rows.Count];
+            foreach (var column in rows.OrderBy(x => x.ColumnSpec.Index))
+            {
+                var data = column.RawData != null ?
+                    ValueSerialization.Deserialize(column.ColumnSpec, column.RawData) :
+                    null;
+
+                instance[column.ColumnSpec.Index] = data;
+            }
+
+            return instance;
         }
     }
 }

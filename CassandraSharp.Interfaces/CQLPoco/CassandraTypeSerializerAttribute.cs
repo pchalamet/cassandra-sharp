@@ -16,17 +16,23 @@
 namespace CassandraSharp.CQLPoco
 {
     using System;
-    using CassandraSharp.Extensibility;
 
-    internal sealed class DataSourceFactory
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class CassandraTypeSerializerAttribute : Attribute
     {
-        public static IDataSource Create(object dataSource)
+        public Type TypeSerializer { get; private set; }
+
+        public ICassandraTypeSerializer Serializer { get; private set; }
+
+        public CassandraTypeSerializerAttribute(Type serializer)
         {
-            Type genDataSource = typeof(DataSource<>);
-            Type[] genParams = new[] {dataSource.GetType()};
-            Type typedDataSource = genDataSource.MakeGenericType(genParams);
-            IDataSource dynDataSource = (IDataSource) Activator.CreateInstance(typedDataSource, dataSource);
-            return dynDataSource;
+            if (!typeof(ICassandraTypeSerializer).IsAssignableFrom(serializer))
+            {
+                throw new ArgumentException(string.Format("{0} does not implement ICassandraTypeSerializer interface", serializer));
+            }
+
+            TypeSerializer = serializer;
+            Serializer = (ICassandraTypeSerializer)Activator.CreateInstance(serializer);
         }
     }
 }
