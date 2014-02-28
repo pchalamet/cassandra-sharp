@@ -33,7 +33,7 @@ namespace CassandraSharp.CQLOrdinal
                 byte[] rawData = null;
                 if (value != null)
                 {
-                    rawData = ValueSerialization.Serialize(column, value);
+                    rawData = column.Serialize(value);
                 }
 
                 yield return new ColumnData(column, rawData);
@@ -48,7 +48,7 @@ namespace CassandraSharp.CQLOrdinal
             foreach (var column in rows.OrderBy(x => x.ColumnSpec.Index))
             {
                 var data = column.RawData != null ?
-                    ValueSerialization.Deserialize(column.ColumnSpec, column.RawData) :
+                    column.ColumnSpec.Deserialize(column.RawData) :
                     null;
 
                 instance[column.ColumnSpec.Index] = data;

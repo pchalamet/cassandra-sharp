@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
-// Copyright (c) 2011-2013 Pierre Chalamet
+// Copyright (c) 2011-2014 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,61 +21,56 @@ namespace CassandraSharp.CQLPoco
     using System.Reflection;
     using System.Reflection.Emit;
 
-    public class ClassMap
+    internal class ClassMap
     {
-        private static readonly Dictionary<Type, ClassMap> ClassMaps;
-        private static readonly Dictionary<Type, ICassandraTypeSerializer> CustomTypeSerializers;
+        private static readonly Dictionary<Type, ClassMap> _classMaps;
 
-        private readonly List<MemberMap> members = new List<MemberMap>();
-        private readonly ILookup<string, MemberMap> memberByName;
-
-        public IEnumerable<MemberMap> Members { get { return members; } }
+        private readonly ILookup<string, MemberMap> _memberByName;
 
         static ClassMap()
         {
-            ClassMaps = new Dictionary<Type, ClassMap>();
-            CustomTypeSerializers = new Dictionary<Type, ICassandraTypeSerializer>();
+            _classMaps = new Dictionary<Type, ClassMap>();
         }
 
         protected ClassMap(Type type)
         {
-            members = GetMappedMembers(type);
-            memberByName = members.ToLookup(x => x.ColumnName);
+            IEnumerable<MemberMap> members = GetMappedMembers(type);
+            _memberByName = members.ToLookup(x => x.ColumnName);
         }
 
         public static ClassMap<T> GetClassMap<T>()
         {
             Type type = typeof(T);
             ClassMap map;
-            if (!ClassMaps.TryGetValue(type, out map))
+            if (!_classMaps.TryGetValue(type, out map))
             {
                 map = new ClassMap<T>();
-                ClassMaps[type] = map;
+                _classMaps[type] = map;
             }
 
-            return (ClassMap<T>)map;
+            return (ClassMap<T>) map;
         }
 
         public MemberMap GetMember(string name)
         {
-            return memberByName[name.ToLowerInvariant()].FirstOrDefault();
+            return _memberByName[name.ToLowerInvariant()].FirstOrDefault();
         }
 
-        private List<MemberMap> GetMappedMembers(Type type)
+        private IEnumerable<MemberMap> GetMappedMembers(Type type)
         {
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
             var members = type.GetProperties(bindingFlags).Concat<MemberInfo>(type.GetFields(bindingFlags));
 
-            return members.Where(x => !MemberMap.IsIgnored(x)).Select(x => new MemberMap(this, x)).ToList();
+            return members.Where(x => !MemberMap.IsIgnored(x)).Select(x => new MemberMap(this, x));
         }
     }
 
-    public class ClassMap<T> : ClassMap
+    internal class ClassMap<T> : ClassMap
     {
         private readonly NewInstance _newInstance;
 
         protected internal ClassMap()
-            : base(typeof(T))
+                : base(typeof(T))
         {
             _newInstance = GenerateNew();
         }
@@ -113,7 +108,7 @@ namespace CassandraSharp.CQLPoco
             }
             gen.Emit(OpCodes.Ret);
 
-            NewInstance newInstance = (NewInstance)dm.CreateDelegate(typeof(NewInstance));
+            NewInstance newInstance = (NewInstance) dm.CreateDelegate(typeof(NewInstance));
             return newInstance;
         }
 

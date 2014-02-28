@@ -1,5 +1,5 @@
 ﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
-// Copyright (c) 2011-2013 Pierre Chalamet
+// Copyright (c) 2011-2014 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,36 +15,42 @@
 
 namespace CassandraSharp.CQLPoco
 {
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Exceptions;
     using System;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Reflection.Emit;
+    using CassandraSharp.CQLBinaryProtocol;
+    using CassandraSharp.Exceptions;
 
-    public class MemberMap
+    internal class MemberMap
     {
-        private readonly ClassMap _classMap;
-        private readonly MemberInfo _memberInfo;
-        private readonly Type _type;
-
-        private readonly IValueSerializer _valueSerializer;
-
-        private readonly string _columnName;
-
-        private Action<object, object> _valueSetter;
         private Func<object, object> _valueGetter;
 
-        public ClassMap ClassMap { get { return _classMap; } }
+        private Action<object, object> _valueSetter;
 
-        public string ColumnName { get { return _columnName; } }
+        public MemberMap(ClassMap classMap, MemberInfo memberInfo)
+        {
+            ClassMap = classMap;
+            MemberInfo = memberInfo;
 
-        public Type Type { get { return _type; } }
+            Type = memberInfo is PropertyInfo
+                    ? (memberInfo as PropertyInfo).PropertyType
+                    : ((FieldInfo) memberInfo).FieldType;
 
-        public MemberInfo MemberInfo { get { return _memberInfo; } }
+            ColumnName = GetColumnName(memberInfo);
+            ValueSerializer = ValueSerializerProvider.GetSerializer(Type);
+        }
 
-        public IValueSerializer ValueSerializer { get { return _valueSerializer; } }
+        public ClassMap ClassMap { get; private set; }
+
+        public string ColumnName { get; private set; }
+
+        public Type Type { get; private set; }
+
+        public MemberInfo MemberInfo { get; private set; }
+
+        public IValueSerializer ValueSerializer { get; private set; }
 
         public Action<object, object> SetValue
         {
@@ -74,25 +80,7 @@ namespace CassandraSharp.CQLPoco
 
         public object CreateTypeInstance()
         {
-            return Activator.CreateInstance(_type);
-        }
-
-        public MemberMap(ClassMap classMap, MemberInfo memberInfo)
-        {
-            _classMap = classMap;
-            _memberInfo = memberInfo;
-
-            if (memberInfo is PropertyInfo)
-            {
-                _type = (memberInfo as PropertyInfo).PropertyType;
-            }
-            else
-            {
-                _type = ((FieldInfo)memberInfo).FieldType;
-            }
-
-            _columnName = GetColumnName(memberInfo);
-            _valueSerializer = ValueSerializerProvider.GetSerializer(_type);
+            return Activator.CreateInstance(Type);
         }
 
         public static bool IsIgnored(MemberInfo mi)
@@ -114,15 +102,15 @@ namespace CassandraSharp.CQLPoco
 
         private Func<object, object> GetGetter()
         {
-            var propertyInfo = _memberInfo as PropertyInfo;
+            var propertyInfo = MemberInfo as PropertyInfo;
             if (propertyInfo != null)
             {
                 var getMethodInfo = propertyInfo.GetGetMethod(true);
                 if (getMethodInfo == null)
                 {
                     var message = string.Format(
-                        "The property '{0} {1}' of class '{2}' has no 'get' accessor.",
-                        propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
+                            "The property '{0} {1}' of class '{2}' has no 'get' accessor.",
+                            propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
 
                     throw new DataMappingException(message);
                 }
@@ -131,26 +119,26 @@ namespace CassandraSharp.CQLPoco
             // lambdaExpression = (obj) => (object) ((TClass) obj).Member
             var objParameter = Expression.Parameter(typeof(object), "obj");
             var lambdaExpression = Expression.Lambda<Func<object, object>>(
-                Expression.Convert(
-                    Expression.MakeMemberAccess(
-                        Expression.Convert(objParameter, _memberInfo.DeclaringType),
-                        _memberInfo
-                    ),
-                    typeof(object)
-                ),
-                objParameter
-            );
+                    Expression.Convert(
+                            Expression.MakeMemberAccess(
+                                    Expression.Convert(objParameter, MemberInfo.DeclaringType),
+                                    MemberInfo
+                                    ),
+                            typeof(object)
+                            ),
+                    objParameter
+                    );
 
             return lambdaExpression.Compile();
         }
 
         private Action<object, object> GetSetter()
         {
-            if (_memberInfo is FieldInfo)
+            if (MemberInfo is FieldInfo)
             {
-                var fieldInfo = _memberInfo as FieldInfo;
+                var fieldInfo = MemberInfo as FieldInfo;
                 var sourceType = fieldInfo.DeclaringType;
-                var method = new DynamicMethod("Set" + fieldInfo.Name, null, new[] { typeof(object), typeof(object) }, true);
+                var method = new DynamicMethod("Set" + fieldInfo.Name, null, new[] {typeof(object), typeof(object)}, true);
                 var gen = method.GetILGenerator();
 
                 gen.Emit(OpCodes.Ldarg_0);
@@ -160,16 +148,16 @@ namespace CassandraSharp.CQLPoco
                 gen.Emit(OpCodes.Stfld, fieldInfo);
                 gen.Emit(OpCodes.Ret);
 
-                return (Action<object, object>)method.CreateDelegate(typeof(Action<object, object>));
+                return (Action<object, object>) method.CreateDelegate(typeof(Action<object, object>));
             }
 
-            var propertyInfo = (PropertyInfo)_memberInfo;
+            var propertyInfo = (PropertyInfo) MemberInfo;
             var setMethodInfo = propertyInfo.GetSetMethod(true);
             if (setMethodInfo == null)
             {
                 var message = string.Format(
-                    "The property '{0} {1}' of class '{2}' has no 'set' accessor.",
-                    propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
+                        "The property '{0} {1}' of class '{2}' has no 'set' accessor.",
+                        propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
                 throw new DataMappingException(message);
             }
 
@@ -177,14 +165,14 @@ namespace CassandraSharp.CQLPoco
             var objParameter = Expression.Parameter(typeof(object), "obj");
             var valueParameter = Expression.Parameter(typeof(object), "value");
             var lambdaExpression = Expression.Lambda<Action<object, object>>(
-                Expression.Call(
-                    Expression.Convert(objParameter, _memberInfo.DeclaringType),
-                    setMethodInfo,
-                    Expression.Convert(valueParameter, _type)
-                ),
-                objParameter,
-                valueParameter
-            );
+                    Expression.Call(
+                            Expression.Convert(objParameter, MemberInfo.DeclaringType),
+                            setMethodInfo,
+                            Expression.Convert(valueParameter, Type)
+                            ),
+                    objParameter,
+                    valueParameter
+                    );
 
             return lambdaExpression.Compile();
         }

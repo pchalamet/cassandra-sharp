@@ -22,9 +22,11 @@ namespace Samples.POCO
 
     public class NerdMovie
     {
-        public string Director;
+        [CqlColumn("Director")]
+        public string TheDirector;
 
-        public string MainActor;
+        [CqlColumn("MainActor")]
+        public string TheMainActor;
 
         public string Movie;
 
@@ -93,7 +95,7 @@ namespace Samples.POCO
             foreach (var resMovie in result)
             {
                 Console.WriteLine("Movie={0} Director={1} MainActor={2}, Year={3}",
-                                  resMovie.Movie, resMovie.Director, resMovie.MainActor, resMovie.Year);
+                                  resMovie.Movie, resMovie.TheDirector, resMovie.TheMainActor, resMovie.Year);
             }
         }
     }

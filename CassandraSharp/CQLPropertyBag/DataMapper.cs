@@ -32,7 +32,7 @@ namespace CassandraSharp.CQLPropertyBag
                 byte[] rawData = null;
                 if (value != null)
                 {
-                    rawData = ValueSerialization.Serialize(column, value);
+                    rawData = column.Serialize(value);
                 }
 
                 yield return new ColumnData(column, rawData);
@@ -46,7 +46,7 @@ namespace CassandraSharp.CQLPropertyBag
             foreach (var column in rowData)
             {
                 var data = column.RawData != null ?
-                    ValueSerialization.Deserialize(column.ColumnSpec, column.RawData) :
+                    column.ColumnSpec.Deserialize(column.RawData) :
                     null;
 
                 instance[column.ColumnSpec.Name] = data;

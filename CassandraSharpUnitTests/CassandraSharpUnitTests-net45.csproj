@@ -77,7 +77,37 @@
     <Compile Include="..\cassandra-sharp-info.cs">
       <Link>Properties\cassandra-sharp-info.cs</Link>
     </Compile>
-    <Compile Include="**\*.cs" />
+    <Compile Include="ClusterTest.cs" />
+    <Compile Include="CQLBinaryProtocol\DateTimeExtensionsTest.cs" />
+    <Compile Include="CQLBinaryProtocol\DefaultKeyspaceTest.cs" />
+    <Compile Include="CQLBinaryProtocol\ValueSerializerTest.cs" />
+    <Compile Include="CQLOrdinal\AllTypesTest.cs" />
+    <Compile Include="EndpointStrategy\FactoryTest.cs" />
+    <Compile Include="EndpointStrategy\RandomEndpointStrategyTest.cs" />
+    <Compile Include="Endurance\EnduranceTest.cs" />
+    <Compile Include="Enlightenment\FutureTest.cs" />
+    <Compile Include="Functional\AllTypesTest.cs" />
+    <Compile Include="Functional\CollectionTest.cs" />
+    <Compile Include="Functional\NullTest.cs" />
+    <Compile Include="Functional\StreamStarvationTest.cs" />
+    <Compile Include="PartitionerTest.cs" />
+    <Compile Include="Partitioner\MurmurHash3PartitionerTest.cs" />
+    <Compile Include="Partitioner\NullPartitioner.cs" />
+    <Compile Include="Performance\BinaryProtocolWrapper.cs" />
+    <Compile Include="Performance\PacketSizePerformanceTest.cs" />
+    <Compile Include="Performance\PerformanceInstrumentation.cs" />
+    <Compile Include="Performance\ProtocolWrapper.cs" />
+    <Compile Include="Performance\ThriftProtocolWrapper.cs" />
+    <Compile Include="Performance\WritePerformanceTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SectionHandlerTest.cs" />
+    <Compile Include="Snitch\FactoryTest.cs" />
+    <Compile Include="Snitch\RackInferringSnitchTest.cs" />
+    <Compile Include="Stress\StressTest.cs" />
+    <Compile Include="Utils\ArrayExtensionsTest.cs" />
+    <Compile Include="Utils\DisposableExtensionsTest.cs" />
+    <Compile Include="Utils\NetworkTest.cs" />
+    <Compile Include="Utils\ServiceActivatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Apache.Cassandra\Apache.Cassandra-net45.csproj">

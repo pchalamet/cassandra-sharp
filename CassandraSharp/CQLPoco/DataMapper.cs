@@ -1,5 +1,5 @@
 // cassandra-sharp - high performance .NET driver for Apache Cassandra
-// Copyright (c) 2011-2013 Pierre Chalamet
+// Copyright (c) 2011-2014 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
 
 namespace CassandraSharp.CQLPoco
 {
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
     internal sealed class DataMapper<T> : IDataMapper
     {
         private static readonly ClassMap<T> _classMap = ClassMap.GetClassMap<T>();
 
         public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
-        {            
+        {
             foreach (var column in columns)
             {
                 string colName = column.Name;
@@ -67,16 +66,17 @@ namespace CassandraSharp.CQLPoco
                     throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
                 }
 
-                var data = column.RawData != null ?
-                    member.ValueSerializer.Deserialize(column.RawData) :
-                    null;
+                var data = column.RawData != null
+                        ? member.ValueSerializer.Deserialize(column.RawData)
+                        : null;
 
                 member.SetValue(instance, data);
             }
 
-            if (instance is IDeserializationCallback)
+            var deserializationCallback = instance as IDeserializationCallback;
+            if (null != deserializationCallback)
             {
-                (instance as IDeserializationCallback).OnDeserialization(null);
+                deserializationCallback.OnDeserialization(null);
             }
 
             return instance;
