@@ -63,7 +63,7 @@ namespace CassandraSharp.CQLPoco
 
                 if (member == null)
                 {
-                    throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
+                    continue;
                 }
 
                 var data = column.RawData != null
