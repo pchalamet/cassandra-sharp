@@ -18,6 +18,7 @@ namespace CassandraSharpUnitTests.CQLPoco
     using NUnit.Framework;
     using System;
     using System.Linq;
+    using System.Reflection;
     using CassandraSharp.CQLPoco;
 
     [TestFixture]
@@ -39,6 +40,20 @@ namespace CassandraSharpUnitTests.CQLPoco
                                    TestProperty = "Property",
                                    TestField = "Field"
                                };
+        }
+
+        [Test]
+        public void MissingSerializerForComplexType_ThrowsException()
+        {
+            try
+            {
+                ClassMap.GetClassMap<BadPoco>();
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.IsTrue(
+                    ex.InnerException.Message.Contains("neither belongs to Cassandra native types nor has custom serializer defined."));
+            }
         }
 
         [Test]
@@ -167,6 +182,17 @@ namespace CassandraSharpUnitTests.CQLPoco
             }
         }
 
+        private class BadPoco
+        {
+            public BadPocoPoint Point { get; set; }
+        }
+
+        private class BadPocoPoint
+        {
+            public int X { get; set; }
+
+            public int Y { get; set; }
+        }
         #endregion
     }
 }

@@ -68,7 +68,36 @@ namespace CassandraSharpUnitTests.CQLPoco
 
             // Data should be mapped and serialized using correct serializer
             Assert.AreEqual(pocoInstance.TestField, stringSerializer.Deserialize(columnData[0].RawData));
-            Assert.AreEqual(pocoInstance.ComplexType, pointSerializer.Deserialize(columnData[1].RawData));
+            var pocoPoint = (PocoPoint)pointSerializer.Deserialize(columnData[1].RawData);
+
+            Assert.AreEqual(pocoInstance.ComplexType.X, pocoPoint.X);
+            Assert.AreEqual(pocoInstance.ComplexType.Y, pocoPoint.Y);
+            Assert.AreEqual(pocoInstance.DifferentName, stringSerializer.Deserialize(columnData[2].RawData));
+        }
+
+        [Test]
+        public void MapToColumns_ShouldBeUnderscoreAndCaseInsensitive()
+        {
+            var columnSpecs = new List<IColumnSpec>
+                                  {
+                                      CreateColumnSpec("Test_Field"),
+                                      CreateColumnSpec("complex_Type"),
+                                      CreateColumnSpec("another_Column")
+                                  };
+
+            var columnData = dataMapper.MapToColumns(pocoInstance, columnSpecs).ToList();
+
+            // Colums should come in same order, as requested
+            Assert.AreEqual(columnSpecs[0], columnData[0].ColumnSpec);
+            Assert.AreEqual(columnSpecs[1], columnData[1].ColumnSpec);
+            Assert.AreEqual(columnSpecs[2], columnData[2].ColumnSpec);
+
+            // Data should be mapped and serialized using correct serializer
+            Assert.AreEqual(pocoInstance.TestField, stringSerializer.Deserialize(columnData[0].RawData));
+            var pocoPoint = (PocoPoint)pointSerializer.Deserialize(columnData[1].RawData);
+
+            Assert.AreEqual(pocoInstance.ComplexType.X, pocoPoint.X);
+            Assert.AreEqual(pocoInstance.ComplexType.Y, pocoPoint.Y);
             Assert.AreEqual(pocoInstance.DifferentName, stringSerializer.Deserialize(columnData[2].RawData));
         }
 
@@ -81,6 +110,25 @@ namespace CassandraSharpUnitTests.CQLPoco
                                       new ColumnData(CreateColumnSpec("TestField"), stringSerializer.Serialize("abcde")),
                                       new ColumnData(CreateColumnSpec("ComplexType"), pointSerializer.Serialize(pocoPoint)),
                                       new ColumnData(CreateColumnSpec("AnotherColumn"), stringSerializer.Serialize("qwerty"))
+                                  };
+
+            var poco = (TestPoco)dataMapper.MapToObject(columnData);
+
+            Assert.AreEqual("abcde", poco.TestField);
+            Assert.AreEqual("qwerty", poco.DifferentName);
+            Assert.AreEqual(100, poco.ComplexType.X);
+            Assert.AreEqual(200, poco.ComplexType.Y);
+        }
+
+        [Test]
+        public void MapToObject__ShouldBeUnderscoreAndCaseInsensitive()
+        {
+            var pocoPoint = new PocoPoint { X = 100, Y = 200 };
+            var columnData = new List<IColumnData>
+                                  {
+                                      new ColumnData(CreateColumnSpec("test_Field"), stringSerializer.Serialize("abcde")),
+                                      new ColumnData(CreateColumnSpec("complex_Type"), pointSerializer.Serialize(pocoPoint)),
+                                      new ColumnData(CreateColumnSpec("Another_Column"), stringSerializer.Serialize("qwerty"))
                                   };
 
             var poco = (TestPoco)dataMapper.MapToObject(columnData);
