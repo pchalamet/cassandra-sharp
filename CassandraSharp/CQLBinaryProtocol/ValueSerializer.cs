@@ -32,9 +32,9 @@ namespace CassandraSharp.CQLBinaryProtocol
 
     public class ValueSerializer<T> : IValueSerializer
     {
-        private Func<object, byte[]> _serializer;
+        private readonly Func<object, byte[]> _serializer;
 
-        private Func<byte[], object> _deserializer;
+        private readonly Func<byte[], object> _deserializer;
 
         public ValueSerializer()
         {

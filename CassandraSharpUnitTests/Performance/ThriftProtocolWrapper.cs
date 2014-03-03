@@ -15,6 +15,7 @@
 
 namespace CassandraSharpUnitTests.Performance
 {
+#if NET45
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -91,4 +92,5 @@ namespace CassandraSharpUnitTests.Performance
             _client.execute_prepared_cql3_query(_query.ItemId, listPrms, ConsistencyLevel.QUORUM);
         }
     }
+#endif
 }
