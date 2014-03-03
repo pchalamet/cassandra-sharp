@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2012
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{220BEE49-7E3C-40D9-B58C-A5299F55419E}"
 	ProjectSection(SolutionItems) = preProject
 		cassandra-sharp.nuspec = cassandra-sharp.nuspec
@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus-net40", "cqlplus\cq
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp.Interfaces-net40", "CassandraSharp.Interfaces\CassandraSharp.Interfaces-net40.csproj", "{A2114728-05BC-4D36-9B3C-327B53CCCBF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharpUnitTests-net40", "CassandraSharpUnitTests\CassandraSharpUnitTests-net40.csproj", "{A22A3E7E-0148-4623-A982-A9AB21E3F23B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2114728-05BC-4D36-9B3C-327B53CCCBF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A22A3E7E-0148-4623-A982-A9AB21E3F23B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A22A3E7E-0148-4623-A982-A9AB21E3F23B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A22A3E7E-0148-4623-A982-A9AB21E3F23B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A22A3E7E-0148-4623-A982-A9AB21E3F23B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
