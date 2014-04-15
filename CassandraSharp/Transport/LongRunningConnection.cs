@@ -146,6 +146,10 @@ namespace CassandraSharp.Transport
         public void Dispose()
         {
             Close(null);
+
+            // wait for worker threads to gracefully shutdown
+            //ExceptionExtensions.SafeExecute(() => _responseWorker.Wait());
+            //ExceptionExtensions.SafeExecute(() => _queryWorker.Wait());
         }
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
@@ -203,10 +207,6 @@ namespace CassandraSharp.Transport
                 OnFailure(this, failureEventArgs);
                 OnFailure = null;
             }
-
-            // wait for worker threads to gracefully shutdown
-            ExceptionExtensions.SafeExecute(() => _responseWorker.Wait());
-            ExceptionExtensions.SafeExecute(() => _queryWorker.Wait());
         }
 
         private void SendQueryWorker()
