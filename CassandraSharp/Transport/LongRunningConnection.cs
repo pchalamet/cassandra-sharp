@@ -193,18 +193,15 @@ namespace CassandraSharp.Transport
                     }
                 }
 
-				var pendingQueriesList = _pendingQueries.ToList();
-				_pendingQueries.Clear();
-
-				foreach (var queryInfo in pendingQueriesList)
+				foreach (var queryInfo in _pendingQueries)
 				{
 					queryInfo.NotifyError(canceledException);
 					_instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
 				}
 
-				pendingQueriesList.Clear();
+				_pendingQueries.Clear();
 
-                _isClosed = true;
+				_isClosed = true;
             }
 
             // we have now the guarantee this instance is destroyed once
