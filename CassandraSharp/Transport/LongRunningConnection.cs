@@ -193,7 +193,15 @@ namespace CassandraSharp.Transport
                     }
                 }
 
-                _isClosed = true;
+				foreach (var queryInfo in _pendingQueries)
+				{
+					queryInfo.NotifyError(canceledException);
+					_instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
+				}
+
+				_pendingQueries.Clear();
+
+				_isClosed = true;
             }
 
             // we have now the guarantee this instance is destroyed once
@@ -203,7 +211,7 @@ namespace CassandraSharp.Transport
             {
                 _logger.Fatal("Failed with error : {0}", ex);
 
-                FailureEventArgs failureEventArgs = new FailureEventArgs(null);
+				FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
                 OnFailure(this, failureEventArgs);
                 OnFailure = null;
             }
@@ -259,6 +267,8 @@ namespace CassandraSharp.Transport
                             }
                             if (_isClosed)
                             {
+								queryInfo.NotifyError(new OperationCanceledException());
+								_instrumentation.ClientTrace(token, EventType.Cancellation);
                                 Monitor.Pulse(_lock);
                                 return;
                             }
