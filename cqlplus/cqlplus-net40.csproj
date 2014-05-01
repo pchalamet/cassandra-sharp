@@ -51,7 +51,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.XML" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\cassandra-sharp-version.cs">
@@ -73,17 +73,16 @@
     <Content Include="cassandra.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net40.csproj">
-      <Project>{a2114728-05bc-4d36-9b3c-327b53cccbf4}</Project>
-      <Name>CassandraSharp.Interfaces-net40</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp-net40.csproj">
-      <Project>{cca30206-6177-416c-9303-8d57d6038c77}</Project>
+      <Project>{CCA30206-6177-416C-9303-8D57D6038C77}</Project>
       <Name>CassandraSharp-net40</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net40.csproj">
+      <Project>{A2114728-05BC-4D36-9B3C-327B53CCCBF4}</Project>
+      <Name>CassandraSharp.Interfaces-net40</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
