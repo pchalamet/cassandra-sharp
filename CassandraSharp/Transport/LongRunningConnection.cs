@@ -101,8 +101,8 @@ namespace CassandraSharp.Transport
                 _pushResult = _config.ReceiveBuffering
                                       ? (Action<QueryInfo, IFrameReader, bool>) ((qi, fr, a) => Task.Factory.StartNew(() => PushResult(qi, fr, a)))
                                       : PushResult;
-                _responseWorker = Task.Factory.StartNew(ReadResponseWorker, TaskCreationOptions.LongRunning);
-                _queryWorker = Task.Factory.StartNew(SendQueryWorker, TaskCreationOptions.LongRunning);
+				_responseWorker = Task.Factory.StartNew(() => RunWorker(ReadResponse), TaskCreationOptions.LongRunning);
+				_queryWorker = Task.Factory.StartNew(() => RunWorker(SendQuery), TaskCreationOptions.LongRunning);
 
                 // readify the connection
                 _logger.Debug("Readyfying connection for {0}", Endpoint);
@@ -148,8 +148,8 @@ namespace CassandraSharp.Transport
             Close(null);
 
             // wait for worker threads to gracefully shutdown
-            //ExceptionExtensions.SafeExecute(() => _responseWorker.Wait());
-            //ExceptionExtensions.SafeExecute(() => _queryWorker.Wait());
+            ExceptionExtensions.SafeExecute(() => _responseWorker.Wait());
+            ExceptionExtensions.SafeExecute(() => _queryWorker.Wait());
         }
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
@@ -213,21 +213,23 @@ namespace CassandraSharp.Transport
 
 				FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
                 OnFailure(this, failureEventArgs);
-                OnFailure = null;
             }
+
+			// release event to release observer
+			OnFailure = null;
         }
 
-        private void SendQueryWorker()
-        {
-            try
-            {
-                SendQuery();
-            }
-            catch (Exception ex)
-            {
-                HandleError(ex);
-            }
-        }
+		private void RunWorker(Action action)
+		{
+			try
+			{
+				action();
+			}
+			catch (Exception ex)
+			{
+				HandleError(ex);
+			}
+		}
 
         private void SendQuery()
         {
@@ -298,18 +300,6 @@ namespace CassandraSharp.Transport
             }
         }
 
-        private void ReadResponseWorker()
-        {
-            try
-            {
-                ReadResponse();
-            }
-            catch (Exception ex)
-            {
-                HandleError(ex);
-            }
-        }
-
         private void ReadResponse()
         {
             while (true)
@@ -349,6 +339,7 @@ namespace CassandraSharp.Transport
                 _queryInfos[streamId] = null;
                 _availableStreamIds.Push(streamId);
             }
+
             return queryInfo;
         }
 
