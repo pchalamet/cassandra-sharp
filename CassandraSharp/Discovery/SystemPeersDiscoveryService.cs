@@ -44,9 +44,10 @@ namespace CassandraSharp.Discovery
 
             _logger = logger;
             _cluster = cluster;
-            _timer = new Timer(config.Interval * 1000);
+            _timer = new Timer(config.Interval*1000);
             _timer.Elapsed += (s, e) => TryDiscover();
             _timer.AutoReset = true;
+            _timer.Start();
 
             TryDiscover();
         }
