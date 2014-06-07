@@ -83,13 +83,25 @@ namespace CassandraSharp.Transport
 
                 _tcpClient = new TcpClient
                     {
-                            ReceiveTimeout = _config.ReceiveTimeout,
-                            SendTimeout = _config.SendTimeout,
-                            NoDelay = true,
-                            LingerState = {Enabled = true, LingerTime = 0},
+                        ReceiveTimeout = _config.ReceiveTimeout,
+                        SendTimeout = _config.SendTimeout,
+                        NoDelay = true,
+                        LingerState = { Enabled = true, LingerTime = 0 },
                     };
 
-                _tcpClient.Connect(address, _config.Port);
+                IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
+                bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
+
+                if (!success)
+                    throw new InvalidOperationException("Connection timeout occured.");
+
+                if (!_tcpClient.Connected)
+                {
+                    _tcpClient.Close();
+                    throw new InvalidOperationException("Can't connect to node.");
+                }
+
+                _tcpClient.EndConnect(asyncResult);
                 _socket = _tcpClient.Client;
 
                 _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
@@ -99,10 +111,10 @@ namespace CassandraSharp.Transport
                 }
 
                 _pushResult = _config.ReceiveBuffering
-                                      ? (Action<QueryInfo, IFrameReader, bool>) ((qi, fr, a) => Task.Factory.StartNew(() => PushResult(qi, fr, a)))
+                                      ? (Action<QueryInfo, IFrameReader, bool>)((qi, fr, a) => Task.Factory.StartNew(() => PushResult(qi, fr, a)))
                                       : PushResult;
-				_responseWorker = Task.Factory.StartNew(() => RunWorker(ReadResponse), TaskCreationOptions.LongRunning);
-				_queryWorker = Task.Factory.StartNew(() => RunWorker(SendQuery), TaskCreationOptions.LongRunning);
+                _responseWorker = Task.Factory.StartNew(() => RunWorker(ReadResponse), TaskCreationOptions.LongRunning);
+                _queryWorker = Task.Factory.StartNew(() => RunWorker(SendQuery), TaskCreationOptions.LongRunning);
 
                 // readify the connection
                 _logger.Debug("Readyfying connection for {0}", Endpoint);
@@ -193,15 +205,15 @@ namespace CassandraSharp.Transport
                     }
                 }
 
-				foreach (var queryInfo in _pendingQueries)
-				{
-					queryInfo.NotifyError(canceledException);
-					_instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
-				}
+                foreach (var queryInfo in _pendingQueries)
+                {
+                    queryInfo.NotifyError(canceledException);
+                    _instrumentation.ClientTrace(queryInfo.Token, EventType.Cancellation);
+                }
 
-				_pendingQueries.Clear();
+                _pendingQueries.Clear();
 
-				_isClosed = true;
+                _isClosed = true;
             }
 
             // we have now the guarantee this instance is destroyed once
@@ -211,25 +223,25 @@ namespace CassandraSharp.Transport
             {
                 _logger.Fatal("Failed with error : {0}", ex);
 
-				FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
+                FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
                 OnFailure(this, failureEventArgs);
             }
 
-			// release event to release observer
-			OnFailure = null;
+            // release event to release observer
+            OnFailure = null;
         }
 
-		private void RunWorker(Action action)
-		{
-			try
-			{
-				action();
-			}
-			catch (Exception ex)
-			{
-				HandleError(ex);
-			}
-		}
+        private void RunWorker(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex);
+            }
+        }
 
         private void SendQuery()
         {
@@ -269,8 +281,8 @@ namespace CassandraSharp.Transport
                             }
                             if (_isClosed)
                             {
-								queryInfo.NotifyError(new OperationCanceledException());
-								_instrumentation.ClientTrace(token, EventType.Cancellation);
+                                queryInfo.NotifyError(new OperationCanceledException());
+                                _instrumentation.ClientTrace(token, EventType.Cancellation);
                                 Monitor.Pulse(_lock);
                                 return;
                             }
@@ -431,7 +443,7 @@ namespace CassandraSharp.Transport
             }
 
             var obsAuth = new AuthenticateQuery(this, ConsistencyLevel.ONE, ExecutionFlags.None, _config.User, _config.Password).AsFuture();
-            if (! obsAuth.Result.Single())
+            if (!obsAuth.Result.Single())
             {
                 throw new InvalidCredentialException();
             }
@@ -478,7 +490,7 @@ namespace CassandraSharp.Transport
         {
             public QueryInfo(Action<IFrameWriter> writer, Func<IFrameReader, IEnumerable<T>> reader,
                              InstrumentationToken token, IObserver<T> observer)
-                    : base(token)
+                : base(token)
             {
                 Writer = writer;
                 Reader = reader;
