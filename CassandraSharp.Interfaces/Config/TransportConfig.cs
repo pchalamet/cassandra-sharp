@@ -44,6 +44,9 @@ namespace CassandraSharp.Config
         [XmlAttribute("type")]
         public string Type { get; set; }
 
+        [XmlAttribute("connTimeout")]
+        public int ConnectionTimeout { get; set; }
+
         [XmlAttribute("rcvTimeout")]
         public int ReceiveTimeout { get; set; }
 
