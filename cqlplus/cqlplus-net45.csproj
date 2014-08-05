@@ -50,7 +50,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.XML" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\cassandra-sharp-version.cs">
@@ -73,11 +73,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net45.csproj">
-      <Project>{6f6eb447-9569-406a-a23b-c09b6dbdbe10}</Project>
+      <Project>{6F6EB447-9569-406A-A23B-C09B6DBDBE10}</Project>
       <Name>CassandraSharp.Interfaces-net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
-      <Project>{c1d252b7-d766-4c28-9c46-0696f896846c}</Project>
+      <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
       <Name>CassandraSharp-net45</Name>
     </ProjectReference>
   </ItemGroup>
