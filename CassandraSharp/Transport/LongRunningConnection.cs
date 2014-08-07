@@ -89,8 +89,9 @@ namespace CassandraSharp.Transport
                         LingerState = { Enabled = true, LingerTime = 0 },
                     };
 
+				var ttw = _config.ConnectionTimeout == 0 ? TimeSpan.FromMilliseconds(-1) : TimeSpan.FromSeconds(_config.ConnectionTimeout);
                 IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
-                bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
+                bool success = asyncResult.AsyncWaitHandle.WaitOne(ttw, true);
 
                 if (! success)
                 {
