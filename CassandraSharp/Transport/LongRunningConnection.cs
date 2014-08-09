@@ -93,7 +93,6 @@ namespace CassandraSharp.Transport
                 {
                     // TODO: refactor this and this probably is not robust in front of error
                     IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
-                    int connTimeout = _config.ConnectionTimeout;
                     bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
 
                     if (! success)
@@ -197,8 +196,11 @@ namespace CassandraSharp.Transport
             // already in close state ?
             lock (_lock)
             {
-                Monitor.Pulse(_lock);
-                if (_isClosed)
+                bool wasClosed = _isClosed;
+                _isClosed = true;
+                Monitor.PulseAll(_lock);
+
+                if (wasClosed)
                 {
                     return;
                 }
@@ -224,8 +226,6 @@ namespace CassandraSharp.Transport
                 }
 
                 _pendingQueries.Clear();
-
-                _isClosed = true;
             }
 
             // we have now the guarantee this instance is destroyed once
