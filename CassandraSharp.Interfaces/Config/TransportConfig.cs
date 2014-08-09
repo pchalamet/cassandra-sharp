@@ -30,6 +30,7 @@ namespace CassandraSharp.Config
             DefaultExecutionFlags = ExecutionFlags.None;
             KeepAlive = true;
             ReceiveBuffering = true;
+            ConnectionTimeout = -1;
         }
 
         [XmlAttribute("keepAlive")]

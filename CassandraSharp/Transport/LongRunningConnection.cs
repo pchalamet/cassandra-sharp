@@ -89,21 +89,31 @@ namespace CassandraSharp.Transport
                         LingerState = { Enabled = true, LingerTime = 0 },
                     };
 
-                IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
-                bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
-
-                if (! success)
+                if(0 < _config.ConnectionTimeout)
                 {
-                    throw new InvalidOperationException("Connection timeout occured.");
-                }
+                    // TODO: refactor this and this probably is not robust in front of error
+                    IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
+                    int connTimeout = _config.ConnectionTimeout;
+                    bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
 
-                if (! _tcpClient.Connected)
+                    if (! success)
+                    {
+                        throw new InvalidOperationException("Connection timeout occured.");
+                    }
+
+                    if (! _tcpClient.Connected)
+                    {
+                        _tcpClient.Close();
+                        throw new InvalidOperationException("Can't connect to node.");
+                    }
+
+                    _tcpClient.EndConnect(asyncResult);
+                }
+                else
                 {
-                    _tcpClient.Close();
-                    throw new InvalidOperationException("Can't connect to node.");
+                    _tcpClient.Connect(address, _config.Port);
                 }
-
-                _tcpClient.EndConnect(asyncResult);
+    
                 _socket = _tcpClient.Client;
 
                 _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
