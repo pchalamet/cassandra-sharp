@@ -196,8 +196,11 @@ namespace CassandraSharp.Transport
             // already in close state ?
             lock (_lock)
             {
+                bool wasClosed = _isClosed;
+                _isClosed = true;
                 Monitor.PulseAll(_lock);
-                if (_isClosed)
+
+                if (wasClosed)
                 {
                     return;
                 }
@@ -223,8 +226,6 @@ namespace CassandraSharp.Transport
                 }
 
                 _pendingQueries.Clear();
-
-                _isClosed = true;
             }
 
             // we have now the guarantee this instance is destroyed once
