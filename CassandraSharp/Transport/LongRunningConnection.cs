@@ -93,7 +93,6 @@ namespace CassandraSharp.Transport
                 {
                     // TODO: refactor this and this probably is not robust in front of error
                     IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
-                    int connTimeout = _config.ConnectionTimeout;
                     bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
 
                     if (! success)
@@ -197,7 +196,7 @@ namespace CassandraSharp.Transport
             // already in close state ?
             lock (_lock)
             {
-                Monitor.Pulse(_lock);
+                Monitor.PulseAll(_lock);
                 if (_isClosed)
                 {
                     return;
