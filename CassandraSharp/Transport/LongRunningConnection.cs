@@ -177,6 +177,11 @@ namespace CassandraSharp.Transport
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
         {
+			if (ExceptionExtensions.IsMono)
+			{
+				return;
+			}
+
             // marshal the equivalent of the native structure into a byte array
             byte[] inOptionValues = new byte[12];
 

@@ -20,6 +20,8 @@ namespace CassandraSharp.Utils
 
     internal static class ExceptionExtensions
     {
+		private static bool _isMono = Type.GetType ("Mono.Runtime") != null;
+
         public static void SafeExecute(Action action)
         {
             try
@@ -32,5 +34,10 @@ namespace CassandraSharp.Utils
             {
             }
         }
+
+		public static bool IsMono
+		{
+			get { return _isMono; }
+		}
     }
 }
