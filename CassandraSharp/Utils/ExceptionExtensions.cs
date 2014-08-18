@@ -20,20 +20,6 @@ namespace CassandraSharp.Utils
 
     internal static class ExceptionExtensions
     {
-        private static readonly Action<Exception> _preserveInternalException;
-
-        static ExceptionExtensions()
-        {
-            MethodInfo preserveStackTrace = typeof(Exception).GetMethod("InternalPreserveStackTrace", BindingFlags.Instance | BindingFlags.NonPublic);
-            _preserveInternalException = (Action<Exception>) Delegate.CreateDelegate(typeof(Action<Exception>), preserveStackTrace);
-        }
-
-        public static void RethrowPreserveStackTrace(this Exception @this)
-        {
-            _preserveInternalException(@this);
-            throw @this;
-        }
-
         public static void SafeExecute(Action action)
         {
             try
