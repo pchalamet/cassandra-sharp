@@ -68,7 +68,7 @@ namespace CassandraSharp.CQLPoco
 
                 var data = column.RawData != null
                         ? member.ValueSerializer.Deserialize(column.RawData)
-                        : null;
+                        : member.DefaultValue;
 
                 member.SetValue(instance, data);
             }
