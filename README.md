@@ -1,6 +1,6 @@
 cassandra-sharp - high performance .NET driver for Apache Cassandra
 ===================================================================
-https://ci.appveyor.com/api/projects/status/github/pchalamet/cassandra-sharp?branch=master
+![build status](https://ci.appveyor.com/api/projects/status/github/pchalamet/cassandra-sharp?branch=master)
 
 The philosophy of cassandra-sharp is to be really simple and fast: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 
