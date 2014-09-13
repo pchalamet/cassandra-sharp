@@ -59,7 +59,7 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             // grab a connection
-            BigInteger? token = _cluster.Partitioner.ComputeToken(partitionKey);
+            BigInteger? token = partitionKey == null ? null : _cluster.Partitioner.ComputeToken(partitionKey);
             IConnection connection = _cluster.GetConnection(token);
 
             // define execution context
