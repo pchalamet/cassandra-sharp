@@ -17,19 +17,13 @@ namespace CassandraSharp.Utils
 {
     using System;
 
-    internal static class ExceptionExtensions
+    internal static class Runtime
     {
-        public static void SafeExecute(Action action)
+        private static readonly bool _isMono = Type.GetType("Mono.Runtime") != null;
+
+        public static bool IsMono
         {
-            try
-            {
-                action();
-            }
-// ReSharper disable EmptyGeneralCatchClause
-            catch
-// ReSharper restore EmptyGeneralCatchClause
-            {
-            }
+            get { return _isMono; }
         }
     }
 }

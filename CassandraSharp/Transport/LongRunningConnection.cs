@@ -177,7 +177,7 @@ namespace CassandraSharp.Transport
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
         {
-			if (ExceptionExtensions.IsMono)
+			if (Runtime.IsMono)
 			{
 				return;
 			}
