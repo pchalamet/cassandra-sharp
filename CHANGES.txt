@@ -1,4 +1,9 @@
-﻿version 3.4.0
+﻿version 3.5.0
+- dropped .net 4.0 support
+- fixed issue 82 (https://github.com/pchalamet/cassandra-sharp/issues/82)
+- fixed issue 83 (https://github.com/pchalamet/cassandra-sharp/issues/83)
+
+version 3.4.0
 - fixed issue 73 (https://github.com/pchalamet/cassandra-sharp/issues/73)
 - new features by Virus-X: POCO mapper enhancements
 

@@ -84,30 +84,15 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<ApiFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.Interfaces.dll" />
-		<ApiFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.Interfaces.pdb" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ApiFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.Interfaces.dll" />
 		<ApiFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.Interfaces.pdb" />
 	</ItemGroup>
 	
 	<ItemGroup>
-		<CoreFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.dll" />
-		<CoreFiles-net40 Include="bin\net40\$(Configuration)\CassandraSharp.pdb" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<CoreFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.dll" />
 		<CoreFiles-net45 Include="bin\net45\$(Configuration)\CassandraSharp.pdb" />
 	</ItemGroup>
 	
-	<ItemGroup>
-		<ToolsFiles-net40 Include="bin\net40\$(Configuration)\cqlplus.exe" />
-		<ToolsFiles-net40 Include="bin\net40\$(Configuration)\cqlplus.pdb" />
-	</ItemGroup>
-
 	<ItemGroup>
 		<ToolsFiles-net45 Include="bin\net45\$(Configuration)\cqlplus.exe" />
 		<ToolsFiles-net45 Include="bin\net45\$(Configuration)\cqlplus.pdb" />
@@ -146,20 +131,12 @@
 
 	<Target Name="BuildNuGetPackages" DependsOnTargets="Clean;Compile">
 		<ItemGroup>
-			<RxFiles-net40 Include="packages\Rx-Core.$(RxCoreVersion)\lib\Net40\System.Reactive.Core.dll" />
-			<RxFiles-net40 Include="packages\Rx-Interfaces.$(RxInterfacesVersion)\lib\Net40\System.Reactive.Interfaces.dll" />
-			<RxFiles-net40 Include="packages\Rx-Linq.$(RxLinqVersion)\lib\Net40\System.Reactive.Linq.dll" />
-			<RxFiles-net40 Include="packages\Rx-PlatformServices.$(RxPlatformServicesVersion)\lib\Net40\System.Reactive.PlatformServices.dll" />
-		</ItemGroup>
-
-		<ItemGroup>
 			<RxFiles-net45 Include="packages\Rx-Core.$(RxCoreVersion)\lib\Net45\System.Reactive.Core.dll" />
 			<RxFiles-net45 Include="packages\Rx-Interfaces.$(RxInterfacesVersion)\lib\Net45\System.Reactive.Interfaces.dll" />
 			<RxFiles-net45 Include="packages\Rx-Linq.$(RxLinqVersion)\lib\Net45\System.Reactive.Linq.dll" />
 			<RxFiles-net45 Include="packages\Rx-PlatformServices.$(RxPlatformServicesVersion)\lib\Net45\System.Reactive.PlatformServices.dll" />
 		</ItemGroup>
 			
-		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetApiPackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(ApiFiles-net45)" DestinationFolder="$(NuGetApiPackageDir)\lib\net45" />		
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetApiPackageDir)" />
 		<Copy SourceFiles="$(ApiProjectName).nuspec" DestinationFolder="$(NuGetApiPackageDir)" />
@@ -167,7 +144,6 @@
 		<XmlPoke XmlInputPath="$(NuGetApiPackageDir)\$(ApiProjectName).nuspec" Query="/package/metadata/releaseNotes" Value="$(ReleaseNotes)" />
 		<Exec Command="$(NuGet) pack $(NuGetApiPackageDir)\$(ApiProjectName).nuspec -OutputDirectory $(OutDir)" />
 
-		<Copy SourceFiles="@(CoreFiles-net40)" DestinationFolder="$(NuGetCorePackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(CoreFiles-net45)" DestinationFolder="$(NuGetCorePackageDir)\lib\net45" />		
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetCorePackageDir)" />
 		<Copy SourceFiles="$(CoreProjectName).nuspec" DestinationFolder="$(NuGetCorePackageDir)" />
@@ -186,13 +162,8 @@
 		<XmlPoke XmlInputPath="$(NuGetMainPackageDir)\$(MainProjectName).nuspec" Query="/package/metadata/releaseNotes" Value="$(ReleaseNotes)" />
 		<Exec Command="$(NuGet) pack $(NuGetMainPackageDir)\$(MainProjectName).nuspec -OutputDirectory $(OutDir)" />
 		
-		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
-		<Copy SourceFiles="@(ApiFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
-		<Copy SourceFiles="@(CoreFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(CoreFiles-net45)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net45" />		
-		<Copy SourceFiles="@(ToolsFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(ToolsFiles-net45)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net45" />		
-		<Copy SourceFiles="@(RxFiles-net40)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net40" />		
 		<Copy SourceFiles="@(RxFiles-net45)" DestinationFolder="$(NuGetToolsPackageDir)\lib\net45" />				
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetToolsPackageDir)" />
 		<Copy SourceFiles="$(ToolsProjectName).nuspec" DestinationFolder="$(NuGetToolsPackageDir)" />

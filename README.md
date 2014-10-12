@@ -1,5 +1,7 @@
 cassandra-sharp - high performance .NET driver for Apache Cassandra
 ===================================================================
+![build status](https://ci.appveyor.com/api/projects/status/github/pchalamet/cassandra-sharp?branch=master)
+
 The philosophy of cassandra-sharp is to be really simple and fast: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 
 Starting from version 2, only CQL 3 binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Also, only .NET 4.0+ is supported. If you are looking for a Thrift compatible driver, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.

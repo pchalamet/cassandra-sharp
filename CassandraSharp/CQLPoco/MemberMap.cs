@@ -40,6 +40,7 @@ namespace CassandraSharp.CQLPoco
 
             ColumnName = GetColumnName(memberInfo);
             ValueSerializer = ValueSerializerProvider.GetSerializer(Type);
+			DefaultValue = Type.IsValueType ? Activator.CreateInstance(Type) : null;
         }
 
         public ClassMap ClassMap { get; private set; }
@@ -82,6 +83,8 @@ namespace CassandraSharp.CQLPoco
         {
             return Activator.CreateInstance(Type);
         }
+
+		public object DefaultValue { get; private set; }
 
         public static bool IsIgnored(MemberInfo mi)
         {
