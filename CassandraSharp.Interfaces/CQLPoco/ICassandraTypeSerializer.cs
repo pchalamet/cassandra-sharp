@@ -13,12 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.CQLPoco
 {
-    public interface ICassandraTypeSerializer
+    public interface ICassandraTypeSerializerBase
+    {
+        
+    }
+    public interface ICassandraTypeSerializer : ICassandraTypeSerializerBase
     {
         byte[] Serialize(object value);
 
         object Deserialize(byte[] data);
+    }
+    public interface ICassandraGenericTypeSerializer : ICassandraTypeSerializerBase
+    {
+        byte[] Serialize(object value, Func<Type, Func<object, byte[]>> defaultSerializer);
+
+        object Deserialize(byte[] data, Func<Type, Func<byte[], object>> defaultSerializer);
     }
 }

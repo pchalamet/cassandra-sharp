@@ -17,22 +17,33 @@ namespace CassandraSharp.CQLPoco
 {
     using System;
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
     public class CassandraTypeSerializerAttribute : Attribute
     {
         public Type TypeSerializer { get; private set; }
 
-        public ICassandraTypeSerializer Serializer { get; private set; }
+        public Func<Type, ICassandraTypeSerializerBase> Serializer { get; private set; }
 
         public CassandraTypeSerializerAttribute(Type serializer)
         {
-            if (!typeof(ICassandraTypeSerializer).IsAssignableFrom(serializer))
+            if (!typeof(ICassandraTypeSerializerBase).IsAssignableFrom(serializer))
             {
                 throw new ArgumentException(string.Format("{0} does not implement ICassandraTypeSerializer interface", serializer));
             }
 
             TypeSerializer = serializer;
-            Serializer = (ICassandraTypeSerializer)Activator.CreateInstance(serializer);
+
+            if (serializer.ContainsGenericParameters)
+            {
+                if (serializer.Name.EndsWith("`1"))
+                {
+                    // Assume passing type information to serializer
+                    Serializer = (type) => (ICassandraGenericTypeSerializer)Activator.CreateInstance(TypeSerializer.MakeGenericType(type));
+                    return;
+                }
+                throw new ArgumentException(string.Format("{0} contains more than one generic parameter (assumed to be the type being (de)serialized)", serializer));
+            }
+            Serializer = (type) => (ICassandraTypeSerializer)Activator.CreateInstance(serializer);
         }
     }
 }
