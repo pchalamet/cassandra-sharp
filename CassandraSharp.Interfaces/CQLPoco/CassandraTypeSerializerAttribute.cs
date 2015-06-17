@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
+
 namespace CassandraSharp.CQLPoco
 {
     using System;
@@ -32,17 +34,21 @@ namespace CassandraSharp.CQLPoco
             }
 
             TypeSerializer = serializer;
-
-            if (serializer.ContainsGenericParameters)
+            var ctors = serializer.GetConstructors();
+            var typeCtor = ctors.Where(ctor =>
             {
-                if (serializer.Name.EndsWith("`1"))
-                {
-                    // Assume passing type information to serializer
-                    Serializer = (type) => (ICassandraGenericTypeSerializer)Activator.CreateInstance(TypeSerializer.MakeGenericType(type));
-                    return;
-                }
-                throw new ArgumentException(string.Format("{0} contains more than one generic parameter (assumed to be the type being (de)serialized)", serializer));
+                var prms = ctor.GetParameters();
+                if (prms.Length != 1 || prms.First().ParameterType != typeof (Type))
+                    return false;
+                return true;
+            }).FirstOrDefault();
+
+            if (typeCtor != null)
+            {
+                Serializer = (type) => (ICassandraTypeSerializerEx) typeCtor.Invoke(new object[] {type});
+                return;
             }
+
             Serializer = (type) => (ICassandraTypeSerializer)Activator.CreateInstance(serializer);
         }
     }

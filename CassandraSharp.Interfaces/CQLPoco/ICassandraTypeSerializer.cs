@@ -21,13 +21,15 @@ namespace CassandraSharp.CQLPoco
     {
         
     }
+
     public interface ICassandraTypeSerializer : ICassandraTypeSerializerBase
     {
         byte[] Serialize(object value);
 
         object Deserialize(byte[] data);
     }
-    public interface ICassandraGenericTypeSerializer : ICassandraTypeSerializerBase
+
+    public interface ICassandraTypeSerializerEx : ICassandraTypeSerializerBase
     {
         byte[] Serialize(object value, Func<Type, Func<object, byte[]>> defaultSerializer);
 

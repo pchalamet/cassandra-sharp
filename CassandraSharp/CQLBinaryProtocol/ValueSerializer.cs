@@ -107,8 +107,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             {
                 var serializer = customSerializer.Serializer(type);
                 // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
-                if( serializer is ICassandraGenericTypeSerializer )
-                    return value => ((ICassandraGenericTypeSerializer)serializer).Serialize(value, GenerateObjectSerializer);
+                if( serializer is ICassandraTypeSerializerEx )
+                    return value => ((ICassandraTypeSerializerEx)serializer).Serialize(value, GenerateObjectSerializer);
 
                 return value => ((ICassandraTypeSerializer)serializer).Serialize(value);
             }
@@ -240,8 +240,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             {
                 var serializer = customSerializer.Serializer(type);
                 // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
-                if (serializer is ICassandraGenericTypeSerializer)
-                    return value => ((ICassandraGenericTypeSerializer)serializer).Deserialize(value, GenerateObjectDeserializer);
+                if (serializer is ICassandraTypeSerializerEx)
+                    return value => ((ICassandraTypeSerializerEx)serializer).Deserialize(value, GenerateObjectDeserializer);
 
                 return value => ((ICassandraTypeSerializer)serializer).Deserialize(value);
             }
