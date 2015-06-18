@@ -105,12 +105,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             var customSerializer = type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as CassandraTypeSerializerAttribute;
             if (customSerializer != null)
             {
-                var serializer = customSerializer.Serializer(type);
-                // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
-                if( serializer is ICassandraTypeSerializerEx )
-                    return value => ((ICassandraTypeSerializerEx)serializer).Serialize(value, GenerateObjectSerializer);
-
-                return value => ((ICassandraTypeSerializer)serializer).Serialize(value);
+                var serializer = customSerializer.Serializer(type,GenerateSerializer,GenerateDeserializer);
+                return value => serializer.Serialize(value);
             }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -238,12 +234,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             var customSerializer = type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as CassandraTypeSerializerAttribute;
             if (customSerializer != null)
             {
-                var serializer = customSerializer.Serializer(type);
-                // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
-                if (serializer is ICassandraTypeSerializerEx)
-                    return value => ((ICassandraTypeSerializerEx)serializer).Deserialize(value, GenerateObjectDeserializer);
-
-                return value => ((ICassandraTypeSerializer)serializer).Deserialize(value);
+                var serializer = customSerializer.Serializer(type,GenerateSerializer,GenerateDeserializer);
+                return value => serializer.Deserialize(value);
             }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))

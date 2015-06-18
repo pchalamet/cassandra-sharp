@@ -17,22 +17,10 @@ using System;
 
 namespace CassandraSharp.CQLPoco
 {
-    public interface ICassandraTypeSerializerBase
-    {
-        
-    }
-
-    public interface ICassandraTypeSerializer : ICassandraTypeSerializerBase
+    public interface ICassandraTypeSerializer
     {
         byte[] Serialize(object value);
 
         object Deserialize(byte[] data);
-    }
-
-    public interface ICassandraTypeSerializerEx : ICassandraTypeSerializerBase
-    {
-        byte[] Serialize(object value, Func<Type, Func<object, byte[]>> defaultSerializer);
-
-        object Deserialize(byte[] data, Func<Type, Func<byte[], object>> defaultSerializer);
     }
 }
