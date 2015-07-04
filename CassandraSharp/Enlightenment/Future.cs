@@ -24,16 +24,16 @@ namespace CassandraSharp.Enlightenment
 
     internal sealed class Future : IFuture
     {
-        public Task<IList<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token)
+        public Task<IEnumerable<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token)
         {
-            var obsEnumerable = observable.Aggregate((IList<T>) new List<T>(),
+            var obsEnumerable = observable.Aggregate((IEnumerable<T>) new List<T>(),
                                                      (acc, v) =>
                                                          {
-                                                             acc.Add(v);
+                                                             ((List<T>)acc).Add(v);
                                                              return acc;
                                                          });
 
-            Task<IList<T>> task = token.HasValue
+            Task<IEnumerable<T>> task = token.HasValue
                                           ? obsEnumerable.ToTask(token.Value)
                                           : obsEnumerable.ToTask();
             return task;
