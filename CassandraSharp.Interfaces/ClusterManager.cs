@@ -22,22 +22,22 @@ namespace CassandraSharp
     {
         public static ICluster GetCluster(string name)
         {
-            return EnglightenmentMgr.ClusterManager().GetCluster(name);
+            return EnlightenmentMgr.ClusterManager().GetCluster(name);
         }
 
         public static ICluster GetCluster(ClusterConfig clusterConfig)
         {
-            return EnglightenmentMgr.ClusterManager().GetCluster(clusterConfig);
+            return EnlightenmentMgr.ClusterManager().GetCluster(clusterConfig);
         }
 
         public static void Shutdown()
         {
-            EnglightenmentMgr.ClusterManager().Shutdown();
+            EnlightenmentMgr.ClusterManager().Shutdown();
         }
 
         public static void Configure(CassandraSharpConfig config)
         {
-            EnglightenmentMgr.ClusterManager().Configure(config);
+            EnlightenmentMgr.ClusterManager().Configure(config);
         }
     }
 }

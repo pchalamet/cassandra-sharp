@@ -25,12 +25,12 @@ namespace CassandraSharp
     {
         public static Task<IEnumerable<T>> AsFuture<T>(this IObservable<T> observable, CancellationToken? token = null)
         {
-            return EnglightenmentMgr.Future().AsFuture(observable, token);
+            return EnlightenmentMgr.Future().AsFuture(observable, token);
         }
 
         public static Task AsFuture(this IObservable<NonQuery> observable, CancellationToken? token = null)
         {
-            return EnglightenmentMgr.Future().AsFuture(observable, token);
+            return EnlightenmentMgr.Future().AsFuture(observable, token);
         }
 
         public static IQuery<NonQuery> Execute(this ICqlCommand @this, string cql)

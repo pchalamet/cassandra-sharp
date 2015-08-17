@@ -35,7 +35,7 @@ namespace CassandraSharp.CQLCommand
 
         public ICqlCommand Build()
         {
-            return EnglightenmentMgr.CommandFactory().Create(_cluster, _factoryFrom, _factoryTo);
+            return EnlightenmentMgr.CommandFactory().Create(_cluster, _factoryFrom, _factoryTo);
         }
 
         ICqlCommandBuilderTo ICqlCommandBuilderFrom.Set(IDataMapperFactory factory)
