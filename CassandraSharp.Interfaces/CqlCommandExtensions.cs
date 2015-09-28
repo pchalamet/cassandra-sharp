@@ -23,7 +23,7 @@ namespace CassandraSharp
 
     public static class CqlCommandExtensions
     {
-        public static Task<IEnumerable<T>> AsFuture<T>(this IObservable<T> observable, CancellationToken? token = null)
+        public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable, CancellationToken? token = null)
         {
             return EnlightenmentMgr.Future().AsFuture(observable, token);
         }

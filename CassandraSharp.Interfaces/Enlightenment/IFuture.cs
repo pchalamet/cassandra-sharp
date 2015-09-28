@@ -22,7 +22,7 @@ namespace CassandraSharp.Enlightenment
 
     public interface IFuture
     {
-        Task<IEnumerable<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token);
+        Task<IList<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token);
 
         Task AsFuture(IObservable<NonQuery> observable, CancellationToken? token);
     }
