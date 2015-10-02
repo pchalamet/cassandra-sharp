@@ -26,7 +26,7 @@ namespace CassandraSharp.Enlightenment
     {
         public Task<IList<T>> AsFuture<T>(IObservable<T> observable, CancellationToken? token)
         {
-            var obsEnumerable = observable.Aggregate((IList<T>) new List<T>(),
+            var obsEnumerable = observable.Aggregate((IList<T>)new List<T>(),
                                                      (acc, v) =>
                                                          {
                                                              acc.Add(v);

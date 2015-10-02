@@ -105,7 +105,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             var customSerializer = type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as CassandraTypeSerializerAttribute;
             if (customSerializer != null)
             {
-                return value => customSerializer.Serializer.Serialize(value);
+                var serializer = customSerializer.Serializer(type,GenerateSerializer,GenerateDeserializer);
+                return value => serializer.Serialize(value);
             }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -133,6 +134,12 @@ namespace CassandraSharp.CQLBinaryProtocol
             {
                 return value => ValueSerialization.Serialize(ColumnType.Blob, value);
             }
+
+            if (typeof(DateTimeOffset).IsAssignableFrom(type))
+            {
+                return value => ValueSerialization.Serialize(ColumnType.Timestamp, ((DateTimeOffset) value).UtcDateTime);
+            }
+
 
             if (typeof(IDictionary).IsAssignableFrom(type))
             {
@@ -227,7 +234,8 @@ namespace CassandraSharp.CQLBinaryProtocol
             var customSerializer = type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as CassandraTypeSerializerAttribute;
             if (customSerializer != null)
             {
-                return value => customSerializer.Serializer.Deserialize(value);
+                var serializer = customSerializer.Serializer(type,GenerateSerializer,GenerateDeserializer);
+                return value => serializer.Deserialize(value);
             }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -254,6 +262,11 @@ namespace CassandraSharp.CQLBinaryProtocol
             if (typeof(byte[]).IsAssignableFrom(type))
             {
                 return value => ValueSerialization.Deserialize(ColumnType.Blob, value);
+            }
+            if (typeof(DateTimeOffset).IsAssignableFrom(type))
+            {
+                // DateTime deserializer assumes local, but the value is truely utx
+                return value => (DateTimeOffset) DateTime.SpecifyKind((DateTime) ValueSerialization.Deserialize(ColumnType.Timestamp, value), DateTimeKind.Local);
             }
 
             if (typeof(IDictionary).IsAssignableFrom(type))

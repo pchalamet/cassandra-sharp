@@ -207,7 +207,12 @@ namespace CassandraSharp.CQLBinaryProtocol
                     break;
 
                 case ColumnType.Timestamp:
-                    rawData = ((DateTime)data).GetBytes();
+                    if( data is DateTime )
+                        rawData = ((DateTime)data).GetBytes();
+                    else if( data is DateTimeOffset )
+                        rawData = ((DateTimeOffset)data).DateTime.GetBytes();
+                    else 
+                        throw new ArgumentException("Unsupport timestamp type");
                     break;
 
                 case ColumnType.Bigint:

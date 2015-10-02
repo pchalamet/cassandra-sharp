@@ -15,6 +15,7 @@
 
 namespace CassandraSharp.Utils
 {
+    using CassandraSharp.Enlightenment;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -52,17 +53,7 @@ namespace CassandraSharp.Utils
                 throw new ArgumentException(invalidTypeMsg);
             }
 
-            // mini-dependency injection
-            ConstructorInfo ci = type.GetConstructors().Single();
-            ParameterInfo[] pis = ci.GetParameters();
-            object[] ciPrms = new object[pis.Length];
-            for (int idx = 0; idx < ciPrms.Length; ++idx)
-            {
-                Type piType = pis[idx].ParameterType;
-                ciPrms[idx] = prms.First(piType.IsInstanceOfType);
-            }
-
-            return (TI) Activator.CreateInstance(type, ciPrms);
+            return EnlightenmentMgr.Create<TI>(type, prms);
         }
     }
 }
