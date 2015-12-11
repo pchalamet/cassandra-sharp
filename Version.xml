@@ -1,9 +1,21 @@
 <version>
-    <cassandra-sharp-interfaces version="3.3.1"
+    <cassandra-sharp-interfaces version="3.6.0"
                                 status="" />
-    <cassandra-sharp version="3.5.0"
-                     status="beta" />
+    <cassandra-sharp version="3.6.0"
+                     status="" />
 					 
+    <changes>
+		<change id="3.6.0"><![CDATA[
+- improvements for customer serializer (https://github.com/pchalamet/cassandra-sharp/issues/89 - thanks cjhanson)
+]]></change>	
+
+    <changes>
+		<change id="3.5.0"><![CDATA[
+- dropped .net 4.0 support
+- fixed issue 82 (https://github.com/pchalamet/cassandra-sharp/issues/82)
+- fixed issue 83 (https://github.com/pchalamet/cassandra-sharp/issues/83)
+]]></change>	
+
     <changes>
 		<change id="3.5.0"><![CDATA[
 - dropped .net 4.0 support
