@@ -47,8 +47,8 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\cassandra-sharp-interfaces-version.cs">
-      <Link>Properties\cassandra-sharp-interfaces-version.cs</Link>
+    <Compile Include="..\cassandra-sharp-interfaces-AssemblyInfo.cs">
+      <Link>Properties\cassandra-sharp-interfaces-AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\cassandra-sharp-info.cs">
       <Link>Properties\cassandra-sharp-info.cs</Link>

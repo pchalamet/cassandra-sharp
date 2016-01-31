@@ -110,15 +110,13 @@
     <Target Name="GenerateAssemblyInfo">
         <AssemblyInfo CodeLanguage="CS" 
 					  AssemblyVersion="$(ApiVersion)" 
-					  AssemblyFileVersion="$(ApiVersion)"
 					  AssemblyInformationalVersion="$(ApiVersion)$(CoreStatus)"
-					  OutputFile="$(ApiProjectName)-version.cs" />
+					  OutputFile="$(ApiProjectName)-AssemblyInfo.cs" />
 
 					  <AssemblyInfo CodeLanguage="CS" 
 					  AssemblyVersion="$(CoreVersion)" 
-					  AssemblyFileVersion="$(CoreVersion)"
 					  AssemblyInformationalVersion="$(CoreVersion)$(CoreStatus)"
-					  OutputFile="$(MainProjectName)-version.cs" />
+					  OutputFile="$(MainProjectName)-AssemblyInfo.cs" />
     </Target>
 
     <Target Name="GenerateThrift">

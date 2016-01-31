@@ -42,8 +42,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\cassandra-sharp-version.cs">
-      <Link>Properties\cassandra-sharp-version.cs</Link>
+    <Compile Include="..\cassandra-sharp-AssemblyInfo.cs">
+      <Link>Properties\cassandra-sharp-AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="**\*.cs" />
   </ItemGroup>
