@@ -110,12 +110,10 @@
     <Target Name="GenerateAssemblyInfo">
         <AssemblyInfo CodeLanguage="CS" 
 					  AssemblyVersion="$(ApiVersion)" 
-					  AssemblyInformationalVersion="$(ApiVersion)$(CoreStatus)"
 					  OutputFile="$(ApiProjectName)-AssemblyInfo.cs" />
 
 					  <AssemblyInfo CodeLanguage="CS" 
 					  AssemblyVersion="$(CoreVersion)" 
-					  AssemblyInformationalVersion="$(CoreVersion)$(CoreStatus)"
 					  OutputFile="$(MainProjectName)-AssemblyInfo.cs" />
     </Target>
 
