@@ -86,6 +86,9 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\cassandra-sharp-AssemblyInfo.cs">
+      <Link>Properties\cassandra-sharp-AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
