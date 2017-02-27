@@ -54,68 +54,64 @@ To build from command line and to regenerate thrift proxy, use Build.cmd.
 
 Sample configuration
 ====================
-	<configSections>
-		<section name="CassandraSharp" type="CassandraSharp.SectionHandler, CassandraSharp.Interfaces" />
-	</configSections>
+```xml
+<configSections>
+	<section name="CassandraSharp" type="CassandraSharp.SectionHandler, CassandraSharp.Interfaces" />
+</configSections>
 
-	<CassandraSharp>
-		<Cluster name="TestCassandra">
-			<Endpoints>
-				<Server>localhost</Server>
-			</Endpoints>
-		</Cluster>
-	</CassandraSharp>
-
+<CassandraSharp>
+	<Cluster name="TestCassandra">
+		<Endpoints>
+			<Server>localhost</Server>
+		</Endpoints>
+	</Cluster>
+</CassandraSharp>
+```
 Sample client
 =============
-	public class SchemaKeyspaces
+```c#
+public class SchemaKeyspaces
+{
+    public bool DurableWrites { get; set; }
+    public string KeyspaceName { get; set; }
+    public string StrategyClass { get; set; }
+    public string StrategyOptions { get; set; }
+}
+	
+public static class Sample
+{
+    private static void DisplayKeyspace(SchemaKeyspaces ks)
     {
-        public bool DurableWrites { get; set; }
-
-        public string KeyspaceName { get; set; }
-
-        public string StrategyClass { get; set; }
-
-        public string StrategyOptions { get; set; }
+        Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
+                          ks.DurableWrites,
+                          ks.KeyspaceName,
+                          ks.StrategyClass,
+                          ks.StrategyOptions);
     }
 	
-    public static class Sample
+    public static async Task QueryKeyspaces()
     {
-        private static void DisplayKeyspace(SchemaKeyspaces ks)
+        XmlConfigurator.Configure();
+        using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
         {
-            Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
-                              ks.DurableWrites,
-                              ks.KeyspaceName,
-                              ks.StrategyClass,
-                              ks.StrategyOptions);
+            var cmd = cluster.CreatePocoCommand();
+            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+
+            // async operation with streaming
+            cmd.WithConsistencyLevel(ConsistencyLevel.ONE)
+               .Execute<SchemaKeyspaces>(cqlKeyspaces)
+	       .Subscribe(DisplayKeyspace);
+
+            // future
+            var kss = await cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
+            foreach (var ks in kss)
+                DisplayKeyspace(ks);
         }
-	
-        public static async Task QueryKeyspaces()
-        {
-            XmlConfigurator.Configure();
-            using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
-            {
-                var cmd = cluster.CreatePocoCommand();
 
-                const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
-
-                // async operation with streaming
-                cmd.WithConsistencyLevel(ConsistencyLevel.ONE)
-				   .Execute<SchemaKeyspaces>(cqlKeyspaces)
-				   .Subscribe(DisplayKeyspace);
-
-                // future
-                var kss = await cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
-                foreach (var ks in kss)
-                {
-                    DisplayKeyspace(ks);
-                }
-            }
-
-            ClusterManager.Shutdown();
-        }
-	}
-
+        ClusterManager.Shutdown();
+    }
+}
+```
 Thanks
 ======
 JetBrains provided a free licence of Resharper for the cassandra-sharp project. Big thanks for the awesome product.
