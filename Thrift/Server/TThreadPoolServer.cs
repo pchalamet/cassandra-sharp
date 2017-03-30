@@ -23,6 +23,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Thrift.Protocol;
 using Thrift.Transport;
 
@@ -110,7 +111,7 @@ namespace Thrift.Server
 				try
 				{
 					TTransport client = serverTransport.Accept();
-					ThreadPool.QueueUserWorkItem(this.Execute, client);
+					Task.Run(()=>Execute(client));
 				}
 				catch (TTransportException ttx)
 				{
@@ -146,9 +147,8 @@ namespace Thrift.Server
 		/// threadContext will be a TTransport instance
 		/// </summary>
 		/// <param name="threadContext"></param>
-		private void Execute(Object threadContext)
+        private void Execute(TTransport client)
 		{
-			TTransport client = (TTransport)threadContext;
 			TTransport inputTransport = null;
 			TTransport outputTransport = null;
 			TProtocol inputProtocol = null;
