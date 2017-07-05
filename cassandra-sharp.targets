@@ -21,23 +21,23 @@
 			<Output TaskParameter="Values" PropertyName="CoreStatus" />
 		</XmlQuery>
 		
-		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='Rx-Core']/@version">
+		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='System.Reactive.Core']/@version">
 			<Output TaskParameter="Values" PropertyName="RxCoreVersion" />
 		</XmlQuery>		
 
-		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='Rx-Interfaces']/@version">
+		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='System.Reactive.Interfaces']/@version">
 			<Output TaskParameter="Values" PropertyName="RxInterfacesVersion" />
 		</XmlQuery>		
 
-		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='Rx-Linq']/@version">
+		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='System.Reactive.Linq']/@version">
 			<Output TaskParameter="Values" PropertyName="RxLinqVersion" />
 		</XmlQuery>		
 
-		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='Rx-Main']/@version">
+		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='System.Reactive']/@version">
 			<Output TaskParameter="Values" PropertyName="RxMainVersion" />
 		</XmlQuery>		
 
-		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='Rx-PlatformServices']/@version">
+		<XmlQuery XmlFileName="CassandraSharp/packages.config" XPath="/packages/package[@id='System.Reactive.PlatformServices']/@version">
 			<Output TaskParameter="Values" PropertyName="RxPlatformServicesVersion" />
 		</XmlQuery>		
 
@@ -47,11 +47,11 @@
 
 		<Message Text="BEGIN" />
 		<Message Text="ReleaseNotes: $(ReleaseNotes)" />
-		<Message Text="Rx-Core: $(RxCoreVersion)" />
-		<Message Text="Rx-Interfaces: $(RxInterfacesVersion)" />
-		<Message Text="Rx-Linq: $(RxLinqVersion)" />
-		<Message Text="Rx-Main: $(RxMainVersion)" />
-		<Message Text="Rx-PlatformServices: $(RxPlatformServicesVersion)" />
+		<Message Text="System.Reactive.Core: $(RxCoreVersion)" />
+		<Message Text="System.Reactive.Interfaces: $(RxInterfacesVersion)" />
+		<Message Text="System.Reactive.Linq: $(RxLinqVersion)" />
+		<Message Text="System.Reactive: $(RxMainVersion)" />
+		<Message Text="System.Reactive.PlatformServices: $(RxPlatformServicesVersion)" />
 		<Message Text="END" />
 	</Target>
 
@@ -127,10 +127,10 @@
 
 	<Target Name="BuildNuGetPackages" DependsOnTargets="Clean;Compile">
 		<ItemGroup>
-			<RxFiles-net45 Include="packages\Rx-Core.$(RxCoreVersion)\lib\Net45\System.Reactive.Core.dll" />
-			<RxFiles-net45 Include="packages\Rx-Interfaces.$(RxInterfacesVersion)\lib\Net45\System.Reactive.Interfaces.dll" />
-			<RxFiles-net45 Include="packages\Rx-Linq.$(RxLinqVersion)\lib\Net45\System.Reactive.Linq.dll" />
-			<RxFiles-net45 Include="packages\Rx-PlatformServices.$(RxPlatformServicesVersion)\lib\Net45\System.Reactive.PlatformServices.dll" />
+			<RxFiles-net45 Include="packages\System.Reactive.Core.$(RxCoreVersion)\lib\Net45\System.Reactive.Core.dll" />
+			<RxFiles-net45 Include="packages\System.Reactive.Interfaces.$(RxInterfacesVersion)\lib\Net45\System.Reactive.Interfaces.dll" />
+			<RxFiles-net45 Include="packages\System.Reactive.Linq.$(RxLinqVersion)\lib\Net45\System.Reactive.Linq.dll" />
+			<RxFiles-net45 Include="packages\System.Reactive.PlatformServices.$(RxPlatformServicesVersion)\lib\Net45\System.Reactive.PlatformServices.dll" />
 		</ItemGroup>
 			
 		<Copy SourceFiles="@(ApiFiles-net45)" DestinationFolder="$(NuGetApiPackageDir)\lib\net45" />		
@@ -144,7 +144,7 @@
 		<Copy SourceFiles="CHANGES.txt" DestinationFolder="$(NuGetCorePackageDir)" />
 		<Copy SourceFiles="$(CoreProjectName).nuspec" DestinationFolder="$(NuGetCorePackageDir)" />
 		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/version" Value="$(CoreVersion)$(CoreStatus)" />
-		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='Rx-Main']/@version" Value="$(RxMainVersion).0" />
+		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/dependencies/dependency[@id='System.Reactive']/@version" Value="$(RxMainVersion).0" />
 		<XmlPoke XmlInputPath="$(NuGetCorePackageDir)\$(CoreProjectName).nuspec" Query="/package/metadata/releaseNotes" Value="$(ReleaseNotes)" />
 		<Exec Command="$(NuGet) pack $(NuGetCorePackageDir)\$(CoreProjectName).nuspec -OutputDirectory $(OutDir)" />
 
