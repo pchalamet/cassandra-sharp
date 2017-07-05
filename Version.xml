@@ -1,10 +1,14 @@
 <version>
-    <cassandra-sharp-interfaces version="3.6.0"
+    <cassandra-sharp-interfaces version="3.7.0"
                                 status="" />
-    <cassandra-sharp version="3.6.0"
+    <cassandra-sharp version="3.7.0"
                      status="" />
 					 
     <changes>
+		<change id="3.7.0"><![CDATA[
+- Use System.Reactive instead of Rx-Main
+]]></change>	
+
 		<change id="3.6.0"><![CDATA[
 - improvements for customer serializer (https://github.com/pchalamet/cassandra-sharp/issues/89 - thanks cjhanson)
 ]]></change>	

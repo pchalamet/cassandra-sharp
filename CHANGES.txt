@@ -1,4 +1,6 @@
-﻿version 3.6.0
+﻿version 3.7.0
+- Use System.Reactive instead of Rx-Main
+version 3.6.0
 - improvements for customer serializer (https://github.com/pchalamet/cassandra-sharp/issues/89 - thanks cjhanson)
 version 3.5.0
 - dropped .net 4.0 support
