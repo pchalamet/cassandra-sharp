@@ -33,6 +33,12 @@ namespace CassandraSharp
         LOCAL_QUORUM = 0x0006,
 
         EACH_QUORUM = 0x0007,
+
+        SERIAL = 0x0008,
+
+        LOCAL_SERIAL = 0x0009,
+
+        LOCAL_ONE = 0x000A
         // ReSharper restore InconsistentNaming
     }
 }
