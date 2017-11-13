@@ -88,7 +88,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             using (MemoryStream ms = new MemoryStream(rawData))
             {
-                ushort nbElem = ms.ReadUShort();
+                int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
                     byte[] elemRawKey = ms.ReadShortBytes();
@@ -107,7 +107,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             using (MemoryStream ms = new MemoryStream(rawData))
             {
-                ushort nbElem = ms.ReadUShort();
+                int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
                     byte[] elemRawData = ms.ReadShortBytes();
@@ -124,7 +124,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             using (MemoryStream ms = new MemoryStream(rawData))
             {
-                ushort nbElem = ms.ReadUShort();
+                int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
                     byte[] elemRawData = ms.ReadShortBytes();
@@ -141,7 +141,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                ms.WriteUShort((ushort)data.Count);
+                ms.WriteInt(data.Count);
                 foreach (DictionaryEntry de in data)
                 {
                     ms.WriteShortByteArray(keySerializer(de.Key));
@@ -156,7 +156,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                ms.WriteUShort((ushort)data.Count);
+                ms.WriteInt(data.Count);
                 foreach (object elem in data)
                 {
                     ms.WriteShortByteArray(valueSerializer(elem));
@@ -170,7 +170,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                ms.WriteUShort((ushort)data.Count);
+                ms.WriteInt(data.Count);
                 foreach (object elem in data)
                 {
                     Console.WriteLine(elem);
