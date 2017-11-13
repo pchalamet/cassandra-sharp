@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.CodeDom;
+
 namespace CassandraSharp.CQLBinaryProtocol
 {
     using System;
@@ -31,7 +33,6 @@ namespace CassandraSharp.CQLBinaryProtocol
         private static readonly Dictionary<ColumnType, Type> _colType2Type = new Dictionary<ColumnType, Type>
             {
                     {ColumnType.Ascii, typeof(string)},
-                    {ColumnType.Text, typeof(string)},
                     {ColumnType.Varchar, typeof(string)},
                     {ColumnType.Blob, typeof(byte[])},
                     {ColumnType.Double, typeof(double)},
@@ -91,8 +92,8 @@ namespace CassandraSharp.CQLBinaryProtocol
                 int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
-                    byte[] elemRawKey = ms.ReadShortBytes();
-                    byte[] elemRawValue = ms.ReadShortBytes();
+                    byte[] elemRawKey = ms.ReadByteArray();
+                    byte[] elemRawValue = ms.ReadByteArray();
                     object key = keyDeserializer(elemRawKey);
                     object value = valueDeserializer(elemRawValue);
                     destMap.Add(key, value);
@@ -110,7 +111,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
-                    byte[] elemRawData = ms.ReadShortBytes();
+                    byte[] elemRawData = ms.ReadByteArray();
                     object elem = valueDeserializer(elemRawData);
                     destList.Add(elem);
                     --nbElem;
@@ -127,7 +128,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
-                    byte[] elemRawData = ms.ReadShortBytes();
+                    byte[] elemRawData = ms.ReadByteArray();
                     object elem = valueDeserializer(elemRawData);
                     destSet.AddItem(elem);
                     --nbElem;
@@ -144,8 +145,8 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteInt(data.Count);
                 foreach (DictionaryEntry de in data)
                 {
-                    ms.WriteShortByteArray(keySerializer(de.Key));
-                    ms.WriteShortByteArray(valueSerializer(de.Value));
+                    ms.WriteByteArray(keySerializer(de.Key));
+                    ms.WriteByteArray(valueSerializer(de.Value));
                 }
 
                 return ms.ToArray();
@@ -159,7 +160,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteInt(data.Count);
                 foreach (object elem in data)
                 {
-                    ms.WriteShortByteArray(valueSerializer(elem));
+                    ms.WriteByteArray(valueSerializer(elem));
                 }
 
                 return ms.ToArray();
@@ -173,8 +174,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteInt(data.Count);
                 foreach (object elem in data)
                 {
-                    Console.WriteLine(elem);
-                    ms.WriteShortByteArray(valueSerializer(elem));                    
+                    ms.WriteByteArray(valueSerializer(elem));                    
                 }
 
                 Console.WriteLine(ms.Length);
@@ -189,7 +189,6 @@ namespace CassandraSharp.CQLBinaryProtocol
             switch (colType)
             {
                 case ColumnType.Ascii:
-                case ColumnType.Text:
                 case ColumnType.Varchar:
                     rawData = ((string)data).GetBytes();
                     break;
@@ -215,6 +214,12 @@ namespace CassandraSharp.CQLBinaryProtocol
                         throw new ArgumentException("Unsupport timestamp type");
                     break;
 
+                case ColumnType.Date:
+                    throw new NotSupportedException("Column type Date");
+
+                case ColumnType.Time:
+                    throw new NotSupportedException("Column type time");
+
                 case ColumnType.Bigint:
                 case ColumnType.Counter:
                     rawData = ((long)data).GetBytes();
@@ -222,6 +227,14 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                 case ColumnType.Int:
                     rawData = ((int)data).GetBytes();
+                    break;
+
+                case ColumnType.TinyInt:
+                    rawData = ((byte)data).GetBytes();
+                    break;
+
+                case ColumnType.SmallInt:
+                    rawData = ((short)data).GetBytes();
                     break;
 
                 case ColumnType.Boolean:
@@ -292,7 +305,6 @@ namespace CassandraSharp.CQLBinaryProtocol
             switch (colType)
             {
                 case ColumnType.Ascii:
-                case ColumnType.Text:
                 case ColumnType.Varchar:
                     data = rawData.ToUtf8String();
                     break;

@@ -69,7 +69,26 @@ namespace CassandraSharp.Utils.Stream
             return buffer;
         }
 
+        public static byte[] GetBytes(this sbyte data)
+        {
+            byte[] buffer = BitConverter.GetBytes(data);
+            return buffer;
+        }
+
+        public static byte[] GetBytes(this byte data)
+        {
+            byte[] buffer = BitConverter.GetBytes(data);
+            return buffer;
+        }
+
         public static byte[] GetBytes(this ushort data)
+        {
+            byte[] buffer = BitConverter.GetBytes(data);
+            buffer.ReverseIfLittleEndian();
+            return buffer;
+        }
+
+        public static byte[] GetBytes(this short data)
         {
             byte[] buffer = BitConverter.GetBytes(data);
             buffer.ReverseIfLittleEndian();

@@ -37,8 +37,6 @@ namespace CassandraSharp
 
         Int = 0x0009,
 
-        Text = 0x000A,
-
         Timestamp = 0x000B,
 
         Uuid = 0x000C,
@@ -50,6 +48,14 @@ namespace CassandraSharp
         Timeuuid = 0x000F,
 
         Inet = 0x0010,
+
+        Date = 0x0011,
+
+        Time = 0x0012,
+
+        SmallInt = 0x0013,
+
+        TinyInt = 0x14,
 
         List = 0x0020,
 

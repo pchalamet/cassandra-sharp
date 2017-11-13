@@ -23,5 +23,9 @@ namespace CassandraSharp.CQLBinaryProtocol
         None = 0x0000,
 
         GlobalTablesSpec = 0x0001,
+
+        HasMorePages = 0x0002,
+
+        NoMetadata = 0x0004,
     }
 }

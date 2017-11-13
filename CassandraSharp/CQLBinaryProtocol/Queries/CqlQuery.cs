@@ -110,6 +110,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             Stream stream = frameReader.ReadOnlyStream;
             MetadataFlags flags = (MetadataFlags)stream.ReadInt();
             bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
+            bool hasMorePages = 0 != (flags & MetadataFlags.HasMorePages);
 
             int colCount = stream.ReadInt();
 
@@ -119,6 +120,11 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             {
                 keyspace = stream.ReadString();
                 table = stream.ReadString();
+            }
+
+            if (hasMorePages)
+            {
+                throw new NotSupportedException("Paging is not supported");
             }
 
             IColumnSpec[] columnSpecs = new IColumnSpec[colCount];
