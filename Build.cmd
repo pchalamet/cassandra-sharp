@@ -13,7 +13,11 @@ if "%FLAVOR%" == "" (
 	set FLAVOR=Debug
 )
 
-msbuild /t:GenerateVersion /p:Configuration=%FLAVOR% cassandra-sharp.targets || goto :done
+rmdir /q /s %HERE%nupkgs
+dotnet restore %HERE%cassandra-sharp.sln
+dotnet build %HERE%cassandra-sharp.sln --configuration %FLAVOR% 
+dotnet pack %HERE%CassandraSharp\CassandraSharp.csproj --configuration %FLAVOR% --output %HERE%nupkgs 
+
 
 :done
 popd
