@@ -53,7 +53,7 @@ namespace CassandraSharp.Transport
             _msgOpcode = msgOpcode;
         }
 
-        public void SendFrame(byte streamId, Socket socket)
+        public void SendFrame(ushort streamId, Socket socket)
         {
             const byte version = (byte) (FrameType.Request | FrameType.ProtocolVersion);
             FrameHeaderFlags flags = FrameHeaderFlags.None;
@@ -62,11 +62,12 @@ namespace CassandraSharp.Transport
                 flags |= FrameHeaderFlags.Tracing;
             }
 
-            byte[] header = new byte[4];
+            byte[] header = new byte[5];
             header[0] = version;
             header[1] = (byte) flags;
-            header[2] = streamId;
-            header[3] = (byte) _msgOpcode;
+            header[2] = (byte)(streamId >> 8);
+            header[3] = (byte)streamId;
+            header[4] = (byte) _msgOpcode;
             SendBuffer(socket, header);
 
             int len = (int) _ms.Length;

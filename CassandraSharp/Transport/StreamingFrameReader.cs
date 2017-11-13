@@ -32,7 +32,7 @@ namespace CassandraSharp.Transport
         {
             try
             {
-                SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 8);
+                SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 9);
 
                 FrameType version = (FrameType) _tempBuffer[0];
                 if (0 == (version & FrameType.Response))
@@ -46,10 +46,10 @@ namespace CassandraSharp.Transport
 
                 FrameHeaderFlags flags = (FrameHeaderFlags) _tempBuffer[1];
 
-                StreamId = _tempBuffer[2];
+                StreamId = (ushort)((_tempBuffer[2] << 8) | _tempBuffer[3]);
 
-                MessageOpcode = (MessageOpcodes) _tempBuffer[3];
-                int frameBytesLeft = _tempBuffer.ToInt(4);
+                MessageOpcode = (MessageOpcodes) _tempBuffer[4];
+                int frameBytesLeft = _tempBuffer.ToInt(5);
 
                 bool tracing = 0 != (flags & FrameHeaderFlags.Tracing);
                 if (tracing)
@@ -88,7 +88,7 @@ namespace CassandraSharp.Transport
 
         public Guid TraceId { get; private set; }
 
-        public byte StreamId { get; private set; }
+        public ushort StreamId { get; private set; }
 
         public MessageOpcodes MessageOpcode { get; private set; }
 

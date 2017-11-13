@@ -22,7 +22,7 @@ namespace CassandraSharp.Extensibility
     {
         MessageOpcodes MessageOpcode { get; }
 
-        byte StreamId { get; }
+        ushort StreamId { get; }
 
         Guid TraceId { get; }
 

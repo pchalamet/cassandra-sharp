@@ -36,7 +36,7 @@ namespace cqlplus
             }
         }
 
-        public void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId)
+        public void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, ushort streamId)
         {
             if (0 != (token.ExecutionFlags & ExecutionFlags.ClientTracing))
             {

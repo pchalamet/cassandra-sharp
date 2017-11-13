@@ -33,9 +33,9 @@ namespace CassandraSharp.Transport
     internal sealed class LongRunningConnection : IConnection,
                                                   IDisposable
     {
-        private const byte MAX_STREAMID = 0x80;
+        private const ushort MAX_STREAMID = 0x80;
 
-        private readonly Stack<byte> _availableStreamIds = new Stack<byte>();
+        private readonly Stack<ushort> _availableStreamIds = new Stack<ushort>();
 
         private readonly TransportConfig _config;
 
@@ -67,7 +67,7 @@ namespace CassandraSharp.Transport
         {
             try
             {
-                for (byte streamId = 0; streamId < MAX_STREAMID; ++streamId)
+                for (ushort streamId = 0; streamId < MAX_STREAMID; ++streamId)
                 {
                     _availableStreamIds.Push(streamId);
                 }
@@ -289,7 +289,7 @@ namespace CassandraSharp.Transport
                     {
                         queryInfo.Write(bufferingFrameWriter);
 
-                        byte streamId;
+                        ushort streamId;
                         lock (_lock)
                         {
                             while (!_isClosed && 0 == _availableStreamIds.Count)
@@ -344,7 +344,7 @@ namespace CassandraSharp.Transport
 
                     _pushResult(queryInfo, frameReader, _config.ReceiveBuffering);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     frameReader.SafeDispose();
                     throw;
@@ -355,7 +355,7 @@ namespace CassandraSharp.Transport
         private QueryInfo GetAndReleaseQueryInfo(IFrameReader frameReader)
         {
             QueryInfo queryInfo;
-            byte streamId = frameReader.StreamId;
+            ushort streamId = frameReader.StreamId;
             lock (_lock)
             {
                 Monitor.Pulse(_lock);

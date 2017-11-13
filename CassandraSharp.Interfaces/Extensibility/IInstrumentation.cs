@@ -22,7 +22,7 @@ namespace CassandraSharp.Extensibility
     {
         void ClientQuery(InstrumentationToken token);
 
-        void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, byte streamId);
+        void ClientConnectionInfo(InstrumentationToken token, IPAddress coordinator, ushort streamId);
 
         void ClientTrace(InstrumentationToken token, EventType eventType);
 

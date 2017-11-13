@@ -25,5 +25,7 @@ namespace CassandraSharp.CQLBinaryProtocol
         Compression = 0x0001,
 
         Tracing = 0x0002,
+
+        Warning = 0x0008
     }
 }

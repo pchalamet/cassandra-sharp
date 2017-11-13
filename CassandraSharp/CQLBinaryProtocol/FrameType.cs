@@ -20,7 +20,7 @@ namespace CassandraSharp.CQLBinaryProtocol
     [Flags]
     internal enum FrameType
     {
-        ProtocolVersion = 0x01,
+        ProtocolVersion = 0x04,
 
         ProtocolVersionMask = 0x7F,
 
