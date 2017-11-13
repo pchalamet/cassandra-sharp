@@ -71,14 +71,14 @@ namespace CassandraSharp.Utils.Stream
             }
         }
 
-        public static void WriteShortByteArray(this Stream stream, byte[] data)
+        public static void WriteShortBytes(this Stream stream, byte[] data)
         {
             ushort len = (ushort) data.Length;
             stream.WriteUShort(len);
             stream.Write(data, 0, len);
         }
 
-        public static void WriteByteArray(this Stream stream, byte[] data)
+        public static void WriteBytesArray(this Stream stream, byte[] data)
         {
             if (null != data)
             {
@@ -136,7 +136,7 @@ namespace CassandraSharp.Utils.Stream
             return string.Empty;
         }
 
-        public static byte[] ReadByteArray(this Stream stream)
+        public static byte[] ReadBytesArray(this Stream stream)
         {
             int len = stream.ReadInt();
             if (-1 != len)

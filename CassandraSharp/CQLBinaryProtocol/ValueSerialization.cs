@@ -92,8 +92,8 @@ namespace CassandraSharp.CQLBinaryProtocol
                 int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
-                    byte[] elemRawKey = ms.ReadByteArray();
-                    byte[] elemRawValue = ms.ReadByteArray();
+                    byte[] elemRawKey = ms.ReadBytesArray();
+                    byte[] elemRawValue = ms.ReadBytesArray();
                     object key = keyDeserializer(elemRawKey);
                     object value = valueDeserializer(elemRawValue);
                     destMap.Add(key, value);
@@ -111,7 +111,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
-                    byte[] elemRawData = ms.ReadByteArray();
+                    byte[] elemRawData = ms.ReadBytesArray();
                     object elem = valueDeserializer(elemRawData);
                     destList.Add(elem);
                     --nbElem;
@@ -128,7 +128,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 int nbElem = ms.ReadInt();
                 while (0 < nbElem)
                 {
-                    byte[] elemRawData = ms.ReadByteArray();
+                    byte[] elemRawData = ms.ReadBytesArray();
                     object elem = valueDeserializer(elemRawData);
                     destSet.AddItem(elem);
                     --nbElem;
@@ -145,8 +145,8 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteInt(data.Count);
                 foreach (DictionaryEntry de in data)
                 {
-                    ms.WriteByteArray(keySerializer(de.Key));
-                    ms.WriteByteArray(valueSerializer(de.Value));
+                    ms.WriteBytesArray(keySerializer(de.Key));
+                    ms.WriteBytesArray(valueSerializer(de.Value));
                 }
 
                 return ms.ToArray();
@@ -160,7 +160,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteInt(data.Count);
                 foreach (object elem in data)
                 {
-                    ms.WriteByteArray(valueSerializer(elem));
+                    ms.WriteBytesArray(valueSerializer(elem));
                 }
 
                 return ms.ToArray();
@@ -174,7 +174,7 @@ namespace CassandraSharp.CQLBinaryProtocol
                 ms.WriteInt(data.Count);
                 foreach (object elem in data)
                 {
-                    ms.WriteByteArray(valueSerializer(elem));                    
+                    ms.WriteBytesArray(valueSerializer(elem));                    
                 }
 
                 Console.WriteLine(ms.Length);

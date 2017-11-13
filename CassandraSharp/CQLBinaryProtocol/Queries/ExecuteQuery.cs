@@ -45,12 +45,12 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         protected override void WriteFrame(IFrameWriter fw)
         {
             Stream stream = fw.WriteOnlyStream;
-            stream.WriteShortByteArray(_id);
+            stream.WriteShortBytes(_id);
             stream.WriteUShort((ushort)_columnSpecs.Length);
 
             foreach (var columnData in _mapperIn.MapToColumns(_dataSource, _columnSpecs))
             {
-                stream.WriteByteArray(columnData.RawData);
+                stream.WriteBytesArray(columnData.RawData);
             }
 
             stream.WriteUShort((ushort)ConsistencyLevel);

@@ -100,7 +100,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             int rowCount = stream.ReadInt();
             for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
-                var rowData = columnSpecs.Select(spec => new ColumnData(spec, stream.ReadByteArray()));
+                var rowData = columnSpecs.Select(spec => new ColumnData(spec, stream.ReadBytesArray()));
                 yield return (T)mapperFactory.MapToObject(rowData);
             }
         }
@@ -109,10 +109,11 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
             Stream stream = frameReader.ReadOnlyStream;
             MetadataFlags flags = (MetadataFlags)stream.ReadInt();
+            int colCount = stream.ReadInt();
+
             bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
             bool hasMorePages = 0 != (flags & MetadataFlags.HasMorePages);
-
-            int colCount = stream.ReadInt();
+            bool noMetadata = 0 != (flags & MetadataFlags.NoMetadata);
 
             string keyspace = null;
             string table = null;
@@ -160,6 +161,11 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                 }
 
                 columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colKeyType, colValueType);
+            }
+
+            if (!noMetadata)
+            {
+                throw new NotSupportedException("Metadata in prepared result is not supported");
             }
 
             return columnSpecs;
