@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net452</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>  
+  <ItemGroup>
+    <Compile Include="..\cassandra-sharp-AssemblyInfo.cs">
+      <Link>Properties\cassandra-sharp-AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\cassandra-sharp-info.cs">
+      <Link>Properties\cassandra-sharp-info.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces.csproj" />
+    <ProjectReference Include="..\CassandraSharp\CassandraSharp.csproj" />
+  </ItemGroup>
+</Project>

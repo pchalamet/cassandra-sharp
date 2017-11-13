@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp-net45", "CassandraSharp\CassandraSharp-net45.csproj", "{C1D252B7-D766-4C28-9C46-0696F896846C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp", "CassandraSharp\CassandraSharp.csproj", "{C1D252B7-D766-4C28-9C46-0696F896846C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{220BEE49-7E3C-40D9-B58C-A5299F55419E}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,15 +19,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Version.xml = Version.xml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharpUnitTests-net45", "CassandraSharpUnitTests\CassandraSharpUnitTests-net45.csproj", "{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharpUnitTests", "CassandraSharpUnitTests\CassandraSharpUnitTests.csproj", "{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus-net45", "cqlplus\cqlplus-net45.csproj", "{0A06398E-69BE-487B-A011-4C0BE6619B59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cqlplus", "cqlplus\cqlplus.csproj", "{0A06398E-69BE-487B-A011-4C0BE6619B59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples-net45", "Samples\Samples-net45.csproj", "{8B2359B2-4A73-4A49-8E1E-646014A768A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples", "Samples\Samples.csproj", "{8B2359B2-4A73-4A49-8E1E-646014A768A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thrift-net45", "Thrift\Thrift-net45.csproj", "{499EB63C-D74C-47E8-AE48-A2FC94538E9D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apache.Cassandra-net45", "Apache.Cassandra\Apache.Cassandra-net45.csproj", "{984A4B04-C71A-4550-9193-817CFACBA30A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apache.Cassandra", "Apache.Cassandra\Apache.Cassandra.csproj", "{984A4B04-C71A-4550-9193-817CFACBA30A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DFC6E4A4-128B-470D-8A06-638EEBB5C31C}"
 	ProjectSection(SolutionItems) = preProject
@@ -36,7 +34,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DFC6E4
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp.Interfaces-net45", "CassandraSharp.Interfaces\CassandraSharp.Interfaces-net45.csproj", "{6F6EB447-9569-406A-A23B-C09B6DBDBE10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassandraSharp.Interfaces", "CassandraSharp.Interfaces\CassandraSharp.Interfaces.csproj", "{6F6EB447-9569-406A-A23B-C09B6DBDBE10}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thrift", "Thrift\Thrift.csproj", "{E79AE2AE-0958-41B8-A946-B48199B40773}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,10 +60,6 @@ Global
 		{8B2359B2-4A73-4A49-8E1E-646014A768A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B2359B2-4A73-4A49-8E1E-646014A768A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B2359B2-4A73-4A49-8E1E-646014A768A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{499EB63C-D74C-47E8-AE48-A2FC94538E9D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{984A4B04-C71A-4550-9193-817CFACBA30A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{984A4B04-C71A-4550-9193-817CFACBA30A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{984A4B04-C71A-4550-9193-817CFACBA30A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -72,11 +68,18 @@ Global
 		{6F6EB447-9569-406A-A23B-C09B6DBDBE10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F6EB447-9569-406A-A23B-C09B6DBDBE10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F6EB447-9569-406A-A23B-C09B6DBDBE10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E79AE2AE-0958-41B8-A946-B48199B40773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E79AE2AE-0958-41B8-A946-B48199B40773}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E79AE2AE-0958-41B8-A946-B48199B40773}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E79AE2AE-0958-41B8-A946-B48199B40773}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3755CC3E-75CC-44CA-A6C6-622E6EF48E1D}
+	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = CassandraSharp\CassandraSharp-net45.csproj
+		StartupItem = CassandraSharp\CassandraSharp.csproj
 	EndGlobalSection
 EndGlobal
