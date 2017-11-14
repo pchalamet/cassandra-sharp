@@ -47,7 +47,7 @@ namespace Samples.Async
 
         protected override void InternalRun(ICluster cluster)
         {
-            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+            const string cqlKeyspaces = "SELECT * from system_schema.keyspaces";
 
             ICqlCommand cmd = cluster.CreatePocoCommand();
 

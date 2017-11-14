@@ -49,7 +49,7 @@ namespace Samples.Future
         {
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
-            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+            const string cqlKeyspaces = "SELECT * from system_schema.keyspaces";
 
             var allResults = new List<Task<IList<SchemaKeyspaces>>>();
             for (int i = 0; i < 100; ++i)

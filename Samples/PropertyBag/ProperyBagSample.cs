@@ -45,7 +45,7 @@ namespace Samples.PropertyBag
         {
             var cmd = cluster.CreatePropertyBagCommand();
 
-            const string cqlKeyspaces = "SELECT * from system.schema_columns";
+            const string cqlKeyspaces = "SELECT * from system_schema.columns";
 
             var req = from t in cmd.Execute(cqlKeyspaces).AsFuture().Result
                       where "system" == (string) t["KeyspaceName"]
@@ -57,8 +57,8 @@ namespace Samples.PropertyBag
         {
             foreach (PropertyBag pb in reqs)
             {
-                Console.WriteLine("KeyspaceName={0} ColumnFamilyName={1} ColumnName={2}",
-                                  pb["KeyspaceName"], pb["ColumnFamilyName"], pb["ColumnName"]);
+                Console.WriteLine("KeyspaceName={0} TableName={1} ColumnName={2}",
+                                  pb["KeyspaceName"], pb["TableName"], pb["ColumnName"]);
             }
         }
     }

@@ -45,7 +45,7 @@ namespace Samples.Linq
         {
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
-            const string cqlKeyspaces = "SELECT * from system.schema_columns";
+            const string cqlKeyspaces = "SELECT * from system_schema.columns";
 
             var req = from t in cmd.Execute<SchemaColumns>(cqlKeyspaces).AsFuture().Result
                       where t.KeyspaceName == "system"

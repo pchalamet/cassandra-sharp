@@ -28,13 +28,13 @@ namespace Samples
     {
         private static void Main(string[] args)
         {
-//            new TimeOutSample().Run();
+            new TimeOutSample().Run();
             new PocoSample().Run();
-            //new BatchSample().Run();
-            //new LinqSample().Run();
-            //new FutureSample().Run();
-            //new AsyncSample().Run();
-            //new PropertyBagSample().Run();
+            new BatchSample().Run();
+            new LinqSample().Run();
+            new FutureSample().Run();
+            new AsyncSample().Run();
+            new PropertyBagSample().Run();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

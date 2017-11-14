@@ -41,13 +41,41 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             {
                 case ResultOpcode.Prepared:
                     byte[] queryId = stream.ReadShortBytes();
-                    IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
+                    IColumnSpec[] columnSpecs = ReadMetadata(stream);                
+                    ReadResultMetadata(frameReader);
                     yield return Tuple.Create(queryId, columnSpecs);
                     break;
 
                 default:
                     throw new ArgumentException("Unexpected ResultOpcode");
             }
+        }
+
+        private static IColumnSpec[] ReadMetadata(Stream stream)
+        {
+            var flags = (MetadataFlags)stream.ReadInt();
+            var columnCount = stream.ReadInt();
+            var pkColumnIndexCount = stream.ReadInt();
+
+            // read primary key indices
+            var pkIndices = new ushort[pkColumnIndexCount];
+            for (int i = 0; i < pkColumnIndexCount; ++i)
+            {
+                pkIndices[i] = stream.ReadUShort();
+            }
+
+            // read column specs
+            string keyspace = null;
+            string table = null;
+            bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
+            if (globalTablesSpec)
+            {
+                keyspace = stream.ReadString();
+                table = stream.ReadString();
+            }
+
+            var columnSpecs = ReadColumnSpecs(columnCount, keyspace, table, globalTablesSpec, stream);
+            return columnSpecs;
         }
 
         protected override void WriteFrame(IFrameWriter fw)

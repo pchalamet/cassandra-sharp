@@ -76,7 +76,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                     yield break;
 
                 case ResultOpcode.Rows:
-                    IColumnSpec[] columnSpecs = ReadColumnSpec(frameReader);
+                    IColumnSpec[] columnSpecs = ReadResultMetadata(frameReader);
                     foreach (T row in ReadRows(frameReader, columnSpecs, mapperFactory))
                     {
                         yield return row;
@@ -105,7 +105,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             }
         }
 
-        protected static IColumnSpec[] ReadColumnSpec(IFrameReader frameReader)
+        protected static IColumnSpec[] ReadResultMetadata(IFrameReader frameReader)
         {
             Stream stream = frameReader.ReadOnlyStream;
             MetadataFlags flags = (MetadataFlags)stream.ReadInt();
@@ -117,7 +117,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
             string keyspace = null;
             string table = null;
-            if (globalTablesSpec)
+            if (globalTablesSpec && !noMetadata)
             {
                 keyspace = stream.ReadString();
                 table = stream.ReadString();
@@ -125,9 +125,18 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
             if (hasMorePages)
             {
-                throw new NotSupportedException("Paging is not supported");
+                var pagingState = stream.ReadBytesArray();
             }
 
+            if (noMetadata)
+                return null;
+
+            var columnSpecs = ReadColumnSpecs(colCount, keyspace, table, globalTablesSpec, stream);
+            return columnSpecs;
+        }
+
+        protected static IColumnSpec[] ReadColumnSpecs(int colCount, string keyspace, string table, bool globalTablesSpec, Stream stream)
+        {
             IColumnSpec[] columnSpecs = new IColumnSpec[colCount];
             for (int colIdx = 0; colIdx < colCount; ++colIdx)
             {
@@ -138,6 +147,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
                     colKeyspace = stream.ReadString();
                     colTable = stream.ReadString();
                 }
+
                 string colName = stream.ReadString();
                 ColumnType colType = (ColumnType)stream.ReadUShort();
                 string colCustom = null;
@@ -162,12 +172,6 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
                 columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colKeyType, colValueType);
             }
-
-            if (!noMetadata)
-            {
-                throw new NotSupportedException("Metadata in prepared result is not supported");
-            }
-
             return columnSpecs;
         }
     }
