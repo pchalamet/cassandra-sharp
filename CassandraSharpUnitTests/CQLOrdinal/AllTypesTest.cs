@@ -81,7 +81,7 @@ namespace CassandraSharpUnitTests.CQLOrdinal
                 {
                         Endpoints = new EndpointsConfig
                             {
-                                    Servers = new[] {"localhost"}
+                                    Servers = new[] {"cassandra1"}
                             }
                 };
 

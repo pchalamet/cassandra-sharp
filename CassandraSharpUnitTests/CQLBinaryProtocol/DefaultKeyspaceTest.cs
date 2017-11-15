@@ -39,7 +39,7 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
 
             var config = new ClusterConfig
             {
-                Endpoints = new EndpointsConfig { Servers = new[] { "localhost" } },
+                Endpoints = new EndpointsConfig { Servers = new[] { "cassandra1" } },
                 DefaultKeyspace =
                     new KeyspaceConfig
                     {

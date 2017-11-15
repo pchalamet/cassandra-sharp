@@ -36,7 +36,7 @@ namespace CassandraSharpUnitTests.Endurance
                 {
                         Endpoints = new EndpointsConfig
                             {
-                                    Servers = new[] { "localhost" }
+                                    Servers = new[] { "cassandra1" }
                             },
                         Transport = new TransportConfig
                             {

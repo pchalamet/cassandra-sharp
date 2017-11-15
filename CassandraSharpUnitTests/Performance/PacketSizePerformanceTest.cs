@@ -65,7 +65,7 @@ namespace CassandraSharpUnitTests.Performance
                 {
                         Endpoints = new EndpointsConfig
                             {
-                                    Servers = new[] { "localhost" }
+                                    Servers = new[] { "cassandra1" }
                             },
                 };
 

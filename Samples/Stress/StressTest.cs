@@ -60,7 +60,7 @@ namespace Samples.Stress
 
         private void Worker()
         {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
+            IPHostEntry ipHostInfo = Dns.GetHostEntry("cassandra1");
             IPAddress ipAddress = ipHostInfo.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork);
             EndPoint listenEndpoint = new IPEndPoint(ipAddress, _source);
 
@@ -183,7 +183,7 @@ namespace Samples.Stress
             {
                 Endpoints = new EndpointsConfig
                 {
-                    Servers = new[] { "localhost" },
+                    Servers = new[] { "cassandra1" },
                 },
                 Transport = new TransportConfig
                 {
