@@ -42,8 +42,10 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         {
             var cql = "USE " + _keyspace;
             Stream stream = fw.WriteOnlyStream;
+
             stream.WriteLongString(cql);
             stream.WriteUShort((ushort)ConsistencyLevel);
+            stream.WriteByte(0);
             fw.SetMessageType(MessageOpcodes.Query);
         }
 

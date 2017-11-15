@@ -80,15 +80,15 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
         {
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
-            var res = cmd.Execute<SchemaKeyspace>("SELECT * FROM system.schema_keyspaces").AsFuture().Result;
+            var res = cmd.Execute<SchemaKeyspace>("SELECT * FROM system_schema.keyspaces").AsFuture().Result;
             var testKeyspace =
                 res.FirstOrDefault(
                     x => x.KeyspaceName.Equals(DefaultKeyspaceTest.TestKeyspace, StringComparison.InvariantCultureIgnoreCase));
 
             Assert.IsNotNull(testKeyspace);
             Assert.IsFalse(testKeyspace.DurableWrites);
-            Assert.IsTrue(testKeyspace.StrategyClass.Contains("SimpleStrategy"));
-            Assert.IsTrue(testKeyspace.StrategyOptions.Contains("1"));
+            Assert.AreEqual("org.apache.cassandra.locator.SimpleStrategy", testKeyspace.Replication["class"]);
+            Assert.AreEqual("1", testKeyspace.Replication["replication_factor"]);
         }
 
         [Test]
@@ -113,9 +113,11 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
 
             public bool DurableWrites { get; set; }
 
-            public string StrategyClass { get; set; }
+            public Dictionary<string, string> Replication { get; set; }
 
-            public string StrategyOptions { get; set; }
+            //public string StrategyClass { get; set; }
+
+            //public string StrategyOptions { get; set; }
         }
     }
 }

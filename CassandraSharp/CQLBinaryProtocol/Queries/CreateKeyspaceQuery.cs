@@ -59,6 +59,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             Stream stream = fw.WriteOnlyStream;
             stream.WriteLongString(sb.ToString());
             stream.WriteUShort((ushort)ConsistencyLevel);
+            stream.WriteByte(0);
             fw.SetMessageType(MessageOpcodes.Query);
         }
 

@@ -50,7 +50,7 @@ namespace Samples.TimeOut
         {
             ICqlCommand cmd = cluster.CreatePocoCommand();
 
-            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+            const string cqlKeyspaces = "SELECT * from system_schema.keyspaces";
 
             for (int i = 0; i < 10; ++i)
             {
