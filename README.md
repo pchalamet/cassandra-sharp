@@ -4,7 +4,7 @@ cassandra-sharp - high performance .NET driver for Apache Cassandra
 
 The philosophy of cassandra-sharp is to be really simple and fast: no Linq provider, no complex API. Just CQL, simple object mapping and great performance :)
 
-Starting from version 2, only CQL 3 binary protocol is supported and as a consequence, Cassandra 1.2+ is required. Also, only .NET 4.0+ is supported. If you are looking for a Thrift compatible driver, or have to use Cassandra 1.0/1.1 or require .NET 3.5 support, please consider using version 0.6.4 of cassandra-sharp.
+With version 4, cassandra-sharp is only speaking native protocol 4 - basically, this means you are required to use Cassandra 3.
 
 cassandra-sharp supports async operations exposed as Rx subscriptions or TPL tasks. Efficient memory usage can be achieve using the push model of Rx.
 
@@ -14,12 +14,10 @@ Getting binaries
 ================
 Binaries are available through NuGet : http://www.nuget.org/packages/cassandra-sharp
 
-Zip archive are also available at Google Code (since GitHub removed binaries uploads) : http://code.google.com/p/cassandra-sharp/downloads/list
-
 Copyright & License
 ===================
 	cassandra-sharp - high performance .NET driver for Apache Cassandra
-	Copyright (c) 2011-2013 Pierre Chalamet
+	Copyright (c) 2011-2017 Pierre Chalamet
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -37,7 +35,7 @@ Features
 ========
 * async operations (TPL tasks / Rx subscriptions)
 * Rx interface (IObservable / IObserver) for result streaming
-* TPL Task (compatible with C# 5 async) for future operations
+* TPL Task for future operations
 * Linq friendly
 * extensible rowset mapping (poco and map provided out of the box)
 * blazing fast object marshaler (dynamic gen'ed code)
@@ -49,7 +47,7 @@ Features
 
 How to build
 ============
-To build cassandra-sharp, load cassandra-sharp.sln in Visual Studio 2012.
+To build cassandra-sharp, load cassandra-sharp.sln in Visual Studio 2017.
 To build from command line and to regenerate thrift proxy, use Build.cmd.
 
 Sample configuration
@@ -72,21 +70,20 @@ Sample client
 ```c#
 public class SchemaKeyspaces
 {
-    public bool DurableWrites { get; set; }
     public string KeyspaceName { get; set; }
-    public string StrategyClass { get; set; }
-    public string StrategyOptions { get; set; }
+    public bool DurableWrites { get; set; }
+    public Dictionary<string, string> Replication { get; set; }
 }
 	
 public static class Sample
 {
     private static void DisplayKeyspace(SchemaKeyspaces ks)
     {
-        Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
-                          ks.DurableWrites,
+        Console.WriteLine("KeyspaceName={0} DurableWrites={1} Class={2} ReplicationFactor={3}",
                           ks.KeyspaceName,
-                          ks.StrategyClass,
-                          ks.StrategyOptions);
+                          ks.DurableWrites,
+                          ks.Replication["class"],
+                          ks.Replication["replication_factor"]);
     }
 	
     public static async Task QueryKeyspaces()
@@ -95,12 +92,12 @@ public static class Sample
         using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
         {
             var cmd = cluster.CreatePocoCommand();
-            const string cqlKeyspaces = "SELECT * from system.schema_keyspaces";
+            const string cqlKeyspaces = "SELECT * from system_schema.keyspaces";
 
             // async operation with streaming
             cmd.WithConsistencyLevel(ConsistencyLevel.ONE)
                .Execute<SchemaKeyspaces>(cqlKeyspaces)
-	       .Subscribe(DisplayKeyspace);
+               .Subscribe(DisplayKeyspace);
 
             // future
             var kss = await cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();

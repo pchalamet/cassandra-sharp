@@ -23,19 +23,9 @@ namespace Samples.Async
 
     public class SchemaKeyspaces
     {
-        public bool DurableWrites { get; set; }
-
         public string KeyspaceName { get; set; }
-
-        // ReSharper disable InconsistentNaming
-        public string strategy_Class { get; set; }
-
-        // ReSharper restore InconsistentNaming
-
-        // ReSharper disable InconsistentNaming
-        public string strategy_options { get; set; }
-
-        // ReSharper restore InconsistentNaming
+        public bool DurableWrites { get; set; }
+        public Dictionary<string, string> Replication { get; set; }
     }
 
     public class AsyncSample : Sample
@@ -67,8 +57,9 @@ namespace Samples.Async
             {
                 foreach (var resKeyspace in result)
                 {
-                    Console.WriteLine("DurableWrites={0} KeyspaceName={1} strategy_Class={2} strategy_options={3}",
-                                      resKeyspace.DurableWrites, resKeyspace.KeyspaceName, resKeyspace.strategy_Class, resKeyspace.strategy_options);
+                    Console.WriteLine("DurableWrites={0} KeyspaceName={1} Class={2}",
+                                      resKeyspace.DurableWrites, resKeyspace.KeyspaceName, 
+                                      resKeyspace.Replication["class"]);
                 }
                 Console.WriteLine();
             }

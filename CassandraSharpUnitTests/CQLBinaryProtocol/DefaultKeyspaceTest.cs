@@ -114,10 +114,6 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
             public bool DurableWrites { get; set; }
 
             public Dictionary<string, string> Replication { get; set; }
-
-            //public string StrategyClass { get; set; }
-
-            //public string StrategyOptions { get; set; }
         }
     }
 }

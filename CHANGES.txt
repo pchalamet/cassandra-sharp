@@ -1,4 +1,6 @@
-﻿version 3.7.0
+﻿version 4.0.0
+- Native protocol v4 support (https://github.com/pchalamet/cassandra-sharp/issues/93)
+version 3.7.0
 - Use System.Reactive instead of Rx-Main
 version 3.6.0
 - improvements for customer serializer (https://github.com/pchalamet/cassandra-sharp/issues/89 - thanks cjhanson)
