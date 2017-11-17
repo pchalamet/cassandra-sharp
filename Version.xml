@@ -1,10 +1,14 @@
 <version>
-    <cassandra-sharp-interfaces version="3.7.0"
+    <cassandra-sharp-interfaces version="4.0.0"
                                 status="" />
-    <cassandra-sharp version="3.7.0"
+    <cassandra-sharp version="4.0.0"
                      status="" />
 					 
     <changes>
+		<change id="4.0.0"><![CDATA[
+- Native protocol v4 support (https://github.com/pchalamet/cassandra-sharp/issues/93)
+]]></change>	
+
 		<change id="3.7.0"><![CDATA[
 - Use System.Reactive instead of Rx-Main
 ]]></change>	
