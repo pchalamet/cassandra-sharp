@@ -59,5 +59,18 @@ namespace Apache.Cassandra
     ANY = 6,
     TWO = 7,
     THREE = 8,
+    // Summary:
+    //     Allows reading the current (and possibly uncommitted) state of data without proposing
+    //     a new addition or update. If a SERIAL read finds an uncommitted transaction in
+    //     progress, it will commit the transaction as part of the read.
+    SERIAL = 9,
+    //
+    // Summary:
+    //     Same as Serial, but confined to the data center.
+    LOCAL_SERIAL = 10,
+    //
+    // Summary:
+    //     Similar to One but only within the DC the coordinator is in.
+    LOCAL_ONE = 11
   }
 }
