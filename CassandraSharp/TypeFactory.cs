@@ -1,60 +1,32 @@
-﻿//// cassandra-sharp - high performance .NET driver for Apache Cassandra
-//// Copyright (c) 2011-2013 Pierre Chalamet
-//// 
-//// Licensed under the Apache License, Version 2.0 (the "License");
-//// you may not use this file except in compliance with the License.
-//// You may obtain a copy of the License at
-//// 
-//// http://www.apache.org/licenses/LICENSE-2.0
-//// 
-//// Unless required by applicable law or agreed to in writing, software
-//// distributed under the License is distributed on an "AS IS" BASIS,
-//// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//// See the License for the specific language governing permissions and
-//// limitations under the License.
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
+// Copyright (c) 2011-2013 Pierre Chalamet
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Reflection;
-using CassandraSharp.CQLPoco;
 using System;
-using CassandraSharp.Extensibility;
+using System.Collections.Generic;
+using System.Text;
+using System.Reflection;
+using System.Linq;
+using CassandraSharp;
+using CassandraSharp.CQLPoco;
 
-namespace CassandraSharp.Enlightenment
+namespace CassandraSharp
 {
-
-    internal sealed class EnlightenmentMgr
+    internal class TypeFactory
     {
-        //        private static readonly Lazy<ICommandFactory> _commandFactory = new Lazy<ICommandFactory>(CreateCommandFactory);
-
-        //        private static readonly Lazy<IDataMapperFactory> _pocoDataMapperFactory = new Lazy<IDataMapperFactory>(CreatePocoDataMapperFactory);
-
-        //        private static readonly Lazy<IDataMapperFactory> _propertyBagDataMapperFactory = new Lazy<IDataMapperFactory>(CreatePropertyBagDataMapperFactory);
-
-        //        private static readonly Lazy<IDataMapperFactory> _ordinalDataMapperFactory = new Lazy<IDataMapperFactory>(CreateOrdinalDataMapperFactory);
-
+        private static readonly object _lock = new object();
         private static readonly Dictionary<Type, ICassandraTypeSerializer> _serializers = new Dictionary<Type, ICassandraTypeSerializer>();
-
-        //        public static ICommandFactory CommandFactory()
-        //        {
-        //            return _commandFactory.Value;
-        //        }
-
-        //        public static IDataMapperFactory PocoDataMapperFactory()
-        //        {
-        //            return _pocoDataMapperFactory.Value;
-        //        }
-
-        //        public static IDataMapperFactory PropertyBagDataMapperFactory()
-        //        {
-        //            return _propertyBagDataMapperFactory.Value;
-        //        }
-
-        //        public static IDataMapperFactory OrdinalDataMapperFactory()
-        //        {
-        //            return _ordinalDataMapperFactory.Value;
-        //        }
 
         public static TI Create<TI>(Type type, object[] prms)
         {
@@ -121,7 +93,7 @@ namespace CassandraSharp.Enlightenment
             // ReSharper disable once InconsistentlySynchronizedField
             if (!_serializers.ContainsKey(serializer))
             {
-                lock (_serializers)
+                lock (_lock)
                 {
                     if (!_serializers.ContainsKey(serializer))
                     {
@@ -135,36 +107,5 @@ namespace CassandraSharp.Enlightenment
             // ReSharper disable once InconsistentlySynchronizedField
             return _serializers[serializer];
         }
-
-        //        private static T Create<T>(string typeName)
-        //        {
-        //            Type type = Type.GetType(typeName, true);
-        //            T t = (T)Activator.CreateInstance(type);
-        //            return t;
-        //        }
-
-        //        private static ICommandFactory CreateCommandFactory()
-        //        {
-        //            const string typeName = "CassandraSharp.Enlightenment.CommandFactory, CassandraSharp";
-        //            return Create<ICommandFactory>(typeName);
-        //        }
-
-        //        private static IDataMapperFactory CreatePocoDataMapperFactory()
-        //        {
-        //            const string typeName = "CassandraSharp.Enlightenment.PocoDataMapperFactory, CassandraSharp";
-        //            return Create<IDataMapperFactory>(typeName);
-        //        }
-
-        //        private static IDataMapperFactory CreatePropertyBagDataMapperFactory()
-        //        {
-        //            const string typeName = "CassandraSharp.Enlightenment.PropertyBagDataMapperFactory, CassandraSharp";
-        //            return Create<IDataMapperFactory>(typeName);
-        //        }
-
-        //        private static IDataMapperFactory CreateOrdinalDataMapperFactory()
-        //        {
-        //            const string typeName = "CassandraSharp.Enlightenment.OrdinalDataMapperFactory, CassandraSharp";
-        //            return Create<IDataMapperFactory>(typeName);
-        //        }
     }
 }

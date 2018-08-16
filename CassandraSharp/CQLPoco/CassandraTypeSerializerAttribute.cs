@@ -14,7 +14,8 @@
 // limitations under the License.
 
 using System.Linq;
-using CassandraSharp.Enlightenment;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace CassandraSharp.CQLPoco
 {
@@ -25,7 +26,7 @@ namespace CassandraSharp.CQLPoco
     {
         public Type TypeSerializer { get; private set; }
 
-        public Func<Type, Func<Type,Func<object, byte[]>>, Func<Type,Func<byte[],object>>, ICassandraTypeSerializer> Serializer { get; private set; }
+        public Func<Type, Func<Type, Func<object, byte[]>>, Func<Type, Func<byte[], object>>, ICassandraTypeSerializer> Serializer { get; private set; }
 
         public CassandraTypeSerializerAttribute(Type serializer)
         {
@@ -45,29 +46,31 @@ namespace CassandraSharp.CQLPoco
             var typeCtor = ctors.Where(ctor =>
             {
                 var prms = ctor.GetParameters();
-                return prms.Length == 1 && prms.First().ParameterType == typeof (Type);
+                return prms.Length == 1 && prms.First().ParameterType == typeof(Type);
             }).FirstOrDefault();
 
             // Determine if there is a constructor which passed the serialized object's type as well as access to the default serializer and deserializer (recursable)
             var recurseCtor = ctors.Where(ctor =>
             {
                 var prms = ctor.GetParameters().ToArray();
-                return prms.Length == 3 && prms[0].ParameterType == typeof(Type) && prms[1].ParameterType == typeof(Func<Type,Func<object, byte[]>>) && prms[2].ParameterType == typeof(Func<Type,Func<byte[], object>>);
+                return prms.Length == 3 && prms[0].ParameterType == typeof(Type) && prms[1].ParameterType == typeof(Func<Type, Func<object, byte[]>>) && prms[2].ParameterType == typeof(Func<Type, Func<byte[], object>>);
             }).FirstOrDefault();
 
             // Populate the Serializer field with the appropriate delegate
-            if (recurseCtor != null )
+            if (recurseCtor != null)
             {
-                Serializer = (type, defaultSerializer, defaultDeserializer) => EnlightenmentMgr.CreateSerializer(serializer, type, defaultSerializer, defaultDeserializer);
+                Serializer = (type, defaultSerializer, defaultDeserializer) => TypeFactory.CreateSerializer(serializer, type, defaultSerializer, defaultDeserializer);
             }
             else if (typeCtor != null)
             {
-                Serializer = (type, defaultSerializer, defaultDeserializer) => EnlightenmentMgr.CreateSerializer(serializer, type);
+                Serializer = (type, defaultSerializer, defaultDeserializer) => TypeFactory.CreateSerializer(serializer, type);
             }
             else
             {
-                Serializer = (type, defaultSerializer, defaultDeserializer) => EnlightenmentMgr.CreateSerializer(serializer);
+                Serializer = (type, defaultSerializer, defaultDeserializer) => TypeFactory.CreateSerializer(serializer);
             }
         }
+
+
     }
 }

@@ -53,7 +53,7 @@ namespace CassandraSharp.Utils
                 throw new ArgumentException(invalidTypeMsg);
             }
 
-            return EnlightenmentMgr.Create<TI>(type, prms);
+            return TypeFactory.Create<TI>(type, prms);
         }
     }
 }
