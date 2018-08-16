@@ -21,7 +21,6 @@ namespace Samples.TimeOut
     using System.Threading.Tasks;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Enlightenment;
 
     public class SchemaKeyspaces
     {

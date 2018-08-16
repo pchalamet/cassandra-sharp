@@ -19,7 +19,6 @@ namespace Samples.PreparedStatement
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Enlightenment;
 
     public class BatchSample : Sample
     {

@@ -29,14 +29,15 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
     {
         private const string TestKeyspace = "YouDontHaveIt_12345678";
 
+        private IClusterManager clusterManager;
         private ICluster cluster;
+
 
         [SetUp]
         public void SetUp()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            ClusterManager.Configure(cassandraSharpConfig);
-
+            clusterManager = new ClusterManager(cassandraSharpConfig);
             var config = new ClusterConfig
             {
                 Endpoints = new EndpointsConfig { Servers = new[] { "cassandra1" } },
@@ -49,14 +50,14 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
                         {
                             Options = new Dictionary<string, string>
                                             {
-                                                { "class", "SimpleStrategy" },
-                                                { "replication_factor", "1" },
+                                            { "class", "SimpleStrategy" },
+                                            { "replication_factor", "1" },
                                             }
                         }
                     }
             };
 
-            cluster = ClusterManager.GetCluster(config);
+            cluster = clusterManager.GetCluster(config);
         }
 
         [TearDown]
@@ -72,7 +73,7 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
             {
             }
 
-            ClusterManager.Shutdown();
+            clusterManager.Dispose();
         }
 
         [Test]

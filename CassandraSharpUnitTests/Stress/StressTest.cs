@@ -180,71 +180,71 @@ namespace CassandraSharpUnitTests.Stress
                         Logger = new LoggerConfig {Type = typeof(ResilienceLogger).AssemblyQualifiedName},
                         Recovery = new RecoveryConfig {Interval = 2}
                 };
-            ClusterManager.Configure(cassandraSharpConfig);
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
+            {
 
-            ClusterConfig clusterConfig = new ClusterConfig
+                ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] { "cassandra1" },
-                            },
-                        Transport = new TransportConfig
-                            {
-                                    Port = 666,
-                                    ReceiveTimeout = 10 * 1000,
-                            }
+                    Endpoints = new EndpointsConfig
+                    {
+                        Servers = new[] { "cassandra1" },
+                    },
+                    Transport = new TransportConfig
+                    {
+                        Port = 666,
+                        ReceiveTimeout = 10 * 1000,
+                    }
                 };
 
-            DisconnectingProxy proxy = new DisconnectingProxy(666, 9042);
-            proxy.Start();
+                DisconnectingProxy proxy = new DisconnectingProxy(666, 9042);
+                proxy.Start();
 
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
-            {
-                ICqlCommand cmd = cluster.CreatePocoCommand();
-
-                const string dropFoo = "drop keyspace data";
-                try
+                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    cmd.Execute(dropFoo).AsFuture().Wait();
-                }
-                catch
-                {
-                }
+                    ICqlCommand cmd = cluster.CreatePocoCommand();
 
-                const string createFoo = "CREATE KEYSPACE data WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                cmd.Execute(createFoo).AsFuture().Wait();
-
-                const string createBar = "CREATE TABLE data.test (time text PRIMARY KEY)";
-                cmd.Execute(createBar).AsFuture().Wait();
-
-                proxy.EnableKiller();
-
-                for (int i = 0; i < 10000; ++i)
-                {
-                    int attempt = 0;
-                    while (true)
+                    const string dropFoo = "drop keyspace data";
+                    try
                     {
-                        var now = DateTime.Now;
-                        string insert = String.Format("insert into data.test(time) values ('{0}');", now);
-                        Console.WriteLine("{0}.{1}) {2}", i, ++attempt, insert);
+                        cmd.Execute(dropFoo).AsFuture().Wait();
+                    }
+                    catch
+                    {
+                    }
 
-                        try
+                    const string createFoo = "CREATE KEYSPACE data WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                    cmd.Execute(createFoo).AsFuture().Wait();
+
+                    const string createBar = "CREATE TABLE data.test (time text PRIMARY KEY)";
+                    cmd.Execute(createBar).AsFuture().Wait();
+
+                    proxy.EnableKiller();
+
+                    for (int i = 0; i < 10000; ++i)
+                    {
+                        int attempt = 0;
+                        while (true)
                         {
-                            cmd.Execute(insert).AsFuture().Wait();
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Failed with error {0}", ex.Message);
-                            Thread.Sleep(1000);
+                            var now = DateTime.Now;
+                            string insert = String.Format("insert into data.test(time) values ('{0}');", now);
+                            Console.WriteLine("{0}.{1}) {2}", i, ++attempt, insert);
+
+                            try
+                            {
+                                cmd.Execute(insert).AsFuture().Wait();
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Failed with error {0}", ex.Message);
+                                Thread.Sleep(1000);
+                            }
                         }
                     }
                 }
 
-                ClusterManager.Shutdown();
+                proxy.Stop();
             }
-
-            proxy.Stop();
         }
     }
 }

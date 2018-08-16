@@ -19,7 +19,6 @@ namespace Samples.POCO
     using System.Collections.Generic;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
-    using CassandraSharp.Enlightenment;
 
     public class NerdMovie
     {

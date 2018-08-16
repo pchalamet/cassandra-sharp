@@ -20,7 +20,6 @@ namespace Samples.PropertyBag
     using System.Linq;
     using CassandraSharp;
     using CassandraSharp.CQLPropertyBag;
-    using CassandraSharp.Enlightenment;
 
     public class SchemaColumns
     {

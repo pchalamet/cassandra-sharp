@@ -15,12 +15,6 @@
 
 namespace CassandraSharp
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using CassandraSharp.Enlightenment;
-
     public static class CqlCommandExtensions
     {
         public static IQuery<NonQuery> Execute(this ICqlCommand @this, string cql)

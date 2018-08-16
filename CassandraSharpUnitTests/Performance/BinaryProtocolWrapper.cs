@@ -23,6 +23,8 @@ namespace CassandraSharpUnitTests.Performance
 
     public class BinaryProtocolWrapper : ProtocolWrapper
     {
+        private IClusterManager _clusterManager;
+
         private ICluster _cluster;
 
         private ICqlCommand _cmd;
@@ -40,7 +42,7 @@ namespace CassandraSharpUnitTests.Performance
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
             cassandraSharpConfig.Instrumentation = new InstrumentationConfig();
             cassandraSharpConfig.Instrumentation.Type = typeof(PerformanceInstrumentation).AssemblyQualifiedName;
-            ClusterManager.Configure(cassandraSharpConfig);
+            _clusterManager = new ClusterManager(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
                 {
@@ -50,7 +52,7 @@ namespace CassandraSharpUnitTests.Performance
                             },
                 };
 
-            _cluster = ClusterManager.GetCluster(clusterConfig);
+            _cluster = _clusterManager.GetCluster(clusterConfig);
 
             _cmd = _cluster.CreateOrdinalCommand();
         }
@@ -63,7 +65,7 @@ namespace CassandraSharpUnitTests.Performance
             }
 
             _cluster.Dispose();
-            ClusterManager.Shutdown();
+            _clusterManager.Dispose();
         }
 
         public override void Query(string cmd)

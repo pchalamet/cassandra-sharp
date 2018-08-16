@@ -24,7 +24,6 @@ namespace Samples.Stress
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Enlightenment;
 
     public class DisconnectingProxy
     {
@@ -178,7 +177,7 @@ namespace Samples.Stress
                 Logger = new LoggerConfig { Type = typeof(ResilienceLogger).AssemblyQualifiedName },
                 Recovery = new RecoveryConfig { Interval = 2 }
             };
-            using (var clusterManager = new CassandraSharp.Enlightenment.ClusterManager(cassandraSharpConfig))
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
                 ClusterConfig clusterConfig = new ClusterConfig
                 {

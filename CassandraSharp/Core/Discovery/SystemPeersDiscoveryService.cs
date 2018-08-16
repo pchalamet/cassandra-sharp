@@ -23,7 +23,6 @@ namespace CassandraSharp.Discovery
     using System.Timers;
     using CassandraSharp.CQLBinaryProtocol.Queries;
     using CassandraSharp.Config;
-    using CassandraSharp.Enlightenment;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
 

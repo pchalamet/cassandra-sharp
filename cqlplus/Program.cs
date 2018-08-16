@@ -66,7 +66,7 @@ namespace cqlplus
                 Instrumentation = new InstrumentationConfig { Type = typeof(ConsoleInstrumentation).AssemblyQualifiedName }
             };
 
-            using (var clusterManager = new CassandraSharp.Enlightenment.ClusterManager(cassandraSharpConfig))
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
                 ClusterConfig clusterConfig = new ClusterConfig
                 {

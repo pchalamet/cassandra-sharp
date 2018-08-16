@@ -21,13 +21,13 @@ namespace CassandraSharp.CQLPoco
     {
         public static ICqlCommandBuilderTo FromPoco(this ICqlCommandBuilderFrom @this)
         {
-            var factory = new Enlightenment.PocoDataMapperFactory();
+            var factory = new PocoDataMapperFactory();
             return @this.Set(factory);
         }
 
         public static ICqlCommandBuilderBuild ToPoco(this ICqlCommandBuilderTo @this)
         {
-            var factory = new Enlightenment.PocoDataMapperFactory();
+            var factory = new PocoDataMapperFactory();
             return @this.Set(factory);
         }
 

@@ -30,88 +30,88 @@ namespace CassandraSharpUnitTests.Endurance
         {
             //run Write Performance Test using cassandra-sharp driver
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            ClusterManager.Configure(cassandraSharpConfig);
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
+            {
 
-            ClusterConfig clusterConfig = new ClusterConfig
+                ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] { "cassandra1" }
-                            },
-                        Transport = new TransportConfig
-                            {
-                                    Type = transportType
-                            }
+                    Endpoints = new EndpointsConfig
+                    {
+                        Servers = new[] { "cassandra1" }
+                    },
+                    Transport = new TransportConfig
+                    {
+                        Type = transportType
+                    }
                 };
 
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
-            {
-                ICqlCommand cmd = cluster.CreatePocoCommand();
-
-                const string dropFoo = "drop keyspace Endurance";
-                try
+                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    cmd.Execute(dropFoo).AsFuture().Wait();
-                }
-                catch
-                {
-                }
+                    ICqlCommand cmd = cluster.CreatePocoCommand();
 
-                const string createFoo = "CREATE KEYSPACE Endurance WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createFoo);
-                Console.WriteLine("============================================================");
-
-                var resCount = cmd.Execute(createFoo);
-                resCount.AsFuture().Wait();
-                Console.WriteLine();
-                Console.WriteLine();
-
-                const string createBar = "CREATE TABLE Endurance.stresstest (strid varchar,intid int,PRIMARY KEY (strid))";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createBar);
-                Console.WriteLine("============================================================");
-                resCount = cmd.Execute(createBar);
-                resCount.AsFuture().Wait();
-                Console.WriteLine();
-                Console.WriteLine();
-
-                const string insertPerf = "UPDATE Endurance.stresstest SET intid = ? WHERE strid = ?";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
-                Console.WriteLine("============================================================");
-                var prepared = cmd.Prepare(insertPerf);
-
-                var timer = Stopwatch.StartNew();
-
-                int running = 0;
-                for (int i = 0; i < 100000; i++)
-                {
-                    if (0 == i % 1000)
+                    const string dropFoo = "drop keyspace Endurance";
+                    try
                     {
-                        Console.WriteLine("Sent {0} requests - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
+                        cmd.Execute(dropFoo).AsFuture().Wait();
+                    }
+                    catch
+                    {
                     }
 
-                    Interlocked.Increment(ref running);
-                    prepared.Execute(new {intid = i, strid = i.ToString("X")}).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
+                    const string createFoo = "CREATE KEYSPACE Endurance WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(createFoo);
+                    Console.WriteLine("============================================================");
+
+                    var resCount = cmd.Execute(createFoo);
+                    resCount.AsFuture().Wait();
+                    Console.WriteLine();
+                    Console.WriteLine();
+
+                    const string createBar = "CREATE TABLE Endurance.stresstest (strid varchar,intid int,PRIMARY KEY (strid))";
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(createBar);
+                    Console.WriteLine("============================================================");
+                    resCount = cmd.Execute(createBar);
+                    resCount.AsFuture().Wait();
+                    Console.WriteLine();
+                    Console.WriteLine();
+
+                    const string insertPerf = "UPDATE Endurance.stresstest SET intid = ? WHERE strid = ?";
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(" Cassandra-Sharp Driver write performance test single thread ");
+                    Console.WriteLine("============================================================");
+                    var prepared = cmd.Prepare(insertPerf);
+
+                    var timer = Stopwatch.StartNew();
+
+                    int running = 0;
+                    for (int i = 0; i < 100000; i++)
+                    {
+                        if (0 == i % 1000)
+                        {
+                            Console.WriteLine("Sent {0} requests - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
+                        }
+
+                        Interlocked.Increment(ref running);
+                        prepared.Execute(new { intid = i, strid = i.ToString("X") }).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
+                    }
+
+                    while (0 != Interlocked.CompareExchange(ref running, 0, 0))
+                    {
+                        Console.WriteLine("{0} requests still running", running);
+                        Thread.Sleep(1 * 1000);
+                    }
+                    timer.Stop();
+                    Console.WriteLine("Endurance ran in {0} ms", timer.ElapsedMilliseconds);
+
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(dropFoo);
+                    Console.WriteLine("============================================================");
+
+                    cmd.Execute(dropFoo).AsFuture().Wait();
                 }
-
-                while (0 != Interlocked.CompareExchange(ref running, 0, 0))
-                {
-                    Console.WriteLine("{0} requests still running", running);
-                    Thread.Sleep(1 * 1000);
-                }
-                timer.Stop();
-                Console.WriteLine("Endurance ran in {0} ms", timer.ElapsedMilliseconds);
-
-                Console.WriteLine("============================================================");
-                Console.WriteLine(dropFoo);
-                Console.WriteLine("============================================================");
-
-                cmd.Execute(dropFoo).AsFuture().Wait();
             }
-
-            ClusterManager.Shutdown();
         }
 
         [Test]

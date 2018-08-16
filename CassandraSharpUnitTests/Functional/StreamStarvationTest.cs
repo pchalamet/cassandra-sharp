@@ -119,71 +119,70 @@ namespace CassandraSharpUnitTests.Functional
         public void StreamStarvationMultiThread()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
+            {
+                Logger = new LoggerConfig { Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName }
+            };
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
+            {
+                ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        Logger = new LoggerConfig {Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName}
+                    Endpoints = new EndpointsConfig
+                    {
+                        Servers = new[] { "cassandra1" }
+                    },
                 };
-            ClusterManager.Configure(cassandraSharpConfig);
 
-            ClusterConfig clusterConfig = new ClusterConfig
+                ICluster cluster = clusterManager.GetCluster(clusterConfig);
+                ICqlCommand cmd = cluster.CreatePocoCommand();
+
+                const string dropKeySpace = "drop keyspace Tests";
+                try
                 {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] { "cassandra1" }
-                            },
-                };
-
-            ICluster cluster = ClusterManager.GetCluster(clusterConfig);
-            ICqlCommand cmd = cluster.CreatePocoCommand();
-
-            const string dropKeySpace = "drop keyspace Tests";
-            try
-            {
-                cmd.Execute(dropKeySpace).AsFuture().Wait();
-            }
-            catch
-            {
-            }
-
-            const string createKeySpace = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-            Console.WriteLine("============================================================");
-            Console.WriteLine(createKeySpace);
-            Console.WriteLine("============================================================");
-
-            cmd.Execute(createKeySpace).AsFuture().Wait();
-            Console.WriteLine();
-            Console.WriteLine();
-
-            const string createFoo = "CREATE TABLE Tests.foo (strid varchar,bar varchar,intid int,PRIMARY KEY (strid))";
-            Console.WriteLine("============================================================");
-            Console.WriteLine(createFoo);
-            Console.WriteLine("============================================================");
-            cmd.Execute(createFoo).AsFuture().Wait();
-            Console.WriteLine();
-            Console.WriteLine();
-
-            const string insertPerf = "UPDATE Tests.foo SET bar = ?, intid = ? WHERE strid = ?";
-            Console.WriteLine("============================================================");
-            Console.WriteLine(" Cassandra-Sharp Driver reproducing stream starvation ");
-            Console.WriteLine("============================================================");
-
-            using (var prepared = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertPerf))
-            {
-                Thread[] failsThreads = new Thread[NUM_THREADS];
-
-                for (int i = 0; i < NUM_THREADS; i++)
+                    cmd.Execute(dropKeySpace).AsFuture().Wait();
+                }
+                catch
                 {
-                    failsThreads[i] = new Thread(() => FailingThread(prepared));
-                    failsThreads[i].Start();
-                    //Thread.Sleep(5000);
                 }
 
-                foreach (Thread thread in failsThreads)
+                const string createKeySpace = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                Console.WriteLine("============================================================");
+                Console.WriteLine(createKeySpace);
+                Console.WriteLine("============================================================");
+
+                cmd.Execute(createKeySpace).AsFuture().Wait();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                const string createFoo = "CREATE TABLE Tests.foo (strid varchar,bar varchar,intid int,PRIMARY KEY (strid))";
+                Console.WriteLine("============================================================");
+                Console.WriteLine(createFoo);
+                Console.WriteLine("============================================================");
+                cmd.Execute(createFoo).AsFuture().Wait();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                const string insertPerf = "UPDATE Tests.foo SET bar = ?, intid = ? WHERE strid = ?";
+                Console.WriteLine("============================================================");
+                Console.WriteLine(" Cassandra-Sharp Driver reproducing stream starvation ");
+                Console.WriteLine("============================================================");
+
+                using (var prepared = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertPerf))
                 {
-                    thread.Join();
+                    Thread[] failsThreads = new Thread[NUM_THREADS];
+
+                    for (int i = 0; i < NUM_THREADS; i++)
+                    {
+                        failsThreads[i] = new Thread(() => FailingThread(prepared));
+                        failsThreads[i].Start();
+                        //Thread.Sleep(5000);
+                    }
+
+                    foreach (Thread thread in failsThreads)
+                    {
+                        thread.Join();
+                    }
                 }
             }
-
-            ClusterManager.Shutdown();
         }
     }
 }

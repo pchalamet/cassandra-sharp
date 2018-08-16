@@ -20,7 +20,6 @@ namespace CassandraSharp
     using System.Threading.Tasks;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Enlightenment;
 
     public static class TracingExtensions
     {

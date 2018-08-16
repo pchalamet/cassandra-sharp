@@ -29,7 +29,6 @@ namespace CassandraSharp.Transport
     using CassandraSharp.Exceptions;
     using CassandraSharp.Extensibility;
     using CassandraSharp.Utils;
-    using CassandraSharp.Enlightenment;
 
     internal sealed class LongRunningConnection : IConnection,
                                                   IDisposable

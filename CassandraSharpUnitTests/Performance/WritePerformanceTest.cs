@@ -152,11 +152,5 @@ namespace CassandraSharpUnitTests.Performance
         {
             RunWritePerformanceSingleThread<BinaryProtocolWrapper>();
         }
-
-        [Test]
-        public void ThriftRunWritePerformanceSingleThread()
-        {
-            RunWritePerformanceSingleThread<ThriftProtocolWrapper>();
-        }
     }
 }

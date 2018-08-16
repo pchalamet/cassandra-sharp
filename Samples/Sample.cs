@@ -35,7 +35,7 @@ namespace Samples
             Console.WriteLine("=======================================================");
 
             XmlConfigurator.Configure();
-            using (var clusterManager = new CassandraSharp.Enlightenment.ClusterManager())
+            using (var clusterManager = new ClusterManager())
             using (ICluster cluster = clusterManager.GetCluster("TestCassandra"))
             {
                 try

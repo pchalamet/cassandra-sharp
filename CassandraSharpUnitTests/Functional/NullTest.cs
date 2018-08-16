@@ -25,17 +25,19 @@ namespace CassandraSharpUnitTests.Functional
     [TestFixture]
     public class NullTest
     {
+        private IClusterManager clusterManager;
+
         [TearDown]
         public void TearDown()
         {
-            ClusterManager.Shutdown();
+            clusterManager.Dispose();
         }
 
         [Test]
         public void TestNull()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            ClusterManager.Configure(cassandraSharpConfig);
+            clusterManager = new ClusterManager(cassandraSharpConfig);
 
             ClusterConfig clusterConfig = new ClusterConfig
                 {
@@ -45,7 +47,7 @@ namespace CassandraSharpUnitTests.Functional
                             }
                 };
 
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
+            using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
             {
                 var cmd = cluster.CreatePropertyBagCommand();
 

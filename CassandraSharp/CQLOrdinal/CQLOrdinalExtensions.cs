@@ -21,13 +21,13 @@ namespace CassandraSharp.CQLOrdinal
     {
         public static ICqlCommandBuilderTo FromOrdinal(this ICqlCommandBuilderFrom @this)
         {
-            var factory = new CassandraSharp.Enlightenment.OrdinalDataMapperFactory();
+            var factory = new OrdinalDataMapperFactory();
             return @this.Set(factory);
         }
 
         public static ICqlCommandBuilderBuild ToOrdinal(this ICqlCommandBuilderTo @this)
         {
-            var factory = new CassandraSharp.Enlightenment.OrdinalDataMapperFactory();
+            var factory = new OrdinalDataMapperFactory();
             return @this.Set(factory);
         }
 

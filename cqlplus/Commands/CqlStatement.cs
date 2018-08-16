@@ -17,7 +17,6 @@ namespace cqlplus.Commands
 {
     using CassandraSharp;
     using CassandraSharp.CQLPropertyBag;
-    using CassandraSharp.Enlightenment;
 
     internal class CqlStatement : CommandBase
     {

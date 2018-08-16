@@ -75,41 +75,41 @@ namespace CassandraSharpUnitTests.CQLOrdinal
         public void TestAllTypes()
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            ClusterManager.Configure(cassandraSharpConfig);
-
-            ClusterConfig clusterConfig = new ClusterConfig
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
+            {
+                ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] {"cassandra1"}
-                            }
+                    Endpoints = new EndpointsConfig
+                    {
+                        Servers = new[] { "cassandra1" }
+                    }
                 };
 
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
-            {
-                ICqlCommand cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
-
-                const string dropFoo = "drop keyspace Tests";
-
-                try
+                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    cmd.Execute(dropFoo).AsFuture().Wait();
-                }
-                catch
-                {
-                }
+                    ICqlCommand cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
 
-                const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createFoo);
-                Console.WriteLine("============================================================");
+                    const string dropFoo = "drop keyspace Tests";
 
-                cmd.Execute(createFoo).AsFuture().Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+                    try
+                    {
+                        cmd.Execute(dropFoo).AsFuture().Wait();
+                    }
+                    catch
+                    {
+                    }
 
-                // http://www.datastax.com/docs/1.1/references/cql/cql_data_types
-                const string createBar = @"CREATE TABLE Tests.AllTypes (cAscii ascii, 
+                    const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(createFoo);
+                    Console.WriteLine("============================================================");
+
+                    cmd.Execute(createFoo).AsFuture().Wait();
+                    Console.WriteLine();
+                    Console.WriteLine();
+
+                    // http://www.datastax.com/docs/1.1/references/cql/cql_data_types
+                    const string createBar = @"CREATE TABLE Tests.AllTypes (cAscii ascii, 
                                                                             cBigint bigint,
                                                                             cBlob blob,
                                                                             cBoolean boolean,
@@ -128,40 +128,40 @@ namespace CassandraSharpUnitTests.CQLOrdinal
                                                                             cSet set<int>,
                                                                             cMap map<text, int>,
                                                           PRIMARY KEY (cInt))";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createBar);
-                Console.WriteLine("============================================================");
-                cmd.Execute(createBar).AsFuture().Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(createBar);
+                    Console.WriteLine("============================================================");
+                    cmd.Execute(createBar).AsFuture().Wait();
+                    Console.WriteLine();
+                    Console.WriteLine();
 
-                const string insertBatch = @"insert into Tests.AllTypes (cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat,
+                    const string insertBatch = @"insert into Tests.AllTypes (cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat,
                                                                          cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap)
                                              values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                var prepared = cmd.Prepare(insertBatch);
+                    var prepared = cmd.Prepare(insertBatch);
 
-                var allTypesInsert = new AllTypes
+                    var allTypesInsert = new AllTypes
                     {
-                            CAscii = new string('x', 8000),
-                            CBigint = 0x0102030405060708,
-                            CBlob = Enumerable.Repeat((byte) 42, 7142).ToArray(),
-                            CBoolean = true,
-                            CDouble = 1234.5678,
-                            CFloat = 234.567f,
-                            CInet = new IPAddress(new byte[] {0x01, 0x02, 0x03, 0x04}),
-                            CInt = 42,
-                            CText = new string('x', 3000),
-                            CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
-                            CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
-                            CUuid = Guid.NewGuid(),
-                            CVarchar = new string('x', 5000),
-                            CList = new List<int> {1, 2, 3},
-                            CSet = new HashSet<int> {1, 2, 3},
-                            CMap = new Dictionary<string, int> {{"one", 1}, {"two", 2}, {"three", 3}},
+                        CAscii = new string('x', 8000),
+                        CBigint = 0x0102030405060708,
+                        CBlob = Enumerable.Repeat((byte)42, 7142).ToArray(),
+                        CBoolean = true,
+                        CDouble = 1234.5678,
+                        CFloat = 234.567f,
+                        CInet = new IPAddress(new byte[] { 0x01, 0x02, 0x03, 0x04 }),
+                        CInt = 42,
+                        CText = new string('x', 3000),
+                        CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
+                        CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
+                        CUuid = Guid.NewGuid(),
+                        CVarchar = new string('x', 5000),
+                        CList = new List<int> { 1, 2, 3 },
+                        CSet = new HashSet<int> { 1, 2, 3 },
+                        CMap = new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } },
                     };
 
-                var param = new object[]
-                    {
+                    var param = new object[]
+                        {
                             allTypesInsert.CAscii,
                             allTypesInsert.CBigint,
                             allTypesInsert.CBlob,
@@ -178,35 +178,34 @@ namespace CassandraSharpUnitTests.CQLOrdinal
                             allTypesInsert.CList,
                             allTypesInsert.CSet,
                             allTypesInsert.CMap,
-                    };
+                        };
 
-                prepared.Execute(param).AsFuture().Wait();
+                    prepared.Execute(param).AsFuture().Wait();
 
-                const string selectAll =
-                        "select cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat, cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap from Tests.AllTypes";
-                AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).AsFuture().Result.Single();
+                    const string selectAll =
+                            "select cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat, cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap from Tests.AllTypes";
+                    AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).AsFuture().Result.Single();
 
-                cmd.Execute(dropFoo).AsFuture().Wait();
+                    cmd.Execute(dropFoo).AsFuture().Wait();
 
-                Assert.AreEqual(allTypesInsert.CAscii, allTypesSelect.CAscii);
-                Assert.AreEqual(allTypesInsert.CBigint, allTypesSelect.CBigint);
-                Assert.AreEqual(allTypesInsert.CBlob, allTypesSelect.CBlob);
-                Assert.AreEqual(allTypesInsert.CBoolean, allTypesSelect.CBoolean);
-                Assert.AreEqual(allTypesInsert.CDouble, allTypesSelect.CDouble);
-                Assert.AreEqual(allTypesInsert.CFloat, allTypesSelect.CFloat);
-                Assert.AreEqual(allTypesInsert.CInet, allTypesSelect.CInet);
-                Assert.AreEqual(allTypesInsert.CInt, allTypesSelect.CInt);
-                Assert.AreEqual(allTypesInsert.CText, allTypesSelect.CText);
-                Assert.AreEqual(allTypesInsert.CTimestamp, allTypesSelect.CTimestamp);
-                Assert.AreEqual(allTypesInsert.CTimeuuid, allTypesSelect.CTimeuuid);
-                Assert.AreEqual(allTypesInsert.CUuid, allTypesSelect.CUuid);
-                Assert.AreEqual(allTypesInsert.CVarchar, allTypesSelect.CVarchar);
-                Assert.AreEqual(allTypesInsert.CList, allTypesSelect.CList);
-                Assert.AreEqual(allTypesInsert.CSet, allTypesSelect.CSet);
-                Assert.AreEqual(allTypesInsert.CMap, allTypesSelect.CMap);
+                    Assert.AreEqual(allTypesInsert.CAscii, allTypesSelect.CAscii);
+                    Assert.AreEqual(allTypesInsert.CBigint, allTypesSelect.CBigint);
+                    Assert.AreEqual(allTypesInsert.CBlob, allTypesSelect.CBlob);
+                    Assert.AreEqual(allTypesInsert.CBoolean, allTypesSelect.CBoolean);
+                    Assert.AreEqual(allTypesInsert.CDouble, allTypesSelect.CDouble);
+                    Assert.AreEqual(allTypesInsert.CFloat, allTypesSelect.CFloat);
+                    Assert.AreEqual(allTypesInsert.CInet, allTypesSelect.CInet);
+                    Assert.AreEqual(allTypesInsert.CInt, allTypesSelect.CInt);
+                    Assert.AreEqual(allTypesInsert.CText, allTypesSelect.CText);
+                    Assert.AreEqual(allTypesInsert.CTimestamp, allTypesSelect.CTimestamp);
+                    Assert.AreEqual(allTypesInsert.CTimeuuid, allTypesSelect.CTimeuuid);
+                    Assert.AreEqual(allTypesInsert.CUuid, allTypesSelect.CUuid);
+                    Assert.AreEqual(allTypesInsert.CVarchar, allTypesSelect.CVarchar);
+                    Assert.AreEqual(allTypesInsert.CList, allTypesSelect.CList);
+                    Assert.AreEqual(allTypesInsert.CSet, allTypesSelect.CSet);
+                    Assert.AreEqual(allTypesInsert.CMap, allTypesSelect.CMap);
+                }
             }
-
-            ClusterManager.Shutdown();
         }
     }
 }

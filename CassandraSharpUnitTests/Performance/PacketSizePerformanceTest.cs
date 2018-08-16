@@ -59,73 +59,73 @@ namespace CassandraSharpUnitTests.Performance
 
             //run Write Performance Test using cassandra-sharp driver
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
-            ClusterManager.Configure(cassandraSharpConfig);
+            using (var clusterManager = new ClusterManager(cassandraSharpConfig))
+            {
 
-            ClusterConfig clusterConfig = new ClusterConfig
+                ClusterConfig clusterConfig = new ClusterConfig
                 {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] { "cassandra1" }
-                            },
+                    Endpoints = new EndpointsConfig
+                    {
+                        Servers = new[] { "cassandra1" }
+                    },
                 };
 
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
-            {
-                ICqlCommand cmd = cluster.CreatePocoCommand();
-
-                const string dropFoo = "drop keyspace Tests";
-                try
+                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    cmd.Execute(dropFoo).AsFuture().Wait();
-                }
-// ReSharper disable EmptyGeneralCatchClause
-                catch
-// ReSharper restore EmptyGeneralCatchClause
-                {
-                }
+                    ICqlCommand cmd = cluster.CreatePocoCommand();
 
-                const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createFoo);
-                Console.WriteLine("============================================================");
+                    const string dropFoo = "drop keyspace Tests";
+                    try
+                    {
+                        cmd.Execute(dropFoo).AsFuture().Wait();
+                    }
+                    // ReSharper disable EmptyGeneralCatchClause
+                    catch
+                    // ReSharper restore EmptyGeneralCatchClause
+                    {
+                    }
 
-                var resCount = cmd.Execute(createFoo).AsFuture();
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
+                    const string createFoo = "CREATE KEYSPACE Tests WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(createFoo);
+                    Console.WriteLine("============================================================");
 
-                const string createBar = "CREATE TABLE Tests.tbl ( x varchar primary key, y varchar )";
-                Console.WriteLine("============================================================");
-                Console.WriteLine(createBar);
-                Console.WriteLine("============================================================");
-                resCount = cmd.Execute(createBar).AsFuture();
-                resCount.Wait();
-                Console.WriteLine();
-                Console.WriteLine();
-
-                using (var preparedQuery = cmd.Prepare("insert into Tests.tbl (x, y) values (?, ?)"))
-                {
-                    time1423 = InsertData(new string('x', 1423), preparedQuery);
+                    var resCount = cmd.Execute(createFoo).AsFuture();
+                    resCount.Wait();
+                    Console.WriteLine();
                     Console.WriteLine();
 
-                    time1424 = InsertData(new string('x', 1424), preparedQuery);
+                    const string createBar = "CREATE TABLE Tests.tbl ( x varchar primary key, y varchar )";
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(createBar);
+                    Console.WriteLine("============================================================");
+                    resCount = cmd.Execute(createBar).AsFuture();
+                    resCount.Wait();
                     Console.WriteLine();
+                    Console.WriteLine();
+
+                    using (var preparedQuery = cmd.Prepare("insert into Tests.tbl (x, y) values (?, ?)"))
+                    {
+                        time1423 = InsertData(new string('x', 1423), preparedQuery);
+                        Console.WriteLine();
+
+                        time1424 = InsertData(new string('x', 1424), preparedQuery);
+                        Console.WriteLine();
+                    }
+
+                    Console.WriteLine("============================================================");
+                    Console.WriteLine(dropFoo);
+                    Console.WriteLine("============================================================");
+
+                    resCount = cmd.Execute(dropFoo).AsFuture();
+                    resCount.Wait();
                 }
 
-                Console.WriteLine("============================================================");
-                Console.WriteLine(dropFoo);
-                Console.WriteLine("============================================================");
-
-                resCount = cmd.Execute(dropFoo).AsFuture();
-                resCount.Wait();
+                long delta = Math.Abs(time1424 - time1423);
+                long min = Math.Max(time1423, time1424);
+                double percent = delta / (double)min;
+                Assert.IsTrue(percent < 1.0);
             }
-
-            ClusterManager.Shutdown();
-
-            long delta = Math.Abs(time1424 - time1423);
-            long min = Math.Max(time1423, time1424);
-            double percent = delta / (double) min;
-            Assert.IsTrue(percent < 1.0);
         }
     }
 }
