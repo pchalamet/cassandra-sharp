@@ -1,77 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8B2359B2-4A73-4A49-8E1E-646014A768A4}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Samples</RootNamespace>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFramework>net45</TargetFramework>
     <AssemblyName>Samples</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>$(SolutionDir)\bin\net45\Debug\</OutputPath>
-    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Debug\</BaseIntermediateOutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>$(SolutionDir)\bin\net45\Release\</OutputPath>
-    <BaseIntermediateOutputPath>$(SolutionDir)\obj\net45\Release\</BaseIntermediateOutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <RootNamespace>Samples</RootNamespace>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\cassandra-sharp-AssemblyInfo.cs">
-      <Link>Properties\cassandra-sharp-AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\cassandra-sharp-info.cs">
-      <Link>Properties\cassandra-sharp-info.cs</Link>
-    </Compile>
-    <Compile Include="**\*.cs" />
+    <Compile Include="..\cassandra-sharp-AssemblyInfo.cs" />
+    <Compile Include="..\cassandra-sharp-info.cs" />
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net45.csproj" />
+    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CassandraSharp.Interfaces\CassandraSharp.Interfaces-net45.csproj">
-      <Project>{6F6EB447-9569-406A-A23B-C09B6DBDBE10}</Project>
-      <Name>CassandraSharp.Interfaces-net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CassandraSharp\CassandraSharp-net45.csproj">
-      <Project>{C1D252B7-D766-4C28-9C46-0696F896846C}</Project>
-      <Name>CassandraSharp-net45</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
