@@ -9,3 +9,4 @@ bin/
 obj/
 Resharper.DotSettings
 _ReSharper.*
+.vs

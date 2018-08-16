@@ -61,66 +61,68 @@ namespace cqlplus
         private static void Run(IStatementReader statementReader)
         {
             CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
-                {
-                        Logger = new LoggerConfig {Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName},
-                        Instrumentation = new InstrumentationConfig {Type = typeof(ConsoleInstrumentation).AssemblyQualifiedName}
-                };
-            ClusterManager.Configure(cassandraSharpConfig);
-
-            ClusterConfig clusterConfig = new ClusterConfig
-                {
-                        Transport = new TransportConfig
-                            {
-                                    User = _cliArgs.User,
-                                    Password = _cliArgs.Password
-                            },
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] {_cliArgs.Hostname},
-                            }
-                };
-            if (! _cliArgs.Discovery)
             {
-                clusterConfig.Endpoints.Discovery = new DiscoveryConfig {Type = "Null"};
-            }
+                Logger = new LoggerConfig { Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName },
+                Instrumentation = new InstrumentationConfig { Type = typeof(ConsoleInstrumentation).AssemblyQualifiedName }
+            };
 
-            using (ICluster cluster = ClusterManager.GetCluster(clusterConfig))
+            using (var clusterManager = new CassandraSharp.Enlightenment.ClusterManager(cassandraSharpConfig))
             {
-                CommandContext.Cluster = cluster;
-
-                if (_cliArgs.CheckConnection)
+                ClusterConfig clusterConfig = new ClusterConfig
                 {
-                    Console.WriteLine("Connecting to {0}:{1}...", _cliArgs.Hostname, _cliArgs.Port);
-                    const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
-                    new Exec {Statement = checkStatement}.Execute();
-                    if (CommandContext.LastCommandFailed)
+                    Transport = new TransportConfig
                     {
-                        return;
-                    }
-
-                    Console.WriteLine();
-                    Console.WriteLine("Querying ring state...");
-                    const string peersStatement = "select rpc_address,tokens,release_version from system.peers";
-                    new Exec {Statement = peersStatement}.Execute();
-                    Console.WriteLine();
-
-                    if (CommandContext.LastCommandFailed)
+                        User = _cliArgs.User,
+                        Password = _cliArgs.Password
+                    },
+                    Endpoints = new EndpointsConfig
                     {
-                        return;
+                        Servers = new[] { _cliArgs.Hostname },
                     }
+                };
+                if (!_cliArgs.Discovery)
+                {
+                    clusterConfig.Endpoints.Discovery = new DiscoveryConfig { Type = "Null" };
                 }
 
-                if (! _cliArgs.NoHelp)
+                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    new Exec {Statement = "!help"}.Execute();
-                }
+                    CommandContext.Cluster = cluster;
 
-                foreach (string statement in statementReader.Read())
-                {
-                    new Exec {Statement = statement}.Execute();
-                    if (CommandContext.Exit)
+                    if (_cliArgs.CheckConnection)
                     {
-                        return;
+                        Console.WriteLine("Connecting to {0}:{1}...", _cliArgs.Hostname, _cliArgs.Port);
+                        const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
+                        new Exec { Statement = checkStatement }.Execute();
+                        if (CommandContext.LastCommandFailed)
+                        {
+                            return;
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine("Querying ring state...");
+                        const string peersStatement = "select rpc_address,tokens,release_version from system.peers";
+                        new Exec { Statement = peersStatement }.Execute();
+                        Console.WriteLine();
+
+                        if (CommandContext.LastCommandFailed)
+                        {
+                            return;
+                        }
+                    }
+
+                    if (!_cliArgs.NoHelp)
+                    {
+                        new Exec { Statement = "!help" }.Execute();
+                    }
+
+                    foreach (string statement in statementReader.Read())
+                    {
+                        new Exec { Statement = statement }.Execute();
+                        if (CommandContext.Exit)
+                        {
+                            return;
+                        }
                     }
                 }
             }

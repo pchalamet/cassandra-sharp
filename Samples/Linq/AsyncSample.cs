@@ -20,6 +20,7 @@ namespace Samples.Linq
     using System.Linq;
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
+    using CassandraSharp.Enlightenment;
 
     public class SchemaColumns
     {

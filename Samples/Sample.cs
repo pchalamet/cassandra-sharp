@@ -34,44 +34,38 @@ namespace Samples
             Console.WriteLine("== RUNNING     {0}", _name);
             Console.WriteLine("=======================================================");
 
-            try
+            XmlConfigurator.Configure();
+            using (var clusterManager = new CassandraSharp.Enlightenment.ClusterManager())
+            using (ICluster cluster = clusterManager.GetCluster("TestCassandra"))
             {
-                XmlConfigurator.Configure();
-                using (ICluster cluster = ClusterManager.GetCluster("TestCassandra"))
+                try
                 {
-                    try
-                    {
-                        DropKeyspace(cluster);
-                    }
-// ReSharper disable EmptyGeneralCatchClause
-                    catch
-// ReSharper restore EmptyGeneralCatchClause
-                    {
-                    }
-
-                    CreateKeyspace(cluster);
-
-                    try
-                    {
-                        InternalRun(cluster);
-                        DropKeyspace(cluster);
-                    }
-                    catch (Exception ex)
-                    {
-                        string msg = string.Format("== FAILED  with error\n{0}", ex);
-                        Console.WriteLine("=======================================================");
-                        Console.WriteLine(msg);
-                        Console.WriteLine("=======================================================");
-                    }
-
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine();
+                    DropKeyspace(cluster);
                 }
-            }
-            finally
-            {
-                ClusterManager.Shutdown();
+                // ReSharper disable EmptyGeneralCatchClause
+                catch
+                // ReSharper restore EmptyGeneralCatchClause
+                {
+                }
+
+                CreateKeyspace(cluster);
+
+                try
+                {
+                    InternalRun(cluster);
+                    DropKeyspace(cluster);
+                }
+                catch (Exception ex)
+                {
+                    string msg = string.Format("== FAILED  with error\n{0}", ex);
+                    Console.WriteLine("=======================================================");
+                    Console.WriteLine(msg);
+                    Console.WriteLine("=======================================================");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
             }
         }
 
