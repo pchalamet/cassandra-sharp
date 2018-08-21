@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Version.xml = Version.xml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassandraSharpUnitTests", "CassandraSharpUnitTests\CassandraSharpUnitTests.csproj", "{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cqlplus", "cqlplus\cqlplus.csproj", "{0A06398E-69BE-487B-A011-4C0BE6619B59}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.csproj", "{8B2359B2-4A73-4A49-8E1E-646014A768A4}"
@@ -32,16 +30,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DFC6E4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassandraSharp", "CassandraSharp\CassandraSharp.csproj", "{6F6EB447-9569-406A-A23B-C09B6DBDBE10}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassandraSharp.UnitTests", "CassandraSharp.UnitTests\CassandraSharp.UnitTests.csproj", "{50AC129C-2C36-4ED9-832D-1F6ED17C336A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{22D4356F-BC92-4399-A92C-C1F9EF6ECC73}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0A06398E-69BE-487B-A011-4C0BE6619B59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0A06398E-69BE-487B-A011-4C0BE6619B59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A06398E-69BE-487B-A011-4C0BE6619B59}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -54,6 +50,10 @@ Global
 		{6F6EB447-9569-406A-A23B-C09B6DBDBE10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F6EB447-9569-406A-A23B-C09B6DBDBE10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F6EB447-9569-406A-A23B-C09B6DBDBE10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50AC129C-2C36-4ED9-832D-1F6ED17C336A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50AC129C-2C36-4ED9-832D-1F6ED17C336A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50AC129C-2C36-4ED9-832D-1F6ED17C336A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50AC129C-2C36-4ED9-832D-1F6ED17C336A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

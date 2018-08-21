@@ -1,0 +1,20 @@
+version: "3.1"
+services:
+  cassandra:
+    deploy:
+      replicas: 1
+    ports:
+      - "9042:9042"
+    # entrypoint:
+    # - "sh"
+    # - "-c"
+    # - export CASSANDRA_SEEDS=$$(nrOfTasks=`getent hosts tasks.cassandra | wc -l` ;
+    #   many=`getent hosts tasks.cassandra | awk '{print $$1}' | sed "/$$(hostname --ip-address)/d"
+    #   | paste -d, -s -` ; printf '%s' $$( [ $${nrOfTasks} -gt 1 ] && echo $${many} ||
+    #   echo "$$(hostname --ip-address)" )) ; /docker-entrypoint.sh cassandra -f
+    image: cassandra
+    networks:
+      backend:
+
+networks:
+  backend:
