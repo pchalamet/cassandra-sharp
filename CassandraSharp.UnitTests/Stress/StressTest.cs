@@ -210,7 +210,7 @@ namespace CassandraSharp.UnitTests.Stress
 
                     proxy.EnableKiller();
 
-                    for (var i = 0; i < 10000; ++i)
+                    for (var i = 0; i < 10; ++i)
                     {
                         var attempt = 0;
                         while (true)

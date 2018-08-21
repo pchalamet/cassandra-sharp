@@ -21,7 +21,7 @@ namespace CassandraSharp.Config
     {
         public static CassandraSharpConfig GetConfiguration(string name = "CassandraSharp")
         {
-            var cassandraSharpConfig = (CassandraSharpConfig)ConfigurationManager.GetSection("CassandraSharp");
+            var cassandraSharpConfig = (CassandraSharpConfig)ConfigurationManager.GetSection(name);
             return cassandraSharpConfig;
         }
     }

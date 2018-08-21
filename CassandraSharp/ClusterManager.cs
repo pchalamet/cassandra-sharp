@@ -20,7 +20,6 @@ using System.Net;
 using CassandraSharp.Config;
 using CassandraSharp.Extensibility;
 using CassandraSharp.Utils;
-using Factory = CassandraSharp.Logger.Factory;
 
 namespace CassandraSharp
 {
@@ -41,7 +40,7 @@ namespace CassandraSharp
             lock (_lock)
             {
                 config.CheckArgumentNotNull("config");
-                _logger = ServiceActivator<Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
+                _logger = ServiceActivator<Logger.Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
                 _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;

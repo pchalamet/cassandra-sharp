@@ -73,7 +73,7 @@ namespace CassandraSharp.UnitTests.CQLOrdinal
         [Test]
         public void TestAllTypes()
         {
-            var cassandraSharpConfig = Factory.GetConfiguration("MadeSimple");
+            var cassandraSharpConfig = Factory.GetConfiguration();
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
                 var clusterConfig = new ClusterConfig

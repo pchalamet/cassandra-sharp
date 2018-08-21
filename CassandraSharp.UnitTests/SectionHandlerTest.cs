@@ -13,14 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Configuration;
+using CassandraSharp.Config;
 using NUnit.Framework;
+using Microsoft.Extensions.Configuration.Xml;
 
 namespace CassandraSharp.UnitTests
 {
     [TestFixture]
     public class SectionHandlerTest
     {
-#if NET46
         [Test]
         public void TestLoadConfig()
         {
@@ -46,6 +48,10 @@ namespace CassandraSharp.UnitTests
             Assert.AreEqual("2", cassandraSharpConfig.Clusters[4].DefaultKeyspace.Replication.Options["replication_factor"]);
             Assert.AreEqual("SimpleStrategy", cassandraSharpConfig.Clusters[4].DefaultKeyspace.Replication.Options["class"]);
         }
-#endif
+
+        private void ParseConfig(XmlConfigurationSource obj)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
