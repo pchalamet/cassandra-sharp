@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Numerics;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Utils
+{
     /// <summary>
     ///     Represents spread of tokens around nodes
     /// </summary>

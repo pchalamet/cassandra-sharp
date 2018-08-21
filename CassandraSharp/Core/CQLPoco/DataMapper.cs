@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
-{
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Exceptions;
-    using CassandraSharp.Extensibility;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.Exceptions;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLPoco
+{
     internal sealed class DataMapper<T> : IDataMapper
     {
         private static readonly ClassMap<T> _classMap = ClassMap.GetClassMap<T>();

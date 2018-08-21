@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Partitioner
-{
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
+using System.Numerics;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Partitioner
+{
     internal class NullPartitioner : IPartitioner
     {
         public BigInteger? ComputeToken(PartitionKey partitionKey)

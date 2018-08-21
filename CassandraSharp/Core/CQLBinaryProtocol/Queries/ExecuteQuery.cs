@@ -13,13 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol.Queries
-{
-    using System.IO;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils.Stream;
-    using System;
+using System.IO;
+using CassandraSharp.Core.Utils.Stream;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol.Queries
+{
     internal sealed class ExecuteQuery<T> : CqlQuery<T>
     {
         private readonly IColumnSpec[] _columnSpecs;

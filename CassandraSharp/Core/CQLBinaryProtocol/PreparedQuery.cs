@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
-{
-    using System;
-    using System.Linq;
-    using CassandraSharp.CQLBinaryProtocol.Queries;
-    using CassandraSharp.Extensibility;
+using System;
+using System.Linq;
+using CassandraSharp.Core.CQLBinaryProtocol.Queries;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol
+{
     internal sealed class PreparedQuery<T> : IPreparedQuery<T>
     {
         private readonly ICluster _cluster;

@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Discovery
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Numerics;
-    using System.Timers;
-    using CassandraSharp.CQLBinaryProtocol.Queries;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Numerics;
+using System.Timers;
+using CassandraSharp.Config;
+using CassandraSharp.Core.CQLBinaryProtocol.Queries;
+using CassandraSharp.Core.Utils;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Discovery
+{
     internal sealed class SystemPeersDiscoveryService : IDiscoveryService
     {
         private readonly ICluster _cluster;

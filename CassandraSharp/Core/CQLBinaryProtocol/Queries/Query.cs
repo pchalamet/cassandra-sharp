@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol.Queries
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Reactive.Disposables;
-    using CassandraSharp.Extensibility;
+using System;
+using System.Collections.Generic;
+using System.Reactive.Disposables;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol.Queries
+{
     internal abstract class Query<T> : IQuery<T>
     {
         private readonly IConnection _connection;

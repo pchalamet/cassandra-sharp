@@ -13,16 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPoco
-{
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Exceptions;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Reflection.Emit;
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.CQLPoco;
+using CassandraSharp.Exceptions;
 
+namespace CassandraSharp.Core.CQLPoco
+{
     internal class MemberMap
     {
         private Func<object, object> _valueGetter;

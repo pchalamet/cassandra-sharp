@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Cryptography
+namespace CassandraSharp.Core.Utils.Cryptography
 {
     /// <summary>
     ///     This is a very fast, non-cryptographic hash suitable for general hash-based

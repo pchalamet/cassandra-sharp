@@ -13,21 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.CodeDom;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using CassandraSharp.Core.Utils.Collections;
+using CassandraSharp.Core.Utils.Stream;
+using CassandraSharp.Extensibility;
 
-namespace CassandraSharp.CQLBinaryProtocol
+namespace CassandraSharp.Core.CQLBinaryProtocol
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net;
-    using System.Text;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
-    using CassandraSharp.Utils.Collections;
-    using CassandraSharp.Utils.Stream;
-
     internal static class ValueSerialization
     {
         private static readonly Dictionary<ColumnType, Type> _colType2Type = new Dictionary<ColumnType, Type>

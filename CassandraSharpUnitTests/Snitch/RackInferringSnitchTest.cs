@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.Snitch;
+
 namespace CassandraSharpUnitTests.Snitch
 {
     using System.Net;
-    using CassandraSharp.Snitch;
     using NUnit.Framework;
 
     [TestFixture]

@@ -8,6 +8,7 @@
     <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>CassandraSharpUnitTests</AssemblyName>
     <RootNamespace>CassandraSharpUnitTests</RootNamespace>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.Utils;
+
 namespace CassandraSharpUnitTests.Functional
 {
     using System;
@@ -22,7 +24,6 @@ namespace CassandraSharpUnitTests.Functional
     using CassandraSharp;
     using CassandraSharp.CQLPoco;
     using CassandraSharp.Config;
-    using CassandraSharp.Utils;
     using NUnit.Framework;
 
     [TestFixture]

@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.EndpointStrategy
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Numerics;
+using CassandraSharp.Core.Utils;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.EndpointStrategy
+{
     internal sealed class NearestEndpointStrategy : IEndpointStrategy
     {
         private readonly List<IPAddress> _bannedEndpoints;

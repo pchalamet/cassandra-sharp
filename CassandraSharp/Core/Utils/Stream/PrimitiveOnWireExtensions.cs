@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Stream
-{
-    using System;
-    using System.Net;
-    using System.Text;
+using System;
+using System.Net;
+using System.Text;
 
+namespace CassandraSharp.Core.Utils.Stream
+{
     internal static class PrimitiveOnWireExtensions
     {
         public static byte[] GetBytes(this string data)

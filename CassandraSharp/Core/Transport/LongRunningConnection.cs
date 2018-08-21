@@ -13,23 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Security.Authentication;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using CassandraSharp.CQLBinaryProtocol.Queries;
-    using CassandraSharp.Config;
-    using CassandraSharp.Exceptions;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Threading;
+using System.Threading.Tasks;
+using CassandraSharp.Config;
+using CassandraSharp.Core.CQLBinaryProtocol.Queries;
+using CassandraSharp.Core.Utils;
+using CassandraSharp.Exceptions;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Transport
+{
     internal sealed class LongRunningConnection : IConnection,
                                                   IDisposable
     {

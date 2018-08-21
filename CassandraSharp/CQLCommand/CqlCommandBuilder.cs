@@ -13,10 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.Core.Utils;
+
 namespace CassandraSharp.CQLCommand
 {
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
 
     internal sealed class CqlCommandBuilder : ICqlCommandBuilderFrom,
                                               ICqlCommandBuilderTo,
@@ -35,7 +37,7 @@ namespace CassandraSharp.CQLCommand
 
         public ICqlCommand Build()
         {
-            return new CQLBinaryProtocol.CqlCommand(_cluster, _factoryFrom, _factoryTo);
+            return new CqlCommand(_cluster, _factoryFrom, _factoryTo);
         }
 
         ICqlCommandBuilderTo ICqlCommandBuilderFrom.Set(IDataMapperFactory factory)

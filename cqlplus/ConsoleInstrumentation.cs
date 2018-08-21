@@ -21,7 +21,6 @@ namespace cqlplus
     using System.Threading;
     using CassandraSharp;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Instrumentation;
 
     public class ConsoleInstrumentation : IInstrumentation
     {

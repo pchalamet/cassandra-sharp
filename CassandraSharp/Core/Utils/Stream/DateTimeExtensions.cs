@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Stream
-{
-    using System;
+using System;
 
-    internal static class DateTimeExtensions
+namespace CassandraSharp.Core.Utils.Stream
+{
+    public static class DateTimeExtensions
     {
         private static readonly DateTime _epoch = new DateTime(1970, 1, 1);
 

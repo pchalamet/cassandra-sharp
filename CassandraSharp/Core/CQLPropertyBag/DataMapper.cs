@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLPropertyBag
-{
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using System.Collections.Generic;
+using System.Collections.Generic;
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.CQLPropertyBag;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLPropertyBag
+{
     internal sealed class DataMapper : IDataMapper
     {                
         public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)

@@ -16,7 +16,7 @@
 namespace CassandraSharpUnitTests.Utils
 {
     using System;
-    using CassandraSharp.Utils;
+    using CassandraSharp.Core.Utils;
     using Moq;
     using NUnit.Framework;
 

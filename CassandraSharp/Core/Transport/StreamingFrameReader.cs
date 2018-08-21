@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
-{
-    using System;
-    using System.IO;
-    using System.Net.Sockets;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Exceptions;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
-    using CassandraSharp.Utils.Stream;
+using System;
+using System.IO;
+using System.Net.Sockets;
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.Core.Utils;
+using CassandraSharp.Core.Utils.Stream;
+using CassandraSharp.Exceptions;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Transport
+{
     internal class StreamingFrameReader : IFrameReader
     {
         private readonly byte[] _tempBuffer = new byte[16];

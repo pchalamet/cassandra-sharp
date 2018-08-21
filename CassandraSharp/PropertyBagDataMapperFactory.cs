@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Enlightenment
-{
-    using CassandraSharp.CQLPropertyBag;
-    using CassandraSharp.Extensibility;
-    using System;
+using System;
+using CassandraSharp.Core.CQLPropertyBag;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp
+{
     internal sealed class PropertyBagDataMapperFactory : IDataMapperFactory
     {
         public IDataMapper Create(Type type)

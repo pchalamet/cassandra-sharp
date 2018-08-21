@@ -14,11 +14,11 @@
 // limitations under the License.
 
 
-namespace CassandraSharp.Utils.Collections
-{
-    using System.Collections;
-    using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Generic;
 
+namespace CassandraSharp.Core.Utils.Collections
+{
     internal sealed class HashSetAccessor<T> : IHashSetAccessor
     {
         private readonly ISet<T> _hashSet;

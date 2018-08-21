@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.EndpointStrategy
-{
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+using System.Collections.Generic;
+using System.Net;
+using System.Numerics;
+using CassandraSharp.Core.Utils;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.EndpointStrategy
+{
     /// <summary>
     ///     Will pick a node by it's token to choose the coordinator node by the row key of the query.
     ///     Requires QueryHints.

@@ -13,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Stream
-{
-    using System;
-    using System.IO;
+using System;
+using System.IO;
 
-    internal sealed class DebugStream : Stream
+namespace CassandraSharp.Core.Utils.Stream
+{
+    internal sealed class DebugStream : System.IO.Stream
     {
         private OperationState _opeState = OperationState.Unknown;
 
-        private Stream _stream;
+        private System.IO.Stream _stream;
 
-        public DebugStream(Stream stream)
+        public DebugStream(System.IO.Stream stream)
         {
             _stream = stream;
         }

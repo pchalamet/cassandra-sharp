@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol.Queries
-{
-    using System.Collections.Generic;
-    using System.IO;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils.Stream;
+using System.Collections.Generic;
+using System.IO;
+using CassandraSharp.Core.Utils.Stream;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol.Queries
+{
     internal sealed class AuthenticateQuery : Query<bool>
     {
         private readonly string _password;

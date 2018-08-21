@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Instrumentation
-{
-    using System;
-    using System.Net;
-    using CassandraSharp.Extensibility;
+using System;
+using System.Net;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Instrumentation
+{
     internal sealed class NullInstrumentation : IInstrumentation
     {
         public void ClientQuery(InstrumentationToken token)

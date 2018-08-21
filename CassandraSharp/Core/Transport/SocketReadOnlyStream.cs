@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
-{
-    using System;
-    using System.IO;
-    using System.Net.Sockets;
+using System;
+using System.IO;
+using System.Net.Sockets;
 
+namespace CassandraSharp.Core.Transport
+{
     internal sealed class SocketReadOnlyStream : Stream
     {
         private readonly Socket _socket;

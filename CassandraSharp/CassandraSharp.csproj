@@ -27,5 +27,8 @@
     <Compile Include="..\cassandra-sharp-interfaces-AssemblyInfo.cs" />
     <Compile Include="..\cassandra-sharp-info.cs" />
     <None Include="..\..\cassandra-sharp.snk" />
+  </ItemGroup>    
+  <ItemGroup>
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>

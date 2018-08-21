@@ -17,7 +17,6 @@ namespace cqlplus
 {
     using System;
     using CassandraSharp;
-    using CassandraSharp.Cluster;
     using CassandraSharp.Config;
     using cqlplus.Commands;
     using cqlplus.StatementReader;

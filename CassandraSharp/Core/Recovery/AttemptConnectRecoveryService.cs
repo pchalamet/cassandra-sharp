@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Recovery
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Timers;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Timers;
+using CassandraSharp.Config;
+using CassandraSharp.Core.Utils;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Recovery
+{
     internal sealed class AttemptConnectRecoveryService : IRecoveryService
     {
         private readonly object _lock;

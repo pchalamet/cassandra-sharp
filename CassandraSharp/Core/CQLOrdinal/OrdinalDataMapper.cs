@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLOrdinal
-{
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
-    using System.Collections.Generic;
-    using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLOrdinal
+{
     internal sealed class OrdinalDataMapper : IDataMapper
     {
         public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)

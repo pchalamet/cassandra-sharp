@@ -13,16 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol.Queries
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using CassandraSharp.Extensibility;
-    using CassandraSharp.Utils.Stream;
-    using CassandraSharp.CQLPoco;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CassandraSharp.Core.Utils.Stream;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol.Queries
+{
     internal class CqlQuery<T> : Query<T>
     {
         protected readonly string CQL;

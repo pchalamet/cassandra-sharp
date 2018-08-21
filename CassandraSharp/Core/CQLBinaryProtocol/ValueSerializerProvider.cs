@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
-{
-    using System;
-    using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol
+{
     public static class ValueSerializerProvider
     {
         private static readonly Dictionary<Type, IValueSerializer> _valueSerializers = new Dictionary<Type, IValueSerializer>();

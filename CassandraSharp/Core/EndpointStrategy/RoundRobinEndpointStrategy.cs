@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.EndpointStrategy
-{
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
+using System.Collections.Generic;
+using System.Net;
+using System.Numerics;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.EndpointStrategy
+{
     /// <summary>
     ///     Will loop through nodes to perfectly evenly spread load.
     /// </summary>

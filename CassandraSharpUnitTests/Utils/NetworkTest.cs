@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.Utils;
+
 namespace CassandraSharpUnitTests.Utils
 {
     using System.Net;
-    using CassandraSharp.Utils;
     using NUnit.Framework;
 
     [TestFixture]

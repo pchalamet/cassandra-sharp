@@ -14,10 +14,10 @@
 // limitations under the License.
 
 
-namespace CassandraSharp.Utils.Collections
-{
-    using System.Collections;
+using System.Collections;
 
+namespace CassandraSharp.Core.Utils.Collections
+{
     public interface IHashSetAccessor
     {
         int Count { get; }

@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
-{
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Utils.Collections;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using CassandraSharp.Core.Utils.Collections;
+using CassandraSharp.CQLPoco;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol
+{
     public interface IValueSerializer
     {
         byte[] Serialize(object value);

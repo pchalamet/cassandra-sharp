@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils
-{
-    using System;
-    using System.Diagnostics;
+using System;
+using System.Diagnostics;
 
+namespace CassandraSharp.Core.Utils
+{
     internal static class CheckParameterExtensions
     {
         [Conditional("DEBUG")]

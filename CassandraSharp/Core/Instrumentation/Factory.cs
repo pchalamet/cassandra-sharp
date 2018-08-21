@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Instrumentation
-{
-    using System;
-    using System.Collections.Generic;
-    using CassandraSharp.Utils;
+using System;
+using System.Collections.Generic;
+using CassandraSharp.Core.Utils;
 
+namespace CassandraSharp.Core.Instrumentation
+{
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>

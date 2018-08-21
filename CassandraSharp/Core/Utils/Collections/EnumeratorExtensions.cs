@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Utils.Collections
-{
-    using System.Collections;
-    using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Generic;
 
+namespace CassandraSharp.Core.Utils.Collections
+{
     internal static class EnumeratorExtensions
     {
         public static T Single<T>(this IEnumerator<T> enumerator)

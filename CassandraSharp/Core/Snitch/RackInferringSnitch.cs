@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Snitch
-{
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Net;
-    using CassandraSharp.Extensibility;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Net;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Snitch
+{
     internal sealed class RackInferringSnitch : IEndpointSnitch
     {
         public string GetRack(IPAddress endpoint)

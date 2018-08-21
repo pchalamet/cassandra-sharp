@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
-{
-    using System;
+using System;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol
+{
     [Flags]
     internal enum FrameHeaderFlags
     {

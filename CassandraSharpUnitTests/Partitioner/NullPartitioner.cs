@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.Partitioner;
+
 namespace CassandraSharpUnitTests.Partitioner
 {
     using System.Numerics;
     using CassandraSharp;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Partitioner;
     using NUnit.Framework;
 
     [TestFixture]

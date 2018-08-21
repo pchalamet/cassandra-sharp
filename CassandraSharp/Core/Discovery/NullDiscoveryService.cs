@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Discovery
-{
-    using CassandraSharp.Extensibility;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Discovery
+{
     internal sealed class NullDiscoveryService : IDiscoveryService
     {
         public void Dispose()

@@ -13,9 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.CQLBinaryProtocol;
+
 namespace CassandraSharpUnitTests.CQLBinaryProtocol
 {
-    using CassandraSharp.CQLBinaryProtocol;
     using CassandraSharp.CQLPoco;
     using NUnit.Framework;
     using System;

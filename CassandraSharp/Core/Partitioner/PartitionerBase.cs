@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Partitioner
-{
-    using System.IO;
-    using System.Linq;
-    using System.Numerics;
-    using CassandraSharp.CQLBinaryProtocol;
-    using CassandraSharp.Extensibility;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using CassandraSharp.Core.CQLBinaryProtocol;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Partitioner
+{
     internal abstract class PartitionerBase : IPartitioner
     {
         public BigInteger? ComputeToken(PartitionKey partitionKey)

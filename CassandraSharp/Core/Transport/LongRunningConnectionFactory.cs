@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Transport
-{
-    using System;
-    using System.Net;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
+using System;
+using System.Net;
+using CassandraSharp.Config;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.Transport
+{
     internal sealed class LongRunningConnectionFactory : IConnectionFactory
     {
         private readonly TransportConfig _config;

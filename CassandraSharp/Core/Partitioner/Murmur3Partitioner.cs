@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.Partitioner
-{
-    using System.Numerics;
-    using CassandraSharp.Utils.Cryptography;
+using System.Numerics;
+using CassandraSharp.Core.Utils.Cryptography;
 
+namespace CassandraSharp.Core.Partitioner
+{
     internal class Murmur3Partitioner : PartitionerBase
     {
         protected override BigInteger? Hash(byte[] buffer, int offset, int len)

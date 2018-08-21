@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Core.EndpointStrategy;
+using CassandraSharp.Core.Snitch;
+using CassandraSharp.Core.Utils;
+
 namespace CassandraSharpUnitTests.EndpointStrategy
 {
     using System;
@@ -20,11 +24,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
     using System.Linq;
     using System.Net;
     using System.Numerics;
-    using CassandraSharp;
-    using CassandraSharp.EndpointStrategy;
     using CassandraSharp.Extensibility;
-    using CassandraSharp.Snitch;
-    using CassandraSharp.Utils;
     using NUnit.Framework;
 
     [TestFixture]
@@ -68,7 +68,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
             string customType = typeof(CustomEndpointStrategy).AssemblyQualifiedName;
 
             IEnumerable<IPAddress> endpoints = new List<IPAddress> {null};
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>(customType, endpoints,
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.Core.EndpointStrategy.Factory>.Create<IEndpointStrategy>(customType, endpoints,
                                                                                                                                      new SimpleSnitch());
 
             CustomEndpointStrategy customEndpointStrategy = endpointStrategy as CustomEndpointStrategy;
@@ -80,7 +80,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         [Test]
         public void TestCreateNearest()
         {
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Nearest",
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.Core.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Nearest",
                                                                                                                                      Enumerable.Empty<IPAddress>
                                                                                                                                              (),
                                                                                                                                      new SimpleSnitch());
@@ -90,7 +90,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         [Test]
         public void TestCreateRandom()
         {
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random",
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.Core.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random",
                                                                                                                                      Enumerable.Empty<IPAddress>
                                                                                                                                              (),
                                                                                                                                      new SimpleSnitch());

@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CassandraSharp.CQLBinaryProtocol
-{
-    using CassandraSharp.Extensibility;
+using CassandraSharp.Extensibility;
 
+namespace CassandraSharp.Core.CQLBinaryProtocol
+{
     internal sealed class ColumnSpec : IColumnSpec
     {
         public ColumnSpec(int index, string keyspace, string table, string name, ColumnType columnType, string customData, ColumnType collectionKeyType,
