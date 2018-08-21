@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CassandraSharp.Core.Utils;
+using CassandraSharp.Utils;
 
 namespace CassandraSharpUnitTests.Snitch
 {
@@ -53,22 +53,22 @@ namespace CassandraSharpUnitTests.Snitch
         public void TestCreateCustom()
         {
             string customType = typeof(CustomSnitch).AssemblyQualifiedName;
-            IEndpointSnitch snitch = ServiceActivator<CassandraSharp.Core.Snitch.Factory>.Create<IEndpointSnitch>(customType);
+            IEndpointSnitch snitch = ServiceActivator<CassandraSharp.Snitch.Factory>.Create<IEndpointSnitch>(customType);
             Assert.IsTrue(snitch is CustomSnitch);
         }
 
         [Test]
         public void TestCreateRackInferring()
         {
-            IEndpointSnitch snitch = ServiceActivator<CassandraSharp.Core.Snitch.Factory>.Create<IEndpointSnitch>("RackInferring");
-            Assert.IsTrue(snitch is CassandraSharp.Core.Snitch.RackInferringSnitch);
+            IEndpointSnitch snitch = ServiceActivator<CassandraSharp.Snitch.Factory>.Create<IEndpointSnitch>("RackInferring");
+            Assert.IsTrue(snitch is CassandraSharp.Snitch.RackInferringSnitch);
         }
 
         [Test]
         public void TestCreateSimple()
         {
-            IEndpointSnitch snitch = ServiceActivator<CassandraSharp.Core.Snitch.Factory>.Create<IEndpointSnitch>("Simple");
-            Assert.IsTrue(snitch is CassandraSharp.Core.Snitch.SimpleSnitch);
+            IEndpointSnitch snitch = ServiceActivator<CassandraSharp.Snitch.Factory>.Create<IEndpointSnitch>("Simple");
+            Assert.IsTrue(snitch is CassandraSharp.Snitch.SimpleSnitch);
         }
     }
 }

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CassandraSharp.Core.Logger;
-using CassandraSharp.Core.Utils;
+using CassandraSharp.Logger;
+using CassandraSharp.Utils;
 
 namespace CassandraSharp
 {
@@ -46,8 +46,8 @@ namespace CassandraSharp
             {
                 config.CheckArgumentNotNull("config");
                 _logger = ServiceActivator<Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
-                _recoveryService = ServiceActivator<Core.Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
-                _instrumentation = ServiceActivator<Core.Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
+                _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
+                _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
             }
         }
@@ -75,7 +75,7 @@ namespace CassandraSharp
             KeyspaceConfig keyspaceConfig = clusterConfig.DefaultKeyspace ?? new KeyspaceConfig();
 
             // create endpoints
-            IEndpointSnitch snitch = ServiceActivator<Core.Snitch.Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
+            IEndpointSnitch snitch = ServiceActivator<Snitch.Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(Network.Find).Where(x => null != x).ToArray();
             if (!endpoints.Any())
             {
@@ -83,19 +83,19 @@ namespace CassandraSharp
             }
 
             // create required services
-            IEndpointStrategy endpointsManager = ServiceActivator<Core.EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
+            IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
                                                                                                                       endpoints, snitch,
                                                                                                                       _logger, clusterConfig.Endpoints);
-            IConnectionFactory connectionFactory = ServiceActivator<Core.Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, keyspaceConfig, _logger,
+            IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, keyspaceConfig, _logger,
                                                                                                                   _instrumentation);
 
-            IPartitioner partitioner = ServiceActivator<Core.Partitioner.Factory>.Create<IPartitioner>(clusterConfig.Partitioner);
+            IPartitioner partitioner = ServiceActivator<Partitioner.Factory>.Create<IPartitioner>(clusterConfig.Partitioner);
             
             // create the cluster now
-            ICluster cluster = ServiceActivator<Core.Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
+            ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
                                                                                   recoveryService, partitioner, clusterConfig);
 
-            IDiscoveryService discoveryService = ServiceActivator<Core.Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
+            IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
                                                                                                                clusterConfig.Endpoints.Discovery,
                                                                                                                _logger,
                                                                                                                cluster);

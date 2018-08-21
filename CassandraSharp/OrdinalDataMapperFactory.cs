@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CassandraSharp.Core.CQLOrdinal;
-
 namespace CassandraSharp
 {
     using CassandraSharp.CQLOrdinal;

@@ -16,8 +16,8 @@
 namespace CassandraSharpUnitTests.Utils
 {
     using System.Collections.Generic;
-    using CassandraSharp.Core.Utils;
     using NUnit.Framework;
+    using CassandraSharp.Utils;
 
     [TestFixture]
     public class ArrayExtensionsTest

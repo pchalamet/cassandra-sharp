@@ -14,7 +14,7 @@
 // limitations under the License.
 
 using System;
-using CassandraSharp.Core.CQLPropertyBag;
+using CassandraSharp.CQLPropertyBag;
 using CassandraSharp.Extensibility;
 
 namespace CassandraSharp

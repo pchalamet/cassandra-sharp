@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CassandraSharp.Core.Utils;
+using CassandraSharp.Utils;
 
 namespace CassandraSharpUnitTests.EndpointStrategy
 {
@@ -35,7 +35,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
                 ips[i] = new IPAddress(new byte[] {192, 168, 0, i});
             }
 
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.Core.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random", ips.AsEnumerable());
+            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random", ips.AsEnumerable());
 
             List<IPAddress> alls = new List<IPAddress>();
             for (int i = 0; i < 10000; ++i)

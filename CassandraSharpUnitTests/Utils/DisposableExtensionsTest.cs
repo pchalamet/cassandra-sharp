@@ -16,9 +16,9 @@
 namespace CassandraSharpUnitTests.Utils
 {
     using System;
-    using CassandraSharp.Core.Utils;
     using Moq;
     using NUnit.Framework;
+    using CassandraSharp.Utils;
 
     [TestFixture]
     public class DisposableExtensionsTest
