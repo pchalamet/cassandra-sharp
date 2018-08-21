@@ -13,22 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Configuration;
+using CassandraSharp.Config;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests
 {
-    using System.Configuration;
-    using CassandraSharp.Config;
-    using NUnit.Framework;
-
     [TestFixture]
     public class SectionHandlerTest
     {
         [Test]
         public void TestLoadConfig()
         {
-            CassandraSharpConfig cassandraSharpConfig = (CassandraSharpConfig) ConfigurationManager.GetSection("CassandraSharp");
+            var cassandraSharpConfig = (CassandraSharpConfig)ConfigurationManager.GetSection("CassandraSharp");
 
             Assert.IsNotNull(cassandraSharpConfig);
-            Assert.AreEqual("TestClient.Logger4Log4Net, TestClient", cassandraSharpConfig.Logger.Type);
+            Assert.AreEqual("Default", cassandraSharpConfig.Logger.Type);
             Assert.AreEqual(5, cassandraSharpConfig.Clusters.Length);
             Assert.IsNotNull(cassandraSharpConfig.Clusters[1]);
 //            Assert.IsNotNull(cassandraSharpConfig.Clusters[1].BehaviorConfig);

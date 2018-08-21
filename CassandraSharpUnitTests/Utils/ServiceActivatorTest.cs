@@ -13,14 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using CassandraSharp.Utils;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.Utils
 {
-    using System;
-    using System.Collections.Generic;
-    using NUnit.Framework;
-
     public interface ITestService
     {
         string Key { get; }
@@ -36,19 +35,16 @@ namespace CassandraSharpUnitTests.Utils
             Value = value;
         }
 
-        public string Key { get; private set; }
+        public string Key { get; }
 
-        public int Value { get; private set; }
+        public int Value { get; }
     }
 
     public class FactoryWithCustomType : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>();
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 
     [TestFixture]
@@ -57,11 +53,11 @@ namespace CassandraSharpUnitTests.Utils
         [Test]
         public void TestCreateWithCustomType()
         {
-            string type = typeof(TestService).AssemblyQualifiedName;
+            var type = typeof(TestService).AssemblyQualifiedName;
             const string key = "tralala";
             const int value = 42;
 
-            ITestService testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
+            var testService = ServiceActivator<FactoryWithCustomType>.Create<ITestService>(type, key, value);
             Assert.IsNotNull(testService);
             Assert.IsTrue(key == testService.Key);
             Assert.IsTrue(value == testService.Value);

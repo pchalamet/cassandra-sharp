@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using CassandraSharp.Utils;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Utils
 {
-    using System.Collections.Generic;
-    using NUnit.Framework;
-    using CassandraSharp.Utils;
-
     [TestFixture]
     public class ArrayExtensionsTest
     {
@@ -26,15 +26,9 @@ namespace CassandraSharpUnitTests.Utils
         {
             public int Compare(int x, int y)
             {
-                if (x < y)
-                {
-                    return -1;
-                }
+                if (x < y) return -1;
 
-                if (x > y)
-                {
-                    return 1;
-                }
+                if (x > y) return 1;
 
                 return 0;
             }

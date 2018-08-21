@@ -13,49 +13,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLCommand;
+using CassandraSharp.CQLOrdinal;
+using CassandraSharp.CQLPoco;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.CQLBinaryProtocol
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using CassandraSharp;
-    using CassandraSharp.Config;
-    using CassandraSharp.CQLCommand;
-    using CassandraSharp.CQLOrdinal;
-    using CassandraSharp.CQLPoco;
-    using NUnit.Framework;
-
     public class DefaultKeyspaceTest
     {
         private const string TestKeyspace = "YouDontHaveIt_12345678";
+        private ICluster cluster;
 
         private IClusterManager clusterManager;
-        private ICluster cluster;
 
 
         [SetUp]
         public void SetUp()
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            var cassandraSharpConfig = new CassandraSharpConfig();
             clusterManager = new ClusterManager(cassandraSharpConfig);
             var config = new ClusterConfig
-            {
-                Endpoints = new EndpointsConfig { Servers = new[] { "cassandra1" } },
-                DefaultKeyspace =
-                    new KeyspaceConfig
-                    {
-                        Name = TestKeyspace,
-                        DurableWrites = false,
-                        Replication = new ReplicationConfig
-                        {
-                            Options = new Dictionary<string, string>
-                                            {
-                                            { "class", "SimpleStrategy" },
-                                            { "replication_factor", "1" },
-                                            }
-                        }
-                    }
-            };
+                         {
+                             Endpoints = new EndpointsConfig {Servers = new[] {"cassandra1"}},
+                             DefaultKeyspace =
+                                 new KeyspaceConfig
+                                 {
+                                     Name = TestKeyspace,
+                                     DurableWrites = false,
+                                     Replication = new ReplicationConfig
+                                                   {
+                                                       Options = new Dictionary<string, string>
+                                                                 {
+                                                                     {"class", "SimpleStrategy"},
+                                                                     {"replication_factor", "1"}
+                                                                 }
+                                                   }
+                                 }
+                         };
 
             cluster = clusterManager.GetCluster(config);
         }
@@ -63,7 +63,7 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
         [TearDown]
         public void TearDown()
         {
-            ICqlCommand cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
+            var cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
 
             try
             {
@@ -79,12 +79,12 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
         [Test]
         public void KeyspaceCreated()
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             var res = cmd.Execute<SchemaKeyspace>("SELECT * FROM system_schema.keyspaces").AsFuture().Result;
             var testKeyspace =
                 res.FirstOrDefault(
-                    x => x.KeyspaceName.Equals(DefaultKeyspaceTest.TestKeyspace, StringComparison.InvariantCultureIgnoreCase));
+                                   x => x.KeyspaceName.Equals(TestKeyspace, StringComparison.InvariantCultureIgnoreCase));
 
             Assert.IsNotNull(testKeyspace);
             Assert.IsFalse(testKeyspace.DurableWrites);
@@ -95,16 +95,15 @@ namespace CassandraSharpUnitTests.CQLBinaryProtocol
         [Test]
         public void CanOmitDefaultKeyspaceName()
         {
-            ICqlCommand cmd = cluster.CreateOrdinalCommand();
-            
+            var cmd = cluster.CreateOrdinalCommand();
+
             cmd.Execute("CREATE TABLE Test (cAscii ascii,cInt int,PRIMARY KEY (cInt))").AsFuture().Wait();
-            cmd.Execute("INSERT INTO Test (cAscii,cInt) VALUES ('test',1)").AsFuture().Wait();            
-            var res = cmd.Execute<object[]>("SELECT cAscii FROM Test WHERE cInt = 1").AsFuture().Result.Single();            
+            cmd.Execute("INSERT INTO Test (cAscii,cInt) VALUES ('test',1)").AsFuture().Wait();
+            var res = cmd.Execute<object[]>("SELECT cAscii FROM Test WHERE cInt = 1").AsFuture().Result.Single();
             Assert.AreEqual("test", res[0]);
 
             res =
-                cmd.Execute<object[]>(string.Format("SELECT cAscii FROM {0}.Test WHERE cInt = 1", TestKeyspace)).
-                    AsFuture().Result.Single();
+                cmd.Execute<object[]>(string.Format("SELECT cAscii FROM {0}.Test WHERE cInt = 1", TestKeyspace)).AsFuture().Result.Single();
             Assert.AreEqual("test", res[0]);
         }
 

@@ -13,23 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp.Utils;
+using Moq;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Utils
 {
-    using System;
-    using Moq;
-    using NUnit.Framework;
-    using CassandraSharp.Utils;
-
     [TestFixture]
     public class DisposableExtensionsTest
     {
         [Test]
         public void TestException()
         {
-            Mock<IDisposable> mock = new Mock<IDisposable>();
+            var mock = new Mock<IDisposable>();
             mock.Setup(x => x.Dispose()).Throws<ArithmeticException>();
 
-            IDisposable disposable = mock.Object;
+            var disposable = mock.Object;
             disposable.SafeDispose();
 
             mock.Verify(x => x.Dispose(), Times.Once());
@@ -38,10 +38,10 @@ namespace CassandraSharpUnitTests.Utils
         [Test]
         public void TestNormal()
         {
-            Mock<IDisposable> mock = new Mock<IDisposable>();
+            var mock = new Mock<IDisposable>();
             mock.Setup(x => x.Dispose());
 
-            IDisposable disposable = mock.Object;
+            var disposable = mock.Object;
             disposable.SafeDispose();
 
             mock.Verify(x => x.Dispose(), Times.Once());

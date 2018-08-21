@@ -13,16 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using CassandraSharp;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Enlightenment
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
-    using CassandraSharp;
-    using NUnit.Framework;
-
     [TestFixture]
     public class FutureTest
     {
@@ -38,7 +37,7 @@ namespace CassandraSharpUnitTests.Enlightenment
             var data = Enumerable.Range(0, 10);
             var obsData = data.ToObservable();
 
-            Task<IList<int>> futData = obsData.AsFuture();
+            var futData = obsData.AsFuture();
             Assert.AreEqual(futData.Result.Count, 10);
         }
 
@@ -47,10 +46,10 @@ namespace CassandraSharpUnitTests.Enlightenment
         {
             var obsData = FailureStream().ToObservable();
 
-            Task<IList<int>> futData = obsData.AsFuture();
+            var futData = obsData.AsFuture();
             try
             {
-                int len = futData.Result.Count;
+                var len = futData.Result.Count;
             }
             catch (Exception ex)
             {

@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Text;
+using System.Threading;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLPoco;
+using CassandraSharp.Extensibility;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Functional
 {
-    using System;
-    using System.Text;
-    using System.Threading;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     public class ConsoleDebugLogger : ILogger
     {
         public void Debug(string format, params object[] prms)
@@ -62,7 +62,7 @@ namespace CassandraSharpUnitTests.Functional
 
         private static void Log(string format, object[] prms)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendFormat("LOG   {0} [{1}] - ", DateTime.Now, Thread.CurrentThread.ManagedThreadId);
             sb.AppendFormat(format, prms);
             Console.WriteLine(sb);
@@ -89,12 +89,12 @@ namespace CassandraSharpUnitTests.Functional
             logger.Debug("Starting Failing thread ");
             Thread.Sleep(5000);
 
-            for (int i = 0; i < NUM_UPDATES; i++)
+            for (var i = 0; i < NUM_UPDATES; i++)
             {
                 logger.Debug("start fail update #" + i);
                 try
                 {
-                    if (0 == (i % 2))
+                    if (0 == i % 2)
                     {
                         prepared.Execute(new {bar = "bar" + 1, strid = "1"}).AsFuture().Wait();
                         Assert.IsTrue(false, "Update should have failed");
@@ -118,22 +118,22 @@ namespace CassandraSharpUnitTests.Functional
         [Test]
         public void StreamStarvationMultiThread()
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
-            {
-                Logger = new LoggerConfig { Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName }
-            };
+            var cassandraSharpConfig = new CassandraSharpConfig
+                                       {
+                                           Logger = new LoggerConfig {Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName}
+                                       };
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
-                ClusterConfig clusterConfig = new ClusterConfig
-                {
-                    Endpoints = new EndpointsConfig
-                    {
-                        Servers = new[] { "cassandra1" }
-                    },
-                };
+                var clusterConfig = new ClusterConfig
+                                    {
+                                        Endpoints = new EndpointsConfig
+                                                    {
+                                                        Servers = new[] {"cassandra1"}
+                                                    }
+                                    };
 
-                ICluster cluster = clusterManager.GetCluster(clusterConfig);
-                ICqlCommand cmd = cluster.CreatePocoCommand();
+                var cluster = clusterManager.GetCluster(clusterConfig);
+                var cmd = cluster.CreatePocoCommand();
 
                 const string dropKeySpace = "drop keyspace Tests";
                 try
@@ -168,19 +168,16 @@ namespace CassandraSharpUnitTests.Functional
 
                 using (var prepared = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertPerf))
                 {
-                    Thread[] failsThreads = new Thread[NUM_THREADS];
+                    var failsThreads = new Thread[NUM_THREADS];
 
-                    for (int i = 0; i < NUM_THREADS; i++)
+                    for (var i = 0; i < NUM_THREADS; i++)
                     {
                         failsThreads[i] = new Thread(() => FailingThread(prepared));
                         failsThreads[i].Start();
                         //Thread.Sleep(5000);
                     }
 
-                    foreach (Thread thread in failsThreads)
-                    {
-                        thread.Join();
-                    }
+                    foreach (var thread in failsThreads) thread.Join();
                 }
             }
         }

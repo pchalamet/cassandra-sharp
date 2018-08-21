@@ -13,23 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using CassandraSharp.Utils;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.Utils
 {
-    using System.Net;
-    using NUnit.Framework;
-
     [TestFixture]
     public class NetworkTest
     {
         [Test]
         public void TestValidateEndpoint()
         {
-            IPAddress invalidEndpoint = new IPAddress(new byte[] {0, 0, 0, 0});
+            var invalidEndpoint = new IPAddress(new byte[] {0, 0, 0, 0});
             Assert.IsFalse(Network.IsValidEndpoint(invalidEndpoint));
 
-            IPAddress validEndpoint = new IPAddress(new byte[] {255, 0, 0, 0});
+            var validEndpoint = new IPAddress(new byte[] {255, 0, 0, 0});
             Assert.IsTrue(Network.IsValidEndpoint(validEndpoint));
         }
     }

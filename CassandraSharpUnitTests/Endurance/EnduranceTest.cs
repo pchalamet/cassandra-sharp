@@ -13,41 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using System.Threading;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLPoco;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Endurance
 {
-    using System;
-    using System.Diagnostics;
-    using System.Threading;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
-    using NUnit.Framework;
-
     [TestFixture]
     public class EnduranceTest
     {
         private void BinaryProtocolRunWritePerformanceParallel(string transportType)
         {
             //run Write Performance Test using cassandra-sharp driver
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            var cassandraSharpConfig = new CassandraSharpConfig();
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
+                var clusterConfig = new ClusterConfig
+                                    {
+                                        Endpoints = new EndpointsConfig
+                                                    {
+                                                        Servers = new[] {"cassandra1"}
+                                                    },
+                                        Transport = new TransportConfig
+                                                    {
+                                                        Type = transportType
+                                                    }
+                                    };
 
-                ClusterConfig clusterConfig = new ClusterConfig
+                using (var cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    Endpoints = new EndpointsConfig
-                    {
-                        Servers = new[] { "cassandra1" }
-                    },
-                    Transport = new TransportConfig
-                    {
-                        Type = transportType
-                    }
-                };
-
-                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
-                {
-                    ICqlCommand cmd = cluster.CreatePocoCommand();
+                    var cmd = cluster.CreatePocoCommand();
 
                     const string dropFoo = "drop keyspace Endurance";
                     try
@@ -85,16 +84,13 @@ namespace CassandraSharpUnitTests.Endurance
 
                     var timer = Stopwatch.StartNew();
 
-                    int running = 0;
-                    for (int i = 0; i < 100000; i++)
+                    var running = 0;
+                    for (var i = 0; i < 100000; i++)
                     {
-                        if (0 == i % 1000)
-                        {
-                            Console.WriteLine("Sent {0} requests - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
-                        }
+                        if (0 == i % 1000) Console.WriteLine("Sent {0} requests - pending requests {1}", i, Interlocked.CompareExchange(ref running, 0, 0));
 
                         Interlocked.Increment(ref running);
-                        prepared.Execute(new { intid = i, strid = i.ToString("X") }).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
+                        prepared.Execute(new {intid = i, strid = i.ToString("X")}).AsFuture().ContinueWith(_ => Interlocked.Decrement(ref running));
                     }
 
                     while (0 != Interlocked.CompareExchange(ref running, 0, 0))
@@ -102,6 +98,7 @@ namespace CassandraSharpUnitTests.Endurance
                         Console.WriteLine("{0} requests still running", running);
                         Thread.Sleep(1 * 1000);
                     }
+
                     timer.Stop();
                     Console.WriteLine("Endurance ran in {0} ms", timer.ElapsedMilliseconds);
 

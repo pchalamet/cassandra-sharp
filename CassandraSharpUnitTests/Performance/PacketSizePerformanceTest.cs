@@ -13,40 +13,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLPoco;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Performance
 {
-    using System;
-    using System.Diagnostics;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
-    using NUnit.Framework;
-
     [TestFixture]
     public class PacketSizePerformanceTest
     {
         private static long InsertData(string data, IPreparedQuery<NonQuery> preparedQuery)
         {
             Console.WriteLine("Buffer size {0}", data.Length);
-            Stopwatch totalwatch = Stopwatch.StartNew();
+            var totalwatch = Stopwatch.StartNew();
 
             // warmup
-            for (int i = 0; i < 10; ++i)
-            {
-                preparedQuery.Execute(new {x = "abc", y = data}).AsFuture().Wait();
-            }
+            for (var i = 0; i < 10; ++i) preparedQuery.Execute(new {x = "abc", y = data}).AsFuture().Wait();
 
             const long nbQueries = 5000;
             for (var i = 0; i < nbQueries; ++i)
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                var stopwatch = Stopwatch.StartNew();
                 preparedQuery.Execute(new {x = "abc", y = data}).AsFuture().Wait();
                 stopwatch.Stop();
                 //Console.WriteLine("Insert: {0}", stopwatch.ElapsedMilliseconds);
             }
+
             totalwatch.Stop();
             Console.WriteLine("Total inserts time ms: {0}", totalwatch.ElapsedMilliseconds);
-            Console.WriteLine("Total inserts/s: {0}", (1000.0 * nbQueries) / totalwatch.ElapsedMilliseconds);
+            Console.WriteLine("Total inserts/s: {0}", 1000.0 * nbQueries / totalwatch.ElapsedMilliseconds);
 
             return totalwatch.ElapsedMilliseconds;
         }
@@ -58,21 +56,20 @@ namespace CassandraSharpUnitTests.Performance
             long time1424;
 
             //run Write Performance Test using cassandra-sharp driver
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            var cassandraSharpConfig = new CassandraSharpConfig();
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
+                var clusterConfig = new ClusterConfig
+                                    {
+                                        Endpoints = new EndpointsConfig
+                                                    {
+                                                        Servers = new[] {"cassandra1"}
+                                                    }
+                                    };
 
-                ClusterConfig clusterConfig = new ClusterConfig
+                using (var cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    Endpoints = new EndpointsConfig
-                    {
-                        Servers = new[] { "cassandra1" }
-                    },
-                };
-
-                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
-                {
-                    ICqlCommand cmd = cluster.CreatePocoCommand();
+                    var cmd = cluster.CreatePocoCommand();
 
                     const string dropFoo = "drop keyspace Tests";
                     try
@@ -81,7 +78,7 @@ namespace CassandraSharpUnitTests.Performance
                     }
                     // ReSharper disable EmptyGeneralCatchClause
                     catch
-                    // ReSharper restore EmptyGeneralCatchClause
+                        // ReSharper restore EmptyGeneralCatchClause
                     {
                     }
 
@@ -121,9 +118,9 @@ namespace CassandraSharpUnitTests.Performance
                     resCount.Wait();
                 }
 
-                long delta = Math.Abs(time1424 - time1423);
-                long min = Math.Max(time1423, time1424);
-                double percent = delta / (double)min;
+                var delta = Math.Abs(time1424 - time1423);
+                var min = Math.Max(time1423, time1424);
+                var percent = delta / (double)min;
                 Assert.IsTrue(percent < 1.0);
             }
         }

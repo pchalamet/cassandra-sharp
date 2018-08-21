@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharpUnitTests.Performance
 {
-    using System;
-    using CassandraSharp.Extensibility;
-
     public abstract class ProtocolWrapper : IDisposable
     {
         public abstract string Name { get; }

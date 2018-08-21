@@ -13,38 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharpUnitTests.Performance
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Net;
-    using CassandraSharp.Extensibility;
-
     public class PerformanceInstrumentation : IInstrumentation
     {
         private static readonly object _lock = new object();
-
-        private static readonly List<Guid> _tracingIds = new List<Guid>();
 
         private static Stopwatch _readWatch = new Stopwatch();
 
         private static Stopwatch _writeWatch = new Stopwatch();
 
-        public static long TotalRead
-        {
-            get { return _readWatch.ElapsedMilliseconds; }
-        }
+        public static long TotalRead => _readWatch.ElapsedMilliseconds;
 
-        public static long TotalWrite
-        {
-            get { return _writeWatch.ElapsedMilliseconds; }
-        }
+        public static long TotalWrite => _writeWatch.ElapsedMilliseconds;
 
-        public static List<Guid> TracingIds
-        {
-            get { return _tracingIds; }
-        }
+        public static List<Guid> TracingIds { get; } = new List<Guid>();
 
         public void ClientQuery(InstrumentationToken token)
         {
@@ -80,7 +69,7 @@ namespace CassandraSharpUnitTests.Performance
         {
             lock (_lock)
             {
-                _tracingIds.Add(traceId);
+                TracingIds.Add(traceId);
             }
         }
 
@@ -90,7 +79,7 @@ namespace CassandraSharpUnitTests.Performance
 
         public static void Initialize()
         {
-            _tracingIds.Clear();
+            TracingIds.Clear();
             _writeWatch = new Stopwatch();
             _readWatch = new Stopwatch();
         }

@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Numerics;
 using CassandraSharp.EndpointStrategy;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Snitch;
 using CassandraSharp.Utils;
+using NUnit.Framework;
+using Factory = CassandraSharp.EndpointStrategy.Factory;
 
 namespace CassandraSharpUnitTests.EndpointStrategy
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     [TestFixture]
     public class EndpointsConfigExtensionsTest
     {
@@ -39,7 +39,7 @@ namespace CassandraSharpUnitTests.EndpointStrategy
                 Endpoints = endpoints;
             }
 
-            public IEnumerable<IPAddress> Endpoints { get; set; }
+            public IEnumerable<IPAddress> Endpoints { get; }
 
             public IPAddress Pick(BigInteger? token)
             {
@@ -65,35 +65,35 @@ namespace CassandraSharpUnitTests.EndpointStrategy
         [Test]
         public void TestCreateCustom()
         {
-            string customType = typeof(CustomEndpointStrategy).AssemblyQualifiedName;
+            var customType = typeof(CustomEndpointStrategy).AssemblyQualifiedName;
 
             IEnumerable<IPAddress> endpoints = new List<IPAddress> {null};
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>(customType, endpoints,
-                                                                                                                                     new SimpleSnitch());
+            var endpointStrategy = ServiceActivator<Factory>.Create<IEndpointStrategy>(customType, endpoints,
+                                                                                       new SimpleSnitch());
 
-            CustomEndpointStrategy customEndpointStrategy = endpointStrategy as CustomEndpointStrategy;
+            var customEndpointStrategy = endpointStrategy as CustomEndpointStrategy;
             Assert.IsNotNull(customEndpointStrategy);
-            IPAddress customEndpoint = customEndpointStrategy.Endpoints.Single();
+            var customEndpoint = customEndpointStrategy.Endpoints.Single();
             Assert.AreEqual(customEndpoint, endpoints.Single());
         }
 
         [Test]
         public void TestCreateNearest()
         {
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Nearest",
-                                                                                                                                     Enumerable.Empty<IPAddress>
-                                                                                                                                             (),
-                                                                                                                                     new SimpleSnitch());
+            var endpointStrategy = ServiceActivator<Factory>.Create<IEndpointStrategy>("Nearest",
+                                                                                       Enumerable.Empty<IPAddress>
+                                                                                           (),
+                                                                                       new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is NearestEndpointStrategy);
         }
 
         [Test]
         public void TestCreateRandom()
         {
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random",
-                                                                                                                                     Enumerable.Empty<IPAddress>
-                                                                                                                                             (),
-                                                                                                                                     new SimpleSnitch());
+            var endpointStrategy = ServiceActivator<Factory>.Create<IEndpointStrategy>("Random",
+                                                                                       Enumerable.Empty<IPAddress>
+                                                                                           (),
+                                                                                       new SimpleSnitch());
             Assert.IsTrue(endpointStrategy is RandomEndpointStrategy);
         }
     }

@@ -13,16 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Threading;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Performance
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text;
-    using System.Threading;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     [TestFixture]
     public class WritePerformanceTest
     {
@@ -50,7 +49,7 @@ namespace CassandraSharpUnitTests.Performance
                 }
                 // ReSharper disable EmptyGeneralCatchClause
                 catch
-                // ReSharper restore EmptyGeneralCatchClause
+                    // ReSharper restore EmptyGeneralCatchClause
                 {
                 }
 
@@ -63,9 +62,9 @@ namespace CassandraSharpUnitTests.Performance
 
                 PerformanceInstrumentation.Initialize();
 
-                long totalTime = ExecuteStressTest(protocol);
+                var totalTime = ExecuteStressTest(protocol);
 
-               // ExportTracingInfo(protocol, totalTime);
+                // ExportTracingInfo(protocol, totalTime);
 
                 protocol.Query(dropKeyspace);
             }
@@ -75,13 +74,13 @@ namespace CassandraSharpUnitTests.Performance
         {
             var timer = new Stopwatch();
 
-            int n = 0;
+            var n = 0;
             while (n < NUM_ROUND)
             {
-                for (int i = 0; i < NUM_WRITES_PER_ROUND; ++i)
+                for (var i = 0; i < NUM_WRITES_PER_ROUND; ++i)
                 {
-                    int key = n * NUM_WRITES_PER_ROUND + i;
-                    object[] prms = new object[] { key, key.ToString("X") };
+                    var key = n * NUM_WRITES_PER_ROUND + i;
+                    var prms = new object[] {key, key.ToString("X")};
                     timer.Start();
                     protocol.Execute(prms);
                     timer.Stop();
@@ -89,7 +88,7 @@ namespace CassandraSharpUnitTests.Performance
                     Thread.Sleep(10);
                 }
 
-                double rate = (1000.0 * NUM_WRITES_PER_ROUND) / timer.ElapsedMilliseconds;
+                var rate = 1000.0 * NUM_WRITES_PER_ROUND / timer.ElapsedMilliseconds;
 
                 Console.WriteLine("[{0} Time: {1} ms (rate: {2})", protocol.Name, timer.ElapsedMilliseconds, rate);
                 ++n;
@@ -101,21 +100,21 @@ namespace CassandraSharpUnitTests.Performance
         private static void ExportTracingInfo(ProtocolWrapper protocol, long totalTime)
         {
             Console.WriteLine("Exporting performance for {0}", protocol.Name);
-            Guid guid = Guid.NewGuid();
-            string filename = protocol.Name + "-" + guid + ".csv";
+            var guid = Guid.NewGuid();
+            var filename = protocol.Name + "-" + guid + ".csv";
             using (TextWriter txtWriter = new StreamWriter(filename, false, Encoding.ASCII))
             {
                 txtWriter.WriteLine("SessionId,Activity,EventId,Source,SourceElapsed,Stage,Thread");
 
-                int count = 0;
+                var count = 0;
                 StringBuilder sb;
-                foreach (Guid tracingId in PerformanceInstrumentation.TracingIds)
+                foreach (var tracingId in PerformanceInstrumentation.TracingIds)
                 {
                     Console.WriteLine("Query tracing info {0}", tracingId);
                     var tracingSession = protocol.QueryTracingInfo(tracingId);
 
                     sb = new StringBuilder();
-                    foreach (TracingEvent te in tracingSession.TracingEvents)
+                    foreach (var te in tracingSession.TracingEvents)
                     {
                         sb.AppendFormat("{0},\"{1}\",{2},{3},{4},{5},{6}", tracingSession.SessionId, te.Activity, te.EventId, te.Source,
                                         te.SourceElapsed,
@@ -126,6 +125,7 @@ namespace CassandraSharpUnitTests.Performance
                     txtWriter.Write(sb);
                     ++count;
                 }
+
                 sb = new StringBuilder();
 
                 sb.AppendFormat("{0},\"{1}\",{2},{3},{4},{5},{6}", Guid.Empty, "Write elapsed", Guid.Empty, "",

@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests
 {
-    using System;
-    using CassandraSharp;
-    using NUnit.Framework;
-
     [TestFixture]
     public class PartitionerTest
     {
         [Test]
         public void CheckBuilder()
         {
-            PartitionKey key = PartitionKey.From(42, "toto");
+            var key = PartitionKey.From(42, "toto");
             Assert.IsNotNull(key);
             Assert.IsNotNull(key.Keys);
             Assert.AreEqual(new object[] {42, "toto"}, key.Keys);

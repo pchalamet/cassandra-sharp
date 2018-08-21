@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLPoco;
+using CassandraSharp.Extensibility;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Stress
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Threading;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     public class DisconnectingProxy
     {
         private readonly int _source;
@@ -61,21 +61,21 @@ namespace CassandraSharpUnitTests.Stress
 
         private void Worker()
         {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry("cassandra1");
-            IPAddress ipAddress = ipHostInfo.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork);
+            var ipHostInfo = Dns.GetHostEntry("cassandra1");
+            var ipAddress = ipHostInfo.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork);
             EndPoint listenEndpoint = new IPEndPoint(ipAddress, _source);
 
             while (!_stop)
             {
                 EndPoint targetEndpoint = new IPEndPoint(ipAddress, _target);
-                Socket targetSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                var targetSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 targetSocket.Connect(targetEndpoint);
 
-                Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                var listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 listenSocket.Bind(listenEndpoint);
                 listenSocket.Listen(10);
 
-                Socket clientSocket = listenSocket.Accept();
+                var clientSocket = listenSocket.Accept();
                 ThreadPool.QueueUserWorkItem(_ => Transmit(clientSocket, targetSocket));
                 ThreadPool.QueueUserWorkItem(_ => Transmit(targetSocket, clientSocket));
                 Killer(targetSocket, clientSocket, listenSocket);
@@ -85,22 +85,18 @@ namespace CassandraSharpUnitTests.Stress
 
         private void Killer(params Socket[] sockets)
         {
-            Random rnd = new Random();
+            var rnd = new Random();
             while (!_stop)
             {
                 Thread.Sleep(rnd.Next(500));
 
-                int proba = rnd.Next(1000);
-                if (_enableKiller && 900 < proba)
-                {
-                    break;
-                }
+                var proba = rnd.Next(1000);
+                if (_enableKiller && 900 < proba) break;
             }
 
             Console.WriteLine("Killing connection");
 
-            foreach (Socket socket in sockets)
-            {
+            foreach (var socket in sockets)
                 try
                 {
                     socket.Dispose();
@@ -108,22 +104,18 @@ namespace CassandraSharpUnitTests.Stress
                 catch (Exception)
                 {
                 }
-            }
         }
 
         private static void Transmit(Socket source, Socket target)
         {
             try
             {
-                byte[] buffer = new byte[1024];
+                var buffer = new byte[1024];
                 while (true)
                 {
-                    int count = source.Receive(buffer);
-                    int write = 0;
-                    while (write != count)
-                    {
-                        write += target.Send(buffer, write, count - write, SocketFlags.None);
-                    }
+                    var count = source.Receive(buffer);
+                    var write = 0;
+                    while (write != count) write += target.Send(buffer, write, count - write, SocketFlags.None);
                 }
             }
             catch
@@ -175,33 +167,32 @@ namespace CassandraSharpUnitTests.Stress
         [Test]
         public void RecoveryTest()
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
-                {
-                        Logger = new LoggerConfig {Type = typeof(ResilienceLogger).AssemblyQualifiedName},
-                        Recovery = new RecoveryConfig {Interval = 2}
-                };
+            var cassandraSharpConfig = new CassandraSharpConfig
+                                       {
+                                           Logger = new LoggerConfig {Type = typeof(ResilienceLogger).AssemblyQualifiedName},
+                                           Recovery = new RecoveryConfig {Interval = 2}
+                                       };
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
+                var clusterConfig = new ClusterConfig
+                                    {
+                                        Endpoints = new EndpointsConfig
+                                                    {
+                                                        Servers = new[] {"cassandra1"}
+                                                    },
+                                        Transport = new TransportConfig
+                                                    {
+                                                        Port = 666,
+                                                        ReceiveTimeout = 10 * 1000
+                                                    }
+                                    };
 
-                ClusterConfig clusterConfig = new ClusterConfig
-                {
-                    Endpoints = new EndpointsConfig
-                    {
-                        Servers = new[] { "cassandra1" },
-                    },
-                    Transport = new TransportConfig
-                    {
-                        Port = 666,
-                        ReceiveTimeout = 10 * 1000,
-                    }
-                };
-
-                DisconnectingProxy proxy = new DisconnectingProxy(666, 9042);
+                var proxy = new DisconnectingProxy(666, 9042);
                 proxy.Start();
 
-                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
+                using (var cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    ICqlCommand cmd = cluster.CreatePocoCommand();
+                    var cmd = cluster.CreatePocoCommand();
 
                     const string dropFoo = "drop keyspace data";
                     try
@@ -220,13 +211,13 @@ namespace CassandraSharpUnitTests.Stress
 
                     proxy.EnableKiller();
 
-                    for (int i = 0; i < 10000; ++i)
+                    for (var i = 0; i < 10000; ++i)
                     {
-                        int attempt = 0;
+                        var attempt = 0;
                         while (true)
                         {
                             var now = DateTime.Now;
-                            string insert = String.Format("insert into data.test(time) values ('{0}');", now);
+                            var insert = string.Format("insert into data.test(time) values ('{0}');", now);
                             Console.WriteLine("{0}.{1}) {2}", i, ++attempt, insert);
 
                             try

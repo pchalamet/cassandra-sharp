@@ -13,15 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Partitioner;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.Partitioner
 {
-    using System.Numerics;
-    using CassandraSharp;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     [TestFixture]
     public class NullPartitionerTest
     {
@@ -30,8 +28,8 @@ namespace CassandraSharpUnitTests.Partitioner
         {
             IPartitioner partitioner = new NullPartitioner();
 
-            PartitionKey key = PartitionKey.From(1);
-            BigInteger? token = partitioner.ComputeToken(key);
+            var key = PartitionKey.From(1);
+            var token = partitioner.ComputeToken(key);
             Assert.IsNull(token);
 
             key = PartitionKey.From("toto", 42);

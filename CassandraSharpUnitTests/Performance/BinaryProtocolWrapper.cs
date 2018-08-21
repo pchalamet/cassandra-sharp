@@ -13,44 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLOrdinal;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharpUnitTests.Performance
 {
-    using System;
-    using CassandraSharp;
-    using CassandraSharp.CQLOrdinal;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
-
     public class BinaryProtocolWrapper : ProtocolWrapper
     {
-        private IClusterManager _clusterManager;
-
         private ICluster _cluster;
+        private IClusterManager _clusterManager;
 
         private ICqlCommand _cmd;
 
         private IPreparedQuery<NonQuery> _prepared;
 
-        public override string Name
-        {
-            get { return "BinaryProtocol"; }
-        }
+        public override string Name => "BinaryProtocol";
 
         public override void Open(string hostname)
         {
             //run Write Performance Test using cassandra-sharp driver
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            var cassandraSharpConfig = new CassandraSharpConfig();
             cassandraSharpConfig.Instrumentation = new InstrumentationConfig();
             cassandraSharpConfig.Instrumentation.Type = typeof(PerformanceInstrumentation).AssemblyQualifiedName;
             _clusterManager = new ClusterManager(cassandraSharpConfig);
 
-            ClusterConfig clusterConfig = new ClusterConfig
-                {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] {hostname}
-                            },
-                };
+            var clusterConfig = new ClusterConfig
+                                {
+                                    Endpoints = new EndpointsConfig
+                                                {
+                                                    Servers = new[] {hostname}
+                                                }
+                                };
 
             _cluster = _clusterManager.GetCluster(clusterConfig);
 
@@ -59,10 +55,7 @@ namespace CassandraSharpUnitTests.Performance
 
         public override void Dispose()
         {
-            if (null != _prepared)
-            {
-                _prepared.Dispose();
-            }
+            if (null != _prepared) _prepared.Dispose();
 
             _cluster.Dispose();
             _clusterManager.Dispose();

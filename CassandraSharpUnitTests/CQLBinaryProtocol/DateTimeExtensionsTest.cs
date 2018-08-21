@@ -13,25 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using CassandraSharp.Utils.Stream;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.CQLBinaryProtocol
 {
-    using System;
-    using NUnit.Framework;
-
     [TestFixture]
     public class DateTimeExtensionsTest
     {
         [Test]
         public void TestConversion()
         {
-            DateTime dt = new DateTime(2013, 1, 16, 14, 20, 0);
-            long ts = dt.ToTimestamp();
+            var dt = new DateTime(2013, 1, 16, 14, 20, 0);
+            var ts = dt.ToTimestamp();
 
             Assert.AreEqual(ts, 1358346000000);
 
-            DateTime cdt = ts.ToDateTime();
+            var cdt = ts.ToDateTime();
             Assert.AreEqual(cdt, dt);
         }
     }

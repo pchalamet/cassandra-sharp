@@ -13,21 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLCommand;
+using CassandraSharp.CQLOrdinal;
+using CassandraSharp.CQLPoco;
 using CassandraSharp.Utils;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.CQLOrdinal
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using CassandraSharp;
-    using CassandraSharp.CQLCommand;
-    using CassandraSharp.CQLOrdinal;
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Config;
-    using NUnit.Framework;
-
     [TestFixture]
     public class AllTypesTest
     {
@@ -75,20 +74,20 @@ namespace CassandraSharpUnitTests.CQLOrdinal
         [Test]
         public void TestAllTypes()
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            var cassandraSharpConfig = Factory.GetConfiguration("MadeSimple");
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
-                ClusterConfig clusterConfig = new ClusterConfig
-                {
-                    Endpoints = new EndpointsConfig
-                    {
-                        Servers = new[] { "cassandra1" }
-                    }
-                };
+                var clusterConfig = new ClusterConfig
+                                    {
+                                        Endpoints = new EndpointsConfig
+                                                    {
+                                                        Servers = new[] {"localhost"}
+                                                    }
+                                    };
 
-                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
+                using (var cluster = clusterManager.GetCluster(clusterConfig))
                 {
-                    ICqlCommand cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
+                    var cmd = cluster.CreateCommand().FromOrdinal().ToPoco().Build();
 
                     const string dropFoo = "drop keyspace Tests";
 
@@ -142,50 +141,50 @@ namespace CassandraSharpUnitTests.CQLOrdinal
                     var prepared = cmd.Prepare(insertBatch);
 
                     var allTypesInsert = new AllTypes
-                    {
-                        CAscii = new string('x', 8000),
-                        CBigint = 0x0102030405060708,
-                        CBlob = Enumerable.Repeat((byte)42, 7142).ToArray(),
-                        CBoolean = true,
-                        CDouble = 1234.5678,
-                        CFloat = 234.567f,
-                        CInet = new IPAddress(new byte[] { 0x01, 0x02, 0x03, 0x04 }),
-                        CInt = 42,
-                        CText = new string('x', 3000),
-                        CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
-                        CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
-                        CUuid = Guid.NewGuid(),
-                        CVarchar = new string('x', 5000),
-                        CList = new List<int> { 1, 2, 3 },
-                        CSet = new HashSet<int> { 1, 2, 3 },
-                        CMap = new Dictionary<string, int> { { "one", 1 }, { "two", 2 }, { "three", 3 } },
-                    };
+                                         {
+                                             CAscii = new string('x', 8000),
+                                             CBigint = 0x0102030405060708,
+                                             CBlob = Enumerable.Repeat((byte)42, 7142).ToArray(),
+                                             CBoolean = true,
+                                             CDouble = 1234.5678,
+                                             CFloat = 234.567f,
+                                             CInet = new IPAddress(new byte[] {0x01, 0x02, 0x03, 0x04}),
+                                             CInt = 42,
+                                             CText = new string('x', 3000),
+                                             CTimestamp = new DateTime(2013, 1, 16, 14, 20, 0),
+                                             CTimeuuid = TimedUuid.GenerateTimeBasedGuid(DateTime.Now),
+                                             CUuid = Guid.NewGuid(),
+                                             CVarchar = new string('x', 5000),
+                                             CList = new List<int> {1, 2, 3},
+                                             CSet = new HashSet<int> {1, 2, 3},
+                                             CMap = new Dictionary<string, int> {{"one", 1}, {"two", 2}, {"three", 3}}
+                                         };
 
                     var param = new object[]
-                        {
-                            allTypesInsert.CAscii,
-                            allTypesInsert.CBigint,
-                            allTypesInsert.CBlob,
-                            allTypesInsert.CBoolean,
-                            allTypesInsert.CDouble,
-                            allTypesInsert.CFloat,
-                            allTypesInsert.CInet,
-                            allTypesInsert.CInt,
-                            allTypesInsert.CText,
-                            allTypesInsert.CTimestamp,
-                            allTypesInsert.CTimeuuid,
-                            allTypesInsert.CUuid,
-                            allTypesInsert.CVarchar,
-                            allTypesInsert.CList,
-                            allTypesInsert.CSet,
-                            allTypesInsert.CMap,
-                        };
+                                {
+                                    allTypesInsert.CAscii,
+                                    allTypesInsert.CBigint,
+                                    allTypesInsert.CBlob,
+                                    allTypesInsert.CBoolean,
+                                    allTypesInsert.CDouble,
+                                    allTypesInsert.CFloat,
+                                    allTypesInsert.CInet,
+                                    allTypesInsert.CInt,
+                                    allTypesInsert.CText,
+                                    allTypesInsert.CTimestamp,
+                                    allTypesInsert.CTimeuuid,
+                                    allTypesInsert.CUuid,
+                                    allTypesInsert.CVarchar,
+                                    allTypesInsert.CList,
+                                    allTypesInsert.CSet,
+                                    allTypesInsert.CMap
+                                };
 
                     prepared.Execute(param).AsFuture().Wait();
 
                     const string selectAll =
-                            "select cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat, cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap from Tests.AllTypes";
-                    AllTypes allTypesSelect = cmd.Execute<AllTypes>(selectAll).AsFuture().Result.Single();
+                        "select cAscii, cBigint, cBlob, cBoolean, cDouble, cFloat, cInet, cInt, cText, cTimestamp, cTimeuuid, cUuid, cVarchar, cList, cSet, cMap from Tests.AllTypes";
+                    var allTypesSelect = cmd.Execute<AllTypes>(selectAll).AsFuture().Result.Single();
 
                     cmd.Execute(dropFoo).AsFuture().Wait();
 

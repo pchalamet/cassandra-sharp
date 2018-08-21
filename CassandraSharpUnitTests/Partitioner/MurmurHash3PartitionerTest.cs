@@ -13,15 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Numerics;
+using CassandraSharp;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Partitioner;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.Partitioner
 {
-    using System.Numerics;
-    using CassandraSharp;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     [TestFixture]
     public class MurmurHash3PartitionerTest
     {
@@ -29,8 +28,8 @@ namespace CassandraSharpUnitTests.Partitioner
         public void CheckCompositeKey1()
         {
             IPartitioner partitioner = new Murmur3Partitioner();
-            PartitionKey partitionKey = PartitionKey.From((long)1, 1, 200301);
-            BigInteger? token = partitioner.ComputeToken(partitionKey);
+            var partitionKey = PartitionKey.From((long)1, 1, 200301);
+            var token = partitioner.ComputeToken(partitionKey);
             Assert.IsTrue(token.HasValue);
             Assert.IsTrue(token.Value == new BigInteger(2268761313986801232));
         }
@@ -39,8 +38,8 @@ namespace CassandraSharpUnitTests.Partitioner
         public void CheckCompositeKey2()
         {
             IPartitioner partitioner = new Murmur3Partitioner();
-            PartitionKey partitionKey = PartitionKey.From((long)18653, 1, 200711);
-            BigInteger? token = partitioner.ComputeToken(partitionKey);
+            var partitionKey = PartitionKey.From((long)18653, 1, 200711);
+            var token = partitioner.ComputeToken(partitionKey);
             Assert.IsTrue(token.HasValue);
             Assert.IsTrue(token.Value == new BigInteger(-2403361283253792854));
         }
@@ -49,8 +48,8 @@ namespace CassandraSharpUnitTests.Partitioner
         public void CheckSingleKey()
         {
             IPartitioner partitioner = new Murmur3Partitioner();
-            PartitionKey partitionKey = PartitionKey.From(0x12345678);
-            BigInteger? token = partitioner.ComputeToken(partitionKey);
+            var partitionKey = PartitionKey.From(0x12345678);
+            var token = partitioner.ComputeToken(partitionKey);
             Assert.IsTrue(token.HasValue);
             Assert.IsTrue(token.Value == new BigInteger(-8827056344306985898));
         }

@@ -13,44 +13,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using CassandraSharp.EndpointStrategy;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Utils;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.EndpointStrategy
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using CassandraSharp.Extensibility;
-    using NUnit.Framework;
-
     [TestFixture]
     public class RandomEndpointStrategyTest
     {
         [Test]
         public void TestRandomness()
         {
-            IPAddress[] ips = new IPAddress[4];
-            for (byte i = 0; i < ips.Length; ++i)
+            var ips = new IPAddress[4];
+            for (byte i = 0; i < ips.Length; ++i) ips[i] = new IPAddress(new byte[] {192, 168, 0, i});
+
+            var endpointStrategy = ServiceActivator<Factory>.Create<IEndpointStrategy>("Random", ips.AsEnumerable());
+
+            var alls = new List<IPAddress>();
+            for (var i = 0; i < 10000; ++i)
             {
-                ips[i] = new IPAddress(new byte[] {192, 168, 0, i});
+                var nextEndpoint = endpointStrategy.Pick();
+                if (!alls.Contains(nextEndpoint)) alls.Add(nextEndpoint);
             }
 
-            IEndpointStrategy endpointStrategy = ServiceActivator<CassandraSharp.EndpointStrategy.Factory>.Create<IEndpointStrategy>("Random", ips.AsEnumerable());
-
-            List<IPAddress> alls = new List<IPAddress>();
-            for (int i = 0; i < 10000; ++i)
-            {
-                IPAddress nextEndpoint = endpointStrategy.Pick();
-                if (! alls.Contains(nextEndpoint))
-                {
-                    alls.Add(nextEndpoint);
-                }
-            }
-
-            foreach (IPAddress ip in alls)
-            {
-                Assert.IsTrue(alls.Contains(ip));
-            }
+            foreach (var ip in alls) Assert.IsTrue(alls.Contains(ip));
         }
     }
 }

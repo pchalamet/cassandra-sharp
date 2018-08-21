@@ -13,41 +13,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using CassandraSharp;
+using CassandraSharp.Config;
+using CassandraSharp.CQLPropertyBag;
+using NUnit.Framework;
+
 namespace CassandraSharpUnitTests.Functional
 {
-    using System;
-    using System.Linq;
-    using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
-    using CassandraSharp.Config;
-    using NUnit.Framework;
-
     [TestFixture]
     public class NullTest
     {
-        private IClusterManager clusterManager;
-
         [TearDown]
         public void TearDown()
         {
             clusterManager.Dispose();
         }
 
+        private IClusterManager clusterManager;
+
         [Test]
         public void TestNull()
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig();
+            var cassandraSharpConfig = new CassandraSharpConfig();
             clusterManager = new ClusterManager(cassandraSharpConfig);
 
-            ClusterConfig clusterConfig = new ClusterConfig
-                {
-                        Endpoints = new EndpointsConfig
-                            {
-                                    Servers = new[] { "cassandra1" }
-                            }
-                };
+            var clusterConfig = new ClusterConfig
+                                {
+                                    Endpoints = new EndpointsConfig
+                                                {
+                                                    Servers = new[] {"cassandra1"}
+                                                }
+                                };
 
-            using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
+            using (var cluster = clusterManager.GetCluster(clusterConfig))
             {
                 var cmd = cluster.CreatePropertyBagCommand();
 
@@ -89,7 +89,7 @@ namespace CassandraSharpUnitTests.Functional
                 const string insertBatch = @"insert into Tests.AllTypes (a, b) values (?, ?)";
                 var prepared = cmd.Prepare(insertBatch);
 
-                PropertyBag insertBag = new PropertyBag();
+                var insertBag = new PropertyBag();
                 insertBag["a"] = 1;
                 insertBag["b"] = null;
 
@@ -98,9 +98,9 @@ namespace CassandraSharpUnitTests.Functional
                 const string selectAll = "select * from Tests.AllTypes";
                 var res = cmd.Execute(selectAll).AsFuture();
                 Assert.IsTrue(1 == res.Result.Count);
-                PropertyBag selectBag = res.Result.Single();
+                var selectBag = res.Result.Single();
                 Assert.IsTrue(selectBag.Keys.Contains("a"));
-                Assert.IsTrue(1 == (int) selectBag["a"]);
+                Assert.IsTrue(1 == (int)selectBag["a"]);
                 Assert.IsTrue(null == selectBag["b"]);
             }
         }

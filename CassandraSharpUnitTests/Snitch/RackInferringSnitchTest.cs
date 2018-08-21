@@ -13,28 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using CassandraSharp.Snitch;
+using NUnit.Framework;
 
 namespace CassandraSharpUnitTests.Snitch
 {
-    using System.Net;
-    using NUnit.Framework;
-
     [TestFixture]
     public class RackInferringSnitchTest
     {
         [Test]
         public void TestDatacenter()
         {
-            IPAddress address = new IPAddress(new byte[] {192, 168, 255, 0});
-            IPAddress a1 = new IPAddress(new byte[] {192, 168, 0, 0});
-            IPAddress a2 = new IPAddress(new byte[] {192, 169, 10, 0});
+            var address = new IPAddress(new byte[] {192, 168, 255, 0});
+            var a1 = new IPAddress(new byte[] {192, 168, 0, 0});
+            var a2 = new IPAddress(new byte[] {192, 169, 10, 0});
 
-            RackInferringSnitch rackInferringSnitch = new RackInferringSnitch();
+            var rackInferringSnitch = new RackInferringSnitch();
 
-            string adressDatacenter = rackInferringSnitch.GetDatacenter(address);
-            string a1Datacenter = rackInferringSnitch.GetDatacenter(a1);
-            string a2Datacenter = rackInferringSnitch.GetDatacenter(a2);
+            var adressDatacenter = rackInferringSnitch.GetDatacenter(address);
+            var a1Datacenter = rackInferringSnitch.GetDatacenter(a1);
+            var a2Datacenter = rackInferringSnitch.GetDatacenter(a2);
 
             Assert.AreEqual(adressDatacenter, a1Datacenter);
             Assert.AreNotEqual(adressDatacenter, a2Datacenter);
@@ -43,14 +42,14 @@ namespace CassandraSharpUnitTests.Snitch
         [Test]
         public void TestNearestEndpoint()
         {
-            IPAddress address = new IPAddress(new byte[] {192, 168, 100, 0});
-            IPAddress a1 = new IPAddress(new byte[] {192, 168, 0, 0});
-            IPAddress a2 = new IPAddress(new byte[] {192, 168, 100, 0});
+            var address = new IPAddress(new byte[] {192, 168, 100, 0});
+            var a1 = new IPAddress(new byte[] {192, 168, 0, 0});
+            var a2 = new IPAddress(new byte[] {192, 168, 100, 0});
 
-            RackInferringSnitch rackInferringSnitch = new RackInferringSnitch();
+            var rackInferringSnitch = new RackInferringSnitch();
 
             // a2 is nearest of address
-            int res = rackInferringSnitch.CompareEndpoints(address, a1, a2);
+            var res = rackInferringSnitch.CompareEndpoints(address, a1, a2);
             Assert.AreEqual(1, res);
 
             // same distance
@@ -65,15 +64,15 @@ namespace CassandraSharpUnitTests.Snitch
         [Test]
         public void TestRack()
         {
-            IPAddress address = new IPAddress(new byte[] {192, 168, 255, 0});
-            IPAddress a1 = new IPAddress(new byte[] {192, 168, 0, 0});
-            IPAddress a2 = new IPAddress(new byte[] {192, 169, 255, 0});
+            var address = new IPAddress(new byte[] {192, 168, 255, 0});
+            var a1 = new IPAddress(new byte[] {192, 168, 0, 0});
+            var a2 = new IPAddress(new byte[] {192, 169, 255, 0});
 
-            RackInferringSnitch rackInferringSnitch = new RackInferringSnitch();
+            var rackInferringSnitch = new RackInferringSnitch();
 
-            string adressRack = rackInferringSnitch.GetRack(address);
-            string a1Rack = rackInferringSnitch.GetRack(a1);
-            string a2Rack = rackInferringSnitch.GetRack(a2);
+            var adressRack = rackInferringSnitch.GetRack(address);
+            var a1Rack = rackInferringSnitch.GetRack(a1);
+            var a2Rack = rackInferringSnitch.GetRack(a2);
 
             Assert.AreEqual(adressRack, a2Rack);
             Assert.AreNotEqual(adressRack, a1Rack);
