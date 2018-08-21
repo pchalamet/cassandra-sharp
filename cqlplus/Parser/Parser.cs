@@ -18,8 +18,8 @@
 
 namespace cqlplus.Parser
 {
-
     #region Parser
+
     public class Parser
     {
         private readonly Scanner scanner;
@@ -52,7 +52,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.String), "String");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.String), "String");
             parent.Nodes.Add(node);
 
             tok = scanner.Scan(TokenType.STRING);
@@ -61,7 +61,7 @@ namespace cqlplus.Parser
             node.Nodes.Add(n);
             if (tok.Type != TokenType.STRING)
             {
-                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.STRING.ToString(), 0x1001, 0,
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.STRING, 0x1001, 0,
                                                tok.StartPos, tok.StartPos, tok.Length));
                 return;
             }
@@ -73,7 +73,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Identifier), "Identifier");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.Identifier), "Identifier");
             parent.Nodes.Add(node);
 
             tok = scanner.Scan(TokenType.IDENTIFIER);
@@ -82,7 +82,7 @@ namespace cqlplus.Parser
             node.Nodes.Add(n);
             if (tok.Type != TokenType.IDENTIFIER)
             {
-                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.IDENTIFIER.ToString(),
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.IDENTIFIER,
                                                0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
                 return;
             }
@@ -94,7 +94,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Integer), "Integer");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.Integer), "Integer");
             parent.Nodes.Add(node);
 
             tok = scanner.Scan(TokenType.INTEGER);
@@ -103,7 +103,7 @@ namespace cqlplus.Parser
             node.Nodes.Add(n);
             if (tok.Type != TokenType.INTEGER)
             {
-                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.INTEGER.ToString(), 0x1001,
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.INTEGER, 0x1001,
                                                0, tok.StartPos, tok.StartPos, tok.Length));
                 return;
             }
@@ -115,7 +115,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Value), "Value");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.Value), "Value");
             parent.Nodes.Add(node);
 
             tok = scanner.LookAhead(TokenType.STRING, TokenType.IDENTIFIER, TokenType.INTEGER);
@@ -143,7 +143,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Parameters), "Parameters");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.Parameters), "Parameters");
             parent.Nodes.Add(node);
 
             tok = scanner.LookAhead(TokenType.IDENTIFIER);
@@ -157,7 +157,7 @@ namespace cqlplus.Parser
                 node.Nodes.Add(n);
                 if (tok.Type != TokenType.EQUAL)
                 {
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EQUAL.ToString(), 0x1001,
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EQUAL, 0x1001,
                                                    0, tok.StartPos, tok.StartPos, tok.Length));
                     return;
                 }
@@ -173,7 +173,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CommandWithParameters), "CommandWithParameters");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.CommandWithParameters), "CommandWithParameters");
             parent.Nodes.Add(node);
 
             ParseIdentifier(node);
@@ -187,7 +187,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CqlCommand), "CqlCommand");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.CqlCommand), "CqlCommand");
             parent.Nodes.Add(node);
 
             tok = scanner.Scan(TokenType.EVERYTHING_BUT_START_WITH_BANG);
@@ -197,9 +197,10 @@ namespace cqlplus.Parser
             if (tok.Type != TokenType.EVERYTHING_BUT_START_WITH_BANG)
             {
                 tree.Errors.Add(
-                        new ParseError(
-                                "Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EVERYTHING_BUT_START_WITH_BANG.ToString(),
-                                0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
+                                new ParseError(
+                                               "Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " +
+                                               TokenType.EVERYTHING_BUT_START_WITH_BANG,
+                                               0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
                 return;
             }
 
@@ -210,7 +211,7 @@ namespace cqlplus.Parser
         {
             Token tok;
             ParseNode n;
-            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Start), "Start");
+            var node = parent.CreateNode(scanner.GetToken(TokenType.Start), "Start");
             parent.Nodes.Add(node);
 
             tok = scanner.LookAhead(TokenType.BANG, TokenType.EVERYTHING_BUT_START_WITH_BANG);
@@ -224,7 +225,7 @@ namespace cqlplus.Parser
                     node.Nodes.Add(n);
                     if (tok.Type != TokenType.BANG)
                     {
-                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BANG.ToString(),
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BANG,
                                                        0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
                         return;
                     }
@@ -246,7 +247,7 @@ namespace cqlplus.Parser
             node.Nodes.Add(n);
             if (tok.Type != TokenType.EOF)
             {
-                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EOF.ToString(), 0x1001, 0,
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.EOF, 0x1001, 0,
                                                tok.StartPos, tok.StartPos, tok.Length));
                 return;
             }
@@ -254,6 +255,7 @@ namespace cqlplus.Parser
             parent.Token.UpdateRange(node.Token);
         }
     }
+
     #endregion Parser
 }
 

@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp;
+using CassandraSharp.Config;
+
 namespace Samples
 {
-    using System;
-    using CassandraSharp;
-    using CassandraSharp.Config;
-
     public abstract class Sample
     {
         private readonly string _name;
@@ -36,7 +36,7 @@ namespace Samples
 
             var configuration = Factory.GetConfiguration();
             using (var clusterManager = new ClusterManager(configuration))
-            using (ICluster cluster = clusterManager.GetCluster("TestCassandra"))
+            using (var cluster = clusterManager.GetCluster("TestCassandra"))
             {
                 try
                 {
@@ -44,7 +44,7 @@ namespace Samples
                 }
                 // ReSharper disable EmptyGeneralCatchClause
                 catch
-                // ReSharper restore EmptyGeneralCatchClause
+                    // ReSharper restore EmptyGeneralCatchClause
                 {
                 }
 
@@ -57,7 +57,7 @@ namespace Samples
                 }
                 catch (Exception ex)
                 {
-                    string msg = string.Format("== FAILED  with error\n{0}", ex);
+                    var msg = string.Format("== FAILED  with error\n{0}", ex);
                     Console.WriteLine("=======================================================");
                     Console.WriteLine(msg);
                     Console.WriteLine("=======================================================");

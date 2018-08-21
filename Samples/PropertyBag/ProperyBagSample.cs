@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using CassandraSharp;
+using CassandraSharp.CQLPropertyBag;
+
 namespace Samples.PropertyBag
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
-
     public class SchemaColumns
     {
         public string KeyspaceName { get; set; }
@@ -48,18 +48,16 @@ namespace Samples.PropertyBag
             const string cqlKeyspaces = "SELECT * from system_schema.columns";
 
             var req = from t in cmd.Execute(cqlKeyspaces).AsFuture().Result
-                      where "system" == (string) t["KeyspaceName"]
+                      where "system" == (string)t["KeyspaceName"]
                       select t;
             DisplayResult(req);
         }
 
-        private static void DisplayResult(IEnumerable<PropertyBag> reqs)
+        private static void DisplayResult(IEnumerable<CassandraSharp.CQLPropertyBag.PropertyBag> reqs)
         {
-            foreach (PropertyBag pb in reqs)
-            {
+            foreach (var pb in reqs)
                 Console.WriteLine("KeyspaceName={0} TableName={1} ColumnName={2}",
                                   pb["KeyspaceName"], pb["TableName"], pb["ColumnName"]);
-            }
         }
     }
 }

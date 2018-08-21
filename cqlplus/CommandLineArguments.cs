@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
+
 namespace cqlplus
 {
-    using System;
-    using System.Collections;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Reflection;
-    using System.Text;
-
     /// <summary>
     ///     Used to control parsing of command line arguments.
     /// </summary>
@@ -64,7 +64,7 @@ namespace cqlplus
         ///     The argument is permitted to occur multiple times, but duplicate
         ///     values will cause an error to be reported.
         /// </summary>
-        MultipleUnique = Multiple | Unique,
+        MultipleUnique = Multiple | Unique
     }
 
     /// <summary>
@@ -75,12 +75,6 @@ namespace cqlplus
     [AttributeUsage(AttributeTargets.Field)]
     public class ArgumentAttribute : Attribute
     {
-        private readonly ArgumentType _type;
-
-        private object _defaultValue;
-
-        private string _helpText;
-
         private string _longName;
 
         private string _shortName;
@@ -91,24 +85,18 @@ namespace cqlplus
         /// <param name="type"> Specifies the error checking to be done on the argument. </param>
         public ArgumentAttribute(ArgumentType type)
         {
-            _type = type;
+            Type = type;
         }
 
         /// <summary>
         ///     The error checking to be done on the argument.
         /// </summary>
-        public ArgumentType Type
-        {
-            get { return _type; }
-        }
+        public ArgumentType Type { get; }
 
         /// <summary>
         ///     Returns true if the argument did not have an explicit short name specified.
         /// </summary>
-        public bool DefaultShortName
-        {
-            get { return null == _shortName; }
-        }
+        public bool DefaultShortName => null == _shortName;
 
         /// <summary>
         ///     The short name of the argument.
@@ -119,7 +107,7 @@ namespace cqlplus
         /// </summary>
         public string ShortName
         {
-            get { return _shortName; }
+            get => _shortName;
             set
             {
                 Debug.Assert(value == null || !(this is DefaultArgumentAttribute));
@@ -130,10 +118,7 @@ namespace cqlplus
         /// <summary>
         ///     Returns true if the argument did not have an explicit long name specified.
         /// </summary>
-        public bool DefaultLongName
-        {
-            get { return null == _longName; }
-        }
+        public bool DefaultLongName => null == _longName;
 
         /// <summary>
         ///     The long name of the argument.
@@ -158,36 +143,22 @@ namespace cqlplus
         /// <summary>
         ///     The default value of the argument.
         /// </summary>
-        public object DefaultValue
-        {
-            get { return _defaultValue; }
-            set { _defaultValue = value; }
-        }
+        public object DefaultValue { get; set; }
 
         /// <summary>
         ///     Returns true if the argument has a default value.
         /// </summary>
-        public bool HasDefaultValue
-        {
-            get { return null != _defaultValue; }
-        }
+        public bool HasDefaultValue => null != DefaultValue;
 
         /// <summary>
         ///     Returns true if the argument has help text specified.
         /// </summary>
-        public bool HasHelpText
-        {
-            get { return null != _helpText; }
-        }
+        public bool HasHelpText => null != HelpText;
 
         /// <summary>
         ///     The help text for the argument.
         /// </summary>
-        public string HelpText
-        {
-            get { return _helpText; }
-            set { _helpText = value; }
-        }
+        public string HelpText { get; set; }
     }
 
     /// <summary>
@@ -205,7 +176,7 @@ namespace cqlplus
         /// </summary>
         /// <param name="type"> Specifies the error checking to be done on the argument. </param>
         public DefaultArgumentAttribute(ArgumentType type)
-                : base(type)
+            : base(type)
         {
         }
     }
@@ -262,11 +233,10 @@ namespace cqlplus
             _arguments = new ArrayList();
             _argumentMap = new Hashtable();
 
-            foreach (FieldInfo field in argumentSpecification.GetFields())
-            {
+            foreach (var field in argumentSpecification.GetFields())
                 if (!field.IsStatic && !field.IsInitOnly && !field.IsLiteral)
                 {
-                    ArgumentAttribute attribute = GetAttribute(field);
+                    var attribute = GetAttribute(field);
                     if (attribute is DefaultArgumentAttribute)
                     {
                         Debug.Assert(_defaultArgument == null);
@@ -277,7 +247,6 @@ namespace cqlplus
                         _arguments.Add(new Argument(attribute, field, reporter));
                     }
                 }
-            }
 
             // add explicit names to map
             foreach (Argument argument in _arguments)
@@ -300,29 +269,20 @@ namespace cqlplus
 
             // add implicit names which don't collide to map
             foreach (Argument argument in _arguments)
-            {
                 if (!argument.ExplicitShortName)
                 {
                     if (!string.IsNullOrEmpty(argument.ShortName) && !_argumentMap.ContainsKey(argument.ShortName))
-                    {
                         _argumentMap[argument.ShortName] = argument;
-                    }
                     else
-                    {
                         argument.ClearShortName();
-                    }
                 }
-            }
         }
 
         /// <summary>
         ///     Does this parser have a default argument.
         /// </summary>
         /// <value> Does this parser have a default argument. </value>
-        public bool HasDefaultArgument
-        {
-            get { return _defaultArgument != null; }
-        }
+        public bool HasDefaultArgument => _defaultArgument != null;
 
         /// <summary>
         ///     Parses Command Line Arguments. Displays usage message to Console.Out
@@ -368,7 +328,7 @@ namespace cqlplus
         /// <returns> true if no errors were detected. </returns>
         public static bool ParseArguments(string[] arguments, object destination, ErrorReporter reporter)
         {
-            CommandLineParser parser = new CommandLineParser(destination.GetType(), reporter);
+            var parser = new CommandLineParser(destination.GetType(), reporter);
             return parser.Parse(arguments, destination);
         }
 
@@ -383,8 +343,8 @@ namespace cqlplus
         /// <returns> Returns true if args contains /? or /help. </returns>
         public static bool ParseHelp(string[] args)
         {
-            CommandLineParser helpParser = new CommandLineParser(typeof(HelpArgument), NullErrorReporter);
-            HelpArgument helpArgument = new HelpArgument();
+            var helpParser = new CommandLineParser(typeof(HelpArgument), NullErrorReporter);
+            var helpArgument = new HelpArgument();
             helpParser.Parse(args, helpArgument);
             return HelpArgument.Help;
         }
@@ -411,7 +371,7 @@ namespace cqlplus
         /// <returns> Printable string containing a user friendly description of command line arguments. </returns>
         public static string ArgumentsUsage(Type argumentType, int columns)
         {
-            return (new CommandLineParser(argumentType, null)).GetUsageString(columns);
+            return new CommandLineParser(argumentType, null).GetUsageString(columns);
         }
 
         /// <summary>
@@ -423,13 +383,9 @@ namespace cqlplus
         /// <returns> The index of the first occurence of value or -1 if it is not found. </returns>
         public static int IndexOf(StringBuilder text, char value, int startIndex)
         {
-            for (int index = startIndex; index < text.Length; index++)
-            {
+            for (var index = startIndex; index < text.Length; index++)
                 if (text[index] == value)
-                {
                     return index;
-                }
-            }
 
             return -1;
         }
@@ -443,24 +399,17 @@ namespace cqlplus
         /// <returns>The index of the last occurence of value in text or -1 if it is not found. </returns>
         public static int LastIndexOf(StringBuilder text, char value, int startIndex)
         {
-            for (int index = Math.Min(startIndex, text.Length - 1); index >= 0; index --)
-            {
+            for (var index = Math.Min(startIndex, text.Length - 1); index >= 0; index--)
                 if (text[index] == value)
-                {
                     return index;
-                }
-            }
 
             return -1;
         }
 
         private static ArgumentAttribute GetAttribute(FieldInfo field)
         {
-            object[] attributes = field.GetCustomAttributes(typeof(ArgumentAttribute), false);
-            if (attributes.Length == 1)
-            {
-                return (ArgumentAttribute) attributes[0];
-            }
+            var attributes = field.GetCustomAttributes(typeof(ArgumentAttribute), false);
+            if (attributes.Length == 1) return (ArgumentAttribute)attributes[0];
 
             Debug.Assert(attributes.Length == 0);
             return null;
@@ -479,36 +428,27 @@ namespace cqlplus
         /// <returns> true if an error occurred </returns>
         private bool ParseArgumentList(string[] args, object destination)
         {
-            bool hadError = false;
+            var hadError = false;
             if (args != null)
-            {
-                foreach (string argument in args)
-                {
+                foreach (var argument in args)
                     if (argument.Length > 0)
-                    {
                         switch (argument[0])
                         {
                             case '-':
                             case '/':
-                                int endIndex = argument.IndexOfAny(new[] {':', '+', '-'}, 1);
-                                string option = argument.Substring(1, endIndex == -1
-                                                                              ? argument.Length - 1
-                                                                              : endIndex - 1);
+                                var endIndex = argument.IndexOfAny(new[] {':', '+', '-'}, 1);
+                                var option = argument.Substring(1, endIndex == -1
+                                                                       ? argument.Length - 1
+                                                                       : endIndex - 1);
                                 string optionArgument;
                                 if (option.Length + 1 == argument.Length)
-                                {
                                     optionArgument = null;
-                                }
                                 else if (argument.Length > 1 + option.Length && argument[1 + option.Length] == ':')
-                                {
                                     optionArgument = argument.Substring(option.Length + 2);
-                                }
                                 else
-                                {
                                     optionArgument = argument.Substring(option.Length + 1);
-                                }
 
-                                Argument arg = (Argument) _argumentMap[option];
+                                var arg = (Argument)_argumentMap[option];
                                 if (arg == null)
                                 {
                                     ReportUnrecognizedArgument(argument);
@@ -518,6 +458,7 @@ namespace cqlplus
                                 {
                                     hadError |= !arg.SetValue(optionArgument, destination);
                                 }
+
                                 break;
                             case '@':
                                 string[] nestedArguments;
@@ -534,11 +475,9 @@ namespace cqlplus
                                     ReportUnrecognizedArgument(argument);
                                     hadError = true;
                                 }
+
                                 break;
                         }
-                    }
-                }
-            }
 
             return hadError;
         }
@@ -551,17 +490,11 @@ namespace cqlplus
         /// <returns> true if no parse errors were encountered. </returns>
         public bool Parse(string[] args, object destination)
         {
-            bool hadError = ParseArgumentList(args, destination);
+            var hadError = ParseArgumentList(args, destination);
 
             // check for missing required arguments
-            foreach (Argument arg in _arguments)
-            {
-                hadError |= arg.Finish(destination);
-            }
-            if (_defaultArgument != null)
-            {
-                hadError |= _defaultArgument.Finish(destination);
-            }
+            foreach (Argument arg in _arguments) hadError |= arg.Finish(destination);
+            if (_defaultArgument != null) hadError |= _defaultArgument.Finish(destination);
 
             return !hadError;
         }
@@ -571,40 +504,33 @@ namespace cqlplus
         /// </summary>
         public string GetUsageString(int screenWidth)
         {
-            ArgumentHelpStrings[] strings = GetAllHelpStrings();
+            var strings = GetAllHelpStrings();
 
-            int maxParamLen = 0;
-            foreach (ArgumentHelpStrings helpString in strings)
-            {
-                maxParamLen = Math.Max(maxParamLen, helpString.Syntax.Length);
-            }
+            var maxParamLen = 0;
+            foreach (var helpString in strings) maxParamLen = Math.Max(maxParamLen, helpString.Syntax.Length);
 
             const int minimumNumberOfCharsForHelpText = 10;
             const int minimumHelpTextColumn = 5;
             const int minimumScreenWidth = minimumHelpTextColumn + minimumNumberOfCharsForHelpText;
 
             int helpTextColumn;
-            int idealMinimumHelpTextColumn = maxParamLen + SpaceBeforeParam;
+            var idealMinimumHelpTextColumn = maxParamLen + SpaceBeforeParam;
             screenWidth = Math.Max(screenWidth, minimumScreenWidth);
-            if (screenWidth < (idealMinimumHelpTextColumn + minimumNumberOfCharsForHelpText))
-            {
+            if (screenWidth < idealMinimumHelpTextColumn + minimumNumberOfCharsForHelpText)
                 helpTextColumn = minimumHelpTextColumn;
-            }
             else
-            {
                 helpTextColumn = idealMinimumHelpTextColumn;
-            }
 
             const string newLine = "\n";
-            StringBuilder builder = new StringBuilder();
-            foreach (ArgumentHelpStrings helpStrings in strings)
+            var builder = new StringBuilder();
+            foreach (var helpStrings in strings)
             {
                 // add syntax string
-                int syntaxLength = helpStrings.Syntax.Length;
+                var syntaxLength = helpStrings.Syntax.Length;
                 builder.Append(helpStrings.Syntax);
 
                 // start help text on new line if syntax string is too long
-                int currentColumn = syntaxLength;
+                var currentColumn = syntaxLength;
                 if (syntaxLength >= helpTextColumn)
                 {
                     builder.Append(newLine);
@@ -612,8 +538,8 @@ namespace cqlplus
                 }
 
                 // add help text broken on spaces
-                int charsPerLine = screenWidth - helpTextColumn;
-                int index = 0;
+                var charsPerLine = screenWidth - helpTextColumn;
+                var index = 0;
                 while (index < helpStrings.Help.Length)
                 {
                     // tab to start column
@@ -621,7 +547,7 @@ namespace cqlplus
                     currentColumn = helpTextColumn;
 
                     // find number of chars to display on this line
-                    int endIndex = index + charsPerLine;
+                    var endIndex = index + charsPerLine;
                     if (endIndex >= helpStrings.Help.Length)
                     {
                         // rest of text fits on this line
@@ -630,11 +556,7 @@ namespace cqlplus
                     else
                     {
                         endIndex = helpStrings.Help.LastIndexOf(' ', endIndex - 1, Math.Min(endIndex - index, charsPerLine));
-                        if (endIndex <= index)
-                        {
-                            // no spaces on this line, append full set of chars
-                            endIndex = index + charsPerLine;
-                        }
+                        if (endIndex <= index) endIndex = index + charsPerLine;
                     }
 
                     // add chars
@@ -645,17 +567,11 @@ namespace cqlplus
                     AddNewLine(newLine, builder, ref currentColumn);
 
                     // don't start a new line with spaces
-                    while (index < helpStrings.Help.Length && helpStrings.Help[index] == ' ')
-                    {
-                        index ++;
-                    }
+                    while (index < helpStrings.Help.Length && helpStrings.Help[index] == ' ') index++;
                 }
 
                 // add newline if there's no help text                
-                if (helpStrings.Help.Length == 0)
-                {
-                    builder.Append(newLine);
-                }
+                if (helpStrings.Help.Length == 0) builder.Append(newLine);
             }
 
             return builder.ToString();
@@ -669,19 +585,17 @@ namespace cqlplus
 
         private ArgumentHelpStrings[] GetAllHelpStrings()
         {
-            ArgumentHelpStrings[] strings = new ArgumentHelpStrings[NumberOfParametersToDisplay()];
+            var strings = new ArgumentHelpStrings[NumberOfParametersToDisplay()];
 
-            int index = 0;
+            var index = 0;
             foreach (Argument arg in _arguments)
             {
                 strings[index] = GetHelpStrings(arg);
                 index++;
             }
+
             strings[index++] = new ArgumentHelpStrings("@<file>", "Read response file for more options");
-            if (_defaultArgument != null)
-            {
-                strings[index++] = GetHelpStrings(_defaultArgument);
-            }
+            if (_defaultArgument != null) strings[index++] = GetHelpStrings(_defaultArgument);
 
             return strings;
         }
@@ -693,11 +607,8 @@ namespace cqlplus
 
         private int NumberOfParametersToDisplay()
         {
-            int numberOfParameters = _arguments.Count + 1;
-            if (HasDefaultArgument)
-            {
-                numberOfParameters += 1;
-            }
+            var numberOfParameters = _arguments.Count + 1;
+            if (HasDefaultArgument) numberOfParameters += 1;
             return numberOfParameters;
         }
 
@@ -707,8 +618,10 @@ namespace cqlplus
 
             try
             {
-                using (FileStream file = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-                    args = (new StreamReader(file)).ReadToEnd();
+                using (var file = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                {
+                    args = new StreamReader(file).ReadToEnd();
+                }
             }
             catch (Exception e)
             {
@@ -717,11 +630,11 @@ namespace cqlplus
                 return false;
             }
 
-            bool hadError = false;
-            ArrayList argArray = new ArrayList();
-            StringBuilder currentArg = new StringBuilder();
-            bool inQuotes = false;
-            int index = 0;
+            var hadError = false;
+            var argArray = new ArrayList();
+            var currentArg = new StringBuilder();
+            var inQuotes = false;
+            var index = 0;
 
             // while (index < args.Length)
             try
@@ -729,19 +642,13 @@ namespace cqlplus
                 while (true)
                 {
                     // skip whitespace
-                    while (char.IsWhiteSpace(args[index]))
-                    {
-                        index += 1;
-                    }
+                    while (char.IsWhiteSpace(args[index])) index += 1;
 
                     // # - comment to end of line
                     if (args[index] == '#')
                     {
                         index += 1;
-                        while (args[index] != '\n')
-                        {
-                            index += 1;
-                        }
+                        while (args[index] != '\n') index += 1;
                         continue;
                     }
 
@@ -750,12 +657,9 @@ namespace cqlplus
                     {
                         if (args[index] == '\\')
                         {
-                            int cSlashes = 1;
+                            var cSlashes = 1;
                             index += 1;
-                            while (index == args.Length && args[index] == '\\')
-                            {
-                                cSlashes += 1;
-                            }
+                            while (index == args.Length && args[index] == '\\') cSlashes += 1;
 
                             if (index == args.Length || args[index] != '"')
                             {
@@ -763,15 +667,11 @@ namespace cqlplus
                             }
                             else
                             {
-                                currentArg.Append('\\', (cSlashes >> 1));
+                                currentArg.Append('\\', cSlashes >> 1);
                                 if (0 != (cSlashes & 1))
-                                {
                                     currentArg.Append('"');
-                                }
                                 else
-                                {
                                     inQuotes = !inQuotes;
-                                }
                             }
                         }
                         else if (args[index] == '"')
@@ -785,6 +685,7 @@ namespace cqlplus
                             index += 1;
                         }
                     } while (!char.IsWhiteSpace(args[index]) || inQuotes);
+
                     argArray.Add(currentArg.ToString());
                     currentArg.Length = 0;
                 }
@@ -804,78 +705,60 @@ namespace cqlplus
                 }
             }
 
-            arguments = (string[]) argArray.ToArray(typeof(string));
+            arguments = (string[])argArray.ToArray(typeof(string));
             return hadError;
         }
 
         private static string LongName(ArgumentAttribute attribute, FieldInfo field)
         {
-            return (attribute == null || attribute.DefaultLongName)
-                           ? field.Name
-                           : attribute.LongName;
+            return attribute == null || attribute.DefaultLongName
+                       ? field.Name
+                       : attribute.LongName;
         }
 
         private static string ShortName(ArgumentAttribute attribute, FieldInfo field)
         {
-            if (attribute is DefaultArgumentAttribute)
-            {
-                return null;
-            }
-            if (!ExplicitShortName(attribute))
-            {
-                return LongName(attribute, field).Substring(0, 1);
-            }
+            if (attribute is DefaultArgumentAttribute) return null;
+            if (!ExplicitShortName(attribute)) return LongName(attribute, field).Substring(0, 1);
             return attribute.ShortName;
         }
 
         private static string HelpText(ArgumentAttribute attribute, FieldInfo field)
         {
-            if (attribute == null)
-            {
-                return null;
-            }
+            if (attribute == null) return null;
 
             return attribute.HelpText;
         }
 
         private static bool HasHelpText(ArgumentAttribute attribute)
         {
-            return (attribute != null && attribute.HasHelpText);
+            return attribute != null && attribute.HasHelpText;
         }
 
         private static bool ExplicitShortName(ArgumentAttribute attribute)
         {
-            return (attribute != null && !attribute.DefaultShortName);
+            return attribute != null && !attribute.DefaultShortName;
         }
 
         private static object DefaultValue(ArgumentAttribute attribute, FieldInfo field)
         {
-            return (attribute == null || !attribute.HasDefaultValue)
-                           ? null
-                           : attribute.DefaultValue;
+            return attribute == null || !attribute.HasDefaultValue
+                       ? null
+                       : attribute.DefaultValue;
         }
 
         private static Type ElementType(FieldInfo field)
         {
-            if (IsCollectionType(field.FieldType))
-            {
-                return field.FieldType.GetElementType();
-            }
+            if (IsCollectionType(field.FieldType)) return field.FieldType.GetElementType();
 
             return null;
         }
 
         private static ArgumentType Flags(ArgumentAttribute attribute, FieldInfo field)
         {
-            if (attribute != null)
-            {
-                return attribute.Type;
-            }
+            if (attribute != null) return attribute.Type;
 
-            if (IsCollectionType(field.FieldType))
-            {
-                return ArgumentType.MultipleUnique;
-            }
+            if (IsCollectionType(field.FieldType)) return ArgumentType.MultipleUnique;
 
             return ArgumentType.AtMostOnce;
         }
@@ -888,11 +771,11 @@ namespace cqlplus
         private static bool IsValidElementType(Type type)
         {
             return type != null && (
-                                           type == typeof(int) ||
-                                           type == typeof(uint) ||
-                                           type == typeof(string) ||
-                                           type == typeof(bool) ||
-                                           type.IsEnum);
+                                       type == typeof(int) ||
+                                       type == typeof(uint) ||
+                                       type == typeof(string) ||
+                                       type == typeof(bool) ||
+                                       type.IsEnum);
         }
 
         [DebuggerDisplay("Name = {LongName}")]
@@ -900,141 +783,85 @@ namespace cqlplus
         {
             private readonly ArrayList _collectionValues;
 
-            private readonly object _defaultValue;
-
             private readonly Type _elementType;
-
-            private readonly bool _explicitShortName;
 
             private readonly FieldInfo _field;
 
             private readonly ArgumentType _flags;
 
-            private readonly bool _hasHelpText;
-
-            private readonly string _helpText;
-
-            private readonly bool _isDefault;
-
-            private readonly string _longName;
-
             private readonly ErrorReporter _reporter;
-
-            private bool _seenValue;
-
-            private string _shortName;
 
             public Argument(ArgumentAttribute attribute, FieldInfo field, ErrorReporter reporter)
             {
-                _longName = CommandLineParser.LongName(attribute, field);
-                _explicitShortName = CommandLineParser.ExplicitShortName(attribute);
-                _shortName = CommandLineParser.ShortName(attribute, field);
-                _hasHelpText = CommandLineParser.HasHelpText(attribute);
-                _helpText = CommandLineParser.HelpText(attribute, field);
-                _defaultValue = CommandLineParser.DefaultValue(attribute, field);
+                LongName = LongName(attribute, field);
+                ExplicitShortName = ExplicitShortName(attribute);
+                ShortName = ShortName(attribute, field);
+                HasHelpText = HasHelpText(attribute);
+                HelpText = HelpText(attribute, field);
+                DefaultValue = DefaultValue(attribute, field);
                 _elementType = ElementType(field);
                 _flags = Flags(attribute, field);
                 _field = field;
-                _seenValue = false;
+                SeenValue = false;
                 _reporter = reporter;
-                _isDefault = attribute is DefaultArgumentAttribute;
+                IsDefault = attribute is DefaultArgumentAttribute;
 
-                if (IsCollection)
-                {
-                    _collectionValues = new ArrayList();
-                }
+                if (IsCollection) _collectionValues = new ArrayList();
 
-                Debug.Assert(!string.IsNullOrEmpty(_longName));
-                Debug.Assert(!_isDefault || !ExplicitShortName);
+                Debug.Assert(!string.IsNullOrEmpty(LongName));
+                Debug.Assert(!IsDefault || !ExplicitShortName);
                 Debug.Assert(!IsCollection || AllowMultiple, "Collection arguments must have allow multiple");
                 Debug.Assert(!Unique || IsCollection, "Unique only applicable to collection arguments");
                 Debug.Assert(IsValidElementType(Type) ||
                              IsCollectionType(Type));
-                Debug.Assert((IsCollection && IsValidElementType(_elementType)) ||
-                             (!IsCollection && _elementType == null));
+                Debug.Assert(IsCollection && IsValidElementType(_elementType) ||
+                             !IsCollection && _elementType == null);
                 Debug.Assert(!(IsRequired && HasDefaultValue), "Required arguments cannot have default value");
-                Debug.Assert(!HasDefaultValue || (_defaultValue.GetType() == field.FieldType), "Type of default value must match field type");
+                Debug.Assert(!HasDefaultValue || DefaultValue.GetType() == field.FieldType, "Type of default value must match field type");
             }
 
-            public Type ValueType
-            {
-                get
-                {
-                    return IsCollection
-                                   ? _elementType
-                                   : Type;
-                }
-            }
+            public Type ValueType => IsCollection
+                                         ? _elementType
+                                         : Type;
 
-            public string LongName
-            {
-                get { return _longName; }
-            }
+            public string LongName { get; }
 
-            public bool ExplicitShortName
-            {
-                get { return _explicitShortName; }
-            }
+            public bool ExplicitShortName { get; }
 
-            public string ShortName
-            {
-                get { return _shortName; }
-            }
+            public string ShortName { get; private set; }
 
-            public bool HasShortName
-            {
-                get { return _shortName != null; }
-            }
+            public bool HasShortName => ShortName != null;
 
-            public bool HasHelpText
-            {
-                get { return _hasHelpText; }
-            }
+            public bool HasHelpText { get; }
 
-            public string HelpText
-            {
-                get { return _helpText; }
-            }
+            public string HelpText { get; }
 
-            public object DefaultValue
-            {
-                get { return _defaultValue; }
-            }
+            public object DefaultValue { get; }
 
-            public bool HasDefaultValue
-            {
-                get { return null != _defaultValue; }
-            }
+            public bool HasDefaultValue => null != DefaultValue;
 
             public string FullHelpText
             {
                 get
                 {
-                    StringBuilder builder = new StringBuilder();
-                    if (HasHelpText)
-                    {
-                        builder.Append(HelpText);
-                    }
+                    var builder = new StringBuilder();
+                    if (HasHelpText) builder.Append(HelpText);
                     if (HasDefaultValue)
                     {
-                        if (builder.Length > 0)
-                        {
-                            builder.Append(" ");
-                        }
+                        if (builder.Length > 0) builder.Append(" ");
                         builder.Append("Default value:'");
                         AppendValue(builder, DefaultValue);
                         builder.Append('\'');
                     }
+
                     if (HasShortName)
                     {
-                        if (builder.Length > 0)
-                        {
-                            builder.Append(" ");
-                        }
+                        if (builder.Length > 0) builder.Append(" ");
                         builder.Append("(short form /");
                         builder.Append(ShortName);
                         builder.Append(")");
                     }
+
                     return builder.ToString();
                 }
             }
@@ -1043,7 +870,7 @@ namespace cqlplus
             {
                 get
                 {
-                    StringBuilder builder = new StringBuilder();
+                    var builder = new StringBuilder();
 
                     if (IsDefault)
                     {
@@ -1055,7 +882,7 @@ namespace cqlplus
                     {
                         builder.Append("/");
                         builder.Append(LongName);
-                        Type valueType = ValueType;
+                        var valueType = ValueType;
                         if (valueType == typeof(int))
                         {
                             builder.Append(":<int>");
@@ -1077,22 +904,17 @@ namespace cqlplus
                             Debug.Assert(valueType.IsEnum);
 
                             builder.Append(":{");
-                            bool first = true;
-                            foreach (FieldInfo field in valueType.GetFields())
-                            {
+                            var first = true;
+                            foreach (var field in valueType.GetFields())
                                 if (field.IsStatic)
                                 {
                                     if (first)
-                                    {
                                         first = false;
-                                    }
                                     else
-                                    {
                                         builder.Append('|');
-                                    }
                                     builder.Append(field.Name);
                                 }
-                            }
+
                             builder.Append('}');
                         }
                     }
@@ -1101,56 +923,29 @@ namespace cqlplus
                 }
             }
 
-            public bool IsRequired
-            {
-                get { return 0 != (_flags & ArgumentType.Required); }
-            }
+            public bool IsRequired => 0 != (_flags & ArgumentType.Required);
 
-            public bool SeenValue
-            {
-                get { return _seenValue; }
-            }
+            public bool SeenValue { get; private set; }
 
-            public bool AllowMultiple
-            {
-                get { return 0 != (_flags & ArgumentType.Multiple); }
-            }
+            public bool AllowMultiple => 0 != (_flags & ArgumentType.Multiple);
 
-            public bool Unique
-            {
-                get { return 0 != (_flags & ArgumentType.Unique); }
-            }
+            public bool Unique => 0 != (_flags & ArgumentType.Unique);
 
-            public Type Type
-            {
-                get { return _field.FieldType; }
-            }
+            public Type Type => _field.FieldType;
 
-            public bool IsCollection
-            {
-                get { return IsCollectionType(Type); }
-            }
+            public bool IsCollection => IsCollectionType(Type);
 
-            public bool IsDefault
-            {
-                get { return _isDefault; }
-            }
+            public bool IsDefault { get; }
 
             public bool Finish(object destination)
             {
                 if (SeenValue)
                 {
-                    if (IsCollection)
-                    {
-                        _field.SetValue(destination, _collectionValues.ToArray(_elementType));
-                    }
+                    if (IsCollection) _field.SetValue(destination, _collectionValues.ToArray(_elementType));
                 }
                 else
                 {
-                    if (HasDefaultValue)
-                    {
-                        _field.SetValue(destination, DefaultValue);
-                    }
+                    if (HasDefaultValue) _field.SetValue(destination, DefaultValue);
                 }
 
                 return ReportMissingRequiredArgument();
@@ -1161,15 +956,12 @@ namespace cqlplus
                 if (IsRequired && !SeenValue)
                 {
                     if (IsDefault)
-                    {
                         _reporter(string.Format("Missing required argument '<{0}>'.", LongName));
-                    }
                     else
-                    {
                         _reporter(string.Format("Missing required argument '/{0}'.", LongName));
-                    }
                     return true;
                 }
+
                 return false;
             }
 
@@ -1185,13 +977,11 @@ namespace cqlplus
                     _reporter(string.Format("Duplicate '{0}' argument", LongName));
                     return false;
                 }
-                _seenValue = true;
+
+                SeenValue = true;
 
                 object newValue;
-                if (!ParseValue(ValueType, value, out newValue))
-                {
-                    return false;
-                }
+                if (!ParseValue(ValueType, value, out newValue)) return false;
                 if (IsCollection)
                 {
                     if (Unique && _collectionValues.Contains(newValue))
@@ -1199,10 +989,8 @@ namespace cqlplus
                         ReportDuplicateArgumentValue(value);
                         return false;
                     }
-                    else
-                    {
-                        _collectionValues.Add(newValue);
-                    }
+
+                    _collectionValues.Add(newValue);
                 }
                 else
                 {
@@ -1222,7 +1010,6 @@ namespace cqlplus
                 // null is only valid for bool variables
                 // empty string is never valid
                 if ((stringData != null || type == typeof(bool)) && (stringData == null || stringData.Length > 0))
-                {
                     try
                     {
                         if (type == typeof(string))
@@ -1230,14 +1017,16 @@ namespace cqlplus
                             value = stringData;
                             return true;
                         }
-                        else if (type == typeof(bool))
+
+                        if (type == typeof(bool))
                         {
                             if (stringData == null || stringData == "+")
                             {
                                 value = true;
                                 return true;
                             }
-                            else if (stringData == "-")
+
+                            if (stringData == "-")
                             {
                                 value = false;
                                 return true;
@@ -1257,15 +1046,14 @@ namespace cqlplus
                         {
                             Debug.Assert(type.IsEnum);
 
-                            bool valid = false;
-                            foreach (string name in Enum.GetNames(type))
-                            {
+                            var valid = false;
+                            foreach (var name in Enum.GetNames(type))
                                 if (name == stringData)
                                 {
                                     valid = true;
                                     break;
                                 }
-                            }
+
                             if (valid)
                             {
                                 value = Enum.Parse(type, stringData, true);
@@ -1277,7 +1065,6 @@ namespace cqlplus
                     {
                         // catch parse errors
                     }
-                }
 
                 ReportBadArgumentValue(stringData);
                 value = null;
@@ -1292,19 +1079,16 @@ namespace cqlplus
                 }
                 else if (value is bool)
                 {
-                    builder.Append((bool) value
-                                           ? "+"
-                                           : "-");
+                    builder.Append((bool)value
+                                       ? "+"
+                                       : "-");
                 }
                 else
                 {
-                    bool first = true;
-                    foreach (object o in (Array) value)
+                    var first = true;
+                    foreach (var o in (Array)value)
                     {
-                        if (!first)
-                        {
-                            builder.Append(", ");
-                        }
+                        if (!first) builder.Append(", ");
                         AppendValue(builder, o);
                         first = false;
                     }
@@ -1313,7 +1097,7 @@ namespace cqlplus
 
             public void ClearShortName()
             {
-                _shortName = null;
+                ShortName = null;
             }
         }
 

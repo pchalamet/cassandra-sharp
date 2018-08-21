@@ -13,22 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using CassandraSharp;
+using CassandraSharp.CQLPoco;
+
 namespace Samples.POCO
 {
-    using System;
-    using System.Collections.Generic;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-
     public class NerdMovie
     {
-        [CqlColumn("Director")]
-        public string TheDirector;
-
-        [CqlColumn("MainActor")]
-        public string TheMainActor;
-
         public string Movie;
+
+        [CqlColumn("Director")] public string TheDirector;
+
+        [CqlColumn("MainActor")] public string TheMainActor;
 
         public int Year;
     }
@@ -36,13 +34,13 @@ namespace Samples.POCO
     public class PocoSample : Sample
     {
         public PocoSample()
-                : base("POCOSample")
+            : base("POCOSample")
         {
         }
 
         protected override void CreateKeyspace(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string createKeyspace = "CREATE KEYSPACE videos WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
             cmd.Execute(createKeyspace).AsFuture().Wait();
@@ -57,7 +55,7 @@ namespace Samples.POCO
 
         protected override void DropKeyspace(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string dropExcelsor = "drop keyspace videos";
             cmd.Execute(dropExcelsor).AsFuture().Wait();
@@ -65,7 +63,7 @@ namespace Samples.POCO
 
         protected override void InternalRun(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string insertNerdMovie = "INSERT INTO videos.NerdMovies (movie, director, main_actor, year)" +
                                            "VALUES ('Serenity', 'Joss Whedon', 'Nathan Fillion', 2005) " +
@@ -85,7 +83,7 @@ namespace Samples.POCO
             var preparedAllFrom = cmd.Prepare<NerdMovie>(selectAllFrom);
             var ds = new {Director = "Joss Whedon"};
             var taskSelectWhere =
-                    preparedAllFrom.Execute(ds).AsFuture().ContinueWith(res => DisplayMovies(res.Result));
+                preparedAllFrom.Execute(ds).AsFuture().ContinueWith(res => DisplayMovies(res.Result));
             taskSelectWhere.Wait();
             Console.WriteLine();
         }
@@ -93,10 +91,8 @@ namespace Samples.POCO
         private static void DisplayMovies(IEnumerable<NerdMovie> result)
         {
             foreach (var resMovie in result)
-            {
                 Console.WriteLine("Movie={0} Director={1} MainActor={2}, Year={3}",
                                   resMovie.Movie, resMovie.TheDirector, resMovie.TheMainActor, resMovie.Year);
-            }
         }
     }
 }

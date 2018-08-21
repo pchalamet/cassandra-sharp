@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using cqlplus.Commands;
+using cqlplus.StatementReader;
+using CassandraSharp;
+using CassandraSharp.Config;
+
 namespace cqlplus
 {
-    using System;
-    using CassandraSharp;
-    using CassandraSharp.Config;
-    using cqlplus.Commands;
-    using cqlplus.StatementReader;
-
     internal class Program
     {
         private static CliArgs _cliArgs;
@@ -30,16 +30,13 @@ namespace cqlplus
             _cliArgs = new CliArgs();
             if (!CommandLineParser.ParseArguments(args, _cliArgs))
             {
-                string usage = CommandLineParser.ArgumentsUsage(typeof(CliArgs));
+                var usage = CommandLineParser.ArgumentsUsage(typeof(CliArgs));
                 Console.WriteLine(usage);
                 return 5;
             }
 
             IStatementReader statementInput = new ConsoleInput(_cliArgs.Hostname);
-            if (null != _cliArgs.File)
-            {
-                statementInput = new FileInput(_cliArgs.File);
-            }
+            if (null != _cliArgs.File) statementInput = new FileInput(_cliArgs.File);
 
             CommandContext.DebugLog = _cliArgs.DebugLog;
 
@@ -59,32 +56,29 @@ namespace cqlplus
 
         private static void Run(IStatementReader statementReader)
         {
-            CassandraSharpConfig cassandraSharpConfig = new CassandraSharpConfig
-            {
-                Logger = new LoggerConfig { Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName },
-                Instrumentation = new InstrumentationConfig { Type = typeof(ConsoleInstrumentation).AssemblyQualifiedName }
-            };
+            var cassandraSharpConfig = new CassandraSharpConfig
+                                       {
+                                           Logger = new LoggerConfig {Type = typeof(ConsoleDebugLogger).AssemblyQualifiedName},
+                                           Instrumentation = new InstrumentationConfig {Type = typeof(ConsoleInstrumentation).AssemblyQualifiedName}
+                                       };
 
             using (var clusterManager = new ClusterManager(cassandraSharpConfig))
             {
-                ClusterConfig clusterConfig = new ClusterConfig
-                {
-                    Transport = new TransportConfig
-                    {
-                        User = _cliArgs.User,
-                        Password = _cliArgs.Password
-                    },
-                    Endpoints = new EndpointsConfig
-                    {
-                        Servers = new[] { _cliArgs.Hostname },
-                    }
-                };
-                if (!_cliArgs.Discovery)
-                {
-                    clusterConfig.Endpoints.Discovery = new DiscoveryConfig { Type = "Null" };
-                }
+                var clusterConfig = new ClusterConfig
+                                    {
+                                        Transport = new TransportConfig
+                                                    {
+                                                        User = _cliArgs.User,
+                                                        Password = _cliArgs.Password
+                                                    },
+                                        Endpoints = new EndpointsConfig
+                                                    {
+                                                        Servers = new[] {_cliArgs.Hostname}
+                                                    }
+                                    };
+                if (!_cliArgs.Discovery) clusterConfig.Endpoints.Discovery = new DiscoveryConfig {Type = "Null"};
 
-                using (ICluster cluster = clusterManager.GetCluster(clusterConfig))
+                using (var cluster = clusterManager.GetCluster(clusterConfig))
                 {
                     CommandContext.Cluster = cluster;
 
@@ -92,36 +86,24 @@ namespace cqlplus
                     {
                         Console.WriteLine("Connecting to {0}:{1}...", _cliArgs.Hostname, _cliArgs.Port);
                         const string checkStatement = "select cluster_name, data_center, rack, release_version from system.local";
-                        new Exec { Statement = checkStatement }.Execute();
-                        if (CommandContext.LastCommandFailed)
-                        {
-                            return;
-                        }
+                        new Exec {Statement = checkStatement}.Execute();
+                        if (CommandContext.LastCommandFailed) return;
 
                         Console.WriteLine();
                         Console.WriteLine("Querying ring state...");
                         const string peersStatement = "select rpc_address,tokens,release_version from system.peers";
-                        new Exec { Statement = peersStatement }.Execute();
+                        new Exec {Statement = peersStatement}.Execute();
                         Console.WriteLine();
 
-                        if (CommandContext.LastCommandFailed)
-                        {
-                            return;
-                        }
+                        if (CommandContext.LastCommandFailed) return;
                     }
 
-                    if (!_cliArgs.NoHelp)
-                    {
-                        new Exec { Statement = "!help" }.Execute();
-                    }
+                    if (!_cliArgs.NoHelp) new Exec {Statement = "!help"}.Execute();
 
-                    foreach (string statement in statementReader.Read())
+                    foreach (var statement in statementReader.Read())
                     {
-                        new Exec { Statement = statement }.Execute();
-                        if (CommandContext.Exit)
-                        {
-                            return;
-                        }
+                        new Exec {Statement = statement}.Execute();
+                        if (CommandContext.Exit) return;
                     }
                 }
             }

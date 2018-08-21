@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp;
+using CassandraSharp.CQLPropertyBag;
+
 namespace cqlplus.Commands
 {
-    using CassandraSharp;
-    using CassandraSharp.CQLPropertyBag;
-
     internal class CqlStatement : CommandBase
     {
         private readonly string _statement;
@@ -29,11 +29,8 @@ namespace cqlplus.Commands
 
         public override void Execute()
         {
-            ExecutionFlags executionFlags = ExecutionFlags.None;
-            if (CommandContext.Tracing)
-            {
-                executionFlags |= ExecutionFlags.Tracing;
-            }
+            var executionFlags = ExecutionFlags.None;
+            if (CommandContext.Tracing) executionFlags |= ExecutionFlags.Tracing;
 
             var cmd = CommandContext.Cluster.CreatePropertyBagCommand()
                                     .WithConsistencyLevel(CommandContext.CL)

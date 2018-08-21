@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace cqlplus.StatementReader
 {
-    using System;
-    using System.Collections.Generic;
-
     public class ConsoleInput : IStatementReader
     {
         private readonly string _hostname;
@@ -32,9 +32,10 @@ namespace cqlplus.StatementReader
             while (true)
             {
                 Console.Write("{0}> ", _hostname);
-                string line = Console.ReadLine();
+                var line = Console.ReadLine();
                 yield return line;
             }
+
 // ReSharper disable FunctionNeverReturns
         }
 

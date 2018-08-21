@@ -13,13 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+
 namespace cqlplus.Parser
 {
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-    using System.Xml.Serialization;
-
     #region Scanner
+
     public class Scanner
     {
         private readonly List<TokenType> SkipList; // tokens to be skipped
@@ -32,7 +33,7 @@ namespace cqlplus.Parser
 
         public int CurrentPosition;
 
-        public int EndPos = 0;
+        public int EndPos;
 
         public string Input;
 
@@ -42,7 +43,7 @@ namespace cqlplus.Parser
 
         public List<Token> Skipped; // tokens that were skipped
 
-        public int StartPos = 0;
+        public int StartPos;
 
         public Scanner()
         {
@@ -118,7 +119,7 @@ namespace cqlplus.Parser
 
         public Token GetToken(TokenType type)
         {
-            Token t = new Token(StartPos, EndPos);
+            var t = new Token(StartPos, EndPos);
             t.Type = type;
             return t;
         }
@@ -130,7 +131,7 @@ namespace cqlplus.Parser
         /// <returns></returns>
         public Token Scan(params TokenType[] expectedtokens)
         {
-            Token tok = LookAhead(expectedtokens); // temporarely retrieve the lookahead
+            var tok = LookAhead(expectedtokens); // temporarely retrieve the lookahead
             LookAheadToken = null; // reset lookahead token, so scanning will continue
             StartPos = tok.EndPos;
             EndPos = tok.EndPos; // set the tokenizer to the new scan position
@@ -144,7 +145,7 @@ namespace cqlplus.Parser
         public Token LookAhead(params TokenType[] expectedtokens)
         {
             int i;
-            int startpos = StartPos;
+            var startpos = StartPos;
             Token tok = null;
             List<TokenType> scantokens;
 
@@ -153,9 +154,7 @@ namespace cqlplus.Parser
             if (LookAheadToken != null
                 && LookAheadToken.Type != TokenType._UNDETERMINED_
                 && LookAheadToken.Type != TokenType._NONE_)
-            {
                 return LookAheadToken;
-            }
 
             // if no scantokens specified, then scan for all of them (= backward compatible)
             if (expectedtokens.Length == 0)
@@ -170,17 +169,17 @@ namespace cqlplus.Parser
 
             do
             {
-                int len = -1;
-                TokenType index = (TokenType) int.MaxValue;
-                string input = Input.Substring(startpos);
+                var len = -1;
+                var index = (TokenType)int.MaxValue;
+                var input = Input.Substring(startpos);
 
                 tok = new Token(startpos, EndPos);
 
                 for (i = 0; i < scantokens.Count; i++)
                 {
-                    Regex r = Patterns[scantokens[i]];
-                    Match m = r.Match(input);
-                    if (m.Success && m.Index == 0 && ((m.Length > len) || (scantokens[i] < index && m.Length == len)))
+                    var r = Patterns[scantokens[i]];
+                    var m = r.Match(input);
+                    if (m.Success && m.Index == 0 && (m.Length > len || scantokens[i] < index && m.Length == len))
                     {
                         len = m.Length;
                         index = scantokens[i];
@@ -215,9 +214,11 @@ namespace cqlplus.Parser
             return tok;
         }
     }
+
     #endregion
 
     #region Token
+
     public enum TokenType
     {
         //Non terminal tokens:
@@ -270,45 +271,29 @@ namespace cqlplus.Parser
 
     public class Token
     {
-        [XmlAttribute]
-        public TokenType Type;
-
-        private int endpos;
-
-        private int startpos;
+        [XmlAttribute] public TokenType Type;
 
         public Token()
-                : this(0, 0)
+            : this(0, 0)
         {
         }
 
         public Token(int start, int end)
         {
             Type = TokenType._UNDETERMINED_;
-            startpos = start;
-            endpos = end;
+            StartPos = start;
+            EndPos = end;
             Text = ""; // must initialize with empty string, may cause null reference exceptions otherwise
             Value = null;
         }
 
         // contains all prior skipped symbols
 
-        public int StartPos
-        {
-            get { return startpos; }
-            set { startpos = value; }
-        }
+        public int StartPos { get; set; }
 
-        public int Length
-        {
-            get { return endpos - startpos; }
-        }
+        public int Length => EndPos - StartPos;
 
-        public int EndPos
-        {
-            get { return endpos; }
-            set { endpos = value; }
-        }
+        public int EndPos { get; set; }
 
         public string Text { get; set; }
 
@@ -318,27 +303,17 @@ namespace cqlplus.Parser
 
         public void UpdateRange(Token token)
         {
-            if (token.StartPos < startpos)
-            {
-                startpos = token.StartPos;
-            }
-            if (token.EndPos > endpos)
-            {
-                endpos = token.EndPos;
-            }
+            if (token.StartPos < StartPos) StartPos = token.StartPos;
+            if (token.EndPos > EndPos) EndPos = token.EndPos;
         }
 
         public override string ToString()
         {
             if (Text != null)
-            {
-                return Type.ToString() + " '" + Text + "'";
-            }
-            else
-            {
-                return Type.ToString();
-            }
+                return Type + " '" + Text + "'";
+            return Type.ToString();
         }
     }
+
     #endregion
 }

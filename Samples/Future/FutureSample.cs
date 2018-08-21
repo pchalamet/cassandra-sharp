@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CassandraSharp;
+using CassandraSharp.CQLPoco;
+
 namespace Samples.Future
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-
     public class SchemaKeyspaces
     {
         public string KeyspaceName { get; set; }
@@ -31,27 +31,24 @@ namespace Samples.Future
     public class FutureSample : Sample
     {
         public FutureSample()
-                : base("FutureSample")
+            : base("FutureSample")
         {
         }
 
         protected override void InternalRun(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string cqlKeyspaces = "SELECT * from system_schema.keyspaces";
 
             var allResults = new List<Task<IList<SchemaKeyspaces>>>();
-            for (int i = 0; i < 100; ++i)
+            for (var i = 0; i < 100; ++i)
             {
                 var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture();
                 allResults.Add(futRes);
             }
 
-            foreach (var result in allResults)
-            {
-                DisplayKeyspace(result);
-            }
+            foreach (var result in allResults) DisplayKeyspace(result);
         }
 
         private static void DisplayKeyspace(Task<IList<SchemaKeyspaces>> result)
@@ -59,11 +56,9 @@ namespace Samples.Future
             try
             {
                 foreach (var resKeyspace in result.Result)
-                {
                     Console.WriteLine("DurableWrites={0} KeyspaceName={1} Class={2}",
                                       resKeyspace.DurableWrites, resKeyspace.KeyspaceName,
                                       resKeyspace.Replication["class"]);
-                }
                 Console.WriteLine();
             }
             catch (Exception ex)

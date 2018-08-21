@@ -13,24 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Net;
+using System.Threading;
+using CassandraSharp;
+using CassandraSharp.Extensibility;
+
 namespace cqlplus
 {
-    using System;
-    using System.Net;
-    using System.Text;
-    using System.Threading;
-    using CassandraSharp;
-    using CassandraSharp.Extensibility;
-
     public class ConsoleInstrumentation : IInstrumentation
     {
         public void ClientQuery(InstrumentationToken token)
         {
             if (0 != (token.ExecutionFlags & ExecutionFlags.ClientTracing))
             {
-                string buffer = string.Format("INSTR {0} [{1}] - id:{2}",
-                                              DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              token.Id);
+                var buffer = string.Format("INSTR {0} [{1}] - id:{2}",
+                                           DateTime.Now, Thread.CurrentThread.ManagedThreadId,
+                                           token.Id);
                 Console.WriteLine(buffer);
             }
         }
@@ -39,9 +38,9 @@ namespace cqlplus
         {
             if (0 != (token.ExecutionFlags & ExecutionFlags.ClientTracing))
             {
-                string buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3} coordinator:{4} streamId:{5} cql:{6}",
-                                              DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              token.Id, token.Type, coordinator, streamId, token.Cql);
+                var buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3} coordinator:{4} streamId:{5} cql:{6}",
+                                           DateTime.Now, Thread.CurrentThread.ManagedThreadId,
+                                           token.Id, token.Type, coordinator, streamId, token.Cql);
                 Console.WriteLine(buffer);
             }
         }
@@ -50,9 +49,9 @@ namespace cqlplus
         {
             if (0 != (token.ExecutionFlags & ExecutionFlags.ClientTracing))
             {
-                string buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3}",
-                                              DateTime.Now, Thread.CurrentThread.ManagedThreadId,
-                                              token.Id, eventType);
+                var buffer = string.Format("INSTR {0} [{1}] - id:{2} type:{3}",
+                                           DateTime.Now, Thread.CurrentThread.ManagedThreadId,
+                                           token.Id, eventType);
                 Console.WriteLine(buffer);
             }
         }

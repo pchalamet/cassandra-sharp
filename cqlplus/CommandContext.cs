@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
+using CassandraSharp;
+
 namespace cqlplus
 {
-    using System.IO;
-    using CassandraSharp;
-
     internal class CommandContext
     {
         public enum OutputFormatter
@@ -26,7 +26,7 @@ namespace cqlplus
 
             KV,
 
-            CSV,
+            CSV
         }
 
         static CommandContext()

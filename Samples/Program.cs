@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Samples.Async;
+using Samples.Future;
+using Samples.Linq;
+using Samples.POCO;
+using Samples.PreparedStatement;
+using Samples.PropertyBag;
+using Samples.TimeOut;
+
 namespace Samples
 {
-    using System;
-    using Samples.Async;
-    using Samples.Future;
-    using Samples.Linq;
-    using Samples.POCO;
-    using Samples.PreparedStatement;
-    using Samples.PropertyBag;
-    using Samples.TimeOut;
-
     internal class Program
     {
         private static void Main(string[] args)

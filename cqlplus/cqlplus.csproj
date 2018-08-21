@@ -19,7 +19,6 @@
     <Compile Include="..\cassandra-sharp-AssemblyInfo.cs" />
     <Compile Include="..\cassandra-sharp-info.cs" />
     <Content Include="cassandra.ico" />
-    <None Include="App.config" />
     <None Include="Parser\cqlplus.tpg" />
     <None Include="..\..\cassandra-sharp.snk" />
   </ItemGroup>

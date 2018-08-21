@@ -13,27 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
+using CassandraSharp.CQLPropertyBag;
+
 namespace cqlplus.ResultWriter
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using CassandraSharp.CQLPropertyBag;
-
     public class RowKeyValue : IResultWriter
     {
         public void Write(TextWriter txtWriter, IEnumerable<PropertyBag> rowSet)
         {
-            int rowNum = 0;
+            var rowNum = 0;
             foreach (var row in rowSet)
             {
                 txtWriter.Write("{0,-2}: ", rowNum++);
-                string offset = "";
+                var offset = "";
                 foreach (var col in row.Keys)
                 {
-                    string sValue = ValueFormatter.Format(row[col]);
+                    var sValue = ValueFormatter.Format(row[col]);
                     txtWriter.WriteLine("{0}{1} : {2} ", offset, col, sValue);
                     offset = "    ";
                 }
+
                 txtWriter.WriteLine();
             }
         }

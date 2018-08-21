@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using CassandraSharp.CQLPropertyBag;
+
 namespace cqlplus.ResultWriter
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using CassandraSharp.CQLPropertyBag;
-
     public class Tabular : IResultWriter
     {
         private readonly int _maxWidth;
@@ -42,15 +42,15 @@ namespace cqlplus.ResultWriter
                     colWidths = DetermineColumnWidth(row, _maxWidth);
 
                     rowSeparator = BuildRowSeparator(colWidths);
-                    string headerSeparator = rowSeparator.Replace('-', '=');
-                    string header = BuildRowValues(row, colWidths, (key, value) => key);
+                    var headerSeparator = rowSeparator.Replace('-', '=');
+                    var header = BuildRowValues(row, colWidths, (key, value) => key);
 
                     txtWriter.WriteLine(rowSeparator);
                     txtWriter.WriteLine(header);
                     txtWriter.WriteLine(headerSeparator);
                 }
 
-                string rowValues = BuildRowValues(row, colWidths, (key, value) => ValueFormatter.Format(value));
+                var rowValues = BuildRowValues(row, colWidths, (key, value) => ValueFormatter.Format(value));
                 txtWriter.WriteLine(rowValues);
                 txtWriter.WriteLine(rowSeparator);
             }
@@ -58,53 +58,57 @@ namespace cqlplus.ResultWriter
 
         private static Dictionary<string, int> DetermineColumnWidth(PropertyBag row, int maxWidth)
         {
-            Dictionary<string, int> colWidths = new Dictionary<string, int>();
+            var colWidths = new Dictionary<string, int>();
             foreach (var col in row.Keys)
             {
-                string sValue = ValueFormatter.Format(row[col]);
-                int keyWidth = col.Length;
-                int valWidth = sValue.Length;
-                int colWidth = 4 + Math.Max(keyWidth, valWidth);
+                var sValue = ValueFormatter.Format(row[col]);
+                var keyWidth = col.Length;
+                var valWidth = sValue.Length;
+                var colWidth = 4 + Math.Max(keyWidth, valWidth);
                 colWidth = Math.Min(colWidth, maxWidth);
                 colWidths.Add(col, colWidth);
             }
+
             return colWidths;
         }
 
         private static string BuildRowSeparator(Dictionary<string, int> colWidths)
         {
-            StringBuilder sbRowSeparator = new StringBuilder();
+            var sbRowSeparator = new StringBuilder();
             foreach (var kvp in colWidths)
             {
-                int colWidth = colWidths[kvp.Key];
+                var colWidth = colWidths[kvp.Key];
                 sbRowSeparator.Append("+-").Append(new string('-', colWidth)).Append('-');
             }
+
             sbRowSeparator.Append("-+");
 
-            string rowSeparator = sbRowSeparator.ToString();
+            var rowSeparator = sbRowSeparator.ToString();
             return rowSeparator;
         }
 
         private static string BuildRowValues(PropertyBag row, IDictionary<string, int> colWidths,
                                              Func<string, object, string> formatter)
         {
-            StringBuilder sbValues = new StringBuilder();
+            var sbValues = new StringBuilder();
             foreach (var col in row.Keys)
             {
-                string sValue = formatter(col, row[col]);
-                int colWidth = colWidths[col];
-                string colFormat = string.Format("{{0,-{0}}}", colWidth);
+                var sValue = formatter(col, row[col]);
+                var colWidth = colWidths[col];
+                var colFormat = string.Format("{{0,-{0}}}", colWidth);
 
-                string colValue = string.Format(colFormat, sValue);
+                var colValue = string.Format(colFormat, sValue);
                 if (colWidth < colValue.Length)
                 {
                     colValue = colValue.Substring(0, colWidth - 1);
                     colValue += "~";
                 }
+
                 sbValues.Append("| ").Append(colValue).Append(" ");
             }
+
             sbValues.Append(" |");
-            string rowValues = sbValues.ToString();
+            var rowValues = sbValues.ToString();
             return rowValues;
         }
     }

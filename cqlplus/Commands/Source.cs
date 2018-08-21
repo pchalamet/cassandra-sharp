@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using cqlplus.StatementReader;
+
 namespace cqlplus.Commands
 {
-    using cqlplus.StatementReader;
-
     [Description("load statements from specific file")]
     internal class Source : CommandBase
     {
@@ -27,14 +27,11 @@ namespace cqlplus.Commands
         {
             IStatementReader statementReader = new FileInput(File);
             statementReader = new StatementSplitter(statementReader);
-            foreach (string statement in statementReader.Read())
+            foreach (var statement in statementReader.Read())
             {
                 new Exec {Statement = statement}.Execute();
 
-                if (CommandContext.Exit || CommandContext.LastCommandFailed)
-                {
-                    return;
-                }
+                if (CommandContext.Exit || CommandContext.LastCommandFailed) return;
             }
         }
     }

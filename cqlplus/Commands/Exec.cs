@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using cqlplus.Parser;
+using cqlplus.ResultWriter;
+
 namespace cqlplus.Commands
 {
-    using System;
-    using cqlplus.Parser;
-    using cqlplus.ResultWriter;
-
     [Description("execute statement")]
     internal class Exec : CommandBase
     {
@@ -31,16 +31,13 @@ namespace cqlplus.Commands
             {
                 CommandContext.LastCommandFailed = false;
 
-                Scanner scanner = new Scanner();
-                Parser parser = new Parser(scanner);
-                ParseTree parseTree = parser.Parse(Statement);
-                if (0 < parseTree.Errors.Count)
-                {
-                    throw new ArgumentException(parseTree.Errors[0].Message);
-                }
+                var scanner = new Scanner();
+                var parser = new Parser.Parser(scanner);
+                var parseTree = parser.Parse(Statement);
+                if (0 < parseTree.Errors.Count) throw new ArgumentException(parseTree.Errors[0].Message);
 
-                object result = parseTree.Eval(null);
-                ICommand command = (ICommand) result;
+                var result = parseTree.Eval(null);
+                var command = (ICommand)result;
 
                 CommandContext.ResultWriter = GetResultWriter();
                 CommandContext.TextWriter = Console.Out;
@@ -57,10 +54,7 @@ namespace cqlplus.Commands
                 }
                 else
                 {
-                    while (null != ex.InnerException)
-                    {
-                        ex = ex.InnerException;
-                    }
+                    while (null != ex.InnerException) ex = ex.InnerException;
 
                     Console.WriteLine("Command execution failed with error '{0}'", ex.Message);
                 }

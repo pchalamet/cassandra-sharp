@@ -13,39 +13,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 namespace cqlplus.ResultWriter
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     public static class ValueFormatter
     {
         private static bool IsGenericCollection(Type type)
         {
-            Type collType = type.GetInterfaces()
-                                .Where(face => face.IsGenericType &&
-                                               face.GetGenericTypeDefinition() == typeof(ICollection<>))
-                                .Select(face => face.GetGenericArguments()[0])
-                                .FirstOrDefault();
+            var collType = type.GetInterfaces()
+                               .Where(face => face.IsGenericType &&
+                                              face.GetGenericTypeDefinition() == typeof(ICollection<>))
+                               .Select(face => face.GetGenericArguments()[0])
+                               .FirstOrDefault();
             return null != collType;
         }
 
         public static string Format(object value)
         {
-            if (null == value)
-            {
-                return string.Empty;
-            }
+            if (null == value) return string.Empty;
 
             // dictionary
-            IDictionary map = value as IDictionary;
+            var map = value as IDictionary;
             if (null != map)
             {
-                StringBuilder sb = new StringBuilder();
-                string sep = "";
+                var sb = new StringBuilder();
+                var sep = "";
                 foreach (DictionaryEntry dictionaryEntry in map)
                 {
                     sb.Append(sep).Append(dictionaryEntry.Key).Append("=").Append(dictionaryEntry.Value);
@@ -56,14 +53,11 @@ namespace cqlplus.ResultWriter
             }
 
             // byte array
-            byte[] byteArray = value as byte[];
+            var byteArray = value as byte[];
             if (null != byteArray)
             {
-                StringBuilder sb = new StringBuilder();
-                foreach (byte b in byteArray)
-                {
-                    sb.AppendFormat("{0:X2}", b);
-                }
+                var sb = new StringBuilder();
+                foreach (var b in byteArray) sb.AppendFormat("{0:X2}", b);
 
                 return sb.ToString();
             }
@@ -71,10 +65,10 @@ namespace cqlplus.ResultWriter
             // ICollection<T>
             if (IsGenericCollection(value.GetType()))
             {
-                IEnumerable coll = (IEnumerable) value;
-                StringBuilder sb = new StringBuilder();
-                string sep = "";
-                foreach (object elem in coll)
+                var coll = (IEnumerable)value;
+                var sb = new StringBuilder();
+                var sep = "";
+                foreach (var elem in coll)
                 {
                     sb.Append(sep).Append(elem);
                     sep = " ";

@@ -13,26 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 namespace cqlplus.Commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
     internal class ShellCommand : CommandBase
     {
         private static readonly Dictionary<string, Type> _registeredCommands = new Dictionary<string, Type>
-            {
-                    {"help", typeof(Help)},
-                    {"set", typeof(Set)},
-                    {"exit", typeof(Exit)},
-                    {"reset", typeof(Reset)},
-                    {"cls", typeof(ClearScreen)},
-                    {"exec", typeof(Exec)},
-                    {"source", typeof(Source)},
+                                                                               {
+                                                                                   {"help", typeof(Help)},
+                                                                                   {"set", typeof(Set)},
+                                                                                   {"exit", typeof(Exit)},
+                                                                                   {"reset", typeof(Reset)},
+                                                                                   {"cls", typeof(ClearScreen)},
+                                                                                   {"exec", typeof(Exec)},
+                                                                                   {"source", typeof(Source)}
 //                    {"dbcopy", typeof(DbCopy)},
-            };
+                                                                               };
 
         private readonly string _name;
 
@@ -47,26 +47,20 @@ namespace cqlplus.Commands
         public override void Execute()
         {
             Type cmdType;
-            if (!_registeredCommands.TryGetValue(_name, out cmdType))
-            {
-                throw new ArgumentException(string.Format("Unknown command {0}", _name));
-            }
+            if (!_registeredCommands.TryGetValue(_name, out cmdType)) throw new ArgumentException(string.Format("Unknown command {0}", _name));
 
-            ICommand cmd = (ICommand) Activator.CreateInstance(cmdType);
+            var cmd = (ICommand)Activator.CreateInstance(cmdType);
 
             // feed parameters
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.SetProperty;
-            foreach (KeyValuePair<string, string> prm in _parameters)
+            foreach (var prm in _parameters)
             {
-                PropertyInfo pi = cmd.GetType().GetProperty(prm.Key, bindingFlags);
-                if (null == pi)
-                {
-                    throw new ArgumentException(string.Format("Unknown parameter {0}", prm.Key));
-                }
+                var pi = cmd.GetType().GetProperty(prm.Key, bindingFlags);
+                if (null == pi) throw new ArgumentException(string.Format("Unknown parameter {0}", prm.Key));
 
                 try
                 {
-                    object value = ParseValue(pi.PropertyType, prm.Value);
+                    var value = ParseValue(pi.PropertyType, prm.Value);
                     pi.SetValue(cmd, value, null);
                 }
                 catch
@@ -75,18 +69,14 @@ namespace cqlplus.Commands
                 }
             }
 
-            foreach (PropertyInfo pi in cmd.GetType().GetProperties(bindingFlags))
+            foreach (var pi in cmd.GetType().GetProperties(bindingFlags))
             {
-                string piName = pi.Name.ToLower();
-                DescriptionAttribute prmAttribute =
-                        (DescriptionAttribute) pi.GetCustomAttributes(typeof(DescriptionAttribute), true).SingleOrDefault();
+                var piName = pi.Name.ToLower();
+                var prmAttribute =
+                    (DescriptionAttribute)pi.GetCustomAttributes(typeof(DescriptionAttribute), true).SingleOrDefault();
                 if (null != prmAttribute && prmAttribute.Mandatory)
-                {
-                    if (! _parameters.ContainsKey(piName))
-                    {
+                    if (!_parameters.ContainsKey(piName))
                         throw new ArgumentException(string.Format("Parameter {0} is missing", pi.Name));
-                    }
-                }
             }
 
             cmd.Validate();
@@ -96,9 +86,7 @@ namespace cqlplus.Commands
         private object ParseValue(Type propertyType, string prmValue)
         {
             if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
                 propertyType = propertyType.GetGenericArguments()[0];
-            }
 
             object value = prmValue;
             if (propertyType.IsEnum)
@@ -107,7 +95,7 @@ namespace cqlplus.Commands
             }
             else if (propertyType != typeof(string))
             {
-                MethodInfo mi = propertyType.GetMethod("Parse", new[] {typeof(string)});
+                var mi = propertyType.GetMethod("Parse", new[] {typeof(string)});
                 value = mi.Invoke(null, new object[] {prmValue});
             }
 

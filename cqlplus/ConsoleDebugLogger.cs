@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Text;
+using System.Threading;
+using CassandraSharp.Extensibility;
+
 namespace cqlplus
 {
-    using System;
-    using System.Text;
-    using System.Threading;
-    using CassandraSharp.Extensibility;
-
     internal class ConsoleDebugLogger : ILogger
     {
         public void Debug(string format, params object[] prms)
@@ -47,19 +47,19 @@ namespace cqlplus
             Log(format, prms);
         }
 
+        public void Dispose()
+        {
+        }
+
         private static void Log(string format, object[] prms)
         {
             if (CommandContext.DebugLog)
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.AppendFormat("LOG   {0} [{1}] - ", DateTime.Now, Thread.CurrentThread.ManagedThreadId);
                 sb.AppendFormat(format, prms);
                 Console.WriteLine(sb);
             }
-        }
-
-        public void Dispose()
-        {
         }
     }
 }

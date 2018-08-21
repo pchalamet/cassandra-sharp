@@ -13,24 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using CassandraSharp.CQLPropertyBag;
+
 namespace cqlplus.ResultWriter
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using CassandraSharp.CQLPropertyBag;
-
     internal class CSV : IResultWriter
     {
         public void Write(TextWriter txtWriter, IEnumerable<PropertyBag> rowSet)
         {
-            bool first = true;
+            var first = true;
             foreach (var row in rowSet)
             {
                 string sep;
                 if (first)
                 {
-                    StringBuilder sbHeader = new StringBuilder();
+                    var sbHeader = new StringBuilder();
                     sep = string.Empty;
                     foreach (var col in row.Keys)
                     {
@@ -38,19 +38,20 @@ namespace cqlplus.ResultWriter
                         sep = ",";
                     }
 
-                    string header = sbHeader.ToString();
+                    var header = sbHeader.ToString();
                     txtWriter.WriteLine(header);
                     first = false;
                 }
 
-                StringBuilder sbValues = new StringBuilder();
+                var sbValues = new StringBuilder();
                 sep = string.Empty;
                 foreach (var col in row.Keys)
                 {
                     sbValues.AppendFormat("{0}{1}", sep, ValueFormatter.Format(row[col]));
                     sep = ",";
                 }
-                string values = sbValues.ToString();
+
+                var values = sbValues.ToString();
                 txtWriter.WriteLine(values);
             }
         }

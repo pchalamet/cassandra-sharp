@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CassandraSharp;
+using CassandraSharp.CQLPoco;
+
 namespace Samples.Async
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-
     public class SchemaKeyspaces
     {
         public string KeyspaceName { get; set; }
@@ -31,7 +31,7 @@ namespace Samples.Async
     public class AsyncSample : Sample
     {
         public AsyncSample()
-                : base("AsyncSample")
+            : base("AsyncSample")
         {
         }
 
@@ -39,10 +39,10 @@ namespace Samples.Async
         {
             const string cqlKeyspaces = "SELECT * from system_schema.keyspaces";
 
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             var allTasks = new List<Task>();
-            for (int i = 0; i < 100; ++i)
+            for (var i = 0; i < 100; ++i)
             {
                 var futRes = cmd.Execute<SchemaKeyspaces>(cqlKeyspaces).AsFuture().ContinueWith(t => DisplayKeyspace(t.Result));
                 allTasks.Add(futRes);
@@ -56,11 +56,9 @@ namespace Samples.Async
             try
             {
                 foreach (var resKeyspace in result)
-                {
                     Console.WriteLine("DurableWrites={0} KeyspaceName={1} Class={2}",
-                                      resKeyspace.DurableWrites, resKeyspace.KeyspaceName, 
+                                      resKeyspace.DurableWrites, resKeyspace.KeyspaceName,
                                       resKeyspace.Replication["class"]);
-                }
                 Console.WriteLine();
             }
             catch (Exception ex)

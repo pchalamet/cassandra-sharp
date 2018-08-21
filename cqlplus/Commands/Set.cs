@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp;
+
 namespace cqlplus.Commands
 {
-    using System;
-    using CassandraSharp;
-
     [Description("set environment variable")]
     internal class Set : CommandBase
     {
@@ -38,43 +38,23 @@ namespace cqlplus.Commands
 
         public override void Validate()
         {
-            if (MaxWidth.HasValue && 3 > MaxWidth.Value)
-            {
-                throw new ArgumentException("ColWidth must be greater than 3");
-            }
+            if (MaxWidth.HasValue && 3 > MaxWidth.Value) throw new ArgumentException("ColWidth must be greater than 3");
 
             if (Output.HasValue && !Enum.IsDefined(typeof(CommandContext.OutputFormatter), Output.Value))
-            {
                 throw new ArgumentException("Unknown value for OutputFormatter");
-            }
         }
 
         public override void Execute()
         {
-            if (MaxWidth.HasValue)
-            {
-                CommandContext.ColumnWidth = MaxWidth.Value;
-            }
+            if (MaxWidth.HasValue) CommandContext.ColumnWidth = MaxWidth.Value;
 
-            if (Output.HasValue)
-            {
-                CommandContext.Formatter = Output.Value;
-            }
+            if (Output.HasValue) CommandContext.Formatter = Output.Value;
 
-            if (Log.HasValue)
-            {
-                CommandContext.DebugLog = Log.Value;
-            }
+            if (Log.HasValue) CommandContext.DebugLog = Log.Value;
 
-            if (Tracing.HasValue)
-            {
-                CommandContext.Tracing = Tracing.Value;
-            }
+            if (Tracing.HasValue) CommandContext.Tracing = Tracing.Value;
 
-            if (CL.HasValue)
-            {
-                CommandContext.CL = CL.Value;
-            }
+            if (CL.HasValue) CommandContext.CL = CL.Value;
         }
     }
 }

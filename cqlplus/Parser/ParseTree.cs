@@ -13,16 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
+using cqlplus.Commands;
+
 namespace cqlplus.Parser
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Xml.Serialization;
-    using cqlplus.Commands;
-
     #region ParseTree
+
     [Serializable]
     public class ParseErrors : List<ParseError>
     {
@@ -31,66 +32,36 @@ namespace cqlplus.Parser
     [Serializable]
     public class ParseError
     {
-        private readonly int code;
-
-        private readonly int col;
-
-        private readonly int length;
-
-        private readonly int line;
-
-        private readonly string message;
-
-        private readonly int pos;
-
         public ParseError()
         {
         }
 
         public ParseError(string message, int code, ParseNode node)
-                : this(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
+            : this(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
         {
         }
 
         public ParseError(string message, int code, int line, int col, int pos, int length)
         {
-            this.message = message;
-            this.code = code;
-            this.line = line;
-            this.col = col;
-            this.pos = pos;
-            this.length = length;
+            Message = message;
+            Code = code;
+            Line = line;
+            Column = col;
+            Position = pos;
+            Length = length;
         }
 
-        public int Code
-        {
-            get { return code; }
-        }
+        public int Code { get; }
 
-        public int Line
-        {
-            get { return line; }
-        }
+        public int Line { get; }
 
-        public int Column
-        {
-            get { return col; }
-        }
+        public int Column { get; }
 
-        public int Position
-        {
-            get { return pos; }
-        }
+        public int Position { get; }
 
-        public int Length
-        {
-            get { return length; }
-        }
+        public int Length { get; }
 
-        public string Message
-        {
-            get { return message; }
-        }
+        public string Message { get; }
 
         // just for the sake of serialization
     }
@@ -104,7 +75,7 @@ namespace cqlplus.Parser
         public List<Token> Skipped;
 
         public ParseTree()
-                : base(new Token(), "ParseTree")
+            : base(new Token(), "ParseTree")
         {
             Token.Type = TokenType.Start;
             Token.Text = "Root";
@@ -113,23 +84,20 @@ namespace cqlplus.Parser
 
         public string PrintTree()
         {
-            StringBuilder sb = new StringBuilder();
-            int indent = 0;
+            var sb = new StringBuilder();
+            var indent = 0;
             PrintNode(sb, this, indent);
             return sb.ToString();
         }
 
         private void PrintNode(StringBuilder sb, ParseNode node, int indent)
         {
-            string space = "".PadLeft(indent, ' ');
+            var space = "".PadLeft(indent, ' ');
 
             sb.Append(space);
             sb.AppendLine(node.Text);
 
-            foreach (ParseNode n in node.Nodes)
-            {
-                PrintNode(sb, n, indent + 2);
-            }
+            foreach (var n in node.Nodes) PrintNode(sb, n, indent + 2);
         }
 
         /// <summary>
@@ -147,14 +115,14 @@ namespace cqlplus.Parser
     [XmlInclude(typeof(ParseTree))]
     public class ParseNode
     {
+        protected List<ParseNode> nodes;
+
         [XmlIgnore] // avoid circular references when serializing
         public ParseNode Parent;
 
-        public Token Token; // the token/rule
-
-        protected List<ParseNode> nodes;
-
         protected string text;
+
+        public Token Token; // the token/rule
 
         protected ParseNode(Token token, string text)
         {
@@ -163,22 +131,19 @@ namespace cqlplus.Parser
             nodes = new List<ParseNode>();
         }
 
-        public List<ParseNode> Nodes
-        {
-            get { return nodes; }
-        }
+        public List<ParseNode> Nodes => nodes;
 
         [XmlIgnore] // skip redundant text (is part of Token)
         public string Text
         {
             // text to display in parse tree 
-            get { return text; }
-            set { text = value; }
+            get => text;
+            set => text = value;
         }
 
         public virtual ParseNode CreateNode(Token token, string text)
         {
-            ParseNode node = new ParseNode(token, text);
+            var node = new ParseNode(token, text);
             node.Parent = this;
             return node;
         }
@@ -191,14 +156,10 @@ namespace cqlplus.Parser
         protected object GetValue(ParseTree tree, TokenType type, ref int index)
         {
             object o = null;
-            if (index < 0)
-            {
-                return o;
-            }
+            if (index < 0) return o;
 
             // left to right
-            foreach (ParseNode node in nodes)
-            {
+            foreach (var node in nodes)
                 if (node.Token.Type == type)
                 {
                     index--;
@@ -208,7 +169,7 @@ namespace cqlplus.Parser
                         break;
                     }
                 }
-            }
+
             return o;
         }
 
@@ -258,12 +219,13 @@ namespace cqlplus.Parser
                     Value = Token.Text;
                     break;
             }
+
             return Value;
         }
 
         protected virtual object EvalString(ParseTree tree, params object[] paramlist)
         {
-            var str = (string) GetValue(tree, TokenType.STRING, 0);
+            var str = (string)GetValue(tree, TokenType.STRING, 0);
             str = str.Substring(1, str.Length - 2);
             return str;
         }
@@ -286,23 +248,24 @@ namespace cqlplus.Parser
         protected virtual object EvalParameters(ParseTree tree, params object[] paramlist)
         {
             var res = new Dictionary<string, string>();
-            for (int i = 0; GetValue(tree, TokenType.Identifier, i) != null; ++i)
+            for (var i = 0; GetValue(tree, TokenType.Identifier, i) != null; ++i)
             {
-                var prmName = ((string) GetValue(tree, TokenType.Identifier, i)).ToLower();
-                var prmValue = (string) GetValue(tree, TokenType.Value, i);
+                var prmName = ((string)GetValue(tree, TokenType.Identifier, i)).ToLower();
+                var prmValue = (string)GetValue(tree, TokenType.Value, i);
                 res[prmName] = prmValue;
             }
+
             return res;
         }
 
         protected virtual object EvalCommandWithParameters(ParseTree tree, params object[] paramlist)
         {
-            return new ShellCommand((string) GetValue(tree, TokenType.Identifier, 0), (Dictionary<string, string>) GetValue(tree, TokenType.Parameters, 0));
+            return new ShellCommand((string)GetValue(tree, TokenType.Identifier, 0), (Dictionary<string, string>)GetValue(tree, TokenType.Parameters, 0));
         }
 
         protected virtual object EvalCqlCommand(ParseTree tree, params object[] paramlist)
         {
-            return new CqlStatement((string) GetValue(tree, TokenType.EVERYTHING_BUT_START_WITH_BANG, 0));
+            return new CqlStatement((string)GetValue(tree, TokenType.EVERYTHING_BUT_START_WITH_BANG, 0));
         }
 
         protected virtual object EvalStart(ParseTree tree, params object[] paramlist)
@@ -310,5 +273,6 @@ namespace cqlplus.Parser
             return Default(GetValue(tree, TokenType.CommandWithParameters, 0), GetValue(tree, TokenType.CqlCommand, 0));
         }
     }
+
     #endregion ParseTree
 }

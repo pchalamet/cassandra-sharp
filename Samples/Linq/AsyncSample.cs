@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using CassandraSharp;
+using CassandraSharp.CQLPoco;
+
 namespace Samples.Linq
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-
     public class SchemaColumns
     {
         public string KeyspaceName { get; set; }
@@ -37,13 +37,13 @@ namespace Samples.Linq
     public class LinqSample : Sample
     {
         public LinqSample()
-                : base("LinqSample")
+            : base("LinqSample")
         {
         }
 
         protected override void InternalRun(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string cqlKeyspaces = "SELECT * from system_schema.columns";
 
@@ -55,11 +55,9 @@ namespace Samples.Linq
 
         private static void DisplayResult(IEnumerable<SchemaColumns> req)
         {
-            foreach (SchemaColumns schemaColumns in req)
-            {
+            foreach (var schemaColumns in req)
                 Console.WriteLine("KeyspaceName={0} ColumnFamilyName={1} ColumnName={2}",
                                   schemaColumns.KeyspaceName, schemaColumns.ColumnFamilyName, schemaColumns.ColumnName);
-            }
         }
     }
 }

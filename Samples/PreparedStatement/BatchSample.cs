@@ -13,25 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using CassandraSharp;
+using CassandraSharp.CQLPoco;
+
 namespace Samples.PreparedStatement
 {
-    using System;
-    using System.Threading;
-    using CassandraSharp;
-    using CassandraSharp.CQLPoco;
-
     public class BatchSample : Sample
     {
         private long _running;
 
         public BatchSample()
-                : base("BatchSample")
+            : base("BatchSample")
         {
         }
 
         protected override void CreateKeyspace(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string createKeyspaceFoo = "CREATE KEYSPACE Foo WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1}";
             cmd.Execute(createKeyspaceFoo).AsFuture().Wait();
@@ -42,13 +42,13 @@ namespace Samples.PreparedStatement
 
         protected override void DropKeyspace(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
             cmd.Execute("drop keyspace Foo").AsFuture().Wait();
         }
 
         protected override void InternalRun(ICluster cluster)
         {
-            ICqlCommand cmd = cluster.CreatePocoCommand();
+            var cmd = cluster.CreatePocoCommand();
 
             const string insertBatch = "INSERT INTO Foo.Bar (id, Baz) VALUES (?, ?)";
             var preparedInsert = cmd.WithConsistencyLevel(ConsistencyLevel.ONE).Prepare(insertBatch);
@@ -57,9 +57,9 @@ namespace Samples.PreparedStatement
 
             var random = new Random();
 
-            for (int i = 0; i < times; i++)
+            for (var i = 0; i < times; i++)
             {
-                long running = Interlocked.Increment(ref _running);
+                var running = Interlocked.Increment(ref _running);
 
                 Console.WriteLine("Current {0} Running {1}", i, running);
 
@@ -76,10 +76,7 @@ namespace Samples.PreparedStatement
             }
 
             var result = cmd.Execute<Foo>("select * from Foo.Bar where id = 50").AsFuture().Result;
-            foreach (var res in result)
-            {
-                Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);
-            }
+            foreach (var res in result) Console.WriteLine("{0} len={1}", res.Id, res.Baz.Length);
         }
 
         public class Foo

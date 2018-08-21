@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
+
 namespace cqlplus.StatementReader
 {
-    using System.Collections.Generic;
-    using System.IO;
-
     public class FileInput : IStatementReader
     {
         private readonly string _filename;
@@ -31,7 +31,7 @@ namespace cqlplus.StatementReader
         {
             using (TextReader txtReader = new StreamReader(_filename))
             {
-                string line = txtReader.ReadLine();
+                var line = txtReader.ReadLine();
                 while (null != line)
                 {
                     yield return line;

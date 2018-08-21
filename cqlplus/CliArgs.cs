@@ -23,6 +23,9 @@ namespace cqlplus
         [Argument(ArgumentType.AtMostOnce, HelpText = "Enable debug log", ShortName = "dbglog")]
         public bool DebugLog = false;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable discovery", ShortName = "disco")]
+        public bool Discovery = false;
+
         [Argument(ArgumentType.AtMostOnce, HelpText = "Input file", ShortName = "f")]
         public string File = null;
 
@@ -40,9 +43,6 @@ namespace cqlplus
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "Enable command tracing", ShortName = "trace")]
         public bool Tracing = false;
-
-        [Argument(ArgumentType.AtMostOnce, HelpText = "Enable discovery", ShortName = "disco")]
-        public bool Discovery = false;
 
         [Argument(ArgumentType.AtMostOnce, HelpText = "User", ShortName = "u")]
         public string User = null;
