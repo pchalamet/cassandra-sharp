@@ -13,25 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+
 namespace CassandraSharp.Config
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Xml;
-    using System.Xml.Schema;
-    using System.Xml.Serialization;
-
     [XmlRoot("Replication")]
     public class ReplicationConfig : IXmlSerializable
     {
-        public Dictionary<string, string> Options { get; set; }
-
         public ReplicationConfig()
         {
-            Options = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-            Options["class"] = "SimpleStrategy";
-            Options["replication_factor"] = "1";
+            Options = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+                      {
+                          ["class"] = "SimpleStrategy",
+                          ["replication_factor"] = "1"
+                      };
         }
+
+        public Dictionary<string, string> Options { get; set; }
 
         public XmlSchema GetSchema()
         {
@@ -40,10 +42,10 @@ namespace CassandraSharp.Config
 
         public void ReadXml(XmlReader reader)
         {
-            bool wasEmpty = reader.IsEmptyElement;
+            var wasEmpty = reader.IsEmptyElement;
 
             Options = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-            for (int i = 0; i < reader.AttributeCount; i++)
+            for (var i = 0; i < reader.AttributeCount; i++)
             {
                 reader.MoveToAttribute(i);
                 Options[reader.Name] = reader.Value;
@@ -51,10 +53,7 @@ namespace CassandraSharp.Config
 
             reader.Read();
 
-            if (!wasEmpty)
-            {
-                reader.Skip();
-            }
+            if (!wasEmpty) reader.Skip();
         }
 
         public void WriteXml(XmlWriter writer)

@@ -25,6 +25,6 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         Prepared = 0x0004,
 
-        SchemaChange = 0x0005,
+        SchemaChange = 0x0005
     }
 }

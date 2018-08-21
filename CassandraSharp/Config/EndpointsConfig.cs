@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Xml;
+using System.Xml.Serialization;
+
 namespace CassandraSharp.Config
 {
-    using System.Xml;
-    using System.Xml.Serialization;
-
     public class EndpointsConfig
     {
         public EndpointsConfig()

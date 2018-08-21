@@ -14,7 +14,6 @@
 // limitations under the License.
 
 using System;
-using System.Numerics;
 using CassandraSharp.CQLBinaryProtocol.Queries;
 using CassandraSharp.Extensibility;
 
@@ -53,21 +52,18 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         public IQuery<T> Execute<T>(string cql, object dataSource, PartitionKey partitionKey)
         {
-            if (null != dataSource)
-            {
-                throw new ArgumentException("Binary protocol v2 is not implemented");
-            }
+            if (null != dataSource) throw new ArgumentException("Binary protocol v2 is not implemented");
 
             // grab a connection
-            BigInteger? token = partitionKey == null ? null : _cluster.Partitioner.ComputeToken(partitionKey);
-            IConnection connection = _cluster.GetConnection(token);
+            var token = partitionKey == null ? null : _cluster.Partitioner.ComputeToken(partitionKey);
+            var connection = _cluster.GetConnection(token);
 
             // define execution context
-            ConsistencyLevel cl = _consistencyLevel ?? connection.DefaultConsistencyLevel;
-            ExecutionFlags executionFlags = _executionFlags ?? connection.DefaultExecutionFlags;
+            var cl = _consistencyLevel ?? connection.DefaultConsistencyLevel;
+            var executionFlags = _executionFlags ?? connection.DefaultExecutionFlags;
 
             // out to spit out results
-            IDataMapper factoryOut = _factoryOut.Create<T>();
+            var factoryOut = _factoryOut.Create<T>();
 
             IQuery<T> query = new CqlQuery<T>(connection, cl, executionFlags, cql, factoryOut);
             return query;

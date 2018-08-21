@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.CQLCommand;
+
 namespace CassandraSharp.CQLOrdinal
 {
-    using CassandraSharp.CQLCommand;
-
     public static class CQLOrdinalExtensions
     {
         public static ICqlCommandBuilderTo FromOrdinal(this ICqlCommandBuilderFrom @this)

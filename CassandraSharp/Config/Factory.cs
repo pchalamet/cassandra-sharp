@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Configuration;
+
 namespace CassandraSharp.Config
 {
-    using System.Configuration;
-
     public class Factory
     {
         public static CassandraSharpConfig GetConfiguration(string name = "CassandraSharp")

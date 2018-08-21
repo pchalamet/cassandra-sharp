@@ -39,9 +39,9 @@ namespace CassandraSharp.Transport
 
         private readonly TransportConfig _config;
 
-        private readonly KeyspaceConfig _keyspaceConfig;
-
         private readonly IInstrumentation _instrumentation;
+
+        private readonly KeyspaceConfig _keyspaceConfig;
 
         private readonly object _lock = new object();
 
@@ -67,10 +67,7 @@ namespace CassandraSharp.Transport
         {
             try
             {
-                for (ushort streamId = 0; streamId < MAX_STREAMID; ++streamId)
-                {
-                    _availableStreamIds.Push(streamId);
-                }
+                for (ushort streamId = 0; streamId < MAX_STREAMID; ++streamId) _availableStreamIds.Push(streamId);
 
                 _config = config;
                 _keyspaceConfig = keyspaceConfig;
@@ -82,25 +79,22 @@ namespace CassandraSharp.Transport
                 DefaultExecutionFlags = config.DefaultExecutionFlags;
 
                 _tcpClient = new TcpClient
-                    {
-                        ReceiveTimeout = _config.ReceiveTimeout,
-                        SendTimeout = _config.SendTimeout,
-                        NoDelay = true,
-                        LingerState = { Enabled = true, LingerTime = 0 },
-                    };
+                             {
+                                 ReceiveTimeout = _config.ReceiveTimeout,
+                                 SendTimeout = _config.SendTimeout,
+                                 NoDelay = true,
+                                 LingerState = {Enabled = true, LingerTime = 0}
+                             };
 
-                if(0 < _config.ConnectionTimeout)
+                if (0 < _config.ConnectionTimeout)
                 {
                     // TODO: refactor this and this probably is not robust in front of error
-                    IAsyncResult asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
-                    bool success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
+                    var asyncResult = _tcpClient.BeginConnect(address, _config.Port, null, null);
+                    var success = asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_config.ConnectionTimeout), true);
 
-                    if (! success)
-                    {
-                        throw new InvalidOperationException("Connection timeout occured.");
-                    }
+                    if (!success) throw new InvalidOperationException("Connection timeout occured.");
 
-                    if (! _tcpClient.Connected)
+                    if (!_tcpClient.Connected)
                     {
                         _tcpClient.Close();
                         throw new InvalidOperationException("Can't connect to node.");
@@ -112,18 +106,15 @@ namespace CassandraSharp.Transport
                 {
                     _tcpClient.Connect(address, _config.Port);
                 }
-    
+
                 _socket = _tcpClient.Client;
 
                 _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, _config.KeepAlive);
-                if (_config.KeepAlive && 0 != _config.KeepAliveTime)
-                {
-                    SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
-                }
+                if (_config.KeepAlive && 0 != _config.KeepAliveTime) SetTcpKeepAlive(_socket, _config.KeepAliveTime, 1000);
 
                 _pushResult = _config.ReceiveBuffering
-                                      ? (Action<QueryInfo, IFrameReader, bool>)((qi, fr, a) => Task.Factory.StartNew(() => PushResult(qi, fr, a)))
-                                      : PushResult;
+                                  ? (Action<QueryInfo, IFrameReader, bool>)((qi, fr, a) => Task.Factory.StartNew(() => PushResult(qi, fr, a)))
+                                  : PushResult;
                 _responseWorker = Task.Factory.StartNew(() => RunWorker(ReadResponse), TaskCreationOptions.LongRunning);
                 _queryWorker = Task.Factory.StartNew(() => RunWorker(SendQuery), TaskCreationOptions.LongRunning);
 
@@ -142,11 +133,11 @@ namespace CassandraSharp.Transport
             }
         }
 
-        public IPAddress Endpoint { get; private set; }
+        public IPAddress Endpoint { get; }
 
-        public ConsistencyLevel DefaultConsistencyLevel { get; private set; }
+        public ConsistencyLevel DefaultConsistencyLevel { get; }
 
-        public ExecutionFlags DefaultExecutionFlags { get; private set; }
+        public ExecutionFlags DefaultExecutionFlags { get; }
 
         public event EventHandler<FailureEventArgs> OnFailure;
 
@@ -157,10 +148,7 @@ namespace CassandraSharp.Transport
             lock (_lock)
             {
                 Monitor.Pulse(_lock);
-                if (_isClosed)
-                {
-                    throw new OperationCanceledException();
-                }
+                if (_isClosed) throw new OperationCanceledException();
 
                 _pendingQueries.Enqueue(queryInfo);
             }
@@ -177,17 +165,14 @@ namespace CassandraSharp.Transport
 
         public static void SetTcpKeepAlive(Socket socket, int keepaliveTime, int keepaliveInterval)
         {
-			if (Runtime.IsMono)
-			{
-				return;
-			}
+            if (Runtime.IsMono) return;
 
             // marshal the equivalent of the native structure into a byte array
-            byte[] inOptionValues = new byte[12];
+            var inOptionValues = new byte[12];
 
-            int enable = 0 != keepaliveTime
-                                 ? 1
-                                 : 0;
+            var enable = 0 != keepaliveTime
+                             ? 1
+                             : 0;
             BitConverter.GetBytes(enable).CopyTo(inOptionValues, 0);
             BitConverter.GetBytes(keepaliveTime).CopyTo(inOptionValues, 4);
             BitConverter.GetBytes(keepaliveInterval).CopyTo(inOptionValues, 8);
@@ -201,18 +186,15 @@ namespace CassandraSharp.Transport
             // already in close state ?
             lock (_lock)
             {
-                bool wasClosed = _isClosed;
+                var wasClosed = _isClosed;
                 _isClosed = true;
                 Monitor.PulseAll(_lock);
 
-                if (wasClosed)
-                {
-                    return;
-                }
+                if (wasClosed) return;
 
                 // abort all pending queries
-                OperationCanceledException canceledException = new OperationCanceledException();
-                for (int i = 0; i < _queryInfos.Length; ++i)
+                var canceledException = new OperationCanceledException();
+                for (var i = 0; i < _queryInfos.Length; ++i)
                 {
                     var queryInfo = _queryInfos[i];
                     if (null != queryInfo)
@@ -240,7 +222,7 @@ namespace CassandraSharp.Transport
             {
                 _logger.Fatal("Failed with error : {0}", ex);
 
-                FailureEventArgs failureEventArgs = new FailureEventArgs(ex);
+                var failureEventArgs = new FailureEventArgs(ex);
                 OnFailure(this, failureEventArgs);
             }
 
@@ -267,10 +249,7 @@ namespace CassandraSharp.Transport
                 QueryInfo queryInfo;
                 lock (_lock)
                 {
-                    while (!_isClosed && 0 == _pendingQueries.Count)
-                    {
-                        Monitor.Wait(_lock);
-                    }
+                    while (!_isClosed && 0 == _pendingQueries.Count) Monitor.Wait(_lock);
                     if (_isClosed)
                     {
                         Monitor.Pulse(_lock);
@@ -283,19 +262,16 @@ namespace CassandraSharp.Transport
                 try
                 {
                     // acquire the global lock to write the request
-                    InstrumentationToken token = queryInfo.Token;
-                    bool tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
-                    using (BufferingFrameWriter bufferingFrameWriter = new BufferingFrameWriter(tracing))
+                    var token = queryInfo.Token;
+                    var tracing = 0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing);
+                    using (var bufferingFrameWriter = new BufferingFrameWriter(tracing))
                     {
                         queryInfo.Write(bufferingFrameWriter);
 
                         ushort streamId;
                         lock (_lock)
                         {
-                            while (!_isClosed && 0 == _availableStreamIds.Count)
-                            {
-                                Monitor.Wait(_lock);
-                            }
+                            while (!_isClosed && 0 == _availableStreamIds.Count) Monitor.Wait(_lock);
                             if (_isClosed)
                             {
                                 queryInfo.NotifyError(new OperationCanceledException());
@@ -321,10 +297,7 @@ namespace CassandraSharp.Transport
                 {
                     queryInfo.NotifyError(ex);
 
-                    if (IsStreamInBadState(ex))
-                    {
-                        throw;
-                    }
+                    if (IsStreamInBadState(ex)) throw;
                 }
             }
         }
@@ -337,10 +310,10 @@ namespace CassandraSharp.Transport
                 try
                 {
                     frameReader = _config.ReceiveBuffering
-                                          ? new BufferingFrameReader(_socket)
-                                          : new StreamingFrameReader(_socket);
+                                      ? new BufferingFrameReader(_socket)
+                                      : new StreamingFrameReader(_socket);
 
-                    QueryInfo queryInfo = GetAndReleaseQueryInfo(frameReader);
+                    var queryInfo = GetAndReleaseQueryInfo(frameReader);
 
                     _pushResult(queryInfo, frameReader, _config.ReceiveBuffering);
                 }
@@ -355,14 +328,11 @@ namespace CassandraSharp.Transport
         private QueryInfo GetAndReleaseQueryInfo(IFrameReader frameReader)
         {
             QueryInfo queryInfo;
-            ushort streamId = frameReader.StreamId;
+            var streamId = frameReader.StreamId;
             lock (_lock)
             {
                 Monitor.Pulse(_lock);
-                if (_isClosed)
-                {
-                    throw new OperationCanceledException();
-                }
+                if (_isClosed) throw new OperationCanceledException();
 
                 queryInfo = _queryInfos[streamId];
                 _queryInfos[streamId] = null;
@@ -379,10 +349,7 @@ namespace CassandraSharp.Transport
                 _instrumentation.ClientTrace(queryInfo.Token, EventType.BeginRead);
                 try
                 {
-                    if (null != frameReader.ResponseException)
-                    {
-                        throw frameReader.ResponseException;
-                    }
+                    if (null != frameReader.ResponseException) throw frameReader.ResponseException;
 
                     queryInfo.Push(frameReader);
                 }
@@ -390,39 +357,27 @@ namespace CassandraSharp.Transport
                 {
                     queryInfo.NotifyError(ex);
 
-                    if (IsStreamInBadState(ex))
-                    {
-                        throw;
-                    }
+                    if (IsStreamInBadState(ex)) throw;
                 }
 
                 _instrumentation.ClientTrace(queryInfo.Token, EventType.EndRead);
 
-                InstrumentationToken token = queryInfo.Token;
-                if (0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing))
-                {
-                    _instrumentation.ServerTrace(token, frameReader.TraceId);
-                }
+                var token = queryInfo.Token;
+                if (0 != (token.ExecutionFlags & ExecutionFlags.ServerTracing)) _instrumentation.ServerTrace(token, frameReader.TraceId);
             }
             catch (Exception ex)
             {
-                if (isAsync)
-                {
-                    HandleError(ex);
-                }
+                if (isAsync) HandleError(ex);
             }
             finally
             {
-                if (isAsync)
-                {
-                    frameReader.SafeDispose();
-                }
+                if (isAsync) frameReader.SafeDispose();
             }
         }
 
         private static bool IsStreamInBadState(Exception ex)
         {
-            bool isFatal = ex is SocketException || ex is IOException || ex is TimeOutException;
+            var isFatal = ex is SocketException || ex is IOException || ex is TimeOutException;
             return isFatal;
         }
 
@@ -440,30 +395,18 @@ namespace CassandraSharp.Transport
         private void ReadifyConnection()
         {
             var obsReady = new ReadyQuery(this, ConsistencyLevel.ONE, ExecutionFlags.None, _config.CqlVersion).AsFuture();
-            bool authenticate = obsReady.Result.Single();
-            if (authenticate)
-            {
-                Authenticate();
-            }
+            var authenticate = obsReady.Result.Single();
+            if (authenticate) Authenticate();
 
-            if (!string.IsNullOrWhiteSpace(_keyspaceConfig.Name))
-            {
-                SetupKeyspace();
-            }
+            if (!string.IsNullOrWhiteSpace(_keyspaceConfig.Name)) SetupKeyspace();
         }
 
         private void Authenticate()
         {
-            if (null == _config.User || null == _config.Password)
-            {
-                throw new InvalidCredentialException();
-            }
+            if (null == _config.User || null == _config.Password) throw new InvalidCredentialException();
 
             var obsAuth = new AuthenticateQuery(this, ConsistencyLevel.ONE, ExecutionFlags.None, _config.User, _config.Password).AsFuture();
-            if (!obsAuth.Result.Single())
-            {
-                throw new InvalidCredentialException();
-            }
+            if (!obsAuth.Result.Single()) throw new InvalidCredentialException();
         }
 
         private void SetupKeyspace()
@@ -477,10 +420,10 @@ namespace CassandraSharp.Transport
             catch
             {
                 new CreateKeyspaceQuery(
-                        this,
-                        _keyspaceConfig.Name,
-                        _keyspaceConfig.Replication.Options,
-                        _keyspaceConfig.DurableWrites).AsFuture().Wait();
+                                        this,
+                                        _keyspaceConfig.Name,
+                                        _keyspaceConfig.Replication.Options,
+                                        _keyspaceConfig.DurableWrites).AsFuture().Wait();
                 setKeyspaceQuery.AsFuture().Wait();
             }
 
@@ -494,7 +437,7 @@ namespace CassandraSharp.Transport
                 Token = token;
             }
 
-            public InstrumentationToken Token { get; private set; }
+            public InstrumentationToken Token { get; }
 
             public abstract void Write(IFrameWriter frameWriter);
 
@@ -514,11 +457,11 @@ namespace CassandraSharp.Transport
                 Observer = observer;
             }
 
-            private Func<IFrameReader, IEnumerable<T>> Reader { get; set; }
+            private Func<IFrameReader, IEnumerable<T>> Reader { get; }
 
-            private Action<IFrameWriter> Writer { get; set; }
+            private Action<IFrameWriter> Writer { get; }
 
-            private IObserver<T> Observer { get; set; }
+            private IObserver<T> Observer { get; }
 
             public override void Write(IFrameWriter frameWriter)
             {
@@ -527,11 +470,8 @@ namespace CassandraSharp.Transport
 
             public override void Push(IFrameReader frameReader)
             {
-                IEnumerable<T> data = Reader(frameReader);
-                foreach (T datum in data)
-                {
-                    Observer.OnNext(datum);
-                }
+                var data = Reader(frameReader);
+                foreach (var datum in data) Observer.OnNext(datum);
                 Observer.OnCompleted();
             }
 

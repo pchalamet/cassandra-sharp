@@ -26,6 +26,6 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         HasMorePages = 0x0002,
 
-        NoMetadata = 0x0004,
+        NoMetadata = 0x0004
     }
 }

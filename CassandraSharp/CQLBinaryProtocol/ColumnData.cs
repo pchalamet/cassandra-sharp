@@ -17,16 +17,16 @@ using CassandraSharp.Extensibility;
 
 namespace CassandraSharp.CQLBinaryProtocol
 {
-    public class ColumnData: IColumnData
+    public class ColumnData : IColumnData
     {
-        public IColumnSpec ColumnSpec { get; private set; }
-
-        public byte[] RawData { get; private set; }
-
         public ColumnData(IColumnSpec spec, byte[] rawData)
         {
             ColumnSpec = spec;
             RawData = rawData;
         }
+
+        public IColumnSpec ColumnSpec { get; }
+
+        public byte[] RawData { get; }
     }
 }

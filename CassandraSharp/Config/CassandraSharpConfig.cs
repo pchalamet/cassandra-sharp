@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Xml.Serialization;
+
 namespace CassandraSharp.Config
 {
-    using System.Xml.Serialization;
-
     public class CassandraSharpConfig
     {
         public CassandraSharpConfig()

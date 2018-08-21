@@ -26,10 +26,9 @@ namespace CassandraSharp.CQLBinaryProtocol
         {
             lock (_valueSerializers)
             {
-                IValueSerializer serializer;
-                if (!_valueSerializers.TryGetValue(type, out serializer))
+                if (!_valueSerializers.TryGetValue(type, out var serializer))
                 {
-                    Type serializerType = typeof(ValueSerializer<>).MakeGenericType(type);
+                    var serializerType = typeof(ValueSerializer<>).MakeGenericType(type);
                     serializer = (IValueSerializer)Activator.CreateInstance(serializerType);
 
                     _valueSerializers[type] = serializer;

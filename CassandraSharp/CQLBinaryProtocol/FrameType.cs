@@ -26,6 +26,6 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         Request = 0x00,
 
-        Response = 0x80,
+        Response = 0x80
     }
 }

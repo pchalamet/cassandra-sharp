@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using CassandraSharp.CQLBinaryProtocol.Queries;
 using CassandraSharp.Extensibility;
@@ -42,7 +41,8 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private byte[] _id;
 
-        public PreparedQuery(ICluster cluster, ConsistencyLevel? consistencyLevel, ExecutionFlags? executionFlags, IDataMapperFactory factoryIn,
+        public PreparedQuery(ICluster cluster, ConsistencyLevel? consistencyLevel, ExecutionFlags? executionFlags,
+                             IDataMapperFactory factoryIn,
                              IDataMapperFactory factoryOut, string cql)
         {
             _cluster = cluster;
@@ -60,7 +60,6 @@ namespace CassandraSharp.CQLBinaryProtocol
             ExecutionFlags executionFlags;
             IConnection connection;
             if (null == (connection = _connection))
-            {
                 lock (_lock)
                 {
                     if (null == (connection = _connection))
@@ -73,39 +72,33 @@ namespace CassandraSharp.CQLBinaryProtocol
 
                         var futPrepare = new PrepareQuery(connection, cl, executionFlags, _cql).AsFuture();
                         futPrepare.Wait();
-                        Tuple<byte[], IColumnSpec[]> preparedInfo = futPrepare.Result.Single();
+                        var preparedInfo = futPrepare.Result.Single();
 
                         _id = preparedInfo.Item1;
                         _columnSpecs = preparedInfo.Item2;
                         _connection = connection;
                     }
                 }
-            }
 
             cl = _consistencyLevel ?? connection.DefaultConsistencyLevel;
             executionFlags = _executionFlags ?? connection.DefaultExecutionFlags;
-            IDataMapper mapperIn = _factoryIn.Create(dataSource.GetType());            
-            IDataMapper mapperOut = _factoryOut.Create<T>();
-            var futQuery = new ExecuteQuery<T>(connection, cl, executionFlags, _cql, _id, _columnSpecs, dataSource, mapperIn, mapperOut);
+            var mapperIn = _factoryIn.Create(dataSource.GetType());
+            var mapperOut = _factoryOut.Create<T>();
+            var futQuery = new ExecuteQuery<T>(connection, cl, executionFlags, _cql, _id, _columnSpecs, dataSource,
+                                               mapperIn, mapperOut);
             return futQuery;
         }
 
         public void Dispose()
         {
-            IConnection connection = _connection;
-            if (null != connection)
-            {
-                connection.OnFailure -= ConnectionOnOnFailure;
-            }
+            var connection = _connection;
+            if (null != connection) connection.OnFailure -= ConnectionOnOnFailure;
         }
 
         private void ConnectionOnOnFailure(object sender, FailureEventArgs failureEventArgs)
         {
-            IConnection connection = _connection;
-            if (null != connection)
-            {
-                connection.OnFailure -= ConnectionOnOnFailure;
-            }
+            var connection = _connection;
+            if (null != connection) connection.OnFailure -= ConnectionOnOnFailure;
 
             _connection = null;
         }

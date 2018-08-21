@@ -32,9 +32,8 @@ namespace CassandraSharp.CQLBinaryProtocol
 
     public class ValueSerializer<T> : IValueSerializer
     {
-        private readonly Func<object, byte[]> _serializer;
-
         private readonly Func<byte[], object> _deserializer;
+        private readonly Func<object, byte[]> _serializer;
 
         public ValueSerializer()
         {
@@ -102,27 +101,20 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private Func<object, byte[]> GenerateObjectSerializer(Type type)
         {
-            var customSerializer = type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as CassandraTypeSerializerAttribute;
-            if (customSerializer != null)
+            if (type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() is CassandraTypeSerializerAttribute customSerializer)
             {
-                var serializer = customSerializer.Serializer(type,GenerateSerializer,GenerateDeserializer);
+                var serializer = customSerializer.Serializer(type, GenerateSerializer, GenerateDeserializer);
                 return value => serializer.Serialize(value);
             }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
                 return GenerateSerializer(type.GetGenericArguments()[0]);
-            }
 
             if (typeof(Guid).IsAssignableFrom(type))
-            {
                 return value => ValueSerialization.Serialize(ColumnType.Uuid, value);
-            }
 
             if (typeof(IPAddress).IsAssignableFrom(type))
-            {
                 return value => ValueSerialization.Serialize(ColumnType.Inet, value);
-            }
 
             if (typeof(Enum).IsAssignableFrom(type))
             {
@@ -131,19 +123,18 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             if (typeof(byte[]).IsAssignableFrom(type))
-            {
                 return value => ValueSerialization.Serialize(ColumnType.Blob, value);
-            }
 
             if (typeof(DateTimeOffset).IsAssignableFrom(type))
-            {
-                return value => ValueSerialization.Serialize(ColumnType.Timestamp, ((DateTimeOffset) value).UtcDateTime);
-            }
+                return value => ValueSerialization.Serialize(ColumnType.Timestamp, ((DateTimeOffset)value).UtcDateTime);
 
 
             if (typeof(IDictionary).IsAssignableFrom(type))
             {
-                var dictionaryTypeDef = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+                var dictionaryTypeDef = type.GetInterfaces()
+                                            .FirstOrDefault(x => x.IsGenericType &&
+                                                                 x.GetGenericTypeDefinition() ==
+                                                                 typeof(IDictionary<,>));
                 if (dictionaryTypeDef != null)
                 {
                     var dictionaryArgs = dictionaryTypeDef.GetGenericArguments();
@@ -157,7 +148,9 @@ namespace CassandraSharp.CQLBinaryProtocol
 
             if (typeof(IList).IsAssignableFrom(type))
             {
-                var listTypeDef = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>));
+                var listTypeDef = type.GetInterfaces()
+                                      .FirstOrDefault(x => x.IsGenericType &&
+                                                           x.GetGenericTypeDefinition() == typeof(IList<>));
                 if (listTypeDef != null)
                 {
                     var listItemType = listTypeDef.GetGenericArguments()[0];
@@ -168,21 +161,25 @@ namespace CassandraSharp.CQLBinaryProtocol
                 }
             }
 
-            var hashSetTypeDef = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ISet<>));
+            var hashSetTypeDef = type.GetInterfaces()
+                                     .FirstOrDefault(x => x.IsGenericType &&
+                                                          x.GetGenericTypeDefinition() == typeof(ISet<>));
             if (hashSetTypeDef != null)
             {
                 var setItemType = hashSetTypeDef.GetGenericArguments()[0];
                 var valueSerializer = GenerateSerializer(setItemType);
 
                 return value =>
-                {
-                    Type setAccessorType = typeof(HashSetAccessor<>).MakeGenericType(setItemType);
-                    var hashSet = (IHashSetAccessor)Activator.CreateInstance(setAccessorType, value);
-                    return ValueSerialization.SerializeSet(hashSet, valueSerializer);
-                };
+                       {
+                           var setAccessorType = typeof(HashSetAccessor<>).MakeGenericType(setItemType);
+                           var hashSet = (IHashSetAccessor)Activator.CreateInstance(setAccessorType, value);
+                           return ValueSerialization.SerializeSet(hashSet, valueSerializer);
+                       };
             }
 
-            throw new NotSupportedException(string.Format("Type {0} neither belongs to Cassandra native types nor has custom serializer defined. Use CassandraTypeSerializerAttribute to define custom type serializer to store data inside Blob column.", type.FullName));
+            throw new
+                NotSupportedException(string.Format("Type {0} neither belongs to Cassandra native types nor has custom serializer defined. Use CassandraTypeSerializerAttribute to define custom type serializer to store data inside Blob column.",
+                                                    type.FullName));
         }
 
         private Func<byte[], object> GenerateDeserializer(Type type)
@@ -231,27 +228,23 @@ namespace CassandraSharp.CQLBinaryProtocol
 
         private Func<byte[], object> GenerateObjectDeserializer(Type type)
         {
-            var customSerializer = type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as CassandraTypeSerializerAttribute;
+            var customSerializer =
+                type.GetCustomAttributes(typeof(CassandraTypeSerializerAttribute), false).FirstOrDefault() as
+                    CassandraTypeSerializerAttribute;
             if (customSerializer != null)
             {
-                var serializer = customSerializer.Serializer(type,GenerateSerializer,GenerateDeserializer);
+                var serializer = customSerializer.Serializer(type, GenerateSerializer, GenerateDeserializer);
                 return value => serializer.Deserialize(value);
             }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
                 return GenerateDeserializer(type.GetGenericArguments()[0]);
-            }
 
             if (typeof(Guid).IsAssignableFrom(type))
-            {
                 return value => ValueSerialization.Deserialize(ColumnType.Uuid, value);
-            }
 
             if (typeof(IPAddress).IsAssignableFrom(type))
-            {
                 return value => ValueSerialization.Deserialize(ColumnType.Inet, value);
-            }
 
             if (typeof(Enum).IsAssignableFrom(type))
             {
@@ -260,18 +253,19 @@ namespace CassandraSharp.CQLBinaryProtocol
             }
 
             if (typeof(byte[]).IsAssignableFrom(type))
-            {
                 return value => ValueSerialization.Deserialize(ColumnType.Blob, value);
-            }
             if (typeof(DateTimeOffset).IsAssignableFrom(type))
-            {
-                // DateTime deserializer assumes local, but the value is truely utx
-                return value => (DateTimeOffset) DateTime.SpecifyKind((DateTime) ValueSerialization.Deserialize(ColumnType.Timestamp, value), DateTimeKind.Local);
-            }
+                return value =>
+                           (DateTimeOffset)
+                           DateTime.SpecifyKind((DateTime)ValueSerialization.Deserialize(ColumnType.Timestamp, value),
+                                                DateTimeKind.Local);
 
             if (typeof(IDictionary).IsAssignableFrom(type))
             {
-                var dictionaryTypeDef = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+                var dictionaryTypeDef = type.GetInterfaces()
+                                            .FirstOrDefault(x => x.IsGenericType &&
+                                                                 x.GetGenericTypeDefinition() ==
+                                                                 typeof(IDictionary<,>));
                 if (dictionaryTypeDef != null)
                 {
                     var dictionaryArgs = dictionaryTypeDef.GetGenericArguments();
@@ -280,47 +274,54 @@ namespace CassandraSharp.CQLBinaryProtocol
                     var valueDeserializer = GenerateDeserializer(dictionaryArgs[1]);
 
                     return rawData =>
-                    {
-                        var res = (IDictionary)Activator.CreateInstance(type);
-                        return ValueSerialization.DeserializeMap(rawData, res, keyDeserializer, valueDeserializer);
-                    };
+                           {
+                               var res = (IDictionary)Activator.CreateInstance(type);
+                               return ValueSerialization.DeserializeMap(rawData, res, keyDeserializer,
+                                                                        valueDeserializer);
+                           };
                 }
             }
 
             if (typeof(IList).IsAssignableFrom(type))
             {
-                var listTypeDef = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>));
+                var listTypeDef = type.GetInterfaces()
+                                      .FirstOrDefault(x => x.IsGenericType &&
+                                                           x.GetGenericTypeDefinition() == typeof(IList<>));
                 if (listTypeDef != null)
                 {
                     var listItemType = listTypeDef.GetGenericArguments()[0];
                     var valueSerializer = GenerateDeserializer(listItemType);
 
                     return rawData =>
-                    {
-                        var res = (IList)Activator.CreateInstance(type);
-                        return ValueSerialization.DeserializeList(rawData, res, valueSerializer);
-                    };
+                           {
+                               var res = (IList)Activator.CreateInstance(type);
+                               return ValueSerialization.DeserializeList(rawData, res, valueSerializer);
+                           };
                 }
             }
 
-            var hashSetTypeDef = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ISet<>));
+            var hashSetTypeDef = type.GetInterfaces()
+                                     .FirstOrDefault(x => x.IsGenericType &&
+                                                          x.GetGenericTypeDefinition() == typeof(ISet<>));
             if (hashSetTypeDef != null)
             {
                 var setItemType = hashSetTypeDef.GetGenericArguments()[0];
                 var valueDeserializer = GenerateDeserializer(setItemType);
 
                 return rawData =>
-                {
-                    var hashSet = Activator.CreateInstance(type);
-                    Type accessorType = typeof(HashSetAccessor<>).MakeGenericType(setItemType);
-                    var setAccessor = (IHashSetAccessor)Activator.CreateInstance(accessorType, hashSet);
+                       {
+                           var hashSet = Activator.CreateInstance(type);
+                           var accessorType = typeof(HashSetAccessor<>).MakeGenericType(setItemType);
+                           var setAccessor = (IHashSetAccessor)Activator.CreateInstance(accessorType, hashSet);
 
-                    ValueSerialization.DeserializeSet(rawData, setAccessor, valueDeserializer);
-                    return hashSet;
-                };
+                           ValueSerialization.DeserializeSet(rawData, setAccessor, valueDeserializer);
+                           return hashSet;
+                       };
             }
 
-            throw new NotSupportedException(string.Format("Type {0} neither belongs to Cassandra native types nor has custom serializer defined. Use CassandraTypeSerializerAttribute to define custom type serializer to store data inside Blob column.", type.FullName));
+            throw new
+                NotSupportedException(string.Format("Type {0} neither belongs to Cassandra native types nor has custom serializer defined. Use CassandraTypeSerializerAttribute to define custom type serializer to store data inside Blob column.",
+                                                    type.FullName));
         }
     }
 }

@@ -14,12 +14,11 @@
 // limitations under the License.
 
 using CassandraSharp.CQLBinaryProtocol;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Utils;
 
 namespace CassandraSharp.CQLCommand
 {
-    using CassandraSharp.Extensibility;
-
     internal sealed class CqlCommandBuilder : ICqlCommandBuilderFrom,
                                               ICqlCommandBuilderTo,
                                               ICqlCommandBuilderBuild
