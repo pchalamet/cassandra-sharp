@@ -17,13 +17,12 @@ namespace CassandraSharp.Config
 {
     using System.Configuration;
 
-    public class XmlConfigurator
+    public class Factory
     {
-        public static void Configure()
+        public static CassandraSharpConfig GetConfiguration(string name = "CassandraSharp")
         {
-            // UNDONE
-            //CassandraSharpConfig cassandraSharpConfig = (CassandraSharpConfig) ConfigurationManager.GetSection("CassandraSharp");
-            //ClusterManager.Configure(cassandraSharpConfig);
+            var cassandraSharpConfig = (CassandraSharpConfig)ConfigurationManager.GetSection("CassandraSharp");
+            return cassandraSharpConfig;
         }
     }
 }

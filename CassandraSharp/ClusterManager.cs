@@ -37,15 +37,12 @@ namespace CassandraSharp
 
         private IRecoveryService _recoveryService;
 
-        public ClusterManager(CassandraSharpConfig config = null)
+        public ClusterManager(CassandraSharpConfig config)
         {
-            if (null == config)
-                return;
-
             lock (_lock)
             {
                 config.CheckArgumentNotNull("config");
-                _logger = ServiceActivator<Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
+                _logger = ServiceActivator<Logger.Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
                 _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;

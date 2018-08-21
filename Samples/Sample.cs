@@ -34,8 +34,8 @@ namespace Samples
             Console.WriteLine("== RUNNING     {0}", _name);
             Console.WriteLine("=======================================================");
 
-            XmlConfigurator.Configure();
-            using (var clusterManager = new ClusterManager())
+            var configuration = Factory.GetConfiguration();
+            using (var clusterManager = new ClusterManager(configuration))
             using (ICluster cluster = clusterManager.GetCluster("TestCassandra"))
             {
                 try

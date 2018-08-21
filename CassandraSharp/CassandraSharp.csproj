@@ -3,20 +3,14 @@
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFrameworks>netcoreapp2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net47</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\cassandra-sharp.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>CassandraSharp</AssemblyName>
     <RootNamespace>CassandraSharp</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
     <PackageReference Include="System.Reactive.Core" Version="3.1.1" />
     <PackageReference Include="System.Reactive.Interfaces" Version="3.1.1" />
     <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
@@ -27,5 +21,5 @@
     <Compile Include="..\cassandra-sharp-interfaces-AssemblyInfo.cs" />
     <Compile Include="..\cassandra-sharp-info.cs" />
     <None Include="..\..\cassandra-sharp.snk" />
-  </ItemGroup>
+  </ItemGroup>    
 </Project>
