@@ -1,5 +1,5 @@
 ﻿//// cassandra-sharp - high performance .NET driver for Apache Cassandra
-//// Copyright (c) 2011-2013 Pierre Chalamet
+//// Copyright (c) 2011-2018 Pierre Chalamet
 //// 
 //// Licensed under the Apache License, Version 2.0 (the "License");
 //// you may not use this file except in compliance with the License.
