@@ -23,46 +23,43 @@ namespace CassandraSharp.Utils.Stream
     {
         public static void WriteUShort(this System.IO.Stream stream, ushort data)
         {
-            byte[] buffer = BitConverter.GetBytes(data);
+            var buffer = BitConverter.GetBytes(data);
             buffer.ReverseIfLittleEndian();
             stream.Write(buffer, 0, buffer.Length);
         }
 
         public static void WriteInt(this System.IO.Stream stream, int data)
         {
-            byte[] buffer = BitConverter.GetBytes(data);
+            var buffer = BitConverter.GetBytes(data);
             buffer.ReverseIfLittleEndian();
             stream.Write(buffer, 0, buffer.Length);
         }
 
         public static void WriteString(this System.IO.Stream stream, string data)
         {
-            byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            ushort len = (ushort) bufStr.Length;
+            var bufStr = Encoding.UTF8.GetBytes(data);
+            var len = (ushort)bufStr.Length;
             stream.WriteUShort(len);
             stream.Write(bufStr, 0, len);
         }
 
         public static void WriteStringList(this System.IO.Stream stream, string[] data)
         {
-            stream.WriteUShort((ushort) data.Length);
-            foreach (string s in data)
-            {
-                stream.WriteString(s);
-            }
+            stream.WriteUShort((ushort)data.Length);
+            foreach (var s in data) stream.WriteString(s);
         }
 
         public static void WriteLongString(this System.IO.Stream stream, string data)
         {
-            byte[] bufStr = Encoding.UTF8.GetBytes(data);
-            int len = bufStr.Length;
+            var bufStr = Encoding.UTF8.GetBytes(data);
+            var len = bufStr.Length;
             stream.WriteInt(len);
             stream.Write(bufStr, 0, len);
         }
 
         public static void WriteStringMap(this System.IO.Stream stream, Dictionary<string, string> dic)
         {
-            stream.WriteUShort((ushort) dic.Count);
+            stream.WriteUShort((ushort)dic.Count);
             foreach (var kvp in dic)
             {
                 stream.WriteString(kvp.Key);
@@ -72,7 +69,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static void WriteShortBytes(this System.IO.Stream stream, byte[] data)
         {
-            ushort len = (ushort) data.Length;
+            var len = (ushort)data.Length;
             stream.WriteUShort(len);
             stream.Write(data, 0, len);
         }
@@ -81,7 +78,7 @@ namespace CassandraSharp.Utils.Stream
         {
             if (null != data)
             {
-                int len = data.Length;
+                var len = data.Length;
                 stream.WriteInt(len);
                 stream.Write(data, 0, len);
             }
@@ -93,42 +90,39 @@ namespace CassandraSharp.Utils.Stream
 
         private static void ReadBuffer(this System.IO.Stream stream, byte[] buffer)
         {
-            int read = 0;
-            int len = buffer.Length;
-            while (read != len)
-            {
-                read += stream.Read(buffer, read, len - read);
-            }
+            var read = 0;
+            var len = buffer.Length;
+            while (read != len) read += stream.Read(buffer, read, len - read);
         }
 
         public static ushort ReadUShort(this System.IO.Stream stream)
         {
-            byte[] buffer = new byte[2];
+            var buffer = new byte[2];
             stream.ReadBuffer(buffer);
             buffer.ReverseIfLittleEndian();
 
-            ushort data = BitConverter.ToUInt16(buffer, 0);
+            var data = BitConverter.ToUInt16(buffer, 0);
             return data;
         }
 
         public static int ReadInt(this System.IO.Stream stream)
         {
-            byte[] buffer = new byte[4];
+            var buffer = new byte[4];
             stream.ReadBuffer(buffer);
             buffer.ReverseIfLittleEndian();
 
-            int data = BitConverter.ToInt32(buffer, 0);
+            var data = BitConverter.ToInt32(buffer, 0);
             return data;
         }
 
         public static string ReadString(this System.IO.Stream stream)
         {
-            ushort len = stream.ReadUShort();
+            var len = stream.ReadUShort();
             if (0 != len)
             {
-                byte[] bufStr = new byte[len];
+                var bufStr = new byte[len];
                 stream.ReadBuffer(bufStr);
-                string data = Encoding.UTF8.GetString(bufStr);
+                var data = Encoding.UTF8.GetString(bufStr);
                 return data;
             }
 
@@ -137,10 +131,10 @@ namespace CassandraSharp.Utils.Stream
 
         public static byte[] ReadBytesArray(this System.IO.Stream stream)
         {
-            int len = stream.ReadInt();
+            var len = stream.ReadInt();
             if (-1 != len)
             {
-                byte[] data = new byte[len];
+                var data = new byte[len];
                 stream.ReadBuffer(data);
                 return data;
             }
@@ -150,31 +144,28 @@ namespace CassandraSharp.Utils.Stream
 
         public static byte[] ReadShortBytes(this System.IO.Stream stream)
         {
-            ushort len = stream.ReadUShort();
-            byte[] data = new byte[len];
+            var len = stream.ReadUShort();
+            var data = new byte[len];
             stream.ReadBuffer(data);
             return data;
         }
 
         public static string[] ReadStringList(this System.IO.Stream stream)
         {
-            ushort len = stream.ReadUShort();
-            string[] data = new string[len];
-            for (int i = 0; i < len; ++i)
-            {
-                data[i] = stream.ReadString();
-            }
+            var len = stream.ReadUShort();
+            var data = new string[len];
+            for (var i = 0; i < len; ++i) data[i] = stream.ReadString();
             return data;
         }
 
         public static Dictionary<string, string[]> ReadStringMultimap(this System.IO.Stream stream)
         {
-            ushort len = stream.ReadUShort();
-            Dictionary<string, string[]> data = new Dictionary<string, string[]>(len);
-            for (int i = 0; i < len; ++i)
+            var len = stream.ReadUShort();
+            var data = new Dictionary<string, string[]>(len);
+            for (var i = 0; i < len; ++i)
             {
-                string key = stream.ReadString();
-                string[] value = stream.ReadStringList();
+                var key = stream.ReadString();
+                var value = stream.ReadStringList();
                 data.Add(key, value);
             }
 

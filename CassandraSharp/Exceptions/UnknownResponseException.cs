@@ -18,11 +18,11 @@ namespace CassandraSharp.Exceptions
     public class UnknownResponseException : CassandraException
     {
         public UnknownResponseException(MessageOpcodes messageOpcode)
-                : base(ErrorCodes.Unknown, "Unknown server response")
+            : base(ErrorCodes.Unknown, "Unknown server response")
         {
             MessageOpcode = messageOpcode;
         }
 
-        public MessageOpcodes MessageOpcode { get; private set; }
+        public MessageOpcodes MessageOpcode { get; }
     }
 }

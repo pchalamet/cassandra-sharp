@@ -23,20 +23,14 @@ namespace CassandraSharp.Utils
         [Conditional("DEBUG")]
         public static void CheckArgumentNotNull(this object @this, string name)
         {
-            if (null == @this)
-            {
-                throw new ArgumentNullException(name);
-            }
+            if (null == @this) throw new ArgumentNullException(name);
         }
 
         [Conditional("DEBUG")]
         public static void CheckArrayHasAtLeastOneElement<T>(this T[] @this, string name)
         {
             @this.CheckArgumentNotNull(name);
-            if (0 == @this.Length)
-            {
-                throw new ArgumentException("Array must have at least one element", name);
-            }
+            if (0 == @this.Length) throw new ArgumentException("Array must have at least one element", name);
         }
 
         [Conditional("DEBUG")]
@@ -44,10 +38,7 @@ namespace CassandraSharp.Utils
         {
             @this.CheckArgumentNotNull(thisName);
             otherPrm.CheckArgumentNotNull(otherName);
-            if (@this.Length != otherPrm.Length)
-            {
-                throw new ArgumentException("Arrays must have the same length", thisName + "/" + otherName);
-            }
+            if (@this.Length != otherPrm.Length) throw new ArgumentException("Arrays must have the same length", thisName + "/" + otherName);
         }
     }
 }

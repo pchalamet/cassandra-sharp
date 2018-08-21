@@ -22,14 +22,11 @@ namespace CassandraSharp.Instrumentation
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(NullInstrumentation)},
-                    {"Null", typeof(NullInstrumentation)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(NullInstrumentation)},
+                                                                     {"Null", typeof(NullInstrumentation)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

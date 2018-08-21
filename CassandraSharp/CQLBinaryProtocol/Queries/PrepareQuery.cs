@@ -24,24 +24,21 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     internal sealed class PrepareQuery : CqlQuery<Tuple<byte[], IColumnSpec[]>>
     {
         public PrepareQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql)
-                : base(connection, consistencyLevel, executionFlags, cql, null)
+            : base(connection, consistencyLevel, executionFlags, cql, null)
         {
         }
 
         protected override IEnumerable<Tuple<byte[], IColumnSpec[]>> ReadFrame(IFrameReader frameReader)
         {
-            if (MessageOpcodes.Result != frameReader.MessageOpcode)
-            {
-                throw new ArgumentException("Unknown server response");
-            }
+            if (MessageOpcodes.Result != frameReader.MessageOpcode) throw new ArgumentException("Unknown server response");
 
-            Stream stream = frameReader.ReadOnlyStream;
-            ResultOpcode resultOpcode = (ResultOpcode) stream.ReadInt();
+            var stream = frameReader.ReadOnlyStream;
+            var resultOpcode = (ResultOpcode)stream.ReadInt();
             switch (resultOpcode)
             {
                 case ResultOpcode.Prepared:
-                    byte[] queryId = stream.ReadShortBytes();
-                    IColumnSpec[] columnSpecs = ReadMetadata(stream);                
+                    var queryId = stream.ReadShortBytes();
+                    var columnSpecs = ReadMetadata(stream);
                     ReadResultMetadata(frameReader);
                     yield return Tuple.Create(queryId, columnSpecs);
                     break;
@@ -59,15 +56,12 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
             // read primary key indices
             var pkIndices = new ushort[pkColumnIndexCount];
-            for (int i = 0; i < pkColumnIndexCount; ++i)
-            {
-                pkIndices[i] = stream.ReadUShort();
-            }
+            for (var i = 0; i < pkColumnIndexCount; ++i) pkIndices[i] = stream.ReadUShort();
 
             // read column specs
             string keyspace = null;
             string table = null;
-            bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
+            var globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
             if (globalTablesSpec)
             {
                 keyspace = stream.ReadString();
@@ -80,14 +74,14 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override void WriteFrame(IFrameWriter fw)
         {
-            Stream stream = fw.WriteOnlyStream;
+            var stream = fw.WriteOnlyStream;
             stream.WriteLongString(CQL);
             fw.SetMessageType(MessageOpcodes.Prepare);
         }
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Prepare, ExecutionFlags, CQL);
+            var token = InstrumentationToken.Create(RequestType.Prepare, ExecutionFlags, CQL);
             return token;
         }
     }

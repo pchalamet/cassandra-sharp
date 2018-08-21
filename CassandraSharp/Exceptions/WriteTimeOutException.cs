@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class WriteTimeOutException : TimeOutException
     {
         public WriteTimeOutException(string message, ConsistencyLevel consistencyLevel, int received, int blockFor, string writeType)
-                : base(ErrorCodes.WriteTimeout, message, consistencyLevel, received, blockFor)
+            : base(ErrorCodes.WriteTimeout, message, consistencyLevel, received, blockFor)
         {
             WriteType = writeType;
         }
 
-        public string WriteType { get; private set; }
+        public string WriteType { get; }
     }
 }

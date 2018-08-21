@@ -14,12 +14,11 @@
 // limitations under the License.
 
 using CassandraSharp.CQLBinaryProtocol;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Utils;
 
 namespace CassandraSharp
 {
-    using CassandraSharp.Extensibility;
-
     internal sealed class CommandFactory : ICommandFactory
     {
         public ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut)

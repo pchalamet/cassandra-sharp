@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.CQLCommand;
+
 namespace CassandraSharp.CQLPoco
 {
-    using CassandraSharp.CQLCommand;
-
     public static class CQLPocoExtensions
     {
         public static ICqlCommandBuilderTo FromPoco(this ICqlCommandBuilderFrom @this)

@@ -14,7 +14,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.IO;
 using CassandraSharp.Exceptions;
 using CassandraSharp.Extensibility;
 using CassandraSharp.Utils.Stream;
@@ -24,19 +23,16 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     internal sealed class CreateOptionsQuery : Query<Dictionary<string, string[]>>
     {
         public CreateOptionsQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags)
-                : base(connection, consistencyLevel, executionFlags)
+            : base(connection, consistencyLevel, executionFlags)
         {
         }
 
         protected override IEnumerable<Dictionary<string, string[]>> ReadFrame(IFrameReader frameReader)
         {
-            if (frameReader.MessageOpcode != MessageOpcodes.Supported)
-            {
-                throw new UnknownResponseException(frameReader.MessageOpcode);
-            }
+            if (frameReader.MessageOpcode != MessageOpcodes.Supported) throw new UnknownResponseException(frameReader.MessageOpcode);
 
-            Stream stream = frameReader.ReadOnlyStream;
-            Dictionary<string, string[]> res = stream.ReadStringMultimap();
+            var stream = frameReader.ReadOnlyStream;
+            var res = stream.ReadStringMultimap();
             yield return res;
         }
 
@@ -47,7 +43,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Options, ExecutionFlags.None);
+            var token = InstrumentationToken.Create(RequestType.Options, ExecutionFlags.None);
             return token;
         }
     }

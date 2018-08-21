@@ -34,19 +34,16 @@ namespace CassandraSharp.Utils
         {
             if (string.IsNullOrEmpty(customType))
             {
-                string emptyTypeMsg = string.Format("Expecting nickname or qualified class name for '{0}'", typeof(TI).AssemblyQualifiedName);
+                var emptyTypeMsg = string.Format("Expecting nickname or qualified class name for '{0}'", typeof(TI).AssemblyQualifiedName);
                 throw new ArgumentException(emptyTypeMsg);
             }
 
             Type type;
-            if (!_descriptor.Definition.TryGetValue(customType, out type))
-            {
-                type = Type.GetType(customType);
-            }
+            if (!_descriptor.Definition.TryGetValue(customType, out type)) type = Type.GetType(customType);
 
             if (null == type || !typeof(TI).IsAssignableFrom(type))
             {
-                string invalidTypeMsg = string.Format("'{0}' is not a valid type", customType);
+                var invalidTypeMsg = string.Format("'{0}' is not a valid type", customType);
                 throw new ArgumentException(invalidTypeMsg);
             }
 

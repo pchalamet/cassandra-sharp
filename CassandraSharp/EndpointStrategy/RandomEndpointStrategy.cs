@@ -45,7 +45,7 @@ namespace CassandraSharp.EndpointStrategy
                 IPAddress endpoint = null;
                 if (0 < _healthyEndpoints.Count)
                 {
-                    int candidate = _rnd.Next(_healthyEndpoints.Count);
+                    var candidate = _rnd.Next(_healthyEndpoints.Count);
                     endpoint = _healthyEndpoints[candidate];
                 }
 
@@ -57,10 +57,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                if (_healthyEndpoints.Remove(endpoint))
-                {
-                    _bannedEndpoints.Add(endpoint);
-                }
+                if (_healthyEndpoints.Remove(endpoint)) _bannedEndpoints.Add(endpoint);
             }
         }
 
@@ -68,10 +65,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                if (_bannedEndpoints.Remove(endpoint))
-                {
-                    _healthyEndpoints.Add(endpoint);
-                }
+                if (_bannedEndpoints.Remove(endpoint)) _healthyEndpoints.Add(endpoint);
             }
         }
 
@@ -79,11 +73,8 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                IPAddress endpoint = peer.RpcAddress;
-                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
-                {
-                    _healthyEndpoints.Add(endpoint);
-                }
+                var endpoint = peer.RpcAddress;
+                if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint)) _healthyEndpoints.Add(endpoint);
             }
         }
     }

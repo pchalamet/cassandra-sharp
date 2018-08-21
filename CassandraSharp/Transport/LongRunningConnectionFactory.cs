@@ -23,9 +23,9 @@ namespace CassandraSharp.Transport
     internal sealed class LongRunningConnectionFactory : IConnectionFactory
     {
         private readonly TransportConfig _config;
-        private readonly KeyspaceConfig _keyspaceConfig;
 
         private readonly IInstrumentation _instrumentation;
+        private readonly KeyspaceConfig _keyspaceConfig;
 
         private readonly ILogger _logger;
 
@@ -42,7 +42,7 @@ namespace CassandraSharp.Transport
             _logger.Debug("Creating connection to {0}", address);
             try
             {
-                LongRunningConnection connection = new LongRunningConnection(address, _config, _keyspaceConfig, _logger, _instrumentation);
+                var connection = new LongRunningConnection(address, _config, _keyspaceConfig, _logger, _instrumentation);
                 return connection;
             }
             catch (Exception ex)

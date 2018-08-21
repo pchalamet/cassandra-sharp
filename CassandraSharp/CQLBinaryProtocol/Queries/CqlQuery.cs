@@ -24,9 +24,8 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 {
     internal class CqlQuery<T> : Query<T>
     {
-        protected readonly string CQL;
-
         private readonly IDataMapper _mapperOut;
+        protected readonly string CQL;
 
         public CqlQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, IDataMapper mapperOut)
             : base(connection, consistencyLevel, executionFlags)
@@ -42,7 +41,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override void WriteFrame(IFrameWriter fw)
         {
-            Stream stream = fw.WriteOnlyStream;
+            var stream = fw.WriteOnlyStream;
             stream.WriteLongString(CQL);
             stream.WriteUShort((ushort)ConsistencyLevel);
             stream.WriteByte(0);
@@ -51,35 +50,26 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Query, ExecutionFlags, CQL);
+            var token = InstrumentationToken.Create(RequestType.Query, ExecutionFlags, CQL);
             return token;
         }
 
         private static IEnumerable<T> ReadRowSet(IFrameReader frameReader, IDataMapper mapperFactory)
         {
-            if (MessageOpcodes.Result != frameReader.MessageOpcode)
-            {
-                throw new ArgumentException("Unknown server response");
-            }
+            if (MessageOpcodes.Result != frameReader.MessageOpcode) throw new ArgumentException("Unknown server response");
 
-            if (null == mapperFactory)
-            {
-                yield break;
-            }
+            if (null == mapperFactory) yield break;
 
-            Stream stream = frameReader.ReadOnlyStream;
-            ResultOpcode resultOpcode = (ResultOpcode)stream.ReadInt();
+            var stream = frameReader.ReadOnlyStream;
+            var resultOpcode = (ResultOpcode)stream.ReadInt();
             switch (resultOpcode)
             {
                 case ResultOpcode.Void:
                     yield break;
 
                 case ResultOpcode.Rows:
-                    IColumnSpec[] columnSpecs = ReadResultMetadata(frameReader);
-                    foreach (T row in ReadRows(frameReader, columnSpecs, mapperFactory))
-                    {
-                        yield return row;
-                    }
+                    var columnSpecs = ReadResultMetadata(frameReader);
+                    foreach (var row in ReadRows(frameReader, columnSpecs, mapperFactory)) yield return row;
                     break;
 
                 case ResultOpcode.SetKeyspace:
@@ -95,9 +85,9 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         private static IEnumerable<T> ReadRows(IFrameReader frameReader, IColumnSpec[] columnSpecs, IDataMapper mapperFactory)
         {
-            Stream stream = frameReader.ReadOnlyStream;
-            int rowCount = stream.ReadInt();
-            for (int rowIdx = 0; rowIdx < rowCount; ++rowIdx)
+            var stream = frameReader.ReadOnlyStream;
+            var rowCount = stream.ReadInt();
+            for (var rowIdx = 0; rowIdx < rowCount; ++rowIdx)
             {
                 var rowData = columnSpecs.Select(spec => new ColumnData(spec, stream.ReadBytesArray()));
                 yield return (T)mapperFactory.MapToObject(rowData);
@@ -106,13 +96,13 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected static IColumnSpec[] ReadResultMetadata(IFrameReader frameReader)
         {
-            Stream stream = frameReader.ReadOnlyStream;
-            MetadataFlags flags = (MetadataFlags)stream.ReadInt();
-            int colCount = stream.ReadInt();
+            var stream = frameReader.ReadOnlyStream;
+            var flags = (MetadataFlags)stream.ReadInt();
+            var colCount = stream.ReadInt();
 
-            bool globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
-            bool hasMorePages = 0 != (flags & MetadataFlags.HasMorePages);
-            bool noMetadata = 0 != (flags & MetadataFlags.NoMetadata);
+            var globalTablesSpec = 0 != (flags & MetadataFlags.GlobalTablesSpec);
+            var hasMorePages = 0 != (flags & MetadataFlags.HasMorePages);
+            var noMetadata = 0 != (flags & MetadataFlags.NoMetadata);
 
             string keyspace = null;
             string table = null;
@@ -136,22 +126,22 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected static IColumnSpec[] ReadColumnSpecs(int colCount, string keyspace, string table, bool globalTablesSpec, Stream stream)
         {
-            IColumnSpec[] columnSpecs = new IColumnSpec[colCount];
-            for (int colIdx = 0; colIdx < colCount; ++colIdx)
+            var columnSpecs = new IColumnSpec[colCount];
+            for (var colIdx = 0; colIdx < colCount; ++colIdx)
             {
-                string colKeyspace = keyspace;
-                string colTable = table;
+                var colKeyspace = keyspace;
+                var colTable = table;
                 if (!globalTablesSpec)
                 {
                     colKeyspace = stream.ReadString();
                     colTable = stream.ReadString();
                 }
 
-                string colName = stream.ReadString();
-                ColumnType colType = (ColumnType)stream.ReadUShort();
+                var colName = stream.ReadString();
+                var colType = (ColumnType)stream.ReadUShort();
                 string colCustom = null;
-                ColumnType colKeyType = ColumnType.Custom;
-                ColumnType colValueType = ColumnType.Custom;
+                var colKeyType = ColumnType.Custom;
+                var colValueType = ColumnType.Custom;
                 switch (colType)
                 {
                     case ColumnType.Custom:
@@ -171,6 +161,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
                 columnSpecs[colIdx] = new ColumnSpec(colIdx, colKeyspace, colTable, colName, colType, colCustom, colKeyType, colValueType);
             }
+
             return columnSpecs;
         }
     }

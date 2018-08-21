@@ -24,17 +24,14 @@ namespace CassandraSharp.CQLOrdinal
     {
         public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
         {
-            object[] data = (object[])dataSource;
+            var data = (object[])dataSource;
 
             foreach (var column in columns)
             {
                 var value = data[column.Index];
 
                 byte[] rawData = null;
-                if (value != null)
-                {
-                    rawData = column.Serialize(value);
-                }
+                if (value != null) rawData = column.Serialize(value);
 
                 yield return new ColumnData(column, rawData);
             }
@@ -47,9 +44,7 @@ namespace CassandraSharp.CQLOrdinal
             var instance = new object[rows.Count];
             foreach (var column in rows.OrderBy(x => x.ColumnSpec.Index))
             {
-                var data = column.RawData != null ?
-                    column.ColumnSpec.Deserialize(column.RawData) :
-                    null;
+                var data = column.RawData != null ? column.ColumnSpec.Deserialize(column.RawData) : null;
 
                 instance[column.ColumnSpec.Index] = data;
             }

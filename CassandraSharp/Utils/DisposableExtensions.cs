@@ -22,7 +22,6 @@ namespace CassandraSharp.Utils
         public static void SafeDispose(this IDisposable @this)
         {
             if (null != @this)
-            {
                 try
                 {
                     @this.Dispose();
@@ -32,12 +31,11 @@ namespace CassandraSharp.Utils
 // ReSharper restore EmptyGeneralCatchClause
                 {
                 }
-            }
         }
 
         public static void SafeDispose(this object @this)
         {
-            IDisposable disposable = @this as IDisposable;
+            var disposable = @this as IDisposable;
             disposable.SafeDispose();
         }
     }

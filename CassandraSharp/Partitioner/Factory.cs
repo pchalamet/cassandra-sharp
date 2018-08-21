@@ -22,16 +22,13 @@ namespace CassandraSharp.Partitioner
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(NullPartitioner)},
-                    {"Null", typeof(NullPartitioner)},
-                    {"Random", typeof(RandomPartitioner)},
-                    {"Murmur3", typeof(Murmur3Partitioner)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(NullPartitioner)},
+                                                                     {"Null", typeof(NullPartitioner)},
+                                                                     {"Random", typeof(RandomPartitioner)},
+                                                                     {"Murmur3", typeof(Murmur3Partitioner)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

@@ -15,11 +15,6 @@
 
 namespace CassandraSharp
 {
-    using System.Configuration;
-    using System.Xml;
-    using System.Xml.Serialization;
-    using CassandraSharp.Config;
-
     // UNDONE
     //internal class SectionHandler : IConfigurationSectionHandler
     //{

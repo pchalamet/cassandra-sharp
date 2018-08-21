@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
 namespace CassandraSharp.CQLPropertyBag
 {
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-
     public sealed class PropertyBag
     {
         private readonly Dictionary<string, object> _map = new Dictionary<string, object>();
@@ -27,20 +27,17 @@ namespace CassandraSharp.CQLPropertyBag
         {
             get
             {
-                string lowName = name.ToLower(CultureInfo.InvariantCulture).Replace("_", "");
+                var lowName = name.ToLower(CultureInfo.InvariantCulture).Replace("_", "");
                 return _map[lowName];
             }
 
             set
             {
-                string lowName = name.ToLower(CultureInfo.InvariantCulture).Replace("_", "");
+                var lowName = name.ToLower(CultureInfo.InvariantCulture).Replace("_", "");
                 _map[lowName] = value;
             }
         }
 
-        public string[] Keys
-        {
-            get { return _map.Keys.ToArray(); }
-        }
+        public string[] Keys => _map.Keys.ToArray();
     }
 }

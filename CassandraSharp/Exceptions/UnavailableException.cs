@@ -13,25 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class UnavailableException : CassandraException
     {
         public UnavailableException(string message, ConsistencyLevel consistencyLevel, int required, int alive)
-                : base(ErrorCodes.Unavailable, message)
+            : base(ErrorCodes.Unavailable, message)
         {
             ConsistencyLevel = consistencyLevel;
             Required = required;
             Alive = alive;
         }
 
-        public ConsistencyLevel ConsistencyLevel { get; private set; }
+        public ConsistencyLevel ConsistencyLevel { get; }
 
-        public int Required { get; private set; }
+        public int Required { get; }
 
-        public int Alive { get; private set; }
+        public int Alive { get; }
     }
 }

@@ -22,17 +22,14 @@ namespace CassandraSharp.EndpointStrategy
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(NearestEndpointStrategy)},
-                    {"Random", typeof(RandomEndpointStrategy)},
-                    {"Nearest", typeof(NearestEndpointStrategy)},
-                    {"RoundRobin", typeof(RoundRobinEndpointStrategy)},
-                    {"TokenRing", typeof(TokenRingEndpointStrategy)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(NearestEndpointStrategy)},
+                                                                     {"Random", typeof(RandomEndpointStrategy)},
+                                                                     {"Nearest", typeof(NearestEndpointStrategy)},
+                                                                     {"RoundRobin", typeof(RoundRobinEndpointStrategy)},
+                                                                     {"TokenRing", typeof(TokenRingEndpointStrategy)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
+
 namespace CassandraSharp.Extensibility
 {
-    using System.Net;
-
     /// <summary>
     ///     ITransportFactory creates Cassandra connexion
     /// </summary>

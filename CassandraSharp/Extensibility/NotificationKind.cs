@@ -21,6 +21,6 @@ namespace CassandraSharp.Extensibility
 
         Remove,
 
-        Update,
+        Update
     }
 }

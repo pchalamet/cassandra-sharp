@@ -22,14 +22,11 @@ namespace CassandraSharp.Transport
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(LongRunningConnectionFactory)},
-                    {"LongRunning", typeof(LongRunningConnectionFactory)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(LongRunningConnectionFactory)},
+                                                                     {"LongRunning", typeof(LongRunningConnectionFactory)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

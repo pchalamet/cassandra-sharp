@@ -22,13 +22,10 @@ namespace CassandraSharp.Partitioner
     {
         protected override BigInteger? Hash(byte[] buffer, int offset, int len)
         {
-            long hash = MurmurHash.Hash3_x64_128(buffer, offset, len, 0)[0];
+            var hash = MurmurHash.Hash3_x64_128(buffer, offset, len, 0)[0];
 
             // hash normalization  (minimum value is excluded)
-            if (hash == long.MinValue)
-            {
-                hash = long.MaxValue;
-            }
+            if (hash == long.MinValue) hash = long.MaxValue;
 
             return hash;
         }

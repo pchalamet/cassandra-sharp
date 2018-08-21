@@ -1,4 +1,4 @@
-﻿﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using CassandraSharp.Extensibility;
@@ -24,11 +23,10 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 {
     internal sealed class CreateKeyspaceQuery : Query<bool>
     {
+        private readonly bool _durableWrites;
         private readonly string _name;
 
         private readonly IDictionary<string, string> _replicationOptions;
-
-        private readonly bool _durableWrites;
 
         public CreateKeyspaceQuery(IConnection connection, string name, IDictionary<string, string> replicationOptions, bool durableWrites)
             : base(connection, ConsistencyLevel.ONE, ExecutionFlags.None)
@@ -40,21 +38,21 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override IEnumerable<bool> ReadFrame(IFrameReader frameReader)
         {
-            Stream stream = frameReader.ReadOnlyStream;
-            ResultOpcode resultOpcode = (ResultOpcode)stream.ReadInt();
+            var stream = frameReader.ReadOnlyStream;
+            var resultOpcode = (ResultOpcode)stream.ReadInt();
             yield return resultOpcode == ResultOpcode.SchemaChange;
         }
 
         protected override void WriteFrame(IFrameWriter fw)
         {
-            StringBuilder sb = new StringBuilder("CREATE KEYSPACE ");
+            var sb = new StringBuilder("CREATE KEYSPACE ");
             sb.Append(_name);
             sb.Append(" WITH replication = {");
             sb.Append(string.Join(",", _replicationOptions.Select(x => string.Format("'{0}': '{1}'", x.Key, x.Value))));
             sb.Append("} AND durable_writes = ");
             sb.Append(_durableWrites);
 
-            Stream stream = fw.WriteOnlyStream;
+            var stream = fw.WriteOnlyStream;
             stream.WriteLongString(sb.ToString());
             stream.WriteUShort((ushort)ConsistencyLevel);
             stream.WriteByte(0);
@@ -63,7 +61,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
+            var token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
             return token;
         }
     }

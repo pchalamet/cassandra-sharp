@@ -25,31 +25,31 @@ namespace CassandraSharp.Partitioner
     {
         public BigInteger? ComputeToken(PartitionKey partitionKey)
         {
-            object[] keys = partitionKey.Keys;
+            var keys = partitionKey.Keys;
 
             if (1 == keys.Length)
             {
-                ColumnType colType = keys[0].GetType().ToColumnType();
-                byte[] buffer = ValueSerialization.Serialize(colType, keys[0]);
+                var colType = keys[0].GetType().ToColumnType();
+                var buffer = ValueSerialization.Serialize(colType, keys[0]);
                 return Hash(buffer, 0, buffer.Length);
             }
 
             var rawValues = new byte[keys.Length][];
-            for (int i = 0; i < keys.Length; i++)
+            for (var i = 0; i < keys.Length; i++)
             {
-                ColumnType colType = keys[i].GetType().ToColumnType();
+                var colType = keys[i].GetType().ToColumnType();
                 rawValues[i] = ValueSerialization.Serialize(colType, keys[i]);
             }
 
-            int length = keys.Length * 3 + rawValues.Sum(val => val.Length);
+            var length = keys.Length * 3 + rawValues.Sum(val => val.Length);
             using (var stream = new MemoryStream(length))
             {
                 foreach (var rawValue in rawValues)
                 {
                     //write length of composite key part as short
-                    var len = (short) rawValue.Length;
-                    stream.WriteByte((byte) (len >> 8));
-                    stream.WriteByte((byte) (len));
+                    var len = (short)rawValue.Length;
+                    stream.WriteByte((byte)(len >> 8));
+                    stream.WriteByte((byte)len);
 
                     //write value
                     stream.Write(rawValue, 0, len);
@@ -58,7 +58,7 @@ namespace CassandraSharp.Partitioner
                     stream.WriteByte(0);
                 }
 
-                byte[] buffer = stream.GetBuffer();
+                var buffer = stream.GetBuffer();
                 return Hash(buffer, 0, length);
             }
         }

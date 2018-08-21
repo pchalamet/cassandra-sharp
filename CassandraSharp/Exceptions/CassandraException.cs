@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class CassandraException : Exception
     {
         internal CassandraException(ErrorCodes code, string message)
-                : base(message)
+            : base(message)
         {
             Code = code;
         }
 
-        public ErrorCodes Code { get; private set; }
+        public ErrorCodes Code { get; }
 
         public override string ToString()
         {

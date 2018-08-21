@@ -23,7 +23,7 @@ namespace CassandraSharp.Utils.Stream
 
         public static long ToTimestamp(this DateTime dt)
         {
-            return (long) dt.Subtract(_epoch).TotalMilliseconds;
+            return (long)dt.Subtract(_epoch).TotalMilliseconds;
         }
 
         public static DateTime ToDateTime(this long ts)

@@ -61,6 +61,6 @@ namespace CassandraSharp
 
         Map = 0x0021,
 
-        Set = 0x0022,
+        Set = 0x0022
     }
 }

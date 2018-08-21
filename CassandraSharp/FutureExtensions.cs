@@ -13,29 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace CassandraSharp
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     public static class FutureExtensions
     {
         public static Task<IList<T>> AsFuture<T>(this IObservable<T> observable, CancellationToken? token = null)
         {
             var obsEnumerable = observable.Aggregate((IList<T>)new List<T>(),
                                                      (acc, v) =>
-                                                         {
-                                                             acc.Add(v);
-                                                             return acc;
-                                                         });
+                                                     {
+                                                         acc.Add(v);
+                                                         return acc;
+                                                     });
 
-            Task<IList<T>> task = token.HasValue
-                                          ? obsEnumerable.ToTask(token.Value)
-                                          : obsEnumerable.ToTask();
+            var task = token.HasValue
+                           ? obsEnumerable.ToTask(token.Value)
+                           : obsEnumerable.ToTask();
             return task;
         }
 
@@ -43,8 +43,8 @@ namespace CassandraSharp
         {
             var obsEnumerable = observable.Count();
             Task task = token.HasValue
-                                ? obsEnumerable.ToTask(token.Value)
-                                : obsEnumerable.ToTask();
+                            ? obsEnumerable.ToTask(token.Value)
+                            : obsEnumerable.ToTask();
             return task;
         }
     }

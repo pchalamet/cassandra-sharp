@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Extensibility
 {
-    using System;
-
     public delegate void TopologyUpdate(NotificationKind kind, Peer peer);
 
     public interface IDiscoveryService : IDisposable

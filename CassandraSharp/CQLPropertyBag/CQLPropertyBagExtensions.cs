@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.CQLCommand;
+
 namespace CassandraSharp.CQLPropertyBag
 {
-    using CassandraSharp.CQLCommand;
-
     public static class CQLPropertyBagExtensions
     {
         public static ICqlCommandBuilderTo FromPropertyBag(this ICqlCommandBuilderFrom @this)

@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Net;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharp
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using CassandraSharp.Extensibility;
-
     public interface IConnection
     {
         IPAddress Endpoint { get; }

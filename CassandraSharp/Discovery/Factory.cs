@@ -22,15 +22,12 @@ namespace CassandraSharp.Discovery
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly Dictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(SystemPeersDiscoveryService)},
-                    {"Null", typeof(NullDiscoveryService)},
-                    {"SystemPeers", typeof(SystemPeersDiscoveryService)},
-            };
+                                                                {
+                                                                    {"Default", typeof(SystemPeersDiscoveryService)},
+                                                                    {"Null", typeof(NullDiscoveryService)},
+                                                                    {"SystemPeers", typeof(SystemPeersDiscoveryService)}
+                                                                };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

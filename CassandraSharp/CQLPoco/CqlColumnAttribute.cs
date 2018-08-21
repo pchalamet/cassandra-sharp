@@ -13,23 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.CQLPoco
 {
-    using System;
-
-    [AttributeUsageAttribute(AttributeTargets.Property | AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public sealed class CqlColumnAttribute : Attribute
     {
-        public string Name { get; private set; }
-
         public CqlColumnAttribute(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException("Column name cannot be null or empty.");
-            }
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Column name cannot be null or empty.");
 
             Name = name;
         }
+
+        public string Name { get; }
     }
 }

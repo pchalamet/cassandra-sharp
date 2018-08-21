@@ -34,24 +34,18 @@ namespace CassandraSharp.Transport
             {
                 SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 9);
 
-                FrameType version = (FrameType) _tempBuffer[0];
-                if (0 == (version & FrameType.Response))
-                {
-                    throw new ArgumentException("Expecting response frame");
-                }
-                if (FrameType.ProtocolVersion != (version & FrameType.ProtocolVersionMask))
-                {
-                    throw new ArgumentException("Unknown protocol version");
-                }
+                var version = (FrameType)_tempBuffer[0];
+                if (0 == (version & FrameType.Response)) throw new ArgumentException("Expecting response frame");
+                if (FrameType.ProtocolVersion != (version & FrameType.ProtocolVersionMask)) throw new ArgumentException("Unknown protocol version");
 
-                FrameHeaderFlags flags = (FrameHeaderFlags) _tempBuffer[1];
+                var flags = (FrameHeaderFlags)_tempBuffer[1];
 
                 StreamId = (ushort)((_tempBuffer[2] << 8) | _tempBuffer[3]);
 
-                MessageOpcode = (MessageOpcodes) _tempBuffer[4];
-                int frameBytesLeft = _tempBuffer.ToInt(5);
+                MessageOpcode = (MessageOpcodes)_tempBuffer[4];
+                var frameBytesLeft = _tempBuffer.ToInt(5);
 
-                bool tracing = 0 != (flags & FrameHeaderFlags.Tracing);
+                var tracing = 0 != (flags & FrameHeaderFlags.Tracing);
                 if (tracing)
                 {
                     SocketReadOnlyStream.SocketReceiveBuffer(socket, _tempBuffer, 0, 16);
@@ -64,10 +58,7 @@ namespace CassandraSharp.Transport
                 ReadOnlyStream = CreateStream(socket, frameBytesLeft);
 // ReSharper restore DoNotCallOverridableMethodsInConstructor
 
-                if (MessageOpcodes.Error == MessageOpcode)
-                {
-                    ResponseException = CreateExceptionFromError(ReadOnlyStream);
-                }
+                if (MessageOpcodes.Error == MessageOpcode) ResponseException = CreateExceptionFromError(ReadOnlyStream);
             }
             catch
             {
@@ -76,58 +67,58 @@ namespace CassandraSharp.Transport
             }
         }
 
-        protected virtual Stream CreateStream(Socket socket, int frameBytesLeft)
-        {
-            return new SocketReadOnlyStream(socket, frameBytesLeft);
-        }
-
         public void Dispose()
         {
             ReadOnlyStream.SafeDispose();
         }
 
-        public Guid TraceId { get; private set; }
+        public Guid TraceId { get; }
 
-        public ushort StreamId { get; private set; }
+        public ushort StreamId { get; }
 
-        public MessageOpcodes MessageOpcode { get; private set; }
+        public MessageOpcodes MessageOpcode { get; }
 
-        public Exception ResponseException { get; private set; }
+        public Exception ResponseException { get; }
 
         public Stream ReadOnlyStream { get; protected set; }
 
+        protected virtual Stream CreateStream(Socket socket, int frameBytesLeft)
+        {
+            return new SocketReadOnlyStream(socket, frameBytesLeft);
+        }
+
         private static Exception CreateExceptionFromError(Stream stream)
         {
-            ErrorCodes code = (ErrorCodes) stream.ReadInt();
-            string msg = stream.ReadString();
+            var code = (ErrorCodes)stream.ReadInt();
+            var msg = stream.ReadString();
 
             switch (code)
             {
                 case ErrorCodes.Unavailable:
-                    {
-                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadUShort();
-                        int required = stream.ReadInt();
-                        int alive = stream.ReadInt();
-                        return new UnavailableException(msg, cl, required, alive);
-                    }
+                {
+                    var cl = (ConsistencyLevel)stream.ReadUShort();
+                    var required = stream.ReadInt();
+                    var alive = stream.ReadInt();
+                    return new UnavailableException(msg, cl, required, alive);
+                }
 
                 case ErrorCodes.WriteTimeout:
-                    {
-                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadUShort();
-                        int received = stream.ReadInt();
-                        int blockFor = stream.ReadInt();
-                        string writeType = stream.ReadString();
-                        return new WriteTimeOutException(msg, cl, received, blockFor, writeType);
-                    }
+                {
+                    var cl = (ConsistencyLevel)stream.ReadUShort();
+                    var received = stream.ReadInt();
+                    var blockFor = stream.ReadInt();
+                    var writeType = stream.ReadString();
+                    return new WriteTimeOutException(msg, cl, received, blockFor, writeType);
+                }
 
                 case ErrorCodes.ReadTimeout:
-                    {
-                        ConsistencyLevel cl = (ConsistencyLevel) stream.ReadUShort();
-                        int received = stream.ReadInt();
-                        int blockFor = stream.ReadInt();
-                        bool dataPresent = 0 != stream.ReadByte();
-                        return new ReadTimeOutException(msg, cl, received, blockFor, dataPresent);
-                    }
+                {
+                    var cl = (ConsistencyLevel)stream.ReadUShort();
+                    var received = stream.ReadInt();
+                    var blockFor = stream.ReadInt();
+                    var dataPresent = 0 != stream.ReadByte();
+                    return new ReadTimeOutException(msg, cl, received, blockFor, dataPresent);
+                }
 
                 case ErrorCodes.Syntax:
                     return new SyntaxException(msg);
@@ -139,17 +130,17 @@ namespace CassandraSharp.Transport
                     return new InvalidException(msg);
 
                 case ErrorCodes.AlreadyExists:
-                    {
-                        string keyspace = stream.ReadString();
-                        string table = stream.ReadString();
-                        return new AlreadyExistsException(msg, keyspace, table);
-                    }
+                {
+                    var keyspace = stream.ReadString();
+                    var table = stream.ReadString();
+                    return new AlreadyExistsException(msg, keyspace, table);
+                }
 
                 case ErrorCodes.Unprepared:
-                    {
-                        byte[] unknownId = stream.ReadShortBytes();
-                        return new UnpreparedException(msg, unknownId);
-                    }
+                {
+                    var unknownId = stream.ReadShortBytes();
+                    return new UnpreparedException(msg, unknownId);
+                }
 
                 default:
                     return new CassandraException(code, msg);

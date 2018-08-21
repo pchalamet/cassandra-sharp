@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
+using System.Numerics;
+
 namespace CassandraSharp.Extensibility
 {
-    using System.Net;
-    using System.Numerics;
-
     public sealed class Peer
     {
         public IPAddress RpcAddress { get; internal set; }

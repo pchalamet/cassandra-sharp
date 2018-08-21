@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace CassandraSharp.Extensibility
 {
-    using System.Collections.Generic;
-
     public interface IDataMapper
     {
         IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns);

@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Net;
+
 namespace CassandraSharp.Extensibility
 {
-    using System;
-    using System.Net;
-
     public interface IRecoveryService : IDisposable
     {
         void Recover(IPAddress connection, IConnectionFactory connectionFactory, Action<IConnection> clientRecoveredCallback);

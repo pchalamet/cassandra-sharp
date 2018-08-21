@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp
 {
-    using System;
-
     public class PartitionKey
     {
         private PartitionKey(object[] keys)
@@ -28,10 +28,7 @@ namespace CassandraSharp
 
         public static PartitionKey From(params object[] keys)
         {
-            if (null == keys || 0 == keys.Length)
-            {
-                throw new ArgumentException("Keys array must contain at least one element", "keys");
-            }
+            if (null == keys || 0 == keys.Length) throw new ArgumentException("Keys array must contain at least one element", "keys");
 
             return new PartitionKey(keys);
         }

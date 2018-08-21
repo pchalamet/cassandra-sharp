@@ -13,22 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class AlreadyExistsException : CassandraException
     {
         public AlreadyExistsException(string message, string keyspace, string table)
-                : base(ErrorCodes.AlreadyExists, message)
+            : base(ErrorCodes.AlreadyExists, message)
         {
             Keyspace = keyspace;
             Table = table;
         }
 
-        public string Keyspace { get; private set; }
+        public string Keyspace { get; }
 
-        public string Table { get; private set; }
+        public string Table { get; }
     }
 }

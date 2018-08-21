@@ -1,4 +1,4 @@
-﻿﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
+﻿// cassandra-sharp - high performance .NET driver for Apache Cassandra
 // Copyright (c) 2011-2013 Pierre Chalamet
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.IO;
 using CassandraSharp.Extensibility;
 using CassandraSharp.Utils.Stream;
 
@@ -32,15 +31,15 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override IEnumerable<bool> ReadFrame(IFrameReader frameReader)
         {
-            Stream stream = frameReader.ReadOnlyStream;
-            ResultOpcode resultOpcode = (ResultOpcode)stream.ReadInt();
+            var stream = frameReader.ReadOnlyStream;
+            var resultOpcode = (ResultOpcode)stream.ReadInt();
             yield return resultOpcode == ResultOpcode.Prepared;
         }
 
         protected override void WriteFrame(IFrameWriter fw)
         {
             var cql = "USE " + _keyspace;
-            Stream stream = fw.WriteOnlyStream;
+            var stream = fw.WriteOnlyStream;
 
             stream.WriteLongString(cql);
             stream.WriteUShort((ushort)ConsistencyLevel);
@@ -50,7 +49,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
+            var token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
             return token;
         }
     }

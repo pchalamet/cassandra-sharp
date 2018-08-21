@@ -47,7 +47,7 @@ namespace CassandraSharp.Cluster
             Partitioner = partitioner;
         }
 
-        public IPartitioner Partitioner { get; private set; }
+        public IPartitioner Partitioner { get; }
 
         public event ClusterClosed OnClosed;
 
@@ -55,10 +55,7 @@ namespace CassandraSharp.Cluster
         {
             lock (_globalLock)
             {
-                foreach (IConnection connection in _ip2Connection.Values)
-                {
-                    connection.SafeDispose();
-                }
+                foreach (var connection in _ip2Connection.Values) connection.SafeDispose();
                 _ip2Connection.Clear();
 
                 if (null != OnClosed)
@@ -79,20 +76,14 @@ namespace CassandraSharp.Cluster
                     while (null == connection)
                     {
                         // pick and initialize a new endpoint connection
-                        IPAddress endpoint = _endpointStrategy.Pick(token);
-                        if (null == endpoint)
-                        {
-                            throw new ArgumentException("Can't find any valid endpoint");
-                        }
+                        var endpoint = _endpointStrategy.Pick(token);
+                        if (null == endpoint) throw new ArgumentException("Can't find any valid endpoint");
 
                         if (!_ip2Connection.TryGetValue(endpoint, out connection))
                         {
                             // try to create a new connection - if this fails, recover the endpoint
                             connection = CreateTransportOrMarkEndpointForRecovery(endpoint);
-                            if (null != connection)
-                            {
-                                _ip2Connection.Add(endpoint, connection);
-                            }
+                            if (null != connection) _ip2Connection.Add(endpoint, connection);
                         }
                     }
 
@@ -110,7 +101,7 @@ namespace CassandraSharp.Cluster
         {
             try
             {
-                IConnection connection = _connectionFactory.Create(endpoint);
+                var connection = _connectionFactory.Create(endpoint);
                 connection.OnFailure += OnFailure;
                 return connection;
             }
@@ -127,10 +118,10 @@ namespace CassandraSharp.Cluster
         {
             lock (_globalLock)
             {
-                IConnection connection = sender as IConnection;
+                var connection = sender as IConnection;
                 if (null != connection && _ip2Connection.ContainsKey(connection.Endpoint))
                 {
-                    IPAddress endpoint = connection.Endpoint;
+                    var endpoint = connection.Endpoint;
                     _logger.Error("connection {0} failed with error {1}", endpoint, e.Exception);
 
                     _ip2Connection.Remove(endpoint);

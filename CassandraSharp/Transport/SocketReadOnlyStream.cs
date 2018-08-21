@@ -31,42 +31,30 @@ namespace CassandraSharp.Transport
             _len = len;
         }
 
-        public override bool CanRead
-        {
-            get { return true; }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanWrite
-        {
-            get { return false; }
-        }
+        public override bool CanWrite => false;
 
-        public override long Length
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override long Length => throw new NotSupportedException();
 
         public override long Position
         {
-            get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                byte[] buffer = new byte[32];
+                var buffer = new byte[32];
 
                 // skip unread data
                 while (0 < _len)
                 {
-                    int left = Math.Min(_len, buffer.Length);
+                    var left = Math.Min(_len, buffer.Length);
                     _len -= SocketReceiveBuffer(_socket, buffer, 0, left);
                 }
             }
@@ -90,32 +78,23 @@ namespace CassandraSharp.Transport
         public override int Read(byte[] buffer, int offset, int count)
         {
             _len -= count;
-            if (_len < 0)
-            {
-                throw new IOException("Attempt to read past frame");
-            }
+            if (_len < 0) throw new IOException("Attempt to read past frame");
 
-            int read = SocketReceiveBuffer(_socket, buffer, offset, count);
-            if (read != count)
-            {
-                throw new IOException("Failed to read requested count");
-            }
+            var read = SocketReceiveBuffer(_socket, buffer, offset, count);
+            if (read != count) throw new IOException("Failed to read requested count");
 
             return read;
         }
 
         public static int SocketReceiveBuffer(Socket socket, byte[] buffer, int offset, int len)
         {
-            int read = 0;
+            var read = 0;
             while (read != len)
             {
-                int tmpRead = socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
+                var tmpRead = socket.Receive(buffer, offset + read, len - read, SocketFlags.None);
 
                 // always consider 0 as a peer graceful disconnection
-                if (0 == tmpRead && socket.Poll(1, SelectMode.SelectRead))
-                {
-                    return read;
-                }
+                if (0 == tmpRead && socket.Poll(1, SelectMode.SelectRead)) return read;
 
                 read += tmpRead;
             }

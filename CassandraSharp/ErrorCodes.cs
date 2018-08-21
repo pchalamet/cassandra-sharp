@@ -45,6 +45,6 @@ namespace CassandraSharp
 
         Unprepared = 0x2500,
 
-        Unknown = 0xFFFF,
+        Unknown = 0xFFFF
     }
 }

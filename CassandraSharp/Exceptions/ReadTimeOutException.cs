@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class ReadTimeOutException : TimeOutException
     {
         public ReadTimeOutException(string message, ConsistencyLevel consistencyLevel, int received, int blockFor, bool dataPresent)
-                : base(ErrorCodes.ReadTimeout, message, consistencyLevel, received, blockFor)
+            : base(ErrorCodes.ReadTimeout, message, consistencyLevel, received, blockFor)
         {
             DataPresent = dataPresent;
         }
 
-        public bool DataPresent { get; private set; }
+        public bool DataPresent { get; }
     }
 }

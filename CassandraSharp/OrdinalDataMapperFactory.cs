@@ -13,14 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp.CQLOrdinal;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharp
 {
-    using CassandraSharp.CQLOrdinal;
-    using CassandraSharp.Extensibility;
-
     internal sealed class OrdinalDataMapperFactory : IDataMapperFactory
     {
-        public IDataMapper Create(System.Type type)
+        public IDataMapper Create(Type type)
         {
             return new OrdinalDataMapper();
         }

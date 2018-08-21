@@ -13,20 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CassandraSharp.Core.CQLPoco;
+using System;
+using CassandraSharp.CQLPoco;
+using CassandraSharp.Extensibility;
 
 namespace CassandraSharp
 {
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Extensibility;
-    using System;
-
     internal sealed class PocoDataMapperFactory : IDataMapperFactory
     {
         public IDataMapper Create(Type type)
         {
-            Type genericDataMapper = typeof(DataMapper<>);
-            Type typedDataMapper = genericDataMapper.MakeGenericType(type);
+            var genericDataMapper = typeof(DataMapper<>);
+            var typedDataMapper = genericDataMapper.MakeGenericType(type);
             return (IDataMapper)Activator.CreateInstance(typedDataMapper);
         }
 

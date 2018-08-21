@@ -25,8 +25,8 @@ namespace CassandraSharp.Utils
         {
             try
             {
-                byte[] addrBytes = rpcAddress.GetAddressBytes();
-                bool isValid = 0 != addrBytes.Max();
+                var addrBytes = rpcAddress.GetAddressBytes();
+                var isValid = 0 != addrBytes.Max();
                 return isValid;
             }
             catch
@@ -38,10 +38,7 @@ namespace CassandraSharp.Utils
         public static IPAddress Find(string hostname)
         {
             IPAddress ipAddress;
-            if (IPAddress.TryParse(hostname, out ipAddress))
-            {
-                return ipAddress;
-            }
+            if (IPAddress.TryParse(hostname, out ipAddress)) return ipAddress;
 
             try
             {

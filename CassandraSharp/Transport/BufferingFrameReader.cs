@@ -21,18 +21,15 @@ namespace CassandraSharp.Transport
     internal class BufferingFrameReader : StreamingFrameReader
     {
         public BufferingFrameReader(Socket socket)
-                : base(socket)
+            : base(socket)
         {
         }
 
         protected override Stream CreateStream(Socket socket, int frameBytesLeft)
         {
-            byte[] buffer = new byte[frameBytesLeft];
-            int len = SocketReadOnlyStream.SocketReceiveBuffer(socket, buffer, 0, frameBytesLeft);
-            if (len != frameBytesLeft)
-            {
-                throw new IOException("Failed to read required bytes for frame");
-            }
+            var buffer = new byte[frameBytesLeft];
+            var len = SocketReadOnlyStream.SocketReceiveBuffer(socket, buffer, 0, frameBytesLeft);
+            if (len != frameBytesLeft) throw new IOException("Failed to read required bytes for frame");
 
             return new MemoryStream(buffer, false);
         }

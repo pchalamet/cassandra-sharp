@@ -22,28 +22,22 @@ namespace CassandraSharp.Utils
     {
         public static void ReverseIfLittleEndian(this byte[] buffer)
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer);
-            }
+            if (BitConverter.IsLittleEndian) Array.Reverse(buffer);
         }
 
         public static void ReverseIfLittleEndian(this byte[] buffer, int index, int length)
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(buffer, index, length);
-            }
+            if (BitConverter.IsLittleEndian) Array.Reverse(buffer, index, length);
         }
 
         public static T[] BinaryAdd<T>(this T[] @this, T t, IComparer<T> comparer)
         {
-            int idx = Array.BinarySearch(@this, t, comparer);
+            var idx = Array.BinarySearch(@this, t, comparer);
             if (idx < 0)
             {
                 idx = ~idx;
-                int oldLen = @this.Length;
-                T[] newArray = new T[oldLen + 1];
+                var oldLen = @this.Length;
+                var newArray = new T[oldLen + 1];
                 if (0 == idx)
                 {
                     Array.Copy(@this, 0, newArray, 1, oldLen);
@@ -60,6 +54,7 @@ namespace CassandraSharp.Utils
                     Array.Copy(@this, idx, newArray, idx + 1, oldLen - idx);
                     newArray[idx] = t;
                 }
+
                 return newArray;
             }
 
@@ -69,11 +64,11 @@ namespace CassandraSharp.Utils
 
         public static void BinaryRemove<T>(this T[] @this, T t, IComparer<T> comparer)
         {
-            int idx = Array.BinarySearch(@this, t, comparer);
+            var idx = Array.BinarySearch(@this, t, comparer);
             if (idx >= 0)
             {
-                int newLen = @this.Length - 1;
-                T[] partitions = new T[newLen];
+                var newLen = @this.Length - 1;
+                var partitions = new T[newLen];
                 Array.Copy(@this, 0, partitions, 0, idx);
                 Array.Copy(@this, idx, partitions, idx, newLen - idx);
             }

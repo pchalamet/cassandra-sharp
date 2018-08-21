@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using CassandraSharp.Config;
+
 namespace CassandraSharp
 {
-    using System;
-    using CassandraSharp.Config;
-
     public interface IClusterManager : IDisposable
     {
         ICluster GetCluster(string name);

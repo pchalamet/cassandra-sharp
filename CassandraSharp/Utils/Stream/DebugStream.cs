@@ -29,30 +29,18 @@ namespace CassandraSharp.Utils.Stream
             _stream = stream;
         }
 
-        public override bool CanRead
-        {
-            get { return _stream.CanRead; }
-        }
+        public override bool CanRead => _stream.CanRead;
 
-        public override bool CanSeek
-        {
-            get { return _stream.CanSeek; }
-        }
+        public override bool CanSeek => _stream.CanSeek;
 
-        public override bool CanWrite
-        {
-            get { return _stream.CanWrite; }
-        }
+        public override bool CanWrite => _stream.CanWrite;
 
-        public override long Length
-        {
-            get { return _stream.Length; }
-        }
+        public override long Length => _stream.Length;
 
         public override long Position
         {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
+            get => _stream.Position;
+            set => _stream.Position = value;
         }
 
         protected override void Dispose(bool disposing)
@@ -83,7 +71,7 @@ namespace CassandraSharp.Utils.Stream
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int read = _stream.Read(buffer, offset, count);
+            var read = _stream.Read(buffer, offset, count);
 
             if (_opeState != OperationState.Read)
             {
@@ -92,10 +80,7 @@ namespace CassandraSharp.Utils.Stream
                 Console.Write("READ: ");
             }
 
-            for (int i = 0; i < read; ++i)
-            {
-                Console.Write("{0:X2}", buffer[i]);
-            }
+            for (var i = 0; i < read; ++i) Console.Write("{0:X2}", buffer[i]);
 
             return read;
         }
@@ -109,10 +94,7 @@ namespace CassandraSharp.Utils.Stream
                 Console.Write("WRITE: ");
             }
 
-            for (int i = 0; i < count; ++i)
-            {
-                Console.Write("{0:X2}", buffer[offset + i]);
-            }
+            for (var i = 0; i < count; ++i) Console.Write("{0:X2}", buffer[offset + i]);
 
             _stream.Write(buffer, offset, count);
         }

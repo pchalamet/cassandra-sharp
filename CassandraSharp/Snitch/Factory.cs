@@ -22,15 +22,12 @@ namespace CassandraSharp.Snitch
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(RackInferringSnitch)},
-                    {"Simple", typeof(SimpleSnitch)},
-                    {"RackInferring", typeof(RackInferringSnitch)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(RackInferringSnitch)},
+                                                                     {"Simple", typeof(SimpleSnitch)},
+                                                                     {"RackInferring", typeof(RackInferringSnitch)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

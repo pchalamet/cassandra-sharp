@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp
 {
-    using System;
-
     public class FailureEventArgs : EventArgs
     {
         public FailureEventArgs(Exception exception)
@@ -24,6 +24,6 @@ namespace CassandraSharp
             Exception = exception;
         }
 
-        public Exception Exception { get; private set; }
+        public Exception Exception { get; }
     }
 }

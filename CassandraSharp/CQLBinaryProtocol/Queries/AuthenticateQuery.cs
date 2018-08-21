@@ -14,7 +14,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.IO;
 using CassandraSharp.Extensibility;
 using CassandraSharp.Utils.Stream;
 
@@ -27,7 +26,7 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         private readonly string _user;
 
         public AuthenticateQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string user, string password)
-                : base(connection, consistencyLevel, executionFlags)
+            : base(connection, consistencyLevel, executionFlags)
         {
             _user = user;
             _password = password;
@@ -35,25 +34,25 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override IEnumerable<bool> ReadFrame(IFrameReader frameReader)
         {
-            bool res = frameReader.MessageOpcode == MessageOpcodes.Ready;
+            var res = frameReader.MessageOpcode == MessageOpcodes.Ready;
             yield return res;
         }
 
         protected override void WriteFrame(IFrameWriter fw)
         {
-            Stream stream = fw.WriteOnlyStream;
-            Dictionary<string, string> authParams = new Dictionary<string, string>
-                {
-                        {"username", _user},
-                        {"password", _password}
-                };
+            var stream = fw.WriteOnlyStream;
+            var authParams = new Dictionary<string, string>
+                             {
+                                 {"username", _user},
+                                 {"password", _password}
+                             };
             stream.WriteStringMap(authParams);
             fw.SetMessageType(MessageOpcodes.Credentials);
         }
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Authenticate, ExecutionFlags.None);
+            var token = InstrumentationToken.Create(RequestType.Authenticate, ExecutionFlags.None);
             return token;
         }
     }

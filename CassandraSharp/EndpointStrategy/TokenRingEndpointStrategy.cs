@@ -47,10 +47,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                if (_healthyEndpoints.Remove(endpoint))
-                {
-                    _ring.BanNode(endpoint);
-                }
+                if (_healthyEndpoints.Remove(endpoint)) _ring.BanNode(endpoint);
             }
         }
 
@@ -69,22 +66,16 @@ namespace CassandraSharp.EndpointStrategy
             if (0 < _healthyEndpoints.Count)
             {
                 if (token.HasValue && 0 < _ring.RingSize())
-                {
-                    //Attempt to binary search for key in token ring
                     lock (_lock)
                     {
                         endpoint = _ring.FindReplica(token.Value);
                     }
-                }
                 else
-                {
-                    //fallback to round robin when no hint supplied
                     lock (_lock)
                     {
                         _nextCandidate = (_nextCandidate + 1) % _healthyEndpoints.Count;
                         endpoint = _healthyEndpoints[_nextCandidate];
                     }
-                }
             }
 
             return endpoint;
@@ -94,7 +85,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                IPAddress endpoint = peer.RpcAddress;
+                var endpoint = peer.RpcAddress;
                 switch (kind)
                 {
                     case NotificationKind.Add:
@@ -103,6 +94,7 @@ namespace CassandraSharp.EndpointStrategy
                             _healthyEndpoints.Add(endpoint);
                             _ring.AddOrUpdateNode(peer);
                         }
+
                         break;
 
                     case NotificationKind.Update:
@@ -115,6 +107,7 @@ namespace CassandraSharp.EndpointStrategy
                             _healthyEndpoints.Remove(endpoint);
                             _ring.RemoveNode(endpoint);
                         }
+
                         break;
                 }
             }

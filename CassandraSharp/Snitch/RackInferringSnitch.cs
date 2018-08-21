@@ -24,21 +24,21 @@ namespace CassandraSharp.Snitch
     {
         public string GetRack(IPAddress endpoint)
         {
-            byte[] addrBytes = endpoint.GetAddressBytes();
-            string dc = addrBytes[2].ToString(CultureInfo.InvariantCulture);
+            var addrBytes = endpoint.GetAddressBytes();
+            var dc = addrBytes[2].ToString(CultureInfo.InvariantCulture);
             return dc;
         }
 
         public string GetDatacenter(IPAddress endpoint)
         {
-            byte[] addrBytes = endpoint.GetAddressBytes();
-            string dc = addrBytes[1].ToString(CultureInfo.InvariantCulture);
+            var addrBytes = endpoint.GetAddressBytes();
+            var dc = addrBytes[1].ToString(CultureInfo.InvariantCulture);
             return dc;
         }
 
         public List<IPAddress> GetSortedListByProximity(IPAddress address, IEnumerable<IPAddress> unsortedAddress)
         {
-            List<IPAddress> sortedAddress = new List<IPAddress>(unsortedAddress);
+            var sortedAddress = new List<IPAddress>(unsortedAddress);
             sortedAddress.Sort((a1, a2) => CompareEndpoints(address, a1, a2));
             return sortedAddress;
         }
@@ -46,44 +46,26 @@ namespace CassandraSharp.Snitch
         public int CompareEndpoints(IPAddress address, IPAddress a1, IPAddress a2)
         {
             // compare address first
-            if (Equals(address, a1) && !Equals(address, a2))
-            {
-                return -1;
-            }
+            if (Equals(address, a1) && !Equals(address, a2)) return -1;
 
-            if (Equals(address, a2) && !Equals(address, a1))
-            {
-                return 1;
-            }
+            if (Equals(address, a2) && !Equals(address, a1)) return 1;
 
             // compare datacenter
-            string addressDatacenter = GetDatacenter(address);
-            string a1Datacenter = GetDatacenter(a1);
-            string a2Datacenter = GetDatacenter(a2);
+            var addressDatacenter = GetDatacenter(address);
+            var a1Datacenter = GetDatacenter(a1);
+            var a2Datacenter = GetDatacenter(a2);
 
-            if (addressDatacenter == a1Datacenter && addressDatacenter != a2Datacenter)
-            {
-                return - 1;
-            }
+            if (addressDatacenter == a1Datacenter && addressDatacenter != a2Datacenter) return -1;
 
-            if (addressDatacenter == a2Datacenter && addressDatacenter != a1Datacenter)
-            {
-                return 1;
-            }
+            if (addressDatacenter == a2Datacenter && addressDatacenter != a1Datacenter) return 1;
 
             // compare rack
-            string addressRack = GetRack(address);
-            string a1Rack = GetRack(a1);
-            string a2Rack = GetRack(a2);
+            var addressRack = GetRack(address);
+            var a1Rack = GetRack(a1);
+            var a2Rack = GetRack(a2);
 
-            if (addressRack == a1Rack && addressRack != a2Rack)
-            {
-                return -1;
-            }
-            if (addressRack == a2Rack && addressRack != a1Rack)
-            {
-                return 1;
-            }
+            if (addressRack == a1Rack && addressRack != a2Rack) return -1;
+            if (addressRack == a2Rack && addressRack != a1Rack) return 1;
 
             return 0;
         }

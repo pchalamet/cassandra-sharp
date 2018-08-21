@@ -35,13 +35,13 @@ namespace CassandraSharp.Core.CQLPoco
 
         protected ClassMap(Type type)
         {
-            IEnumerable<MemberMap> members = GetMappedMembers(type);
+            var members = GetMappedMembers(type);
             _memberByName = members.ToLookup(x => x.ColumnName);
         }
 
         public static ClassMap<T> GetClassMap<T>()
         {
-            Type type = typeof(T);
+            var type = typeof(T);
             ClassMap map;
             if (!_classMaps.TryGetValue(type, out map))
             {
@@ -49,7 +49,7 @@ namespace CassandraSharp.Core.CQLPoco
                 _classMaps[type] = map;
             }
 
-            return (ClassMap<T>) map;
+            return (ClassMap<T>)map;
         }
 
         public MemberMap GetMember(string name)
@@ -71,7 +71,7 @@ namespace CassandraSharp.Core.CQLPoco
         private readonly NewInstance _newInstance;
 
         protected internal ClassMap()
-                : base(typeof(T))
+            : base(typeof(T))
         {
             _newInstance = GenerateNew();
         }
@@ -83,19 +83,16 @@ namespace CassandraSharp.Core.CQLPoco
 
         private static NewInstance GenerateNew()
         {
-            Type type = typeof(T);
-            string methodName = "New" + Guid.NewGuid();
+            var type = typeof(T);
+            var methodName = "New" + Guid.NewGuid();
             var dm = new DynamicMethod(methodName, type, new Type[0], type.Module, true);
-            ILGenerator gen = dm.GetILGenerator();
+            var gen = dm.GetILGenerator();
 
             if (type.IsClass)
             {
                 const BindingFlags ctorFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-                ConstructorInfo ctor = type.GetConstructor(ctorFlags, null, new Type[0], null);
-                if (ctor == null)
-                {
-                    return () => { throw new MissingMethodException("No parameterless constructor defined for this object."); };
-                }
+                var ctor = type.GetConstructor(ctorFlags, null, new Type[0], null);
+                if (ctor == null) return () => { throw new MissingMethodException("No parameterless constructor defined for this object."); };
 
                 gen.Emit(OpCodes.Newobj, ctor);
             }
@@ -107,9 +104,10 @@ namespace CassandraSharp.Core.CQLPoco
                 gen.Emit(OpCodes.Initobj, type);
                 gen.Emit(OpCodes.Ldloc_0);
             }
+
             gen.Emit(OpCodes.Ret);
 
-            NewInstance newInstance = (NewInstance) dm.CreateDelegate(typeof(NewInstance));
+            var newInstance = (NewInstance)dm.CreateDelegate(typeof(NewInstance));
             return newInstance;
         }
 

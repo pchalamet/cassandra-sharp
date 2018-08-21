@@ -27,36 +27,36 @@ namespace CassandraSharp.Utils.Cryptography
     {
         private static long GetBlock(byte[] key, int offset, int index)
         {
-            int i_8 = index << 3;
-            int blockOffset = offset + i_8;
-            return ((long) key[blockOffset + 0] & 0xff) + (((long) key[blockOffset + 1] & 0xff) << 8) +
-                   (((long) key[blockOffset + 2] & 0xff) << 16) + (((long) key[blockOffset + 3] & 0xff) << 24) +
-                   (((long) key[blockOffset + 4] & 0xff) << 32) + (((long) key[blockOffset + 5] & 0xff) << 40) +
-                   (((long) key[blockOffset + 6] & 0xff) << 48) + (((long) key[blockOffset + 7] & 0xff) << 56);
+            var i_8 = index << 3;
+            var blockOffset = offset + i_8;
+            return ((long)key[blockOffset + 0] & 0xff) + (((long)key[blockOffset + 1] & 0xff) << 8) +
+                   (((long)key[blockOffset + 2] & 0xff) << 16) + (((long)key[blockOffset + 3] & 0xff) << 24) +
+                   (((long)key[blockOffset + 4] & 0xff) << 32) + (((long)key[blockOffset + 5] & 0xff) << 40) +
+                   (((long)key[blockOffset + 6] & 0xff) << 48) + (((long)key[blockOffset + 7] & 0xff) << 56);
         }
 
         private static long Rotl64(long v, int n)
         {
-            return ((v << n) | ((long) ((ulong) v >> (64 - n))));
+            return (v << n) | (long)((ulong)v >> (64 - n));
         }
 
         private static long Fmix(long k)
         {
-            k ^= (long) ((ulong) k >> 33);
+            k ^= (long)((ulong)k >> 33);
             k *= -0xAE502812AA7333;
-            k ^= (long) ((ulong) k >> 33);
+            k ^= (long)((ulong)k >> 33);
             k *= -0x3B314601E57A13AD;
-            k ^= (long) ((ulong) k >> 33);
+            k ^= (long)((ulong)k >> 33);
 
             return k;
         }
 
         public static long[] Hash3_x64_128(byte[] key, int offset, int length, long seed)
         {
-            int nblocks = length >> 4; // Process as 128-bit blocks.
+            var nblocks = length >> 4; // Process as 128-bit blocks.
 
-            long h1 = seed;
-            long h2 = seed;
+            var h1 = seed;
+            var h2 = seed;
 
             const long c1 = -0x783C846EEEBDAC2B;
             const long c2 = 0x4cf5ad432745937fL;
@@ -64,10 +64,10 @@ namespace CassandraSharp.Utils.Cryptography
             //----------
             // body
 
-            for (int i = 0; i < nblocks; i++)
+            for (var i = 0; i < nblocks; i++)
             {
-                long k1 = GetBlock(key, offset, i * 2 + 0);
-                long k2 = GetBlock(key, offset, i * 2 + 1);
+                var k1 = GetBlock(key, offset, i * 2 + 0);
+                var k2 = GetBlock(key, offset, i * 2 + 1);
 
                 k1 *= c1;
                 k1 = Rotl64(k1, 31);
@@ -101,25 +101,25 @@ namespace CassandraSharp.Utils.Cryptography
                 switch (length & 15)
                 {
                     case 15:
-                        k2 ^= ((long) key[offset + 14]) << 48;
+                        k2 ^= (long)key[offset + 14] << 48;
                         goto case 14;
                     case 14:
-                        k2 ^= ((long) key[offset + 13]) << 40;
+                        k2 ^= (long)key[offset + 13] << 40;
                         goto case 13;
                     case 13:
-                        k2 ^= ((long) key[offset + 12]) << 32;
+                        k2 ^= (long)key[offset + 12] << 32;
                         goto case 12;
                     case 12:
-                        k2 ^= ((long) key[offset + 11]) << 24;
+                        k2 ^= (long)key[offset + 11] << 24;
                         goto case 11;
                     case 11:
-                        k2 ^= ((long) key[offset + 10]) << 16;
+                        k2 ^= (long)key[offset + 10] << 16;
                         goto case 10;
                     case 10:
-                        k2 ^= ((long) key[offset + 9]) << 8;
+                        k2 ^= (long)key[offset + 9] << 8;
                         goto case 9;
                     case 9:
-                        k2 ^= ((long) key[offset + 8]) << 0;
+                        k2 ^= (long)key[offset + 8] << 0;
                         k2 *= c2;
                         k2 = Rotl64(k2, 33);
                         k2 *= c1;
@@ -127,28 +127,28 @@ namespace CassandraSharp.Utils.Cryptography
                         goto case 8;
 
                     case 8:
-                        k1 ^= ((long) key[offset + 7]) << 56;
+                        k1 ^= (long)key[offset + 7] << 56;
                         goto case 7;
                     case 7:
-                        k1 ^= ((long) key[offset + 6]) << 48;
+                        k1 ^= (long)key[offset + 6] << 48;
                         goto case 6;
                     case 6:
-                        k1 ^= ((long) key[offset + 5]) << 40;
+                        k1 ^= (long)key[offset + 5] << 40;
                         goto case 5;
                     case 5:
-                        k1 ^= ((long) key[offset + 4]) << 32;
+                        k1 ^= (long)key[offset + 4] << 32;
                         goto case 4;
                     case 4:
-                        k1 ^= ((long) key[offset + 3]) << 24;
+                        k1 ^= (long)key[offset + 3] << 24;
                         goto case 3;
                     case 3:
-                        k1 ^= ((long) key[offset + 2]) << 16;
+                        k1 ^= (long)key[offset + 2] << 16;
                         goto case 2;
                     case 2:
-                        k1 ^= ((long) key[offset + 1]) << 8;
+                        k1 ^= (long)key[offset + 1] << 8;
                         goto case 1;
                     case 1:
-                        k1 ^= (key[offset]);
+                        k1 ^= key[offset];
                         k1 *= c1;
                         k1 = Rotl64(k1, 31);
                         k1 *= c2;
@@ -171,7 +171,7 @@ namespace CassandraSharp.Utils.Cryptography
             h1 += h2;
             h2 += h1;
 
-            return (new[] {h1, h2});
+            return new[] {h1, h2};
         }
     }
 }

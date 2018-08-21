@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Extensibility
 {
-    using System;
-
     public class InstrumentationToken : IEquatable<InstrumentationToken>
     {
         private InstrumentationToken(RequestType type, ExecutionFlags executionFlags, string cql)
@@ -27,32 +27,29 @@ namespace CassandraSharp.Extensibility
             Cql = cql ?? string.Empty;
         }
 
-        public string Cql { get; private set; }
+        public string Cql { get; }
 
-        public Guid Id { get; private set; }
+        public Guid Id { get; }
 
-        public RequestType Type { get; private set; }
+        public RequestType Type { get; }
 
-        public ExecutionFlags ExecutionFlags { get; private set; }
+        public ExecutionFlags ExecutionFlags { get; }
 
         public bool Equals(InstrumentationToken other)
         {
-            if (null == other)
-            {
-                return false;
-            }
+            if (null == other) return false;
 
-            bool bRes = Id == other.Id
-                        && Type == other.Type
-                        && ExecutionFlags == other.ExecutionFlags
-                        && Cql == other.Cql;
+            var bRes = Id == other.Id
+                       && Type == other.Type
+                       && ExecutionFlags == other.ExecutionFlags
+                       && Cql == other.Cql;
             return bRes;
         }
 
         public override int GetHashCode()
         {
             const int prime = 31;
-            int hash = 0;
+            var hash = 0;
             hash = prime * (hash + Id.GetHashCode());
             hash += prime * (hash + Type.GetHashCode());
             hash += prime * (hash + ExecutionFlags.GetHashCode());
@@ -62,11 +59,8 @@ namespace CassandraSharp.Extensibility
 
         public override bool Equals(object obj)
         {
-            InstrumentationToken other = obj as InstrumentationToken;
-            if (null != other)
-            {
-                return Equals(other);
-            }
+            var other = obj as InstrumentationToken;
+            if (null != other) return Equals(other);
 
             return false;
         }

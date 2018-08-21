@@ -14,6 +14,7 @@
 // limitations under the License.
 
 using System;
+
 namespace CassandraSharp.Extensibility
 {
     public interface IDataMapperFactory

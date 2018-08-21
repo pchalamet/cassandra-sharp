@@ -20,7 +20,7 @@ using CassandraSharp.Extensibility;
 namespace CassandraSharp.CQLPropertyBag
 {
     internal sealed class DataMapper : IDataMapper
-    {                
+    {
         public IEnumerable<IColumnData> MapToColumns(object dataSource, IEnumerable<IColumnSpec> columns)
         {
             var data = (PropertyBag)dataSource;
@@ -30,10 +30,7 @@ namespace CassandraSharp.CQLPropertyBag
                 var value = data[column.Name];
 
                 byte[] rawData = null;
-                if (value != null)
-                {
-                    rawData = column.Serialize(value);
-                }
+                if (value != null) rawData = column.Serialize(value);
 
                 yield return new ColumnData(column, rawData);
             }
@@ -45,9 +42,7 @@ namespace CassandraSharp.CQLPropertyBag
 
             foreach (var column in rowData)
             {
-                var data = column.RawData != null ?
-                    column.ColumnSpec.Deserialize(column.RawData) :
-                    null;
+                var data = column.RawData != null ? column.ColumnSpec.Deserialize(column.RawData) : null;
 
                 instance[column.ColumnSpec.Name] = data;
             }

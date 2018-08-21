@@ -13,25 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class TimeOutException : CassandraException
     {
         protected TimeOutException(ErrorCodes code, string message, ConsistencyLevel consistencyLevel, int received, int blockFor)
-                : base(code, message)
+            : base(code, message)
         {
             ConsistencyLevel = consistencyLevel;
             Received = received;
             BlockFor = blockFor;
         }
 
-        public ConsistencyLevel ConsistencyLevel { get; private set; }
+        public ConsistencyLevel ConsistencyLevel { get; }
 
-        public int Received { get; private set; }
+        public int Received { get; }
 
-        public int BlockFor { get; private set; }
+        public int BlockFor { get; }
     }
 }

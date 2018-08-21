@@ -30,22 +30,16 @@ namespace CassandraSharp.CQLPoco
         {
             foreach (var column in columns)
             {
-                string colName = column.Name;
+                var colName = column.Name;
 
                 var member = _classMap.GetMember(colName) ??
                              _classMap.GetMember(colName.Replace("_", string.Empty));
 
-                if (member == null)
-                {
-                    throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
-                }
+                if (member == null) throw new DataMappingException(string.Format("Object doesn't have specified column: {0}", colName));
 
                 var value = member.GetValue(dataSource);
                 byte[] rawData = null;
-                if (value != null)
-                {
-                    rawData = member.ValueSerializer.Serialize(value);
-                }
+                if (value != null) rawData = member.ValueSerializer.Serialize(value);
 
                 yield return new ColumnData(column, rawData);
             }
@@ -57,28 +51,22 @@ namespace CassandraSharp.CQLPoco
 
             foreach (var column in rowData)
             {
-                string colName = column.ColumnSpec.Name;
+                var colName = column.ColumnSpec.Name;
 
                 var member = _classMap.GetMember(colName) ??
                              _classMap.GetMember(colName.Replace("_", string.Empty));
 
-                if (member == null)
-                {
-                    continue;
-                }
+                if (member == null) continue;
 
                 var data = column.RawData != null
-                        ? member.ValueSerializer.Deserialize(column.RawData)
-                        : member.DefaultValue;
+                               ? member.ValueSerializer.Deserialize(column.RawData)
+                               : member.DefaultValue;
 
                 member.SetValue(instance, data);
             }
 
             var deserializationCallback = instance as IDeserializationCallback;
-            if (null != deserializationCallback)
-            {
-                deserializationCallback.OnDeserialization(null);
-            }
+            if (null != deserializationCallback) deserializationCallback.OnDeserialization(null);
 
             return instance;
         }

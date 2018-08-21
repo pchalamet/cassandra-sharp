@@ -13,27 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using CassandraSharp.CQLPoco;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharp
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using CassandraSharp.CQLPoco;
-    using CassandraSharp.Extensibility;
-
     public static class TracingExtensions
     {
         private static int CompareTracingEvent(TracingEvent x, TracingEvent y)
         {
-            if (x.SourceElapsed < y.SourceElapsed)
-            {
-                return -1;
-            }
+            if (x.SourceElapsed < y.SourceElapsed) return -1;
 
-            if (x.SourceElapsed > y.SourceElapsed)
-            {
-                return 1;
-            }
+            if (x.SourceElapsed > y.SourceElapsed) return 1;
 
             return 0;
         }
@@ -43,12 +37,12 @@ namespace CassandraSharp
             var cmd = @this.CreatePocoCommand();
 
             // query events and session
-            string queryEvents = "select * from system_traces.events where session_id = " + tracingId;
+            var queryEvents = "select * from system_traces.events where session_id = " + tracingId;
             var obsEvents = cmd.WithConsistencyLevel(ConsistencyLevel.ONE)
                                .Execute<TracingEvent>(queryEvents)
                                .AsFuture();
 
-            string querySession = "select * from system_traces.sessions where session_id = " + tracingId;
+            var querySession = "select * from system_traces.sessions where session_id = " + tracingId;
             var obsSession = cmd.WithConsistencyLevel(ConsistencyLevel.ONE)
                                 .Execute<TracingSession>(querySession)
                                 .AsFuture();
@@ -58,16 +52,16 @@ namespace CassandraSharp
             // format the events
             var tracingEvents = obsEvents.Result.ToList();
             tracingEvents.Sort(CompareTracingEvent);
-            TracingEvent[] events = tracingEvents.ToArray();
+            var events = tracingEvents.ToArray();
             foreach (var evt in events)
             {
-                string[] tmp = evt.Thread.Split(':');
+                var tmp = evt.Thread.Split(':');
                 evt.Stage = tmp[0];
                 evt.Thread = tmp[1];
             }
 
             // build the result
-            TracingSession tracingSession = obsSession.Result.Single();
+            var tracingSession = obsSession.Result.Single();
             tracingSession.TracingEvents = events;
             return tracingSession;
         }

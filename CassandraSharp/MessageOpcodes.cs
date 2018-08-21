@@ -41,6 +41,6 @@ namespace CassandraSharp
 
         Register = 0x0B,
 
-        Event = 0x0C,
+        Event = 0x0C
     }
 }

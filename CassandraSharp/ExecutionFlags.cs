@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp
 {
-    using System;
-
     [Flags]
     public enum ExecutionFlags
     {
@@ -26,6 +26,6 @@ namespace CassandraSharp
 
         ServerTracing = 0x0002,
 
-        Tracing = ClientTracing | ServerTracing,
+        Tracing = ClientTracing | ServerTracing
     }
 }

@@ -22,14 +22,11 @@ namespace CassandraSharp.Cluster
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(SingleConnectionPerEndpointCluster)},
-                    {"SingleConnectionPerEndpoint", typeof(SingleConnectionPerEndpointCluster)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(SingleConnectionPerEndpointCluster)},
+                                                                     {"SingleConnectionPerEndpoint", typeof(SingleConnectionPerEndpointCluster)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using CassandraSharp.Extensibility;
 using CassandraSharp.Utils.Stream;
 
@@ -23,11 +22,11 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
     {
         private readonly IColumnSpec[] _columnSpecs;
 
+        private readonly object _dataSource;
+
         private readonly byte[] _id;
 
         private readonly IDataMapper _mapperIn;
-
-        private readonly object _dataSource;
 
         public ExecuteQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cql, byte[] id,
                             IColumnSpec[] columnSpecs,
@@ -43,24 +42,21 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
 
         protected override void WriteFrame(IFrameWriter fw)
         {
-            Stream stream = fw.WriteOnlyStream;
+            var stream = fw.WriteOnlyStream;
             stream.WriteShortBytes(_id);
             stream.WriteUShort((ushort)ConsistencyLevel);
 
             stream.WriteByte(0x01);
             stream.WriteUShort((ushort)_columnSpecs.Length);
 
-            foreach (var columnData in _mapperIn.MapToColumns(_dataSource, _columnSpecs))
-            {
-                stream.WriteBytesArray(columnData.RawData);
-            }
+            foreach (var columnData in _mapperIn.MapToColumns(_dataSource, _columnSpecs)) stream.WriteBytesArray(columnData.RawData);
 
             fw.SetMessageType(MessageOpcodes.Execute);
         }
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Prepare, ExecutionFlags, CQL);
+            var token = InstrumentationToken.Create(RequestType.Prepare, ExecutionFlags, CQL);
             return token;
         }
     }

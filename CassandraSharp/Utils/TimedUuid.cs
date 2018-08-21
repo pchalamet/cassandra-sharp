@@ -70,17 +70,17 @@ namespace CassandraSharp.Utils
 
         public static DateTime GetDateTime(Guid guid)
         {
-            byte[] bytes = guid.ToByteArray();
+            var bytes = guid.ToByteArray();
 
             // reverse the version
             bytes[VERSION_BYTE] &= VERSION_BYTE_MASK;
-            bytes[VERSION_BYTE] |= (byte) GuidVersion.TimeBased >> VERSION_BYTE_SHIFT;
+            bytes[VERSION_BYTE] |= (byte)GuidVersion.TimeBased >> VERSION_BYTE_SHIFT;
 
-            byte[] timestampBytes = new byte[8];
+            var timestampBytes = new byte[8];
             Array.Copy(bytes, TIMESTAMP_BYTE, timestampBytes, 0, 8);
 
-            long timestamp = BitConverter.ToInt64(timestampBytes, 0);
-            long ticks = timestamp + _gregorianCalendarStart.Ticks;
+            var timestamp = BitConverter.ToInt64(timestampBytes, 0);
+            var ticks = timestamp + _gregorianCalendarStart.Ticks;
 
             return new DateTime(ticks, DateTimeKind.Utc);
         }
@@ -93,11 +93,11 @@ namespace CassandraSharp.Utils
         private static Guid GenerateTimeBasedGuid(DateTime dateTime, byte[] node)
         {
             dateTime = dateTime.ToUniversalTime();
-            long ticks = (dateTime - _gregorianCalendarStart).Ticks;
+            var ticks = (dateTime - _gregorianCalendarStart).Ticks;
 
-            byte[] guid = new byte[BYTE_ARRAY_SIZE];
-            byte[] clockSequenceBytes = BitConverter.GetBytes(Convert.ToInt16(Environment.TickCount % Int16.MaxValue));
-            byte[] timestamp = BitConverter.GetBytes(ticks);
+            var guid = new byte[BYTE_ARRAY_SIZE];
+            var clockSequenceBytes = BitConverter.GetBytes(Convert.ToInt16(Environment.TickCount % short.MaxValue));
+            var timestamp = BitConverter.GetBytes(ticks);
 
             // copy node
             Array.Copy(node, 0, guid, NODE_BYTE, Math.Min(6, node.Length));
@@ -114,7 +114,7 @@ namespace CassandraSharp.Utils
 
             // set the version
             guid[VERSION_BYTE] &= VERSION_BYTE_MASK;
-            guid[VERSION_BYTE] |= (byte) GuidVersion.TimeBased << VERSION_BYTE_SHIFT;
+            guid[VERSION_BYTE] |= (byte)GuidVersion.TimeBased << VERSION_BYTE_SHIFT;
 
             return new Guid(guid);
         }

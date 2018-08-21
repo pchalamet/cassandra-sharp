@@ -43,7 +43,7 @@ namespace CassandraSharp.Discovery
 
             _logger = logger;
             _cluster = cluster;
-            _timer = new Timer(config.Interval*1000);
+            _timer = new Timer(config.Interval * 1000);
             _timer.Elapsed += (s, e) => TryDiscover();
             _timer.AutoReset = true;
             _timer.Start();
@@ -68,13 +68,13 @@ namespace CassandraSharp.Discovery
 
             if (null != OnTopologyUpdate)
             {
-                Peer peer = new Peer
-                    {
-                            RpcAddress = rpcAddress,
-                            Datacenter = datacenter,
-                            Rack = rack,
-                            Tokens = tokens.Select(BigInteger.Parse).ToArray()
-                    };
+                var peer = new Peer
+                           {
+                               RpcAddress = rpcAddress,
+                               Datacenter = datacenter,
+                               Rack = rack,
+                               Tokens = tokens.Select(BigInteger.Parse).ToArray()
+                           };
 
                 _logger.Info("Discovered peer {0}, {1}, {2}", rpcAddress, datacenter, rack);
 
@@ -86,16 +86,20 @@ namespace CassandraSharp.Discovery
         {
             try
             {
-                IConnection connection = _cluster.GetConnection();
+                var connection = _cluster.GetConnection();
 
-                var obsLocalPeer = new CqlQuery<DiscoveredPeer>(connection, ConsistencyLevel.ONE, ExecutionFlags.None, "select data_center,rack,tokens from system.local",
+                var obsLocalPeer = new CqlQuery<DiscoveredPeer>(connection, ConsistencyLevel.ONE, ExecutionFlags.None,
+                                                                "select data_center,rack,tokens from system.local",
                                                                 _peerFactory);
-                obsLocalPeer.Subscribe(x => Notify(connection.Endpoint, x.Datacenter, x.Rack, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
+                obsLocalPeer.Subscribe(x => Notify(connection.Endpoint, x.Datacenter, x.Rack, x.Tokens),
+                                       ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
 
                 var obsPeers =
-                        new CqlQuery<DiscoveredPeer>(connection, ConsistencyLevel.ONE, ExecutionFlags.None, "select rpc_address,data_center,rack,tokens from system.peers",
-                                                     _peerFactory);
-                obsPeers.Subscribe(x => Notify(x.RpcAddress, x.Datacenter, x.Rack, x.Tokens), ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
+                    new CqlQuery<DiscoveredPeer>(connection, ConsistencyLevel.ONE, ExecutionFlags.None,
+                                                 "select rpc_address,data_center,rack,tokens from system.peers",
+                                                 _peerFactory);
+                obsPeers.Subscribe(x => Notify(x.RpcAddress, x.Datacenter, x.Rack, x.Tokens),
+                                   ex => _logger.Error("SystemPeersDiscoveryService failed with error {0}", ex));
             }
             catch (Exception ex)
             {

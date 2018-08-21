@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Net;
+
 namespace CassandraSharp.Extensibility
 {
-    using System.Collections.Generic;
-    using System.Net;
-
     public interface IEndpointSnitch
     {
         string GetRack(IPAddress endpoint);

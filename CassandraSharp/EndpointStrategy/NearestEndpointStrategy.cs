@@ -38,10 +38,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             _snitch = snitch;
             _clientAddress = Network.Find(Dns.GetHostName());
-            if (null == _clientAddress)
-            {
-                throw new ArgumentException("Failed to resolve IP for client address");
-            }
+            if (null == _clientAddress) throw new ArgumentException("Failed to resolve IP for client address");
 
             _healthyEndpoints = snitch.GetSortedListByProximity(_clientAddress, endpoints);
             _bannedEndpoints = new List<IPAddress>();
@@ -52,10 +49,7 @@ namespace CassandraSharp.EndpointStrategy
             lock (_lock)
             {
                 IPAddress endpoint = null;
-                if (0 < _healthyEndpoints.Count)
-                {
-                    endpoint = _healthyEndpoints[0];
-                }
+                if (0 < _healthyEndpoints.Count) endpoint = _healthyEndpoints[0];
 
                 return endpoint;
             }
@@ -65,10 +59,7 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                if (_healthyEndpoints.Remove(endPoint))
-                {
-                    _bannedEndpoints.Add(endPoint);
-                }
+                if (_healthyEndpoints.Remove(endPoint)) _bannedEndpoints.Add(endPoint);
             }
         }
 
@@ -88,18 +79,15 @@ namespace CassandraSharp.EndpointStrategy
         {
             lock (_lock)
             {
-                bool updated = false;
-                IPAddress endpoint = peer.RpcAddress;
+                var updated = false;
+                var endpoint = peer.RpcAddress;
                 if (!_healthyEndpoints.Contains(endpoint) && !_bannedEndpoints.Contains(endpoint))
                 {
                     _healthyEndpoints.Add(endpoint);
                     updated = true;
                 }
 
-                if (updated)
-                {
-                    _healthyEndpoints.Sort((a1, a2) => _snitch.CompareEndpoints(_clientAddress, a1, a2));
-                }
+                if (updated) _healthyEndpoints.Sort((a1, a2) => _snitch.CompareEndpoints(_clientAddress, a1, a2));
             }
         }
     }

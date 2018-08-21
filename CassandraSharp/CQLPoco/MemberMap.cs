@@ -36,32 +36,29 @@ namespace CassandraSharp.CQLPoco
             MemberInfo = memberInfo;
 
             Type = memberInfo is PropertyInfo
-                    ? (memberInfo as PropertyInfo).PropertyType
-                    : ((FieldInfo) memberInfo).FieldType;
+                       ? (memberInfo as PropertyInfo).PropertyType
+                       : ((FieldInfo)memberInfo).FieldType;
 
             ColumnName = GetColumnName(memberInfo);
             ValueSerializer = ValueSerializerProvider.GetSerializer(Type);
-			DefaultValue = Type.IsValueType ? Activator.CreateInstance(Type) : null;
+            DefaultValue = Type.IsValueType ? Activator.CreateInstance(Type) : null;
         }
 
-        public ClassMap ClassMap { get; private set; }
+        public ClassMap ClassMap { get; }
 
-        public string ColumnName { get; private set; }
+        public string ColumnName { get; }
 
-        public Type Type { get; private set; }
+        public Type Type { get; }
 
-        public MemberInfo MemberInfo { get; private set; }
+        public MemberInfo MemberInfo { get; }
 
-        public IValueSerializer ValueSerializer { get; private set; }
+        public IValueSerializer ValueSerializer { get; }
 
         public Action<object, object> SetValue
         {
             get
             {
-                if (_valueSetter == null)
-                {
-                    _valueSetter = GetSetter();
-                }
+                if (_valueSetter == null) _valueSetter = GetSetter();
 
                 return _valueSetter;
             }
@@ -71,21 +68,18 @@ namespace CassandraSharp.CQLPoco
         {
             get
             {
-                if (_valueGetter == null)
-                {
-                    _valueGetter = GetGetter();
-                }
+                if (_valueGetter == null) _valueGetter = GetGetter();
 
                 return _valueGetter;
             }
         }
 
+        public object DefaultValue { get; }
+
         public object CreateTypeInstance()
         {
             return Activator.CreateInstance(Type);
         }
-
-		public object DefaultValue { get; private set; }
 
         public static bool IsIgnored(MemberInfo mi)
         {
@@ -96,10 +90,7 @@ namespace CassandraSharp.CQLPoco
         public static string GetColumnName(MemberInfo mi)
         {
             var customColumn = mi.GetCustomAttributes(typeof(CqlColumnAttribute), true).FirstOrDefault() as CqlColumnAttribute;
-            if (customColumn != null)
-            {
-                return customColumn.Name.ToLowerInvariant();
-            }
+            if (customColumn != null) return customColumn.Name.ToLowerInvariant();
 
             return mi.Name.ToLowerInvariant();
         }
@@ -113,8 +104,8 @@ namespace CassandraSharp.CQLPoco
                 if (getMethodInfo == null)
                 {
                     var message = string.Format(
-                            "The property '{0} {1}' of class '{2}' has no 'get' accessor.",
-                            propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
+                                                "The property '{0} {1}' of class '{2}' has no 'get' accessor.",
+                                                propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
 
                     throw new DataMappingException(message);
                 }
@@ -123,15 +114,17 @@ namespace CassandraSharp.CQLPoco
             // lambdaExpression = (obj) => (object) ((TClass) obj).Member
             var objParameter = Expression.Parameter(typeof(object), "obj");
             var lambdaExpression = Expression.Lambda<Func<object, object>>(
-                    Expression.Convert(
-                            Expression.MakeMemberAccess(
-                                    Expression.Convert(objParameter, MemberInfo.DeclaringType),
-                                    MemberInfo
-                                    ),
-                            typeof(object)
-                            ),
-                    objParameter
-                    );
+                                                                           Expression.Convert(
+                                                                                              Expression.MakeMemberAccess(
+                                                                                                                          Expression.Convert(objParameter,
+                                                                                                                                             MemberInfo
+                                                                                                                                                 .DeclaringType),
+                                                                                                                          MemberInfo
+                                                                                                                         ),
+                                                                                              typeof(object)
+                                                                                             ),
+                                                                           objParameter
+                                                                          );
 
             return lambdaExpression.Compile();
         }
@@ -152,16 +145,16 @@ namespace CassandraSharp.CQLPoco
                 gen.Emit(OpCodes.Stfld, fieldInfo);
                 gen.Emit(OpCodes.Ret);
 
-                return (Action<object, object>) method.CreateDelegate(typeof(Action<object, object>));
+                return (Action<object, object>)method.CreateDelegate(typeof(Action<object, object>));
             }
 
-            var propertyInfo = (PropertyInfo) MemberInfo;
+            var propertyInfo = (PropertyInfo)MemberInfo;
             var setMethodInfo = propertyInfo.GetSetMethod(true);
             if (setMethodInfo == null)
             {
                 var message = string.Format(
-                        "The property '{0} {1}' of class '{2}' has no 'set' accessor.",
-                        propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
+                                            "The property '{0} {1}' of class '{2}' has no 'set' accessor.",
+                                            propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
                 throw new DataMappingException(message);
             }
 
@@ -169,14 +162,14 @@ namespace CassandraSharp.CQLPoco
             var objParameter = Expression.Parameter(typeof(object), "obj");
             var valueParameter = Expression.Parameter(typeof(object), "value");
             var lambdaExpression = Expression.Lambda<Action<object, object>>(
-                    Expression.Call(
-                            Expression.Convert(objParameter, MemberInfo.DeclaringType),
-                            setMethodInfo,
-                            Expression.Convert(valueParameter, Type)
-                            ),
-                    objParameter,
-                    valueParameter
-                    );
+                                                                             Expression.Call(
+                                                                                             Expression.Convert(objParameter, MemberInfo.DeclaringType),
+                                                                                             setMethodInfo,
+                                                                                             Expression.Convert(valueParameter, Type)
+                                                                                            ),
+                                                                             objParameter,
+                                                                             valueParameter
+                                                                            );
 
             return lambdaExpression.Compile();
         }

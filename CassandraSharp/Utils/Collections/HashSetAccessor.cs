@@ -28,10 +28,7 @@ namespace CassandraSharp.Utils.Collections
             _hashSet = (ISet<T>)hashSet;
         }
 
-        public int Count
-        {
-            get { return _hashSet.Count; }
-        }
+        public int Count => _hashSet.Count;
 
         public IEnumerator GetEnumerator()
         {

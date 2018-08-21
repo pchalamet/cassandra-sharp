@@ -13,18 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CassandraSharp.Logger;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using CassandraSharp.Config;
+using CassandraSharp.Extensibility;
 using CassandraSharp.Utils;
+using Factory = CassandraSharp.Logger.Factory;
 
 namespace CassandraSharp
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using CassandraSharp.Config;
-    using CassandraSharp.Extensibility;
-
     public sealed class ClusterManager : IClusterManager
     {
         private readonly object _lock = new object();
@@ -42,7 +41,7 @@ namespace CassandraSharp
             lock (_lock)
             {
                 config.CheckArgumentNotNull("config");
-                _logger = ServiceActivator<Logger.Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
+                _logger = ServiceActivator<Factory>.Create<ILogger>(config.Logger.Type, config.Logger);
                 _recoveryService = ServiceActivator<Recovery.Factory>.Create<IRecoveryService>(config.Recovery.Type, config.Recovery, _logger);
                 _instrumentation = ServiceActivator<Instrumentation.Factory>.Create<IInstrumentation>(config.Instrumentation.Type, config.Instrumentation);
                 _config = config;
@@ -53,12 +52,9 @@ namespace CassandraSharp
         {
             name.CheckArgumentNotNull("name");
 
-            if (null == _config)
-            {
-                throw new InvalidOperationException("ClusterManager is not initialized");
-            }
+            if (null == _config) throw new InvalidOperationException("ClusterManager is not initialized");
 
-            ClusterConfig clusterConfig = GetClusterConfig(name);
+            var clusterConfig = GetClusterConfig(name);
             return GetCluster(clusterConfig);
         }
 
@@ -67,35 +63,33 @@ namespace CassandraSharp
             clusterConfig.CheckArgumentNotNull("clusterConfig");
             clusterConfig.Endpoints.CheckArgumentNotNull("clusterConfig.Endpoints");
 
-            TransportConfig transportConfig = clusterConfig.Transport ?? new TransportConfig();
-            IRecoveryService recoveryService = GetRecoveryService(transportConfig.Recoverable);
-            KeyspaceConfig keyspaceConfig = clusterConfig.DefaultKeyspace ?? new KeyspaceConfig();
+            var transportConfig = clusterConfig.Transport ?? new TransportConfig();
+            var recoveryService = GetRecoveryService(transportConfig.Recoverable);
+            var keyspaceConfig = clusterConfig.DefaultKeyspace ?? new KeyspaceConfig();
 
             // create endpoints
-            IEndpointSnitch snitch = ServiceActivator<Snitch.Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
+            var snitch = ServiceActivator<Snitch.Factory>.Create<IEndpointSnitch>(clusterConfig.Endpoints.Snitch, _logger);
             IEnumerable<IPAddress> endpoints = clusterConfig.Endpoints.Servers.Select(Network.Find).Where(x => null != x).ToArray();
-            if (!endpoints.Any())
-            {
-                throw new ArgumentException("Expecting at least one valid endpoint");
-            }
+            if (!endpoints.Any()) throw new ArgumentException("Expecting at least one valid endpoint");
 
             // create required services
-            IEndpointStrategy endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
-                                                                                                                      endpoints, snitch,
-                                                                                                                      _logger, clusterConfig.Endpoints);
-            IConnectionFactory connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, keyspaceConfig, _logger,
-                                                                                                                  _instrumentation);
+            var endpointsManager = ServiceActivator<EndpointStrategy.Factory>.Create<IEndpointStrategy>(clusterConfig.Endpoints.Strategy,
+                                                                                                        endpoints, snitch,
+                                                                                                        _logger, clusterConfig.Endpoints);
+            var connectionFactory = ServiceActivator<Transport.Factory>.Create<IConnectionFactory>(transportConfig.Type, transportConfig, keyspaceConfig,
+                                                                                                   _logger,
+                                                                                                   _instrumentation);
 
-            IPartitioner partitioner = ServiceActivator<Partitioner.Factory>.Create<IPartitioner>(clusterConfig.Partitioner);
-            
+            var partitioner = ServiceActivator<Partitioner.Factory>.Create<IPartitioner>(clusterConfig.Partitioner);
+
             // create the cluster now
-            ICluster cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
-                                                                                  recoveryService, partitioner, clusterConfig);
+            var cluster = ServiceActivator<Cluster.Factory>.Create<ICluster>(clusterConfig.Type, endpointsManager, _logger, connectionFactory,
+                                                                             recoveryService, partitioner, clusterConfig);
 
-            IDiscoveryService discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
-                                                                                                               clusterConfig.Endpoints.Discovery,
-                                                                                                               _logger,
-                                                                                                               cluster);
+            var discoveryService = ServiceActivator<Discovery.Factory>.Create<IDiscoveryService>(clusterConfig.Endpoints.Discovery.Type,
+                                                                                                 clusterConfig.Endpoints.Discovery,
+                                                                                                 _logger,
+                                                                                                 cluster);
             discoveryService.OnTopologyUpdate += endpointsManager.Update;
             cluster.OnClosed += discoveryService.SafeDispose;
 
@@ -121,12 +115,12 @@ namespace CassandraSharp
 
         private ClusterConfig GetClusterConfig(string name)
         {
-            ClusterConfig clusterConfig = (from config in _config.Clusters
-                                           where config.Name == name
-                                           select config).FirstOrDefault();
+            var clusterConfig = (from config in _config.Clusters
+                                 where config.Name == name
+                                 select config).FirstOrDefault();
             if (null == clusterConfig)
             {
-                string msg = string.Format("Can't find cluster configuration '{0}'", name);
+                var msg = string.Format("Can't find cluster configuration '{0}'", name);
                 throw new KeyNotFoundException(msg);
             }
 
@@ -138,8 +132,8 @@ namespace CassandraSharp
             lock (_lock)
             {
                 return !recover
-                               ? null
-                               : _recoveryService;
+                           ? null
+                           : _recoveryService;
             }
         }
     }

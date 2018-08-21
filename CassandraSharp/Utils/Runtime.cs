@@ -19,11 +19,6 @@ namespace CassandraSharp.Utils
 {
     internal static class Runtime
     {
-        private static readonly bool _isMono = Type.GetType("Mono.Runtime") != null;
-
-        public static bool IsMono
-        {
-            get { return _isMono; }
-        }
+        public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null;
     }
 }

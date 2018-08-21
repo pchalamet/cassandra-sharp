@@ -23,8 +23,8 @@ namespace CassandraSharp.Partitioner
         protected override BigInteger? Hash(byte[] buffer, int offset, int len)
         {
             HashAlgorithm md5 = new MD5CryptoServiceProvider();
-            byte[] hash = md5.ComputeHash(buffer, offset, len);
-            BigInteger token = new BigInteger(hash);
+            var hash = md5.ComputeHash(buffer, offset, len);
+            var token = new BigInteger(hash);
             return token;
         }
     }

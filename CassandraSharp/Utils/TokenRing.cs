@@ -46,15 +46,12 @@ namespace CassandraSharp.Utils
         /// <returns>IPAddress of node that owns the token</returns>
         internal IPAddress FindReplica(BigInteger key)
         {
-            int i = _tokenCache.BinarySearch(key);
+            var i = _tokenCache.BinarySearch(key);
 
             if (i < 0)
             {
                 i = ~i - 1;
-                if (i >= _permittedTokenRing.Keys.Count || i < 0)
-                {
-                    i = 0;
-                }
+                if (i >= _permittedTokenRing.Keys.Count || i < 0) i = 0;
             }
 
             return _permittedTokenRing[_permittedTokenRing.Keys.ElementAt(i)];
@@ -78,7 +75,7 @@ namespace CassandraSharp.Utils
         /// <param name="peer">IPAddress and token range of the discovered node</param>
         internal void AddOrUpdateNode(Peer peer)
         {
-            foreach (BigInteger token in peer.Tokens)
+            foreach (var token in peer.Tokens)
             {
                 //remove if updating
                 _permittedTokenRing.Remove(token);
@@ -113,10 +110,7 @@ namespace CassandraSharp.Utils
         /// <param name="val">Value to remove by</param>
         private static void RemoveOnValue(IDictionary<BigInteger, IPAddress> src, IPAddress val)
         {
-            foreach (var keyVal in src.Where(keyVal => keyVal.Value.Equals(val)).ToArray())
-            {
-                src.Remove(keyVal.Key);
-            }
+            foreach (var keyVal in src.Where(keyVal => keyVal.Value.Equals(val)).ToArray()) src.Remove(keyVal.Key);
         }
 
         /// <summary>

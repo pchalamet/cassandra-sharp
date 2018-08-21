@@ -15,10 +15,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
 using System.Linq;
-using CassandraSharp;
 using CassandraSharp.CQLPoco;
 
 namespace CassandraSharp
@@ -31,19 +28,19 @@ namespace CassandraSharp
         public static TI Create<TI>(Type type, object[] prms)
         {
             // mini-dependency injection
-            ConstructorInfo ci = type.GetConstructors().Single();
+            var ci = type.GetConstructors().Single();
 
             // Note: parameters must all be of different types
-            ParameterInfo[] pis = ci.GetParameters();
+            var pis = ci.GetParameters();
 
             // Create an array to ensure proper ordering of parameters
-            object[] ciPrms = new object[pis.Length];
+            var ciPrms = new object[pis.Length];
 
             // Populate the array.  Missing parameters cause exceptions
-            for (int idx = 0; idx < ciPrms.Length; ++idx)
+            for (var idx = 0; idx < ciPrms.Length; ++idx)
             {
                 // Get parameter type
-                Type piType = pis[idx].ParameterType;
+                var piType = pis[idx].ParameterType;
 
                 // IsInstanceOfType (and other methods) do not honor generic parameters
                 // For Serializer, we must differenciate the Func`2, so we use the order of parameters
@@ -72,14 +69,15 @@ namespace CassandraSharp
         // Create a serializer with the target type passed in the constructor
         public static ICassandraTypeSerializer CreateSerializer(Type serializer, Type serializedType)
         {
-            var parameters = new object[] { serializedType };
+            var parameters = new object[] {serializedType};
             return CreateAndCacheSerializer(serializer, parameters);
         }
 
         // Create a serializer with the target type passed in the constructor, as well as access to the default serializer and deserializer
-        public static ICassandraTypeSerializer CreateSerializer(Type serializer, Type serializedType, Func<Type, Func<object, byte[]>> defaultSerializer, Func<Type, Func<byte[], object>> defaultDeserializer)
+        public static ICassandraTypeSerializer CreateSerializer(Type serializer, Type serializedType, Func<Type, Func<object, byte[]>> defaultSerializer,
+                                                                Func<Type, Func<byte[], object>> defaultDeserializer)
         {
-            var parameters = new object[] { serializedType, defaultSerializer, defaultDeserializer };
+            var parameters = new object[] {serializedType, defaultSerializer, defaultDeserializer};
             return CreateAndCacheSerializer(serializer, parameters);
         }
 
@@ -92,7 +90,6 @@ namespace CassandraSharp
             // While only small improvement, this is the most optimized approach.
             // ReSharper disable once InconsistentlySynchronizedField
             if (!_serializers.ContainsKey(serializer))
-            {
                 lock (_lock)
                 {
                     if (!_serializers.ContainsKey(serializer))
@@ -102,7 +99,6 @@ namespace CassandraSharp
                         return instance;
                     }
                 }
-            }
 
             // ReSharper disable once InconsistentlySynchronizedField
             return _serializers[serializer];

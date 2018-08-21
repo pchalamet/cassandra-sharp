@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class InvalidException : CassandraException
     {
         public InvalidException(string message)
-                : base(ErrorCodes.Invalid, message)
+            : base(ErrorCodes.Invalid, message)
         {
         }
     }

@@ -43,10 +43,7 @@ namespace CassandraSharp.Transport
             _ms.SafeDispose();
         }
 
-        public Stream WriteOnlyStream
-        {
-            get { return _ms; }
-        }
+        public Stream WriteOnlyStream => _ms;
 
         public void SetMessageType(MessageOpcodes msgOpcode)
         {
@@ -55,23 +52,20 @@ namespace CassandraSharp.Transport
 
         public void SendFrame(ushort streamId, Socket socket)
         {
-            const byte version = (byte) (FrameType.Request | FrameType.ProtocolVersion);
-            FrameHeaderFlags flags = FrameHeaderFlags.None;
-            if (_tracing)
-            {
-                flags |= FrameHeaderFlags.Tracing;
-            }
+            const byte version = (byte)(FrameType.Request | FrameType.ProtocolVersion);
+            var flags = FrameHeaderFlags.None;
+            if (_tracing) flags |= FrameHeaderFlags.Tracing;
 
-            byte[] header = new byte[5];
+            var header = new byte[5];
             header[0] = version;
-            header[1] = (byte) flags;
+            header[1] = (byte)flags;
             header[2] = (byte)(streamId >> 8);
             header[3] = (byte)streamId;
-            header[4] = (byte) _msgOpcode;
+            header[4] = (byte)_msgOpcode;
             SendBuffer(socket, header);
 
-            int len = (int) _ms.Length;
-            byte[] bodyLen = len.GetBytes();
+            var len = (int)_ms.Length;
+            var bodyLen = len.GetBytes();
             SendBuffer(socket, bodyLen);
 
             // body
@@ -85,11 +79,8 @@ namespace CassandraSharp.Transport
 
         private static void SendBuffer(Socket socket, byte[] buffer, int offset, int len)
         {
-            int written = 0;
-            while (written != len)
-            {
-                written += socket.Send(buffer, offset + written, len - written, SocketFlags.None);
-            }
+            var written = 0;
+            while (written != len) written += socket.Send(buffer, offset + written, len - written, SocketFlags.None);
         }
     }
 }

@@ -22,15 +22,12 @@ namespace CassandraSharp.Recovery
     internal sealed class Factory : IServiceDescriptor
     {
         private static readonly IDictionary<string, Type> _def = new Dictionary<string, Type>
-            {
-                    {"Default", typeof(AttemptConnectRecoveryService)},
-                    {"Null", typeof(NullRecoveryService)},
-                    {"AttemptConnect", typeof(AttemptConnectRecoveryService)},
-            };
+                                                                 {
+                                                                     {"Default", typeof(AttemptConnectRecoveryService)},
+                                                                     {"Null", typeof(NullRecoveryService)},
+                                                                     {"AttemptConnect", typeof(AttemptConnectRecoveryService)}
+                                                                 };
 
-        public IDictionary<string, Type> Definition
-        {
-            get { return _def; }
-        }
+        public IDictionary<string, Type> Definition => _def;
     }
 }

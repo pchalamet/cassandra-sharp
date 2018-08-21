@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace CassandraSharp.Exceptions
 {
-    using System;
-
     [Serializable]
     public class UnpreparedException : CassandraException
     {
         public UnpreparedException(string message, byte[] unknownId)
-                : base(ErrorCodes.Unprepared, message)
+            : base(ErrorCodes.Unprepared, message)
         {
             UnknownId = unknownId;
         }
 
-        public byte[] UnknownId { get; private set; }
+        public byte[] UnknownId { get; }
     }
 }

@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Numerics;
+
 namespace CassandraSharp.Extensibility
 {
-    using System.Numerics;
-
     public interface IPartitioner
     {
         BigInteger? ComputeToken(PartitionKey partitionKey);

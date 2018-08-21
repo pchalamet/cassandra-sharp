@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharp
 {
-    using CassandraSharp.Extensibility;
-
     public interface ICommandFactory
     {
         ICqlCommand Create(ICluster cluster, IDataMapperFactory factoryIn, IDataMapperFactory factoryOut);

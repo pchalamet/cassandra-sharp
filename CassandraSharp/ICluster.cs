@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Numerics;
+using CassandraSharp.Extensibility;
+
 namespace CassandraSharp
 {
-    using System;
-    using System.Numerics;
-    using CassandraSharp.Extensibility;
-
     public delegate void ClusterClosed();
 
     public interface ICluster : IDisposable

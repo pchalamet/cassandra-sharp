@@ -31,9 +31,9 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
             ExecutionFlags = executionFlags;
         }
 
-        protected ConsistencyLevel ConsistencyLevel { get; private set; }
+        protected ConsistencyLevel ConsistencyLevel { get; }
 
-        protected ExecutionFlags ExecutionFlags { get; private set; }
+        protected ExecutionFlags ExecutionFlags { get; }
 
         public IDisposable Subscribe(IObserver<T> observer)
         {

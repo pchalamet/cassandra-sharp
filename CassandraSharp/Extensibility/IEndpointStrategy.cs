@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
+using System.Numerics;
+
 namespace CassandraSharp.Extensibility
 {
-    using System.Net;
-    using System.Numerics;
-
     /// <summary>
     ///     IEndpointStrategy helps choosing a server to connect to Implementation must be thread safe
     /// </summary>

@@ -28,12 +28,9 @@ namespace CassandraSharp.Utils.Collections
 
         public static IList<T> ToList<T>(this IEnumerator<T> enumerator)
         {
-            List<T> list = new List<T>();
+            var list = new List<T>();
             enumerator.Reset();
-            while (enumerator.MoveNext())
-            {
-                list.Add(enumerator.Current);
-            }
+            while (enumerator.MoveNext()) list.Add(enumerator.Current);
 
             return list;
         }
@@ -41,11 +38,8 @@ namespace CassandraSharp.Utils.Collections
         public static int Count<T>(this IEnumerator<T> enumerator)
         {
             enumerator.Reset();
-            int count = 0;
-            while (enumerator.MoveNext())
-            {
-                ++count;
-            }
+            var count = 0;
+            while (enumerator.MoveNext()) ++count;
 
             return count;
         }
@@ -79,15 +73,9 @@ namespace CassandraSharp.Utils.Collections
                 _enumerator.Reset();
             }
 
-            public T Current
-            {
-                get { return (T) _enumerator.Current; }
-            }
+            public T Current => (T)_enumerator.Current;
 
-            object IEnumerator.Current
-            {
-                get { return Current; }
-            }
+            object IEnumerator.Current => Current;
         }
     }
 }

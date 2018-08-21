@@ -24,30 +24,30 @@ namespace CassandraSharp.CQLBinaryProtocol.Queries
         private readonly string _cqlVersion;
 
         public ReadyQuery(IConnection connection, ConsistencyLevel consistencyLevel, ExecutionFlags executionFlags, string cqlVersion)
-                : base(connection, consistencyLevel, executionFlags)
+            : base(connection, consistencyLevel, executionFlags)
         {
             _cqlVersion = cqlVersion;
         }
 
         protected override IEnumerable<bool> ReadFrame(IFrameReader frameReader)
         {
-            bool mustAuthenticate = frameReader.MessageOpcode == MessageOpcodes.Authenticate;
+            var mustAuthenticate = frameReader.MessageOpcode == MessageOpcodes.Authenticate;
             yield return mustAuthenticate;
         }
 
         protected override void WriteFrame(IFrameWriter fw)
         {
-            Dictionary<string, string> options = new Dictionary<string, string>
-                {
-                        {"CQL_VERSION", _cqlVersion}
-                };
+            var options = new Dictionary<string, string>
+                          {
+                              {"CQL_VERSION", _cqlVersion}
+                          };
             fw.WriteOnlyStream.WriteStringMap(options);
             fw.SetMessageType(MessageOpcodes.Startup);
         }
 
         protected override InstrumentationToken CreateInstrumentationToken()
         {
-            InstrumentationToken token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
+            var token = InstrumentationToken.Create(RequestType.Ready, ExecutionFlags.None);
             return token;
         }
     }

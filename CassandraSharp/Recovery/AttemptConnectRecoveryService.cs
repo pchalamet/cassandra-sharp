@@ -47,7 +47,7 @@ namespace CassandraSharp.Recovery
         {
             lock (_lock)
             {
-                RecoveryItem recoveryItem = new RecoveryItem(endpoint, connectionFactory, clientRecoveredCallback);
+                var recoveryItem = new RecoveryItem(endpoint, connectionFactory, clientRecoveredCallback);
                 _toRecover.Add(recoveryItem);
                 _timer.Start();
             }
@@ -68,12 +68,11 @@ namespace CassandraSharp.Recovery
                 toRecover = new List<RecoveryItem>(_toRecover);
             }
 
-            foreach (RecoveryItem recoveryItem in toRecover)
-            {
+            foreach (var recoveryItem in toRecover)
                 try
                 {
                     _logger.Debug("Trying to recover endpoint {0}", recoveryItem.Endpoint);
-                    IConnection client = recoveryItem.ConnectionFactory.Create(recoveryItem.Endpoint);
+                    var client = recoveryItem.ConnectionFactory.Create(recoveryItem.Endpoint);
                     _logger.Debug("Endpoint {0} successfully recovered", recoveryItem.Endpoint);
 
                     lock (_lock)
@@ -87,7 +86,6 @@ namespace CassandraSharp.Recovery
                 {
                     _logger.Debug("Failed to recover endpoint {0} with error {1}", recoveryItem.Endpoint, ex);
                 }
-            }
 
             lock (_lock)
             {
@@ -104,11 +102,11 @@ namespace CassandraSharp.Recovery
                 ClientRecoveredCallback = clientRecoveredCallback;
             }
 
-            public IPAddress Endpoint { get; private set; }
+            public IPAddress Endpoint { get; }
 
-            public IConnectionFactory ConnectionFactory { get; private set; }
+            public IConnectionFactory ConnectionFactory { get; }
 
-            public Action<IConnection> ClientRecoveredCallback { get; private set; }
+            public Action<IConnection> ClientRecoveredCallback { get; }
         }
     }
 }
