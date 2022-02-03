@@ -1,3 +1,7 @@
+NOTE
+====
+I've stopped working on this driver. For better support, please gear towards the official [.net Cassandra driver](https://github.com/datastax/csharp-driver).
+
 cassandra-sharp - high performance .NET driver for Apache Cassandra
 ===================================================================
 ![build status](https://ci.appveyor.com/api/projects/status/github/pchalamet/cassandra-sharp?branch=master)
